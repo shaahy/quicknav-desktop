@@ -481,12 +481,12 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   )
 
   const handleErrorDelete = useCallback(
-    async (cardId: string) => {
+    (cardId: string) => {
+      // Close the error dialog and route through S14 confirmation dialog (FR-010)
       setErrorDialogState(null)
-      await deleteCard(cardId)
-      showStatusBar('已保存')
+      setDeletingCardId(cardId)
     },
-    [deleteCard, showStatusBar]
+    []
   )
 
   const handleErrorClose = useCallback(() => {
