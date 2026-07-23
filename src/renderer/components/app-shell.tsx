@@ -142,6 +142,13 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // Initial items snapshot for entering reorder mode; useSort manages the order internally.
   const [cardReorderInit, setCardReorderInit] = useState<ReorderItem[]>([])
 
+  // ── Existing card names for name-uniqueness validation (FR-006) ──
+
+  const existingCardNames = useMemo<string[]>(
+    () => state.data.cards.map(c => c.name),
+    [state.data.cards]
+  )
+
   // ── Existing names for category editor validation ──
 
   const existingNamesForEditor = useMemo<string[]>(() => {
@@ -849,6 +856,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           initialData={null}
           onSave={handleFormSave}
           onClose={handleFormClose}
+          existingCardNames={existingCardNames}
         />
       )}
 
@@ -867,6 +875,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           filePath={editingCard?.fileReference.absolutePath}
           onSave={handleEditSave}
           onClose={handleEditClose}
+          existingCardNames={existingCardNames}
         />
       )}
 

@@ -60,6 +60,9 @@ export function useCards() {
         cardName = fileResult.file.fileName
       }
 
+      // Name uniqueness check — FR-006 defense-in-depth (form validation is primary gate)
+      if (state.data.cards.some(c => c.name === cardName)) return null
+
       const now = new Date().toISOString()
       const cardId = crypto.randomUUID()
 

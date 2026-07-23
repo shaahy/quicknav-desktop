@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { FormField } from './form-field'
 import { CategoryChecklist } from './category-checklist'
@@ -33,6 +33,8 @@ interface CardFormDialogProps {
   filePath?: string
   /** Called when user clicks "重新选择文件". Optional — button hidden if omitted. */
   onReselectFile?: () => void
+  /** Existing card names to check for uniqueness (FR-006). Defaults to []. */
+  existingCardNames?: string[]
 }
 
 // ── Component ──
@@ -54,6 +56,7 @@ export function CardFormDialog({
   onClose,
   filePath,
   onReselectFile,
+  existingCardNames = [],
 }: CardFormDialogProps) {
   const { categories } = useCategories()
 
@@ -87,16 +90,23 @@ export function CardFormDialog({
     setNoteError(null)
   }, [initialData])
 
+  // ── Effective existing names for uniqueness check ──
+  // In edit mode, exclude the card's own name so the user can keep it unchanged.
+  const effectiveExistingNames = useMemo<string[]>(() => {
+    if (!initialData) return existingCardNames
+    return existingCardNames.filter(n => n !== initialData.name)
+  }, [existingCardNames, initialData])
+
   // ── Handlers ──
 
   const handleNameChange = useCallback(
     (value: string) => {
       setName(value)
       if (nameError) {
-        setNameError(validateCardName(value, []))
+        setNameError(validateCardName(value, effectiveExistingNames))
       }
     },
-    [nameError]
+    [nameError, effectiveExistingNames]
   )
 
   const handleNoteChange = useCallback(
@@ -111,7 +121,7 @@ export function CardFormDialog({
 
   const handleSave = useCallback(() => {
     // Name validation
-    const nameErr = validateCardName(name, [])
+    const nameErr = validateCardName(name, effectiveExistingNames)
     if (nameErr) {
       setNameError(nameErr)
       return
@@ -134,7 +144,7 @@ export function CardFormDialog({
       note,
       categoryIds,
     })
-  }, [name, note, categoryIds, onSave])
+  }, [name, note, categoryIds, onSave, effectiveExistingNames])
 
   const handleClose = useCallback(() => {
     const current: CardFormData = { name, note, categoryIds }
