@@ -7,13 +7,9 @@ export function useCategories() {
   const { state } = useAppState()
   const dispatch = useAppDispatch()
 
-  // ── Categories sorted by order ──
-
   const categories = useMemo<Category[]>(() => {
     return [...state.data.categories].sort((a, b) => a.order - b.order)
   }, [state.data.categories])
-
-  // ── Uncategorized cards (0 user categories) ──
 
   const uncategorizedCards = useMemo<Card[]>(() => {
     const uncategorizedViewOrder = state.data.viewOrders.find(
@@ -26,8 +22,6 @@ export function useCategories() {
       .map(id => cardMap.get(id))
       .filter((c): c is Card => c !== undefined)
   }, [state.data])
-
-  // ── addCategory ──
 
   const addCategory = useCallback(
     async (name: string): Promise<Category | null> => {
@@ -47,7 +41,6 @@ export function useCategories() {
 
       dispatch({ type: 'ADD_CATEGORY', category })
 
-      // Persist
       try {
         const current = state.data
         const updatedData = {
@@ -70,8 +63,6 @@ export function useCategories() {
     },
     [state.data, dispatch]
   )
-
-  // ── renameCategory ──
 
   const renameCategory = useCallback(
     async (id: string, name: string): Promise<boolean> => {
@@ -105,8 +96,6 @@ export function useCategories() {
     [state.data, dispatch]
   )
 
-  // ── deleteCategory ──
-
   const deleteCategory = useCallback(
     async (id: string): Promise<void> => {
       dispatch({ type: 'DELETE_CATEGORY', categoryId: id })
@@ -115,7 +104,6 @@ export function useCategories() {
         const current = state.data
         const categoryViewType = `category:${id}` as const
 
-        // Track orphan cards
         const affectedIds = new Set(
           current.cards.filter(c => c.categoryIds.includes(id)).map(c => c.id)
         )
@@ -155,8 +143,6 @@ export function useCategories() {
     },
     [state.data, dispatch]
   )
-
-  // ── reorderCategories ──
 
   const reorderCategories = useCallback(
     async (ids: string[]): Promise<void> => {
