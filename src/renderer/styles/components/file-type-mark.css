@@ -1,0 +1,27 @@
+/* ── FileTypeMark ──
+   Inline pill/badge showing icon + file extension.
+   BEM block: qc-file-type-mark
+*/
+
+.qc-file-type-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 1px var(--spacing-2);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--rounded-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.qc-file-type-mark__icon {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.qc-file-type-mark__ext {
+  text-transform: lowercase;
+}
