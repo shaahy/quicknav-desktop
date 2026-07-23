@@ -591,14 +591,25 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     setIsCategoryReorderMode(false)
   }, [])
 
+  // ── Derived booleans ──
+
+  const hasActiveSearch = state.searchQuery.trim().length > 0
+  const isCategoryView = state.currentView.startsWith('category:')
+
+  // ── Cards to display ──
+  // When search is active, use scored results from useSearch (across ALL cards,
+  // by name only, with exact/prefix/contains scoring — FR-023/024/025).
+  // When inactive, use the current-view-ordered cards from useCards.
+  const displayCards = hasActiveSearch ? search.searchResults : visibleCards
+
   // ── Card reorder handlers (S08) ──
 
   const handleCardReorderStart = useCallback(() => {
     setCardReorderInit(
-      visibleCards.map(c => ({ id: c.id, name: c.name }))
+      displayCards.map(c => ({ id: c.id, name: c.name }))
     )
     setIsCardReorderMode(true)
-  }, [visibleCards])
+  }, [displayCards])
 
   // Debounced persistence callback for useSort — fires 500ms after the last user action.
   const handleCardReorderPersist = useCallback(
@@ -638,11 +649,6 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       retryRef.current.focus()
     }
   }, [loadingState])
-
-  // ── Derived booleans ──
-
-  const hasActiveSearch = state.searchQuery.trim().length > 0
-  const isCategoryView = state.currentView.startsWith('category:')
 
   // ── Loading state ──
   // Shell skeleton with non-interactive loading indicator.
@@ -707,7 +713,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // ── Ready state ──
   // Full app UI: sidebar + view-header + toolbar + card grid or reorder or empty-state.
 
-  const hasCards = visibleCards.length > 0
+  const hasCards = displayCards.length > 0
 
   return (
     <div className="qc-app-shell">
@@ -752,7 +758,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       <main className="qc-app-shell__main" aria-labelledby="view-header-title">
         <ViewHeader
           title={viewTitle}
-          cardCount={visibleCards.length}
+          cardCount={displayCards.length}
           showSortInfo={isCardReorderMode}
         />
 
@@ -800,12 +806,12 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           </div>
         ) : hasCards ? (
           <div className="qc-app-shell__grid">
-            {visibleCards.map((card, index) => (
+            {displayCards.map((card, index) => (
               <FileCard
                 key={card.id}
                 card={card}
                 index={index}
-                total={visibleCards.length}
+                total={displayCards.length}
                 viewType={state.currentView}
                 onOpenFile={handleOpenFile}
                 onShowMenu={handleShowMenu}
