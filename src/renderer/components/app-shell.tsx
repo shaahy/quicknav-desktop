@@ -1,8 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import type { FileSelectionResult, CardFormData, MenuItem } from '@shared/types'
+import type { FileSelectionResult, CardFormData, MenuItem, ReorderItem, ViewType } from '@shared/types'
 import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
-import { useAppState } from '../contexts/AppState'
+import { useAppState, useAppDispatch } from '../contexts/AppState'
 import { useCards } from '../hooks/useCards'
+import { useCategories } from '../hooks/useCategories'
+import { CategoryNav } from './category-nav'
+import type { CategoryNavView } from './category-nav'
 import { ViewHeader } from './view-header'
 import { ToolbarButton } from './toolbar-button'
 import { FileCard } from './file-card'
@@ -10,6 +13,8 @@ import { EmptyState } from './empty-state'
 import { CardFormDialog } from './card-form-dialog'
 import { ActionMenu } from './action-menu'
 import { ConfirmationDialog } from './confirmation-dialog'
+import { ReorderControl } from './reorder-control'
+import { CategoryEditorPopover } from './category-editor-popover'
 import '../styles/components/app-shell.css'
 
 export interface AppShellProps {
@@ -35,7 +40,14 @@ export interface AppShellProps {
  */
 export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   const { state } = useAppState()
+  const dispatch = useAppDispatch()
   const { visibleCards, addCard, updateCard, deleteCard } = useCards()
+  const {
+    categories,
+    addCategory,
+    renameCategory,
+    reorderCategories,
+  } = useCategories()
 
   const retryRef = useRef<HTMLButtonElement>(null)
 
@@ -49,6 +61,30 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     )
     return cat?.name ?? '全部卡片'
   }, [state.currentView, state.data.categories])
+
+  // ── CategoryNav views ──
+
+  const categoryNavViews = useMemo<CategoryNavView[]>(() => {
+    const result: CategoryNavView[] = [
+      { id: VIEW_ALL_CARDS, name: '全部卡片', type: 'system' },
+      ...categories.map(c => ({
+        id: `category:${c.id}` as const,
+        name: c.name,
+        type: 'user' as const,
+      })),
+      { id: VIEW_UNCATEGORIZED, name: '未分类', type: 'system' },
+    ]
+    return result
+  }, [categories])
+
+  // ── View switching ──
+
+  const handleSwitchView = useCallback(
+    (viewId: string) => {
+      dispatch({ type: 'SET_CURRENT_VIEW', viewType: viewId as ViewType })
+    },
+    [dispatch]
+  )
 
   // ── Card form dialog state (S10: file-selection flow) ──
 
@@ -71,6 +107,37 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // ── Card delete confirmation state (S14) ──
 
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null)
+
+  // ── Category editor state ──
+
+  const [categoryEditorState, setCategoryEditorState] = useState<{
+    mode: 'create' | 'rename'
+    categoryId?: string
+    initialName?: string
+  } | null>(null)
+
+  // ── Category reorder mode (S09) ──
+
+  const [isCategoryReorderMode, setIsCategoryReorderMode] = useState(false)
+  const [categoryReorderItems, setCategoryReorderItems] = useState<ReorderItem[]>([])
+
+  // ── Card reorder mode (S08) ──
+
+  const [isCardReorderMode, setIsCardReorderMode] = useState(false)
+  const [cardReorderItems, setCardReorderItems] = useState<ReorderItem[]>([])
+
+  // ── Existing names for category editor validation ──
+
+  const existingNamesForEditor = useMemo<string[]>(() => {
+    if (!categoryEditorState) return []
+    if (categoryEditorState.mode === 'create') {
+      return state.data.categories.map(c => c.name)
+    }
+    // For rename, exclude the current category's own name
+    return state.data.categories
+      .filter(c => c.id !== categoryEditorState.categoryId)
+      .map(c => c.name)
+  }, [categoryEditorState, state.data.categories])
 
   // ── Handlers ──
 
@@ -111,14 +178,34 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     setMenuAnchor(null)
   }, [])
 
+  // ── "移出当前类别" handler ──
+
+  const handleRemoveFromCategory = useCallback(
+    async (cardId: string) => {
+      if (!state.currentView.startsWith('category:')) return
+      const categoryId = state.currentView.slice('category:'.length)
+
+      const card = state.data.cards.find(c => c.id === cardId)
+      if (!card || card.categoryIds.length <= 1) return
+
+      const newCategoryIds = card.categoryIds.filter(id => id !== categoryId)
+      await updateCard(cardId, { categoryIds: newCategoryIds })
+    },
+    [state.currentView, state.data.cards, updateCard]
+  )
+
   // ── Menu items computed lazily when menu is open ──
 
   const menuItems = useMemo<MenuItem[]>(() => {
     if (!menuCardId) return []
 
     const card = state.data.cards.find(c => c.id === menuCardId)
+    const isCategoryView = state.currentView.startsWith('category:')
+    const categoryId = isCategoryView
+      ? state.currentView.slice('category:'.length)
+      : null
 
-    return [
+    const items: MenuItem[] = [
       {
         id: 'edit',
         label: '编辑',
@@ -140,16 +227,36 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           }
         },
       },
-      {
-        id: 'delete',
-        label: '删除',
-        variant: 'danger' as const,
-        onClick: () => {
-          setDeletingCardId(menuCardId)
-        },
-      },
     ]
-  }, [menuCardId, state.data.cards])
+
+    // "移出当前类别" when viewing a category and card has multiple categories
+    if (
+      categoryId &&
+      card &&
+      card.categoryIds.includes(categoryId) &&
+      card.categoryIds.length > 1
+    ) {
+      items.push({
+        id: 'remove-from-category',
+        label: '移出当前类别',
+        variant: 'default' as const,
+        onClick: () => {
+          handleRemoveFromCategory(menuCardId)
+        },
+      })
+    }
+
+    items.push({
+      id: 'delete',
+      label: '删除',
+      variant: 'danger' as const,
+      onClick: () => {
+        setDeletingCardId(menuCardId)
+      },
+    })
+
+    return items
+  }, [menuCardId, state.data.cards, state.currentView, handleRemoveFromCategory])
 
   // ── Card editing (S11) ──
 
@@ -214,6 +321,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     setPendingDiscard(false)
   }, [])
 
+  // ── Open file handler ──
+
   const handleOpenFile = useCallback(
     async (cardId: string) => {
       const card = state.data.cards.find(c => c.id === cardId)
@@ -221,7 +330,6 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       try {
         const result = await window.electronAPI.openFile(card.fileReference.absolutePath)
         if (result.error) {
-          // US4: show error dialog — for now just log
           console.error('Failed to open file:', result.error)
         }
       } catch {
@@ -230,6 +338,116 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     },
     [state.data.cards]
   )
+
+  // ── Category editor handlers ──
+
+  const handleCreateCategory = useCallback(() => {
+    setCategoryEditorState({ mode: 'create' })
+  }, [])
+
+  const handleRenameCategory = useCallback(
+    (categoryId: string, currentName: string) => {
+      setCategoryEditorState({
+        mode: 'rename',
+        categoryId,
+        initialName: currentName,
+      })
+    },
+    []
+  )
+
+  const handleCategoryEditorSave = useCallback(
+    async (name: string) => {
+      if (!categoryEditorState) return
+      if (categoryEditorState.mode === 'create') {
+        await addCategory(name)
+      } else if (
+        categoryEditorState.mode === 'rename' &&
+        categoryEditorState.categoryId
+      ) {
+        await renameCategory(categoryEditorState.categoryId, name)
+      }
+      setCategoryEditorState(null)
+    },
+    [categoryEditorState, addCategory, renameCategory]
+  )
+
+  const handleCategoryEditorClose = useCallback(() => {
+    setCategoryEditorState(null)
+  }, [])
+
+  // ── Category reorder handlers (S09) ──
+
+  const handleReorderCategoriesStart = useCallback(() => {
+    setCategoryReorderItems(
+      categories.map(c => ({ id: c.id, name: c.name }))
+    )
+    setIsCategoryReorderMode(true)
+  }, [categories])
+
+  const handleCategoryReorder = useCallback(
+    (ids: string[]) => {
+      setCategoryReorderItems(prev => {
+        const itemMap = new Map(prev.map(i => [i.id, i]))
+        return ids.map(id => itemMap.get(id)!).filter(Boolean)
+      })
+    },
+    []
+  )
+
+  const handleCategoryReorderDone = useCallback(async () => {
+    await reorderCategories(categoryReorderItems.map(i => i.id))
+    setIsCategoryReorderMode(false)
+  }, [categoryReorderItems, reorderCategories])
+
+  const handleCategoryReorderCancel = useCallback(() => {
+    setIsCategoryReorderMode(false)
+  }, [])
+
+  // ── Card reorder handlers (S08) ──
+
+  const handleCardReorderStart = useCallback(() => {
+    setCardReorderItems(
+      visibleCards.map(c => ({ id: c.id, name: c.name }))
+    )
+    setIsCardReorderMode(true)
+  }, [visibleCards])
+
+  const handleCardReorder = useCallback(
+    (ids: string[]) => {
+      setCardReorderItems(prev => {
+        const itemMap = new Map(prev.map(i => [i.id, i]))
+        return ids.map(id => itemMap.get(id)!).filter(Boolean)
+      })
+    },
+    []
+  )
+
+  const handleCardReorderDone = useCallback(async () => {
+    if (!isCardReorderMode) return
+
+    const cardIds = cardReorderItems.map(i => i.id)
+    dispatch({ type: 'REORDER_CARDS', viewType: state.currentView, cardIds })
+
+    try {
+      const current = state.data
+      const updatedData = {
+        ...current,
+        viewOrders: current.viewOrders.map(vo =>
+          vo.viewType === state.currentView ? { ...vo, cardIds } : vo
+        ),
+      }
+      await window.electronAPI.saveAppData(updatedData)
+    } catch {
+      // Persist failure — state is already updated in memory
+    }
+
+    setIsCardReorderMode(false)
+  }, [isCardReorderMode, cardReorderItems, dispatch, state.currentView, state.data])
+
+  const handleCardReorderCancel = useCallback(() => {
+    setIsCardReorderMode(false)
+  }, [])
 
   // ── Focus retry button on error for initial focus ──
 
@@ -300,34 +518,98 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   }
 
   // ── Ready state ──
-  // Full app UI: sidebar + view-header + toolbar + card grid or empty-state.
+  // Full app UI: sidebar + view-header + toolbar + card grid or reorder or empty-state.
 
   const hasCards = visibleCards.length > 0
 
   return (
     <div className="qc-app-shell">
       <aside className="qc-app-shell__sidebar" aria-label="分类导航">
-        <div className="qc-app-shell__nav-item qc-app-shell__nav-item--active">
-          全部卡片
-        </div>
+        {isCategoryReorderMode ? (
+          <div className="qc-app-shell__sidebar-reorder">
+            <div className="qc-app-shell__sidebar-reorder-header">
+              <h2 className="qc-app-shell__sidebar-reorder-title">整理类别</h2>
+              <button
+                type="button"
+                className="qc-app-shell__sidebar-reorder-done-btn"
+                onClick={handleCategoryReorderDone}
+              >
+                完成
+              </button>
+            </div>
+            <button
+              type="button"
+              className="qc-app-shell__sidebar-reorder-cancel-btn"
+              onClick={handleCategoryReorderCancel}
+            >
+              取消
+            </button>
+            <ReorderControl
+              items={categoryReorderItems}
+              onReorder={handleCategoryReorder}
+              itemType="category"
+            />
+          </div>
+        ) : (
+          <CategoryNav
+            views={categoryNavViews}
+            currentViewId={state.currentView}
+            onSwitchView={handleSwitchView}
+            onCreateCategory={handleCreateCategory}
+            onReorderCategories={handleReorderCategoriesStart}
+            onRenameCategory={handleRenameCategory}
+          />
+        )}
       </aside>
 
       <main className="qc-app-shell__main" aria-labelledby="view-header-title">
         <ViewHeader
           title={viewTitle}
           cardCount={visibleCards.length}
-          showSortInfo={false}
+          showSortInfo={isCardReorderMode}
         />
 
         <div className="qc-app-shell__toolbar">
-          <ToolbarButton
-            label="选择文件"
-            variant="primary"
-            onClick={handleSelectFile}
-          />
+          {isCardReorderMode ? (
+            <>
+              <ToolbarButton
+                label="完成"
+                variant="primary"
+                onClick={handleCardReorderDone}
+              />
+              <ToolbarButton
+                label="取消"
+                variant="secondary"
+                onClick={handleCardReorderCancel}
+              />
+            </>
+          ) : (
+            <>
+              <ToolbarButton
+                label="选择文件"
+                variant="primary"
+                onClick={handleSelectFile}
+              />
+              {hasCards && (
+                <ToolbarButton
+                  label="整理排序"
+                  variant="secondary"
+                  onClick={handleCardReorderStart}
+                />
+              )}
+            </>
+          )}
         </div>
 
-        {hasCards ? (
+        {isCardReorderMode ? (
+          <div className="qc-app-shell__reorder-area">
+            <ReorderControl
+              items={cardReorderItems}
+              onReorder={handleCardReorder}
+              itemType="card"
+            />
+          </div>
+        ) : hasCards ? (
           <div className="qc-app-shell__grid">
             {visibleCards.map((card, index) => (
               <FileCard
@@ -349,6 +631,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           />
         )}
       </main>
+
+      {/* ── Dialogs and overlays ── */}
 
       {showFormDialog && pendingFileResult && (
         <CardFormDialog
@@ -392,6 +676,17 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           data={{}}
           onConfirm={handleDeleteConfirm}
           onCancel={handleDeleteCancel}
+        />
+      )}
+
+      {categoryEditorState && (
+        <CategoryEditorPopover
+          mode={categoryEditorState.mode}
+          initialName={categoryEditorState.initialName}
+          existingNames={existingNamesForEditor}
+          onSave={handleCategoryEditorSave}
+          onClose={handleCategoryEditorClose}
+          open
         />
       )}
     </div>
