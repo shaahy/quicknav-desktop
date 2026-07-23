@@ -504,6 +504,139 @@ describe('useCards', () => {
     })
   })
 
+  // ── repairFile ──
+
+  describe('repairFile', () => {
+    it('updates fileReference while preserving name, note, categoryIds, and orders', async () => {
+      mocks.state.data.cards = [
+        makeCard({
+          id: 'card-1',
+          name: 'Original Name',
+          note: 'Some notes',
+          categoryIds: ['cat-1'],
+          fileReference: {
+            absolutePath: '/old/path.txt',
+            fileName: 'old',
+            extension: 'txt',
+            fileSize: 100,
+            mtimeMs: 0,
+          },
+        }),
+      ]
+      mocks.state.data.viewOrders = [
+        { viewType: 'allCards', cardIds: ['card-1'] },
+        { viewType: 'category:cat-1', cardIds: ['card-1'] },
+        { viewType: 'uncategorized', cardIds: [] },
+      ]
+
+      const { repairFile } = useCards()
+
+      const fileResult = {
+        canceled: false,
+        file: {
+          absolutePath: '/new/path.pdf',
+          fileName: 'new',
+          extension: 'pdf',
+          fileSize: 5000,
+          mtimeMs: 999999,
+          isHtml: false,
+        },
+      }
+
+      await repairFile('card-1', fileResult)
+
+      // dispatch was called with UPDATE_CARD and only fileReference
+      expect(mocks.dispatch).toHaveBeenCalledWith({
+        type: 'UPDATE_CARD',
+        cardId: 'card-1',
+        updates: {
+          fileReference: {
+            absolutePath: '/new/path.pdf',
+            fileName: 'new',
+            extension: 'pdf',
+            fileSize: 5000,
+            mtimeMs: 999999,
+          },
+        },
+      })
+
+      // saveAppData was called
+      expect(mocks.electronAPI.saveAppData).toHaveBeenCalledTimes(1)
+      const savedData = mocks.electronAPI.saveAppData.mock.calls[0][0]
+      const updatedCard = savedData.cards.find((c: { id: string }) => c.id === 'card-1')
+      // name preserved
+      expect(updatedCard.name).toBe('Original Name')
+      // note preserved
+      expect(updatedCard.note).toBe('Some notes')
+      // categoryIds preserved
+      expect(updatedCard.categoryIds).toEqual(['cat-1'])
+      // fileReference updated
+      expect(updatedCard.fileReference.absolutePath).toBe('/new/path.pdf')
+      expect(updatedCard.fileReference.fileName).toBe('new')
+      expect(updatedCard.fileReference.extension).toBe('pdf')
+      expect(updatedCard.fileReference.fileSize).toBe(5000)
+      expect(updatedCard.fileReference.mtimeMs).toBe(999999)
+    })
+
+    it('normalizes the file path during repair', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', name: 'To Repair' }),
+      ]
+
+      const { repairFile } = useCards()
+
+      const fileResult = {
+        canceled: false,
+        file: {
+          absolutePath: 'c:\\Users\\test\\repaired.docx',
+          fileName: 'repaired',
+          extension: 'docx',
+          fileSize: 3000,
+          mtimeMs: 55555,
+          isHtml: false,
+        },
+      }
+
+      await repairFile('card-1', fileResult)
+
+      expect(mocks.dispatch).toHaveBeenCalledWith({
+        type: 'UPDATE_CARD',
+        cardId: 'card-1',
+        updates: {
+          fileReference: expect.objectContaining({
+            absolutePath: 'C:/Users/test/repaired.docx',
+          }),
+        },
+      })
+    })
+
+    it('returns early when file selection is canceled', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', name: 'Test' }),
+      ]
+
+      const { repairFile } = useCards()
+
+      await repairFile('card-1', { canceled: true })
+
+      expect(mocks.dispatch).not.toHaveBeenCalled()
+      expect(mocks.electronAPI.saveAppData).not.toHaveBeenCalled()
+    })
+
+    it('returns early when file is missing from result', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', name: 'Test' }),
+      ]
+
+      const { repairFile } = useCards()
+
+      await repairFile('card-1', { canceled: false })
+
+      expect(mocks.dispatch).not.toHaveBeenCalled()
+      expect(mocks.electronAPI.saveAppData).not.toHaveBeenCalled()
+    })
+  })
+
   // ── findDuplicateByPath ──
 
   describe('findDuplicateByPath', () => {

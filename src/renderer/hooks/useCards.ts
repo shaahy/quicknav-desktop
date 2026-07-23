@@ -8,20 +8,15 @@ export function useCards() {
   const { state } = useAppState()
   const dispatch = useAppDispatch()
 
-  // ── Derived: visible cards for current view + search ──
-
   const visibleCards = useMemo<Card[]>(() => {
-    // Get ordered card IDs for the current view
     const viewOrder = state.data.viewOrders.find(vo => vo.viewType === state.currentView)
     if (!viewOrder) return []
 
-    // Build card lookup and return in viewOrder sequence
     const cardMap = new Map(state.data.cards.map(c => [c.id, c]))
     const ordered = viewOrder.cardIds
       .map(id => cardMap.get(id))
       .filter((c): c is Card => c !== undefined)
 
-    // Apply search filter
     if (!state.searchQuery) return ordered
 
     const q = state.searchQuery.toLowerCase()
@@ -31,16 +26,12 @@ export function useCards() {
     )
   }, [state.data, state.currentView, state.searchQuery])
 
-  // ── Duplicate check ──
-
   const findDuplicateByPath = useCallback(
     (normalizedPath: string): Card | undefined => {
       return state.data.cards.find(c => c.fileReference.absolutePath === normalizedPath)
     },
     [state.data.cards]
   )
-
-  // ── addCard ──
 
   const addCard = useCallback(
     async (
@@ -53,18 +44,16 @@ export function useCards() {
       const platform = window.electronAPI.getPlatform()
       const normalized = normalizePath(fileResult.file.absolutePath, platform)
 
-      // Duplicate check
       const existing = findDuplicateByPath(normalized)
-      if (existing) return null // caller should handle duplicate feedback
+      if (existing) return null
 
-      // Determine card name
       let cardName = name
       if (!cardName && isHtmlFile(fileResult.file.extension)) {
         try {
           const htmlTitle = await window.electronAPI.readHtmlTitle(fileResult.file.absolutePath)
           if (htmlTitle) cardName = htmlTitle
         } catch {
-          // ignore HTML title read failure
+          // ignore HTML title read failures
         }
       }
       if (!cardName) {
@@ -92,7 +81,6 @@ export function useCards() {
 
       dispatch({ type: 'ADD_CARD', card })
 
-      // Persist
       try {
         const current = state.data
         const updatedData = {
@@ -120,8 +108,6 @@ export function useCards() {
     },
     [state.data, dispatch, findDuplicateByPath]
   )
-
-  // ── updateCard ──
 
   const updateCard = useCallback(
     async (
@@ -179,7 +165,7 @@ export function useCards() {
           }
         }
 
-        const updatedData: typeof current = {
+        const updatedData = {
           ...current,
           cards: current.cards.map(c =>
             c.id === cardId
@@ -199,15 +185,13 @@ export function useCards() {
     [state.data, dispatch]
   )
 
-  // ── deleteCard ──
-
   const deleteCard = useCallback(
     async (cardId: string): Promise<void> => {
       dispatch({ type: 'DELETE_CARD', cardId })
 
       try {
         const current = state.data
-        const updatedData: typeof current = {
+        const updatedData = {
           ...current,
           cards: current.cards.filter(c => c.id !== cardId),
           viewOrders: current.viewOrders.map(vo => ({
@@ -225,8 +209,6 @@ export function useCards() {
     },
     [state.data, dispatch]
   )
-
-  // ── repairFile ──
 
   const repairFile = useCallback(
     async (cardId: string, fileResult: FileSelectionResult): Promise<void> => {
