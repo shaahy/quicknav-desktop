@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react'
+import React, { useRef, useState, useCallback, useMemo } from 'react'
 import { useSort } from '../hooks/useSort'
 import type { ReorderItem } from '@shared/types'
 import '../styles/components/reorder-control.css'
@@ -57,7 +57,14 @@ export function ReorderControl({
   onReorder,
   itemType,
 }: ReorderControlProps) {
-  const { orderedItems, moveUp, moveDown, moveTo } = useSort(items, onReorder)
+  const { localOrder, setOrder, commitOrder } = useSort(items, onReorder)
+
+  const orderedItems = useMemo<ReorderItem[]>(() => {
+    const itemMap = new Map(items.map(i => [i.id, i]))
+    return localOrder
+      .map(id => itemMap.get(id))
+      .filter((i): i is ReorderItem => i !== undefined)
+  }, [localOrder, items])
 
   // ── Refs ──
 
@@ -86,26 +93,34 @@ export function ReorderControl({
 
   const handleMoveUp = useCallback(
     (index: number) => {
+      if (index <= 0 || index >= localOrder.length) return
+      const next = [...localOrder]
+      ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
+      setOrder(next)
+      commitOrder()
       const item = orderedItems[index]
-      if (!item) return
-      moveUp(index)
-      // After moveUp, the item lands at position `index` (1-based)
-      announce(`${item.name}, 位置 ${index}/${orderedItems.length}`)
+      if (item) {
+        announce(`${item.name}, 位置 ${index}/${orderedItems.length}`)
+      }
     },
-    [orderedItems, moveUp, announce]
+    [localOrder, setOrder, commitOrder, orderedItems, announce]
   )
 
   // ── Down button handler ──
 
   const handleMoveDown = useCallback(
     (index: number) => {
+      if (index < 0 || index >= localOrder.length - 1) return
+      const next = [...localOrder]
+      ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
+      setOrder(next)
+      commitOrder()
       const item = orderedItems[index]
-      if (!item) return
-      moveDown(index)
-      // After moveDown, the item lands at position `index + 2` (1-based)
-      announce(`${item.name}, 位置 ${index + 2}/${orderedItems.length}`)
+      if (item) {
+        announce(`${item.name}, 位置 ${index + 2}/${orderedItems.length}`)
+      }
     },
-    [orderedItems, moveDown, announce]
+    [localOrder, setOrder, commitOrder, orderedItems, announce]
   )
 
   // ── Drag-and-drop handlers ──
@@ -141,7 +156,11 @@ export function ReorderControl({
         return
       }
 
-      moveTo(fromIndex, targetIndex)
+      const next = [...localOrder]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(targetIndex, 0, moved)
+      setOrder(next)
+      commitOrder()
 
       const item = orderedItems[fromIndex]
       if (item) {
@@ -150,7 +169,7 @@ export function ReorderControl({
 
       dragIndexRef.current = null
     },
-    [orderedItems, moveTo, announce]
+    [localOrder, setOrder, commitOrder, orderedItems, announce]
   )
 
   const handleDragEnd = useCallback(() => {

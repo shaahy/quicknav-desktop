@@ -16,7 +16,7 @@ export interface UseSearchReturn {
    *   2. Prefix name match
    *   3. Substring name match
    *   Within each tier, sorted by allCards view order.
-   * Empty array when query is empty or no matches.
+   * Returns ALL cards when query is empty (or whitespace-only).
    */
   searchResults: Card[]
   /** True while the debounce timer is active (user typing). */
@@ -33,8 +33,8 @@ export interface UseSearchReturn {
  * - Internally debounces by `SEARCH_DEBOUNCE_MS` (200ms) before computing
  *   match-scored `searchResults`, avoiding expensive re-sorts on every keystroke.
  * - Ignores leading/trailing whitespace; case-insensitive (English).
- * - Searches across **all** cards by **name** only (the existing `useCards`
- *   filter also checks notes for backward compatibility).
+ * - Searches across **all** cards by **name** only.
+ * - Returns ALL cards (in allCards view order) when the query is empty.
  */
 export function useSearch(): UseSearchReturn {
   const { state } = useAppState()
@@ -82,7 +82,16 @@ export function useSearch(): UseSearchReturn {
 
   const searchResults = useMemo<Card[]>(() => {
     const query = debouncedQuery.trim()
-    if (!query) return []
+    if (!query) {
+      // Empty query: return ALL cards in allCards view order
+      const allCardsOrder =
+        state.data.viewOrders.find(vo => vo.viewType === VIEW_ALL_CARDS)
+          ?.cardIds ?? []
+      const cardMap = new Map(state.data.cards.map(c => [c.id, c]))
+      return allCardsOrder
+        .map(id => cardMap.get(id))
+        .filter((c): c is Card => c !== undefined)
+    }
 
     const q = query.toLowerCase()
 

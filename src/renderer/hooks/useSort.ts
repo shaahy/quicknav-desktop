@@ -1,17 +1,25 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import type { ReorderItem } from '@shared/types'
+import { SAVE_DEBOUNCE_MS } from '@shared/constants'
 
 // ── Public API ──
 
 export interface UseSortReturn {
-  /** Items sorted by current local order (immediate UI state). */
-  orderedItems: ReorderItem[]
-  /** Move item at the given index one position up (no-op if already first). */
-  moveUp: (index: number) => void
-  /** Move item at the given index one position down (no-op if already last). */
-  moveDown: (index: number) => void
-  /** Move item from `fromIndex` to `toIndex` (for drag-and-drop). */
-  moveTo: (fromIndex: number, toIndex: number) => void
+  /** Immediately updated cardIds in display order. */
+  localOrder: string[]
+  /** Update localOrder instantly. */
+  setOrder: (newOrder: string[]) => void
+  /**
+   * Debounced (500ms) save callback.
+   * Call this after setOrder to persist the current order.
+   */
+  commitOrder: () => void
+  /** Whether the user is currently in reorder mode. */
+  isReorderMode: boolean
+  /** Enter reorder mode. */
+  enterReorderMode: () => void
+  /** Exit reorder mode (also commits the current order). */
+  exitReorderMode: () => void
 }
 
 // ── Hook ──
@@ -19,38 +27,63 @@ export interface UseSortReturn {
 /**
  * View-specific reorder hook with immediate UI update + debounced persistence.
  *
- * - Maintains a local ordering that updates **instantly** on user action so the
- *   next animation frame (<16 ms) reflects the change.
- * - Debounces the `onReorder` callback by 500 ms so the persistence layer
- *   (disk write / IPC / state update) is not called on every single move.
+ * - `localOrder` updates **instantly** on `setOrder` so the next animation frame
+ *   (<16 ms) reflects the change.
+ * - `commitOrder` debounces the `onReorder` callback by 500 ms so the persistence
+ *   layer (disk write / IPC / state update) is not called on every single move.
  * - Automatically merges external mutations (add / delete items) into the local
  *   order without disrupting the user's current drag sequence.
+ * - `enterReorderMode` / `exitReorderMode` manage a reorder-mode flag;
+ *   `exitReorderMode` also calls `commitOrder` to persist on exit.
  *
- * @param items    The current list of reorderable items (source of truth).
+ * @param items      The current list of reorderable items (source of truth).
  * @param onReorder  Called with the new ID array **after** the 500 ms debounce
  *                   settles.  The caller should persist this order.
- *
- * @example
- * ```tsx
- * const { orderedItems, moveUp, moveDown, moveTo } = useSort(
- *   categories,
- *   (newOrder) => dispatch({ type: 'REORDER_CATEGORIES', categoryIds: newOrder })
- * )
- * ```
  */
 export function useSort(
   items: ReorderItem[],
   onReorder: (newOrder: string[]) => void
 ): UseSortReturn {
-  // ── Local order state (immediate UI) ──
+  // ── State ──
 
-  const [order, setOrder] = useState<string[]>(() => items.map(i => i.id))
+  const [localOrder, setLocalOrder] = useState<string[]>(() => items.map(i => i.id))
+  const [isReorderMode, setIsReorderMode] = useState(false)
 
   // ── Refs ──
+  //
+  // `localOrderRef` is updated on every render so `commitOrder` can always
+  // capture the latest value when its timer fires, regardless of closure age.
 
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const localOrderRef = useRef(localOrder)
+  localOrderRef.current = localOrder
+
   const onReorderRef = useRef(onReorder)
   onReorderRef.current = onReorder
+
+  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  // ── Public setters ──
+
+  const setOrder = useCallback((newOrder: string[]) => {
+    localOrderRef.current = newOrder
+    setLocalOrder(newOrder)
+  }, [])
+
+  const commitOrder = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      onReorderRef.current(localOrderRef.current)
+    }, SAVE_DEBOUNCE_MS)
+  }, [])
+
+  const enterReorderMode = useCallback(() => {
+    setIsReorderMode(true)
+  }, [])
+
+  const exitReorderMode = useCallback(() => {
+    setIsReorderMode(false)
+    commitOrder()
+  }, [commitOrder])
 
   // ── Sync external changes ──
   //
@@ -59,7 +92,7 @@ export function useSort(
   // the end.  Local reorder positions are preserved.
 
   useEffect(() => {
-    setOrder(prev => {
+    setLocalOrder(prev => {
       const validIds = new Set(items.map(i => i.id))
 
       // Drop items that no longer exist
@@ -82,80 +115,13 @@ export function useSort(
     })
   }, [items])
 
-  // ── Debounced save ──
+  // ── Cleanup on unmount ──
 
-  const scheduleSave = useCallback((newOrder: string[]) => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(() => {
-      onReorderRef.current(newOrder)
-    }, 500)
-  }, [])
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [])
 
-  // ── Move actions ──
-
-  const moveUp = useCallback(
-    (index: number) => {
-      setOrder(prev => {
-        if (index <= 0 || index >= prev.length) return prev
-        const next = [...prev]
-        ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-        scheduleSave(next)
-        return next
-      })
-    },
-    [scheduleSave]
-  )
-
-  const moveDown = useCallback(
-    (index: number) => {
-      setOrder(prev => {
-        if (index < 0 || index >= prev.length - 1) return prev
-        const next = [...prev]
-        ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-        scheduleSave(next)
-        return next
-      })
-    },
-    [scheduleSave]
-  )
-
-  const moveTo = useCallback(
-    (fromIndex: number, toIndex: number) => {
-      setOrder(prev => {
-        if (
-          fromIndex === toIndex ||
-          fromIndex < 0 ||
-          fromIndex >= prev.length ||
-          toIndex < 0 ||
-          toIndex >= prev.length
-        ) {
-          return prev
-        }
-        const next = [...prev]
-        const [moved] = next.splice(fromIndex, 1)
-        next.splice(toIndex, 0, moved)
-        scheduleSave(next)
-        return next
-      })
-    },
-    [scheduleSave]
-  )
-
-  // ── Derived ordered items ──
-
-  const orderedItems = useMemo<ReorderItem[]>(() => {
-    const orderIdx = new Map(order.map((id, i) => [id, i]))
-    return [...items].sort(
-      (a, b) => (orderIdx.get(a.id) ?? Infinity) - (orderIdx.get(b.id) ?? Infinity)
-    )
-  }, [items, order])
-
-  return { orderedItems, moveUp, moveDown, moveTo }
+  return { localOrder, setOrder, commitOrder, isReorderMode, enterReorderMode, exitReorderMode }
 }
