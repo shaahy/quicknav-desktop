@@ -9,7 +9,7 @@ interface FileCardProps {
   total: number
   viewType: ViewType
   onOpenFile: (cardId: string) => void
-  onShowMenu: (cardId: string) => void
+  onShowMenu: (cardId: string, anchorRect: DOMRect) => void
   isReorderMode: boolean
 }
 
@@ -33,8 +33,10 @@ export function FileCard({
     }
   }
 
-  const handleMenu = () => {
-    onShowMenu(card.id)
+  const handleMenu = (e: React.MouseEvent) => {
+    const btn = e.currentTarget as HTMLElement
+    const rect = btn.getBoundingClientRect()
+    onShowMenu(card.id, rect)
   }
 
   return (

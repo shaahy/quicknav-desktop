@@ -7,7 +7,7 @@ import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 type AppAction =
   | { type: 'LOAD'; data: AppData }
   | { type: 'ADD_CARD'; card: Card }
-  | { type: 'UPDATE_CARD'; cardId: string; updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference'>> }
+  | { type: 'UPDATE_CARD'; cardId: string; updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference' | 'categoryIds'>> }
   | { type: 'DELETE_CARD'; cardId: string }
   | { type: 'ADD_CATEGORY'; category: Category }
   | { type: 'UPDATE_CATEGORY'; categoryId: string; name: string }
@@ -84,6 +84,58 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'UPDATE_CARD': {
       const { cardId, updates } = action
+      const oldCard = state.data.cards.find(c => c.id === cardId)
+      if (!oldCard) return state
+
+      let updatedViewOrders = state.data.viewOrders
+
+      if (updates.categoryIds) {
+        const oldIds = oldCard.categoryIds
+        const newIds = updates.categoryIds
+        const removedFromCategories = oldIds.filter(id => !newIds.includes(id))
+        const addedToCategories = newIds.filter(id => !oldIds.includes(id))
+
+        if (removedFromCategories.length > 0 || addedToCategories.length > 0) {
+          updatedViewOrders = updatedViewOrders.map(vo => {
+            // Remove card from categories it left
+            if (
+              removedFromCategories.some(
+                catId => vo.viewType === (`category:${catId}` as ViewType)
+              )
+            ) {
+              return { ...vo, cardIds: vo.cardIds.filter(id => id !== cardId) }
+            }
+            // Add card to categories it joined
+            if (
+              addedToCategories.some(
+                catId => vo.viewType === (`category:${catId}` as ViewType)
+              ) &&
+              !vo.cardIds.includes(cardId)
+            ) {
+              return { ...vo, cardIds: [...vo.cardIds, cardId] }
+            }
+            return vo
+          })
+
+          // Handle uncategorized view
+          if (oldIds.length === 0 && newIds.length > 0) {
+            // Was uncategorized, now has categories
+            updatedViewOrders = updatedViewOrders.map(vo =>
+              vo.viewType === VIEW_UNCATEGORIZED
+                ? { ...vo, cardIds: vo.cardIds.filter(id => id !== cardId) }
+                : vo
+            )
+          } else if (oldIds.length > 0 && newIds.length === 0) {
+            // Had categories, now has none
+            updatedViewOrders = updatedViewOrders.map(vo =>
+              vo.viewType === VIEW_UNCATEGORIZED && !vo.cardIds.includes(cardId)
+                ? { ...vo, cardIds: [...vo.cardIds, cardId] }
+                : vo
+            )
+          }
+        }
+      }
+
       return {
         ...state,
         data: {
@@ -91,6 +143,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
           cards: state.data.cards.map(c =>
             c.id === cardId ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c
           ),
+          viewOrders: updatedViewOrders,
         },
       }
     }

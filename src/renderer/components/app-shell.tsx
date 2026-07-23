@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import type { FileSelectionResult, CardFormData } from '@shared/types'
+import type { FileSelectionResult, CardFormData, MenuItem } from '@shared/types'
 import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 import { useAppState } from '../contexts/AppState'
 import { useCards } from '../hooks/useCards'
@@ -8,6 +8,8 @@ import { ToolbarButton } from './toolbar-button'
 import { FileCard } from './file-card'
 import { EmptyState } from './empty-state'
 import { CardFormDialog } from './card-form-dialog'
+import { ActionMenu } from './action-menu'
+import { ConfirmationDialog } from './confirmation-dialog'
 import '../styles/components/app-shell.css'
 
 export interface AppShellProps {
@@ -33,7 +35,7 @@ export interface AppShellProps {
  */
 export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   const { state } = useAppState()
-  const { visibleCards, addCard } = useCards()
+  const { visibleCards, addCard, updateCard, deleteCard } = useCards()
 
   const retryRef = useRef<HTMLButtonElement>(null)
 
@@ -52,6 +54,23 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
 
   const [pendingFileResult, setPendingFileResult] = useState<FileSelectionResult | null>(null)
   const showFormDialog = pendingFileResult !== null
+
+  // ── Action menu state ──
+
+  const [menuCardId, setMenuCardId] = useState<string | null>(null)
+  const [menuAnchor, setMenuAnchor] = useState<DOMRect | null>(null)
+
+  // ── Card editing state (S11) ──
+
+  const [editingCardId, setEditingCardId] = useState<string | null>(null)
+
+  // ── Discard confirmation state (S15) ──
+
+  const [pendingDiscard, setPendingDiscard] = useState(false)
+
+  // ── Card delete confirmation state (S14) ──
+
+  const [deletingCardId, setDeletingCardId] = useState<string | null>(null)
 
   // ── Handlers ──
 
@@ -77,6 +96,124 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     []
   )
 
+  // ── Action menu (S11 / S14) ──
+
+  const handleShowMenu = useCallback(
+    (cardId: string, anchorRect: DOMRect) => {
+      setMenuCardId(cardId)
+      setMenuAnchor(anchorRect)
+    },
+    []
+  )
+
+  const handleCloseMenu = useCallback(() => {
+    setMenuCardId(null)
+    setMenuAnchor(null)
+  }, [])
+
+  // ── Menu items computed lazily when menu is open ──
+
+  const menuItems = useMemo<MenuItem[]>(() => {
+    if (!menuCardId) return []
+
+    const card = state.data.cards.find(c => c.id === menuCardId)
+
+    return [
+      {
+        id: 'edit',
+        label: '编辑',
+        variant: 'default' as const,
+        onClick: () => {
+          setEditingCardId(menuCardId)
+        },
+      },
+      {
+        id: 'show-in-folder',
+        label: '在文件管理器中显示',
+        variant: 'default' as const,
+        disabledReason: card ? undefined : '卡片数据异常',
+        onClick: () => {
+          if (card) {
+            window.electronAPI
+              .showItemInFolder(card.fileReference.absolutePath)
+              .catch(() => {})
+          }
+        },
+      },
+      {
+        id: 'delete',
+        label: '删除',
+        variant: 'danger' as const,
+        onClick: () => {
+          setDeletingCardId(menuCardId)
+        },
+      },
+    ]
+  }, [menuCardId, state.data.cards])
+
+  // ── Card editing (S11) ──
+
+  const editingCard = useMemo(() => {
+    if (!editingCardId) return null
+    return state.data.cards.find(c => c.id === editingCardId) ?? null
+  }, [editingCardId, state.data.cards])
+
+  const editInitialData = useMemo<CardFormData | null>(() => {
+    if (!editingCard) return null
+    return {
+      name: editingCard.name,
+      note: editingCard.note ?? '',
+      categoryIds: editingCard.categoryIds,
+    }
+  }, [editingCard])
+
+  const handleEditSave = useCallback(
+    async (data: CardFormData) => {
+      if (!editingCardId) return
+      await updateCard(editingCardId, {
+        name: data.name,
+        note: data.note || null,
+        categoryIds: data.categoryIds,
+      })
+      setEditingCardId(null)
+    },
+    [editingCardId, updateCard]
+  )
+
+  const handleEditClose = useCallback(
+    (hasChanges: boolean) => {
+      if (hasChanges) {
+        setPendingDiscard(true)
+      } else {
+        setEditingCardId(null)
+      }
+    },
+    []
+  )
+
+  // ── Card delete (S14) ──
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deletingCardId) return
+    await deleteCard(deletingCardId)
+    setDeletingCardId(null)
+  }, [deletingCardId, deleteCard])
+
+  const handleDeleteCancel = useCallback(() => {
+    setDeletingCardId(null)
+  }, [])
+
+  // ── Discard changes (S15) ──
+
+  const handleDiscardConfirm = useCallback(() => {
+    setEditingCardId(null)
+    setPendingDiscard(false)
+  }, [])
+
+  const handleDiscardCancel = useCallback(() => {
+    setPendingDiscard(false)
+  }, [])
+
   const handleOpenFile = useCallback(
     async (cardId: string) => {
       const card = state.data.cards.find(c => c.id === cardId)
@@ -93,10 +230,6 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     },
     [state.data.cards]
   )
-
-  const handleShowMenu = useCallback((_cardId: string) => {
-    // Placeholder — card context menu will be implemented in US3
-  }, [])
 
   // ── Focus retry button on error for initial focus ──
 
@@ -223,6 +356,42 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           initialData={null}
           onSave={handleFormSave}
           onClose={handleFormClose}
+        />
+      )}
+
+      {menuCardId && menuAnchor && (
+        <ActionMenu
+          items={menuItems}
+          anchor={menuAnchor}
+          onClose={handleCloseMenu}
+        />
+      )}
+
+      {editingCardId && editInitialData && (
+        <CardFormDialog
+          mode="edit"
+          initialData={editInitialData}
+          filePath={editingCard?.fileReference.absolutePath}
+          onSave={handleEditSave}
+          onClose={handleEditClose}
+        />
+      )}
+
+      {pendingDiscard && (
+        <ConfirmationDialog
+          variant="discard-changes"
+          data={{}}
+          onConfirm={handleDiscardConfirm}
+          onCancel={handleDiscardCancel}
+        />
+      )}
+
+      {deletingCardId !== null && (
+        <ConfirmationDialog
+          variant="delete-card"
+          data={{}}
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
         />
       )}
     </div>

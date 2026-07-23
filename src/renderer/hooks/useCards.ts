@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from 'react'
 import type { Card, FileSelectionResult } from '@shared/types'
-import { VIEW_ALL_CARDS } from '@shared/constants'
+import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 import { normalizePath, isHtmlFile } from '@shared/validation'
 import { useAppState, useAppDispatch } from '../contexts/AppState'
 
@@ -123,12 +123,59 @@ export function useCards() {
   const updateCard = useCallback(
     async (
       cardId: string,
-      updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference'>>
+      updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference' | 'categoryIds'>>
     ): Promise<void> => {
       dispatch({ type: 'UPDATE_CARD', cardId, updates })
 
       try {
         const current = state.data
+        let updatedViewOrders = current.viewOrders
+
+        if (updates.categoryIds) {
+          const oldCard = current.cards.find(c => c.id === cardId)
+          if (oldCard) {
+            const oldIds = oldCard.categoryIds
+            const newIds = updates.categoryIds
+            const removedFromCategories = oldIds.filter(id => !newIds.includes(id))
+            const addedToCategories = newIds.filter(id => !oldIds.includes(id))
+
+            if (removedFromCategories.length > 0 || addedToCategories.length > 0) {
+              updatedViewOrders = updatedViewOrders.map(vo => {
+                if (
+                  removedFromCategories.some(
+                    catId => vo.viewType === (`category:${catId}` as const)
+                  )
+                ) {
+                  return { ...vo, cardIds: vo.cardIds.filter(id => id !== cardId) }
+                }
+                if (
+                  addedToCategories.some(
+                    catId => vo.viewType === (`category:${catId}` as const)
+                  ) &&
+                  !vo.cardIds.includes(cardId)
+                ) {
+                  return { ...vo, cardIds: [...vo.cardIds, cardId] }
+                }
+                return vo
+              })
+
+              if (oldIds.length === 0 && newIds.length > 0) {
+                updatedViewOrders = updatedViewOrders.map(vo =>
+                  vo.viewType === VIEW_UNCATEGORIZED
+                    ? { ...vo, cardIds: vo.cardIds.filter(id => id !== cardId) }
+                    : vo
+                )
+              } else if (oldIds.length > 0 && newIds.length === 0) {
+                updatedViewOrders = updatedViewOrders.map(vo =>
+                  vo.viewType === VIEW_UNCATEGORIZED && !vo.cardIds.includes(cardId)
+                    ? { ...vo, cardIds: [...vo.cardIds, cardId] }
+                    : vo
+                )
+              }
+            }
+          }
+        }
+
         const updatedData: typeof current = {
           ...current,
           cards: current.cards.map(c =>
@@ -136,6 +183,7 @@ export function useCards() {
               ? { ...c, ...updates, updatedAt: new Date().toISOString() }
               : c
           ),
+          viewOrders: updatedViewOrders,
         }
         await window.electronAPI.saveAppData(updatedData)
       } catch {
