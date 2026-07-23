@@ -3,6 +3,15 @@ import * as path from 'path'
 import { registerIpcHandlers } from './ipc'
 import { DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT } from '../shared/constants'
 
+function getDataDir(): string {
+  // 生产模式: 数据文件放在 exe 同目录下，方便打包分发
+  if (app.isPackaged) {
+    return path.dirname(app.getPath('exe'))
+  }
+  // 开发模式: 放在项目根目录
+  return app.getAppPath()
+}
+
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
@@ -66,7 +75,7 @@ function createTray(): void {
 
 app.on('ready', () => {
   isQuitting = false
-  registerIpcHandlers(() => mainWindow!, app.getPath('userData'))
+  registerIpcHandlers(() => mainWindow!, getDataDir())
   createTray()
   createWindow()
 })
