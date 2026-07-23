@@ -1,0 +1,101 @@
+/* ── CategoryItem ──
+   Single row item in the sidebar category navigation.
+   BEM block: qc-category-item
+*/
+
+.qc-category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  min-height: var(--spacing-control-height);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--rounded-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.qc-category-item:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-category-item:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+/* ── Active state ── */
+
+.qc-category-item--active {
+  background: var(--color-action);
+  color: var(--color-on-action);
+}
+
+.qc-category-item--active:hover {
+  background: var(--color-action-hover);
+}
+
+/* ── System type modifier (no more button, no special hover changes) ── */
+
+.qc-category-item--system {
+  /* reserved for potential future differentiation */
+}
+
+/* ── Name ── */
+
+.qc-category-item__name {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-label);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── More button ── */
+
+.qc-category-item__more-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  color: inherit;
+  border-radius: var(--rounded-sm);
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.1s;
+}
+
+/* Show more button on row hover or when the button itself is focused */
+
+.qc-category-item:hover .qc-category-item__more-btn,
+.qc-category-item:focus-within .qc-category-item__more-btn,
+.qc-category-item__more-btn:focus-visible {
+  opacity: 1;
+}
+
+.qc-category-item__more-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Active row: more button hover uses light overlay on dark bg */
+
+.qc-category-item--active .qc-category-item__more-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.qc-category-item__more-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  opacity: 1;
+}
