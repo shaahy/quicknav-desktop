@@ -23,10 +23,34 @@ export interface CategoryNavProps {
   currentViewId: string
   /** Called when the user clicks a navigation item to switch view. */
   onSwitchView: (viewId: string) => void
-  /** Opens S12 category editor to create a new category. */
+  /** Opens the category editor to create a new category. */
   onCreateCategory: () => void
   /** Enters S09 reorder mode for categories. */
   onReorderCategories: () => void
+  /**
+   * When provided, "rename" menu action delegates to parent (popover usage).
+   * Otherwise uses inline rename input.
+   */
+  onRenameCategory?: (categoryId: string, currentName: string) => void
+  /**
+   * When provided, "delete" menu action delegates to parent.
+   * Otherwise uses internal confirmation dialog.
+   */
+  onDeleteCategory?: (categoryId: string) => void
+}
+
+// ── Helpers ──
+
+/**
+ * Extract the raw category UUID from a view ID that may be in
+ * `category:{uuid}` format. Returns the ID as-is if it does not
+ * start with `category:`.
+ */
+function extractCategoryId(viewId: string): string {
+  if (viewId.startsWith('category:')) {
+    return viewId.slice('category:'.length)
+  }
+  return viewId
 }
 
 // ── Component ──
@@ -39,6 +63,9 @@ export interface CategoryNavProps {
  * "更多" button that opens an action menu with rename and delete options.
  *
  * Uses `role="navigation"` and `aria-label="类别导航"` for accessibility.
+ *
+ * View IDs for user categories should use `category:{uuid}` format so
+ * they double as ViewType values for view switching.
  */
 export function CategoryNav({
   views,
@@ -46,6 +73,8 @@ export function CategoryNav({
   onSwitchView,
   onCreateCategory,
   onReorderCategories,
+  onRenameCategory,
+  onDeleteCategory,
 }: CategoryNavProps) {
   const { state } = useAppState()
   const { uncategorizedCards, renameCategory, deleteCategory } = useCategories()
@@ -55,12 +84,12 @@ export function CategoryNav({
   const [menuTargetId, setMenuTargetId] = useState<string | null>(null)
   const [menuAnchor, setMenuAnchor] = useState<DOMRect | null>(null)
 
-  // ── Rename state ──
+  // ── Rename state (inline fallback when onRenameCategory is not provided) ──
 
   const [renamingCategoryId, setRenamingCategoryId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
 
-  // ── Delete confirmation state ──
+  // ── Delete confirmation state (internal fallback when onDeleteCategory is not provided) ──
 
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
 
@@ -76,7 +105,11 @@ export function CategoryNav({
     const orderMap = new Map(state.data.categories.map(c => [c.id, c.order]))
     const userViews = [...views]
       .filter(v => v.type === 'user')
-      .sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0))
+      .sort((a, b) => {
+        const aId = extractCategoryId(a.id)
+        const bId = extractCategoryId(b.id)
+        return (orderMap.get(aId) ?? 0) - (orderMap.get(bId) ?? 0)
+      })
 
     const result: CategoryNavView[] = []
     if (allCardsView) result.push(allCardsView)
@@ -89,7 +122,8 @@ export function CategoryNav({
 
   const menuItems = useMemo<MenuItem[]>(() => {
     if (!menuTargetId) return []
-    const cat = state.data.categories.find(c => c.id === menuTargetId)
+    const rawId = extractCategoryId(menuTargetId)
+    const cat = state.data.categories.find(c => c.id === rawId)
     if (!cat) return []
 
     return [
@@ -98,18 +132,28 @@ export function CategoryNav({
         label: '重命名',
         variant: 'default' as const,
         onClick: () => {
-          setRenamingCategoryId(menuTargetId)
-          setRenameValue(cat.name)
+          if (onRenameCategory) {
+            onRenameCategory(cat.id, cat.name)
+          } else {
+            setRenamingCategoryId(menuTargetId)
+            setRenameValue(cat.name)
+          }
         },
       },
       {
         id: 'delete',
         label: '删除',
         variant: 'danger' as const,
-        onClick: () => setDeletingCategoryId(menuTargetId),
+        onClick: () => {
+          if (onDeleteCategory) {
+            onDeleteCategory(cat.id)
+          } else {
+            setDeletingCategoryId(menuTargetId)
+          }
+        },
       },
     ]
-  }, [menuTargetId, state.data.categories])
+  }, [menuTargetId, state.data.categories, onRenameCategory, onDeleteCategory])
 
   // ── Menu handlers ──
 
@@ -118,11 +162,12 @@ export function CategoryNav({
     setMenuAnchor(null)
   }, [])
 
-  // ── Rename handlers ──
+  // ── Inline rename handlers (fallback) ──
 
   const handleRenameSubmit = useCallback(async () => {
     if (!renamingCategoryId) return
-    const success = await renameCategory(renamingCategoryId, renameValue)
+    const rawId = extractCategoryId(renamingCategoryId)
+    const success = await renameCategory(rawId, renameValue)
     if (success) {
       setRenamingCategoryId(null)
     }
@@ -140,18 +185,19 @@ export function CategoryNav({
     [handleRenameSubmit]
   )
 
-  // ── Delete handlers ──
+  // ── Inline delete handlers (fallback) ──
 
   const deleteCategoryData = useMemo(() => {
     if (!deletingCategoryId) return null
-    const cat = state.data.categories.find(c => c.id === deletingCategoryId)
+    const rawId = extractCategoryId(deletingCategoryId)
+    const cat = state.data.categories.find(c => c.id === rawId)
     if (!cat) return null
     const totalCards = state.data.cards.filter(c =>
-      c.categoryIds.includes(deletingCategoryId)
+      c.categoryIds.includes(rawId)
     ).length
     const uncategorizedCount = state.data.cards.filter(
       c =>
-        c.categoryIds.includes(deletingCategoryId) &&
+        c.categoryIds.includes(rawId) &&
         c.categoryIds.length === 1
     ).length
     return { categoryName: cat.name, totalCards, uncategorizedCount }
@@ -159,13 +205,18 @@ export function CategoryNav({
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingCategoryId) return
-    await deleteCategory(deletingCategoryId)
+    const rawId = extractCategoryId(deletingCategoryId)
+    await deleteCategory(rawId)
     setDeletingCategoryId(null)
   }, [deletingCategoryId, deleteCategory])
 
   const handleDeleteCancel = useCallback(() => {
     setDeletingCategoryId(null)
   }, [])
+
+  // ── Check if we should show inline rename (only when no callback provided) ──
+
+  const showInlineRename = !onRenameCategory
 
   // ── Render ──
 
@@ -184,12 +235,23 @@ export function CategoryNav({
         </button>
       </div>
 
+      {/* "整理类别" button */}
+      <div className="qc-category-nav__reorder-bar">
+        <button
+          type="button"
+          className="qc-category-nav__reorder-btn"
+          onClick={onReorderCategories}
+        >
+          整理类别
+        </button>
+      </div>
+
       {/* Views list */}
       <div className="qc-category-nav__list">
         {renderedViews.map(view => {
-          const isRenaming = renamingCategoryId === view.id
+          const isRenaming = showInlineRename && renamingCategoryId === view.id
 
-          // ── Rename input mode ──
+          // ── Inline rename input mode ──
           if (isRenaming) {
             return (
               <div key={view.id} className="qc-category-nav__rename-row">
@@ -236,7 +298,7 @@ export function CategoryNav({
         />
       )}
 
-      {/* Delete confirmation dialog */}
+      {/* Delete confirmation dialog (internal fallback) */}
       {deletingCategoryId && deleteCategoryData && (
         <ConfirmationDialog
           variant="delete-category"

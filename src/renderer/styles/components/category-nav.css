@@ -87,3 +87,39 @@
   outline: none;
   line-height: 1.4;
 }
+
+/* ── Reorder bar ── */
+
+.qc-category-nav__reorder-bar {
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.qc-category-nav__reorder-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--spacing-control-height);
+  border: 1px dashed var(--color-border-muted);
+  border-radius: var(--rounded-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  padding: var(--spacing-1) var(--spacing-3);
+  line-height: 1;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.qc-category-nav__reorder-btn:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.qc-category-nav__reorder-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

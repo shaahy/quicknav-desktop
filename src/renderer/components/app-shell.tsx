@@ -119,12 +119,14 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // ── Category reorder mode (S09) ──
 
   const [isCategoryReorderMode, setIsCategoryReorderMode] = useState(false)
-  const [categoryReorderItems, setCategoryReorderItems] = useState<ReorderItem[]>([])
+  // Initial items snapshot for entering reorder mode; useSort manages the order internally.
+  const [categoryReorderInit, setCategoryReorderInit] = useState<ReorderItem[]>([])
 
   // ── Card reorder mode (S08) ──
 
   const [isCardReorderMode, setIsCardReorderMode] = useState(false)
-  const [cardReorderItems, setCardReorderItems] = useState<ReorderItem[]>([])
+  // Initial items snapshot for entering reorder mode; useSort manages the order internally.
+  const [cardReorderInit, setCardReorderInit] = useState<ReorderItem[]>([])
 
   // ── Existing names for category editor validation ──
 
@@ -379,26 +381,16 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // ── Category reorder handlers (S09) ──
 
   const handleReorderCategoriesStart = useCallback(() => {
-    setCategoryReorderItems(
+    setCategoryReorderInit(
       categories.map(c => ({ id: c.id, name: c.name }))
     )
     setIsCategoryReorderMode(true)
   }, [categories])
 
-  const handleCategoryReorder = useCallback(
-    (ids: string[]) => {
-      setCategoryReorderItems(prev => {
-        const itemMap = new Map(prev.map(i => [i.id, i]))
-        return ids.map(id => itemMap.get(id)!).filter(Boolean)
-      })
-    },
-    []
-  )
-
-  const handleCategoryReorderDone = useCallback(async () => {
-    await reorderCategories(categoryReorderItems.map(i => i.id))
+  // useSort inside ReorderControl manages internal order and calls onReorder (debounced).
+  const handleCategoryReorderDone = useCallback(() => {
     setIsCategoryReorderMode(false)
-  }, [categoryReorderItems, reorderCategories])
+  }, [])
 
   const handleCategoryReorderCancel = useCallback(() => {
     setIsCategoryReorderMode(false)
@@ -407,43 +399,35 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   // ── Card reorder handlers (S08) ──
 
   const handleCardReorderStart = useCallback(() => {
-    setCardReorderItems(
+    setCardReorderInit(
       visibleCards.map(c => ({ id: c.id, name: c.name }))
     )
     setIsCardReorderMode(true)
   }, [visibleCards])
 
-  const handleCardReorder = useCallback(
+  // Debounced persistence callback for useSort — fires 500ms after the last user action.
+  const handleCardReorderPersist = useCallback(
     (ids: string[]) => {
-      setCardReorderItems(prev => {
-        const itemMap = new Map(prev.map(i => [i.id, i]))
-        return ids.map(id => itemMap.get(id)!).filter(Boolean)
-      })
+      dispatch({ type: 'REORDER_CARDS', viewType: state.currentView, cardIds: ids })
+      try {
+        const current = state.data
+        const updatedData = {
+          ...current,
+          viewOrders: current.viewOrders.map(vo =>
+            vo.viewType === state.currentView ? { ...vo, cardIds: ids } : vo
+          ),
+        }
+        window.electronAPI.saveAppData(updatedData).catch(() => {})
+      } catch {
+        // Persist failure — state already updated in memory
+      }
     },
-    []
+    [dispatch, state.currentView, state.data]
   )
 
-  const handleCardReorderDone = useCallback(async () => {
-    if (!isCardReorderMode) return
-
-    const cardIds = cardReorderItems.map(i => i.id)
-    dispatch({ type: 'REORDER_CARDS', viewType: state.currentView, cardIds })
-
-    try {
-      const current = state.data
-      const updatedData = {
-        ...current,
-        viewOrders: current.viewOrders.map(vo =>
-          vo.viewType === state.currentView ? { ...vo, cardIds } : vo
-        ),
-      }
-      await window.electronAPI.saveAppData(updatedData)
-    } catch {
-      // Persist failure — state is already updated in memory
-    }
-
+  const handleCardReorderDone = useCallback(() => {
     setIsCardReorderMode(false)
-  }, [isCardReorderMode, cardReorderItems, dispatch, state.currentView, state.data])
+  }, [])
 
   const handleCardReorderCancel = useCallback(() => {
     setIsCardReorderMode(false)
@@ -545,8 +529,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
               取消
             </button>
             <ReorderControl
-              items={categoryReorderItems}
-              onReorder={handleCategoryReorder}
+              items={categoryReorderInit}
+              onReorder={reorderCategories}
               itemType="category"
             />
           </div>
@@ -604,8 +588,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
         {isCardReorderMode ? (
           <div className="qc-app-shell__reorder-area">
             <ReorderControl
-              items={cardReorderItems}
-              onReorder={handleCardReorder}
+              items={cardReorderInit}
+              onReorder={handleCardReorderPersist}
               itemType="card"
             />
           </div>

@@ -82,6 +82,93 @@
   }
 }
 
+/* ── Sidebar reorder mode ── */
+
+.qc-app-shell__sidebar-reorder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.qc-app-shell__sidebar-reorder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.qc-app-shell__sidebar-reorder-title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.qc-app-shell__sidebar-reorder-done-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-3);
+  border: none;
+  border-radius: var(--rounded-md);
+  background: var(--color-action);
+  color: var(--color-on-action);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.qc-app-shell__sidebar-reorder-done-btn:hover {
+  background: var(--color-action-hover);
+}
+
+.qc-app-shell__sidebar-reorder-done-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - var(--spacing-8));
+  margin: var(--spacing-2) var(--spacing-4);
+  min-height: var(--spacing-control-height);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Card reorder area ── */
+
+.qc-app-shell__reorder-area {
+  flex: 1;
+  overflow-y: auto;
+}
+
 /* ── Loading state ── */
 
 .qc-app-shell__loading {
