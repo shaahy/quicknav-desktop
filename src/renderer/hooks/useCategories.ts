@@ -58,9 +58,12 @@ export function useCategories() {
             { viewType: `category:${category.id}` as const, cardIds: [] },
           ],
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure — state is already updated in memory
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
 
       return category
@@ -89,9 +92,12 @@ export function useCategories() {
             c.id === id ? { ...c, name: trimmed } : c
           ),
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
 
       return true
@@ -139,9 +145,12 @@ export function useCategories() {
               return vo
             }),
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
     },
     [state.data, dispatch]
@@ -163,9 +172,12 @@ export function useCategories() {
           .filter((c): c is Category => c !== null)
 
         const updatedData = { ...current, categories: reordered }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
     },
     [state.data, dispatch]

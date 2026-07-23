@@ -18,6 +18,7 @@ type AppAction =
   | { type: 'REMOVE_CARD_FROM_CATEGORY'; cardId: string; categoryId: string }
   | { type: 'SET_CURRENT_VIEW'; viewType: ViewType }
   | { type: 'SET_SEARCH_QUERY'; query: string }
+  | { type: 'SET_SAVE_ERROR'; error: string | null }
 
 // ── State ──
 
@@ -27,6 +28,7 @@ interface AppState {
   searchQuery: string
   isLoading: boolean
   loadError: string | null
+  saveError: string | null
 }
 
 const INITIAL_APP_DATA: AppData = {
@@ -45,6 +47,7 @@ const initialState: AppState = {
   searchQuery: '',
   isLoading: true,
   loadError: null,
+  saveError: null,
 }
 
 // ── Reducer ──
@@ -57,6 +60,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         data: action.data,
         isLoading: false,
         loadError: null,
+        saveError: null,
       }
     }
 
@@ -352,6 +356,10 @@ function appReducer(state: AppState, action: AppAction): AppState {
 
     case 'SET_SEARCH_QUERY': {
       return { ...state, searchQuery: action.query }
+    }
+
+    case 'SET_SAVE_ERROR': {
+      return { ...state, saveError: action.error }
     }
 
     default:

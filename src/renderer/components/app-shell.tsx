@@ -1,9 +1,12 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { FileSelectionResult, CardFormData, MenuItem, ReorderItem, ViewType } from '@shared/types'
 import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
+import { normalizePath } from '@shared/validation'
 import { useAppState, useAppDispatch } from '../contexts/AppState'
 import { useCards } from '../hooks/useCards'
 import { useCategories } from '../hooks/useCategories'
+import { useSearch } from '../hooks/useSearch'
+import { useFileRepair } from '../hooks/useFileRepair'
 import { CategoryNav } from './category-nav'
 import type { CategoryNavView } from './category-nav'
 import { ViewHeader } from './view-header'
@@ -16,6 +19,9 @@ import { ConfirmationDialog } from './confirmation-dialog'
 import { ReorderControl } from './reorder-control'
 import { CategoryEditorPopover } from './category-editor-popover'
 import { GlobalSearch } from './global-search'
+import { ErrorDialog } from './error-dialog'
+import { DuplicateDialog } from './duplicate-dialog'
+import { StatusBar } from './status-bar'
 import '../styles/components/app-shell.css'
 
 export interface AppShellProps {
@@ -42,13 +48,20 @@ export interface AppShellProps {
 export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   const { state } = useAppState()
   const dispatch = useAppDispatch()
-  const { visibleCards, addCard, updateCard, deleteCard } = useCards()
+  const { visibleCards, addCard, updateCard, deleteCard, findDuplicateByPath } = useCards()
   const {
     categories,
     addCategory,
     renameCategory,
     reorderCategories,
   } = useCategories()
+  const search = useSearch()
+  const {
+    repairFile,
+    getFailureCount,
+    incrementFailure,
+    resetFailureCount,
+  } = useFileRepair()
 
   const retryRef = useRef<HTMLButtonElement>(null)
 
@@ -142,6 +155,49 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       .map(c => c.name)
   }, [categoryEditorState, state.data.categories])
 
+  // ── Error dialog state (US4: S16 open-failed / S17 locate-failed) ──
+
+  const [errorDialogState, setErrorDialogState] = useState<{
+    variant: 'open-failed' | 'locate-failed'
+    cardId: string
+    cardName: string
+    showWarning?: boolean
+  } | null>(null)
+
+  // ── Duplicate dialog state ──
+
+  const [duplicateDialogState, setDuplicateDialogState] = useState<{
+    existingCardId: string
+    existingCardName: string
+    /** Set when the duplicate follows a pendingFileResult in the add flow. */
+    pendingFileResult?: FileSelectionResult
+    /** Set when the duplicate follows a repair attempt. */
+    sourceCardId?: string
+  } | null>(null)
+
+  // ── Status bar state ──
+
+  const [statusBarState, setStatusBarState] = useState<{
+    message: string
+    visible: boolean
+    /** Unique key to force re-render when showing the same message. */
+    messageKey?: number
+  }>({ message: '', visible: false })
+  const statusBarCountRef = useRef(0)
+
+  /**
+   * Show a transient status bar message. Successive calls replace the previous
+   * message and restart the auto-dismiss timer.
+   */
+  const showStatusBar = useCallback((message: string) => {
+    statusBarCountRef.current += 1
+    setStatusBarState({ message, visible: true, messageKey: statusBarCountRef.current })
+  }, [])
+
+  const dismissStatusBar = useCallback(() => {
+    setStatusBarState(prev => ({ ...prev, visible: false }))
+  }, [])
+
   // ── Handlers ──
 
   const handleSelectFile = useCallback(async () => {
@@ -153,10 +209,31 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
   const handleFormSave = useCallback(
     async (data: CardFormData) => {
       if (!pendingFileResult) return
-      await addCard(pendingFileResult, data.name, data.categoryIds)
-      setPendingFileResult(null)
+      if (!pendingFileResult.file) return
+
+      const card = await addCard(pendingFileResult, data.name, data.categoryIds)
+      if (card) {
+        // Success — close form, show status
+        setPendingFileResult(null)
+        showStatusBar('已保存')
+      } else {
+        // Duplicate detected — find the existing card
+        const platform = window.electronAPI.getPlatform()
+        const normalized = normalizePath(pendingFileResult.file.absolutePath, platform)
+        const duplicate = findDuplicateByPath(normalized)
+        if (duplicate) {
+          setPendingFileResult(null)
+          setDuplicateDialogState({
+            existingCardId: duplicate.id,
+            existingCardName: duplicate.name,
+          })
+        } else {
+          // Unexpected — just close the form
+          setPendingFileResult(null)
+        }
+      }
     },
-    [pendingFileResult, addCard]
+    [pendingFileResult, addCard, findDuplicateByPath, showStatusBar]
   )
 
   const handleFormClose = useCallback(
@@ -193,8 +270,9 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
 
       const newCategoryIds = card.categoryIds.filter(id => id !== categoryId)
       await updateCard(cardId, { categoryIds: newCategoryIds })
+      showStatusBar('已移出当前类别')
     },
-    [state.currentView, state.data.cards, updateCard]
+    [state.currentView, state.data.cards, updateCard, showStatusBar]
   )
 
   // ── Menu items computed lazily when menu is open ──
@@ -226,7 +304,19 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           if (card) {
             window.electronAPI
               .showItemInFolder(card.fileReference.absolutePath)
-              .catch(() => {})
+              .then((locateResult) => {
+                if (locateResult && locateResult.error) {
+                  const count = incrementFailure(menuCardId)
+                  setErrorDialogState({
+                    variant: 'locate-failed',
+                    cardId: menuCardId,
+                    cardName: card.name,
+                    showWarning: count >= 3,
+                  })
+                } else {
+                  resetFailureCount(menuCardId)
+                }
+              })
           }
         },
       },
@@ -259,7 +349,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     })
 
     return items
-  }, [menuCardId, state.data.cards, state.currentView, handleRemoveFromCategory])
+  }, [menuCardId, state.data.cards, state.currentView, handleRemoveFromCategory, incrementFailure, resetFailureCount])
 
   // ── Card editing (S11) ──
 
@@ -286,8 +376,9 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
         categoryIds: data.categoryIds,
       })
       setEditingCardId(null)
+      showStatusBar('已保存')
     },
-    [editingCardId, updateCard]
+    [editingCardId, updateCard, showStatusBar]
   )
 
   const handleEditClose = useCallback(
@@ -307,7 +398,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     if (!deletingCardId) return
     await deleteCard(deletingCardId)
     setDeletingCardId(null)
-  }, [deletingCardId, deleteCard])
+    showStatusBar('已保存')
+  }, [deletingCardId, deleteCard, showStatusBar])
 
   const handleDeleteCancel = useCallback(() => {
     setDeletingCardId(null)
@@ -324,7 +416,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
     setPendingDiscard(false)
   }, [])
 
-  // ── Open file handler ──
+  // ── Open file handler (US4: S16 error handling + cumulative failure) ──
 
   const handleOpenFile = useCallback(
     async (cardId: string) => {
@@ -332,15 +424,117 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       if (!card) return
       try {
         const result = await window.electronAPI.openFile(card.fileReference.absolutePath)
-        if (result.error) {
-          console.error('Failed to open file:', result.error)
+        if (result && result.error) {
+          const count = incrementFailure(cardId)
+          setErrorDialogState({
+            variant: 'open-failed',
+            cardId,
+            cardName: card.name,
+            showWarning: count >= 3,
+          })
+        } else {
+          resetFailureCount(cardId)
         }
       } catch {
-        console.error('Unexpected error opening file')
+        // Unexpected JS error — treat as open-failed
+        incrementFailure(cardId)
+        setErrorDialogState({
+          variant: 'open-failed',
+          cardId,
+          cardName: card.name,
+        })
       }
     },
-    [state.data.cards]
+    [state.data.cards, incrementFailure, resetFailureCount]
   )
+
+  // ── Error dialog handlers ──
+
+  const handleErrorReSelect = useCallback(
+    async (cardId: string) => {
+      // Close the error dialog and start repair flow
+      setErrorDialogState(null)
+      const repairResult = await repairFile(cardId)
+      if (repairResult.result === 'success') {
+        showStatusBar('已重新关联')
+      } else if (repairResult.result === 'duplicate') {
+        setDuplicateDialogState({
+          existingCardId: repairResult.duplicateCardId!,
+          existingCardName: repairResult.duplicateCardName!,
+          sourceCardId: cardId,
+        })
+      }
+      // 'canceled' — no action needed
+    },
+    [repairFile, showStatusBar]
+  )
+
+  const handleErrorDelete = useCallback(
+    async (cardId: string) => {
+      setErrorDialogState(null)
+      await deleteCard(cardId)
+      showStatusBar('已保存')
+    },
+    [deleteCard, showStatusBar]
+  )
+
+  const handleErrorClose = useCallback(() => {
+    // Show cumulative-failure warning on dismiss if threshold reached
+    if (errorDialogState?.showWarning) {
+      showStatusBar('文件可能已移动，建议重新关联')
+    }
+    setErrorDialogState(null)
+  }, [errorDialogState, showStatusBar])
+
+  // ── Duplicate dialog handlers ──
+
+  const handleDuplicateViewCard = useCallback(
+    (existingCardId: string) => {
+      setDuplicateDialogState(null)
+      // Dispatch a view switch to show the existing card
+      // Switch to allCards view where all cards are visible
+      search.setSearchQuery('')
+      dispatch({ type: 'SET_CURRENT_VIEW', viewType: VIEW_ALL_CARDS as ViewType })
+    },
+    [dispatch, search]
+  )
+
+  const handleDuplicateReSelect = useCallback(() => {
+    // Close duplicate dialog and start a new file selection
+    const dupState = duplicateDialogState
+    setDuplicateDialogState(null)
+    if (dupState?.sourceCardId) {
+      // Repair flow — re-trigger repair
+      handleErrorReSelect(dupState.sourceCardId)
+    } else {
+      // Add flow — start a new file selection
+      handleSelectFile()
+    }
+  }, [duplicateDialogState, handleErrorReSelect, handleSelectFile])
+
+  const handleDuplicateCancel = useCallback(() => {
+    setDuplicateDialogState(null)
+  }, [])
+
+  // ── Search handlers ──
+
+  const handleClearSearch = useCallback(() => {
+    search.setSearchQuery('')
+  }, [search])
+
+  // ── Save error handler ──
+
+  const handleSaveErrorRetry = useCallback(() => {
+    dispatch({ type: 'SET_SAVE_ERROR', error: null })
+  }, [dispatch])
+
+  const handleSaveErrorQuit = useCallback(() => {
+    quitApp()
+  }, [quitApp])
+
+  const handleSaveErrorClose = useCallback(() => {
+    dispatch({ type: 'SET_SAVE_ERROR', error: null })
+  }, [dispatch])
 
   // ── Category editor handlers ──
 
@@ -408,7 +602,7 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
 
   // Debounced persistence callback for useSort — fires 500ms after the last user action.
   const handleCardReorderPersist = useCallback(
-    (ids: string[]) => {
+    async (ids: string[]) => {
       dispatch({ type: 'REORDER_CARDS', viewType: state.currentView, cardIds: ids })
       try {
         const current = state.data
@@ -418,9 +612,12 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
             vo.viewType === state.currentView ? { ...vo, cardIds: ids } : vo
           ),
         }
-        window.electronAPI.saveAppData(updatedData).catch(() => {})
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Persist failure — state already updated in memory
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
     },
     [dispatch, state.currentView, state.data]
@@ -441,6 +638,11 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
       retryRef.current.focus()
     }
   }, [loadingState])
+
+  // ── Derived booleans ──
+
+  const hasActiveSearch = state.searchQuery.trim().length > 0
+  const isCategoryView = state.currentView.startsWith('category:')
 
   // ── Loading state ──
   // Shell skeleton with non-interactive loading indicator.
@@ -611,12 +813,26 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
               />
             ))}
           </div>
+        ) : hasActiveSearch ? (
+          <EmptyState
+            variant="no-results"
+            searchQuery={state.searchQuery}
+            primaryAction={{ label: '清空搜索', onClick: handleClearSearch }}
+          />
         ) : (
           <EmptyState
-            variant="first-launch"
+            variant={isCategoryView ? 'category-empty' : 'first-launch'}
             primaryAction={{ label: '选择文件', onClick: handleSelectFile }}
           />
         )}
+
+        {/* ── Status bar ── */}
+        <StatusBar
+          key={statusBarState.messageKey ?? 0}
+          message={statusBarState.message}
+          visible={statusBarState.visible}
+          onDismiss={dismissStatusBar}
+        />
       </main>
 
       {/* ── Dialogs and overlays ── */}
@@ -674,6 +890,42 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           onSave={handleCategoryEditorSave}
           onClose={handleCategoryEditorClose}
           open
+        />
+      )}
+
+      {/* ── Error dialog (open-failed / locate-failed) ── */}
+      {errorDialogState && (
+        <ErrorDialog
+          variant={errorDialogState.variant}
+          cardName={errorDialogState.cardName}
+          onReSelect={() => handleErrorReSelect(errorDialogState.cardId)}
+          onDelete={() => handleErrorDelete(errorDialogState.cardId)}
+          onClose={handleErrorClose}
+        />
+      )}
+
+      {/* ── Duplicate dialog ── */}
+      {duplicateDialogState && (
+        <DuplicateDialog
+          existingCardName={duplicateDialogState.existingCardName}
+          existingCardId={duplicateDialogState.existingCardId}
+          onViewCard={handleDuplicateViewCard}
+          onReSelect={handleDuplicateReSelect}
+          onCancel={handleDuplicateCancel}
+        />
+      )}
+
+      {/* ── Save-failed dialog (blocking) ── */}
+      {state.saveError && (
+        <ErrorDialog
+          variant="save-failed"
+          cardName=""
+          errorDetail={state.saveError}
+          onReSelect={handleSaveErrorRetry}
+          onDelete={() => dispatch({ type: 'SET_SAVE_ERROR', error: null })}
+          onClose={handleSaveErrorClose}
+          onRetry={handleSaveErrorRetry}
+          onQuit={handleSaveErrorQuit}
         />
       )}
     </div>

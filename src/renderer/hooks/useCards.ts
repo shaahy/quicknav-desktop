@@ -108,9 +108,12 @@ export function useCards() {
             return vo
           }),
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure — state is already updated in memory
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
 
       return card
@@ -185,9 +188,12 @@ export function useCards() {
           ),
           viewOrders: updatedViewOrders,
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure — state is already updated in memory
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
     },
     [state.data, dispatch]
@@ -209,9 +215,12 @@ export function useCards() {
             cardIds: vo.cardIds.filter(id => id !== cardId),
           })),
         }
-        await window.electronAPI.saveAppData(updatedData)
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+        }
       } catch {
-        // Save failure — state is already updated in memory
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
       }
     },
     [state.data, dispatch]
