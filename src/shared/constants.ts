@@ -1,12 +1,37 @@
-/** 卡片名最大长度 */
-export const MAX_CARD_NAME_LENGTH = 80;
-/** 类别名最大长度 */
-export const MAX_CATEGORY_NAME_LENGTH = 30;
-/** 备注最大长度 */
-export const MAX_NOTE_LENGTH = 500;
-/** 最大卡片数量 */
-export const MAX_CARDS = 500;
-/** 最大用户类别数量 */
-export const MAX_CATEGORIES = 50;
-/** 保留类别名称（系统视图，不可作为用户类别名） */
-export const RESERVED_CATEGORY_NAMES = ['全部卡片', '未分类'] as const;
+export const MAX_CARD_NAME = 80
+export const MAX_CATEGORY_NAME = 30
+export const MAX_NOTE = 500
+export const MAX_CARDS = 500
+export const MAX_CATEGORIES = 50
+export const MAX_CATEGORY_TAGS = 2
+
+export const RESERVED_NAMES = ['全部卡片', '未分类'] as const
+
+export const VIEW_ALL_CARDS = 'allCards'
+export const VIEW_UNCATEGORIZED = 'uncategorized'
+
+export const SEARCH_DEBOUNCE_MS = 200
+export const SAVE_DEBOUNCE_MS = 500
+export const STATUS_BAR_MIN_MS = 8000
+export const CUMULATIVE_FAILURE_THRESHOLD = 3
+
+export const MIN_WINDOW_WIDTH = 760
+export const MIN_WINDOW_HEIGHT = 560
+export const DEFAULT_WINDOW_WIDTH = 1024
+export const DEFAULT_WINDOW_HEIGHT = 720
+export const SIDEBAR_WIDTH = 208
+export const CONTROL_HEIGHT = 36
+export const TARGET_MIN = 44
+
+export const HTML_READ_SIZE = 65536 // 64KB
+
+export const IPC_CHANNELS = {
+  FILE_SELECT: 'file:select',
+  FILE_READ_HTML_TITLE: 'file:readHtmlTitle',
+  SHELL_OPEN_FILE: 'shell:openFile',
+  SHELL_SHOW_IN_FOLDER: 'shell:showItemInFolder',
+  STORE_LOAD: 'store:load',
+  STORE_SAVE: 'store:save',
+} as const
+
+export const APP_DATA_FILENAME = 'app-data.json'

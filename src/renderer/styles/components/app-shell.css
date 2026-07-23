@@ -1,0 +1,263 @@
+/* ── AppShell ──
+   Root layout: sidebar (208px fixed) + main content area.
+   BEM block: qc-app-shell
+*/
+
+.qc-app-shell {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+
+.qc-app-shell__sidebar {
+  width: var(--spacing-sidebar);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  padding: var(--spacing-4) 0;
+}
+
+.qc-app-shell__nav-item {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.4;
+}
+
+.qc-app-shell__nav-item--active {
+  font-weight: var(--font-weight-label);
+  background: var(--color-surface-subtle);
+}
+
+/* ── Main content area ── */
+
+.qc-app-shell__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-canvas);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* ── Toolbar ── */
+
+.qc-app-shell__toolbar {
+  padding: var(--spacing-3) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+/* ── Card grid ──
+   Responsive: 3 cols ≥1024px, 2 cols 760-1023px, 1 col <760px.
+*/
+
+.qc-app-shell__grid {
+  display: grid;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-6);
+  flex: 1;
+  align-content: start;
+}
+
+@media (min-width: 1024px) {
+  .qc-app-shell__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1023.98px) {
+  .qc-app-shell__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 759.98px) {
+  .qc-app-shell__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Sidebar reorder mode ── */
+
+.qc-app-shell__sidebar-reorder {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.qc-app-shell__sidebar-reorder-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.qc-app-shell__sidebar-reorder-title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.qc-app-shell__sidebar-reorder-done-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-3);
+  border: none;
+  border-radius: var(--rounded-md);
+  background: var(--color-action);
+  color: var(--color-on-action);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.qc-app-shell__sidebar-reorder-done-btn:hover {
+  background: var(--color-action-hover);
+}
+
+.qc-app-shell__sidebar-reorder-done-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - var(--spacing-8));
+  margin: var(--spacing-2) var(--spacing-4);
+  min-height: var(--spacing-control-height);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.qc-app-shell__sidebar-reorder-cancel-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Card reorder area ── */
+
+.qc-app-shell__reorder-area {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Loading state ── */
+
+.qc-app-shell__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.qc-app-shell__loading-text {
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ── Error state ── */
+
+.qc-app-shell__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: var(--spacing-8);
+  text-align: center;
+}
+
+.qc-app-shell__error-title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-2);
+}
+
+.qc-app-shell__error-description {
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-6);
+  line-height: 1.6;
+}
+
+.qc-app-shell__error-actions {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.qc-app-shell__error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-4);
+  border-radius: var(--rounded-md);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  outline: none;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.qc-app-shell__error-btn--primary {
+  background: var(--color-action);
+  color: var(--color-on-action);
+  border: none;
+}
+
+.qc-app-shell__error-btn--primary:hover {
+  background: var(--color-action-hover);
+}
+
+.qc-app-shell__error-btn--primary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.qc-app-shell__error-btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.qc-app-shell__error-btn--secondary:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-app-shell__error-btn--secondary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

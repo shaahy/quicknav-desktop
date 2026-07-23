@@ -1,32 +1,56 @@
-import { MAX_CATEGORY_NAME_LENGTH, RESERVED_CATEGORY_NAMES } from './constants';
+import { MAX_CARD_NAME, MAX_CATEGORY_NAME, MAX_NOTE, RESERVED_NAMES } from './constants'
 
-/**
- * 校验类别名称
- * @param name - 待校验的类别名
- * @param existingNames - 已有类别名列表（用于唯一性检查），可选
- * @returns 校验通过返回 null，否则返回错误文案
- */
-export function validateCategoryName(
-  name: string,
-  existingNames?: string[],
-): string | null {
-  const trimmed = name.trim();
+export function validateCardName(name: string, existingNames: string[]): string | null {
+  const trimmed = name.trim()
+  if (!trimmed) return '名称不能为空'
+  if (trimmed.includes('\n')) return '名称不能包含换行'
+  if (trimmed.length > MAX_CARD_NAME) return `名称最多 ${MAX_CARD_NAME} 个字符`
+  if (existingNames.includes(trimmed)) return '该名称已被使用'
+  return null
+}
 
-  if (!trimmed) {
-    return '类别名不能为空';
+export function validateCategoryName(name: string, existingNames: string[]): string | null {
+  const trimmed = name.trim()
+  if (!trimmed) return '名称不能为空'
+  if (trimmed.includes('\n')) return '名称不能包含换行'
+  if (trimmed.length > MAX_CATEGORY_NAME) return `名称最多 ${MAX_CATEGORY_NAME} 个字符`
+  if ((RESERVED_NAMES as readonly string[]).includes(trimmed)) return '保留名称，不可使用'
+  if (existingNames.map(n => n.trim()).includes(trimmed)) return '该名称已被使用'
+  return null
+}
+
+export function validateNote(note: string): string | null {
+  if (note.length > MAX_NOTE) return `备注最多 ${MAX_NOTE} 个字符`
+  return null
+}
+
+export function normalizeNote(note: string): string | null {
+  const trimmed = note.trim()
+  return trimmed ? trimmed : null
+}
+
+export function isHtmlFile(extension: string): boolean {
+  return extension === 'html' || extension === 'htm'
+}
+
+export function normalizePath(p: string, platform: 'win32' | 'darwin'): string {
+  if (platform === 'win32') {
+    let normalized = p.replace(/\\/g, '/')
+    if (/^[a-z]:\//i.test(normalized)) {
+      normalized = normalized[0].toUpperCase() + normalized.slice(1)
+    }
+    return normalized
   }
+  return p
+}
 
-  if (trimmed.length > MAX_CATEGORY_NAME_LENGTH) {
-    return `类别名不能超过${MAX_CATEGORY_NAME_LENGTH}个字符`;
-  }
-
-  if ((RESERVED_CATEGORY_NAMES as readonly string[]).includes(trimmed)) {
-    return `"${trimmed}"为保留名称，不可使用`;
-  }
-
-  if (existingNames && existingNames.includes(trimmed)) {
-    return '该名称已存在';
-  }
-
-  return null;
+export function hasUnsavedChanges(
+  current: { name: string; note: string; categoryIds: string[] },
+  initial: { name: string; note: string; categoryIds: string[] }
+): boolean {
+  return (
+    current.name !== initial.name ||
+    current.note !== initial.note ||
+    JSON.stringify([...current.categoryIds].sort()) !== JSON.stringify([...initial.categoryIds].sort())
+  )
 }

@@ -1,0 +1,115 @@
+/* ── CategoryEditorPopover ──
+   Small dialog for creating / renaming a category.
+   BEM block: qc-category-editor-popover
+*/
+
+.qc-category-editor-popover__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 50;
+}
+
+.qc-category-editor-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 51;
+  padding: var(--spacing-5);
+  font-family: var(--font-family-ui);
+}
+
+.qc-category-editor-popover__title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-4);
+}
+
+.qc-category-editor-popover__body {
+  margin-bottom: var(--spacing-4);
+}
+
+.qc-category-editor-popover__input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  padding: var(--spacing-2) var(--spacing-3);
+  outline: none;
+  line-height: 1.4;
+  min-height: var(--spacing-control-height);
+}
+
+.qc-category-editor-popover__input:focus {
+  border-color: var(--color-focus);
+}
+
+.qc-category-editor-popover__input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.qc-category-editor-popover__error {
+  font-size: var(--font-size-meta);
+  color: var(--color-danger);
+  margin: var(--spacing-2) 0 0;
+  line-height: 1.4;
+}
+
+.qc-category-editor-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+
+.qc-category-editor-popover__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-4);
+  border-radius: var(--rounded-md);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  outline: none;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.qc-category-editor-popover__btn--cancel {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.qc-category-editor-popover__btn--cancel:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-category-editor-popover__btn--save {
+  background: var(--color-action);
+  color: var(--color-on-action);
+  border: none;
+}
+
+.qc-category-editor-popover__btn--save:hover {
+  background: var(--color-action-hover);
+}
+
+.qc-category-editor-popover__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

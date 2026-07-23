@@ -1,0 +1,159 @@
+/* ── CardFormDialog ──
+   Modal form for creating / editing cards.
+   BEM block: qc-card-form-dialog
+   Uses @radix-ui/react-dialog for modal behavior.
+*/
+
+/* ── Overlay (scrim) ── */
+
+.qc-card-form-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+/* ── Dialog surface ── */
+
+.qc-card-form-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-6);
+  min-width: 420px;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.qc-card-form-dialog:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Title ── */
+
+.qc-card-form-dialog__title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-4);
+}
+
+/* ── Body / form fields ── */
+
+.qc-card-form-dialog__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+/* ── Section (category group) ── */
+
+.qc-card-form-dialog__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.qc-card-form-dialog__section-label {
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  color: var(--color-text);
+}
+
+/* ── File area (edit mode only) ── */
+
+.qc-card-form-dialog__file-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.qc-card-form-dialog__file-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.qc-card-form-dialog__file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface);
+  color: var(--color-action);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-meta);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.qc-card-form-dialog__file-btn:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-card-form-dialog__file-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Action buttons (cancel / save) ── */
+
+.qc-card-form-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+
+.qc-card-form-dialog__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-4);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.qc-card-form-dialog__btn--cancel {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.qc-card-form-dialog__btn--cancel:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-card-form-dialog__btn--save {
+  background: var(--color-action);
+  color: var(--color-on-action);
+  border: none;
+}
+
+.qc-card-form-dialog__btn--save:hover {
+  opacity: 0.9;
+}
+
+.qc-card-form-dialog__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

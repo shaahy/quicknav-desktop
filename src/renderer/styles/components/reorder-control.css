@@ -1,0 +1,140 @@
+/* ── ReorderControl ──
+   Reorderable list with drag handle and up/down buttons.
+   BEM block: qc-reorder-control
+   Visual tokens: --color-surface, --color-text, --color-border, --color-focus,
+                  --color-text-disabled, --color-text-muted, --color-border-muted,
+                  --color-surface-subtle, --rounded-sm, --spacing-*, --font-size-*
+*/
+
+/* ── Container ── */
+
+.qc-reorder-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+/* ── Empty state ── */
+
+.qc-reorder-control--empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+/* ── ARIA live region (visually hidden, active for screen readers) ── */
+
+.qc-reorder-control__live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Item row ── */
+
+.qc-reorder-control__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  min-height: var(--spacing-control-height);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.qc-reorder-control__item:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-reorder-control__item:focus-within {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Drag-over indicator ── */
+
+.qc-reorder-control__item--drag-over {
+  border-color: var(--color-focus);
+  background: var(--color-surface-subtle);
+}
+
+/* ── Drag handle ── */
+
+.qc-reorder-control__drag-handle {
+  flex-shrink: 0;
+  cursor: grab;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.qc-reorder-control__drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ── Item name ── */
+
+.qc-reorder-control__name {
+  flex: 1;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-body);
+  color: var(--color-text);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Up / Down buttons ── */
+
+.qc-reorder-control__btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--spacing-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-meta);
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.qc-reorder-control__btn:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+.qc-reorder-control__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Disabled button (first item up / last item down) ── */
+
+.qc-reorder-control__btn:disabled {
+  color: var(--color-text-disabled);
+  border-color: var(--color-border-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}

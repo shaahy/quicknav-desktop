@@ -1,0 +1,104 @@
+/* ── ConfirmationDialog ──
+   Alert dialog for destructive action confirmation (S13, S14, S15).
+   BEM block: qc-confirmation-dialog
+   Uses @radix-ui/react-dialog for modal behavior.
+*/
+
+/* ── Overlay (scrim) ── */
+
+.qc-confirmation-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+/* ── Dialog surface ── */
+
+.qc-confirmation-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-6);
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.qc-confirmation-dialog:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Title ── */
+
+.qc-confirmation-dialog__title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-3);
+}
+
+/* ── Body ── */
+
+.qc-confirmation-dialog__body {
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-6);
+}
+
+/* ── Action buttons ── */
+
+.qc-confirmation-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+
+.qc-confirmation-dialog__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.qc-confirmation-dialog__btn--safe {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.qc-confirmation-dialog__btn--safe:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-confirmation-dialog__btn--destructive {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+  border: none;
+}
+
+.qc-confirmation-dialog__btn--destructive:hover {
+  opacity: 0.9;
+}
+
+.qc-confirmation-dialog__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

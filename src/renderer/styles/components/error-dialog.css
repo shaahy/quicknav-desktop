@@ -1,0 +1,150 @@
+/* ── ErrorDialog ──
+   Alert dialog for error feedback after file operations fail (S12).
+   BEM block: qc-error-dialog
+   Uses @radix-ui/react-dialog for modal behavior.
+*/
+
+/* ── Overlay (scrim) ── */
+
+.qc-error-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+/* ── Dialog surface ── */
+
+.qc-error-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-6);
+  min-width: 360px;
+  max-width: 440px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  outline: none;
+}
+
+.qc-error-dialog:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Header (icon + title) ── */
+
+.qc-error-dialog__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-3);
+}
+
+.qc-error-dialog__warning-icon {
+  color: var(--color-warning);
+  flex-shrink: 0;
+}
+
+.qc-error-dialog__title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* ── Body ── */
+
+.qc-error-dialog__body {
+  font-size: var(--font-size-body);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-6);
+}
+
+.qc-error-dialog__message {
+  margin: 0 0 var(--spacing-1);
+}
+
+.qc-error-dialog__card-name {
+  font-weight: var(--font-weight-label);
+  color: var(--color-text);
+  margin: 0 0 var(--spacing-1);
+  word-break: break-all;
+}
+
+.qc-error-dialog__error-detail {
+  margin: var(--spacing-2) 0 0;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-surface-subtle);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-text-muted);
+}
+
+/* ── Action buttons ── */
+
+.qc-error-dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+}
+
+.qc-error-dialog__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--spacing-control-height);
+  padding: 0 var(--spacing-3);
+  border-radius: var(--rounded-sm);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.qc-error-dialog__btn--safe {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.qc-error-dialog__btn--safe:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-error-dialog__btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-muted);
+}
+
+.qc-error-dialog__btn--secondary:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.qc-error-dialog__btn--destructive {
+  background: var(--color-danger);
+  color: var(--color-on-danger);
+  border: none;
+}
+
+.qc-error-dialog__btn--destructive:hover {
+  opacity: 0.9;
+}
+
+.qc-error-dialog__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
