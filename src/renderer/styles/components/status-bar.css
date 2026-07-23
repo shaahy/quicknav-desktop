@@ -1,0 +1,60 @@
+/* ── StatusBar ──
+   Transient status bar anchored to the bottom of the main content area.
+   BEM block: qc-status-bar
+   Does NOT push layout — overlays at the bottom.
+*/
+
+.qc-status-bar {
+  position: fixed;
+  bottom: 0;
+  left: var(--spacing-sidebar);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--color-surface);
+  border-top: 2px solid var(--color-success);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  min-height: var(--spacing-control-height);
+}
+
+.qc-status-bar__message {
+  font-size: var(--font-size-label);
+  color: var(--color-success);
+  font-weight: var(--font-weight-label);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qc-status-bar__dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rounded-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-body);
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.qc-status-bar__dismiss:hover {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}
+
+.qc-status-bar__dismiss:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
