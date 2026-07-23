@@ -1,13 +1,20 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import { loadAppData, saveAppData, emptyAppData, getDataPath } from '../../src/main/store'
 
+// Make fs mockable for error handling tests (spyOn across mock boundaries)
+vi.mock('fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('fs')>()
+  return { ...actual }
+})
+
 const tmpDir = path.join(os.tmpdir(), 'qc-store-test-' + Date.now())
 
 describe('store', () => {
   afterEach(() => {
+    vi.restoreAllMocks()
     if (fs.existsSync(tmpDir)) fs.rmSync(tmpDir, { recursive: true })
   })
 
@@ -50,5 +57,87 @@ describe('store', () => {
     const result = saveAppData(blockedDir, emptyAppData())
     expect(result.success).toBe(false)
     fs.rmSync(blockedDir)
+  })
+
+  // ── Save error handling (mocked fs) ──
+
+  it('saveAppData returns disk-full when write fails with ENOSPC', () => {
+    vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {
+      const err: any = new Error('No space left on device')
+      err.code = 'ENOSPC'
+      throw err
+    })
+
+    const result = saveAppData(tmpDir, emptyAppData())
+    expect(result.success).toBe(false)
+    if (!result.success) expect(result.error).toBe('disk-full')
+  })
+
+  it('saveAppData returns permission-denied when write fails with EACCES', () => {
+    vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {
+      const err: any = new Error('Permission denied')
+      err.code = 'EACCES'
+      throw err
+    })
+
+    const result = saveAppData(tmpDir, emptyAppData())
+    expect(result.success).toBe(false)
+    if (!result.success) expect(result.error).toBe('permission-denied')
+  })
+
+  it('saveAppData returns locked when write fails with EBUSY', () => {
+    vi.spyOn(fs, 'writeFileSync').mockImplementation(() => {
+      const err: any = new Error('Resource busy')
+      err.code = 'EBUSY'
+      throw err
+    })
+
+    const result = saveAppData(tmpDir, emptyAppData())
+    expect(result.success).toBe(false)
+    if (!result.success) expect(result.error).toBe('locked')
+  })
+
+  it('saveAppData calls fs.fsyncSync after successful write (CHK029)', () => {
+    const fsyncSpy = vi.spyOn(fs, 'fsyncSync')
+
+    const data = emptyAppData()
+    const result = saveAppData(tmpDir, data)
+
+    expect(result.success).toBe(true)
+    expect(fsyncSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('saveAppData does NOT corrupt existing file on write failure (original file intact)', () => {
+    // First, save some data successfully
+    const originalData = emptyAppData()
+    originalData.cards.push({
+      id: 'existing-id',
+      name: 'Original File',
+      note: null,
+      fileReference: { absolutePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
+      categoryIds: [],
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    })
+    const saveResult = saveAppData(tmpDir, originalData)
+    expect(saveResult.success).toBe(true)
+
+    // Read the saved file content as baseline
+    const originalContent = fs.readFileSync(getDataPath(tmpDir), 'utf-8')
+
+    // Mock openSync to fail with EACCES (permission denied BEFORE truncation)
+    vi.spyOn(fs, 'openSync').mockImplementation(() => {
+      const err: any = new Error('Permission denied')
+      err.code = 'EACCES'
+      throw err
+    })
+
+    // Attempt to save new data (should fail because openSync throws)
+    const failResult = saveAppData(tmpDir, emptyAppData())
+    expect(failResult.success).toBe(false)
+
+    // Verify original file is unchanged
+    const afterContent = fs.readFileSync(getDataPath(tmpDir), 'utf-8')
+    expect(afterContent).toBe(originalContent)
   })
 })

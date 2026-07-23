@@ -1,0 +1,13 @@
+{
+  "task": "TDD: shell.ts tests + store.ts save error handling tests",
+  "steps": [
+    { "done": false, "id": "1", "name": "RED: Write shell.test.ts (10 tests)", "detail": "Create tests/unit/shell.test.ts with all 10 tests using mocked electron/fs" },
+    { "done": false, "id": "2", "name": "RED: Run shell.test.ts → FAIL verification", "detail": "Run npx vitest run tests/unit/shell.test.ts, observe failures, document" },
+    { "done": false, "id": "3", "name": "GREEN: Add store error-handling tests (5 tests) to store.test.ts", "detail": "Add vi.mock for fs, 5 new tests for disk-full, permission-denied, locked, fsync, no-corruption" },
+    { "done": false, "id": "4", "name": "RED: Run store.test.ts → FAIL verification", "detail": "Run npx vitest run tests/unit/store.test.ts, observe failures" },
+    { "done": false, "id": "5", "name": "GREEN/REFACTOR: Fix mock issues, ensure all tests pass", "detail": "Iterate on test/mock code until all tests pass cleanly" },
+    { "done": false, "id": "6", "name": "TDD Compliance: Verify each test fails without implementation", "detail": "For each new test, temporarily disable implementation, verify test fails, restore" },
+    { "done": false, "id": "7", "name": "Final verification: all tests pass + tsc --noEmit", "detail": "npx vitest run && npx tsc --noEmit" },
+    { "done": false, "id": "8", "name": "Write report + commit", "detail": "Write .superpowers/sdd/task-tdd-2-report.md, commit as 'test: TDD unit tests...'" }
+  ]
+}
