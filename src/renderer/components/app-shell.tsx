@@ -15,6 +15,7 @@ import { ActionMenu } from './action-menu'
 import { ConfirmationDialog } from './confirmation-dialog'
 import { ReorderControl } from './reorder-control'
 import { CategoryEditorPopover } from './category-editor-popover'
+import { GlobalSearch } from './global-search'
 import '../styles/components/app-shell.css'
 
 export interface AppShellProps {
@@ -552,6 +553,8 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           cardCount={visibleCards.length}
           showSortInfo={isCardReorderMode}
         />
+
+        <GlobalSearch />
 
         <div className="qc-app-shell__toolbar">
           {isCardReorderMode ? (
