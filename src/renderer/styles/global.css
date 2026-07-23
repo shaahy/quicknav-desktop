@@ -18,6 +18,32 @@ body {
   color: var(--color-text);
   background: var(--color-canvas);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Text selection ──
+   Uses --color-action at low opacity for a subtle tint. */
+::selection {
+  background: color-mix(in srgb, var(--color-action) 20%, transparent);
+}
+::-moz-selection {
+  background: color-mix(in srgb, var(--color-action) 20%, transparent);
+}
+
+/* ── Scrollbar (WebKit / Firefox) ──
+   Thin, low-visibility thumb; no track styling. */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-muted);
+  border-radius: 3px;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-muted) transparent;
 }
 
 /* BEM naming convention prefix: qc- (quick-lookup) */
+/* Reduced-motion media query lives in tokens.css */

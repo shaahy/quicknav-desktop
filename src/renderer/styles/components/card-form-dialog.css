@@ -152,3 +152,8 @@
 .qc-card-form-dialog__btn--save:hover {
   opacity: 0.9;
 }
+
+.qc-card-form-dialog__btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

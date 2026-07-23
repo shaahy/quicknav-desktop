@@ -1,5 +1,11 @@
 :root {
   /* Colors */
+  /* Contrast ratios (against WCAG AA / AAA thresholds):
+       --color-text (#1B211D) on --color-canvas (#F4F3EC): ~14.73:1
+       --color-text (#1B211D) on --color-surface (#FFFDF7): ~16.11:1
+       --color-on-action (#FFFFFF) on --color-action (#1F6248): ~7.24:1
+       --color-on-danger (#FFFFFF) on --color-danger (#A52A2A): ~7.08:1
+  */
   --color-canvas: #F4F3EC;
   --color-surface: #FFFDF7;
   --color-surface-subtle: #E8E9E1;
