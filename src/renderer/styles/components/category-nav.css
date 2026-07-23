@@ -1,0 +1,89 @@
+/* ── CategoryNav ──
+   Sidebar navigation for category views in the QuickLook app.
+   BEM block: qc-category-nav
+*/
+
+.qc-category-nav {
+  width: var(--spacing-sidebar);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ── Header row ── */
+
+.qc-category-nav__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.qc-category-nav__title {
+  font-size: var(--font-size-heading);
+  font-weight: var(--font-weight-heading);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.qc-category-nav__add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 18px;
+  font-weight: var(--font-weight-heading);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.qc-category-nav__add-btn:hover {
+  background: var(--color-surface-subtle);
+}
+
+.qc-category-nav__add-btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Views list ── */
+
+.qc-category-nav__list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-2) var(--spacing-2);
+}
+
+/* ── Rename row ── */
+
+.qc-category-nav__rename-row {
+  min-height: var(--spacing-control-height);
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.qc-category-nav__rename-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-focus);
+  border-radius: var(--rounded-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+  outline: none;
+  line-height: 1.4;
+}
