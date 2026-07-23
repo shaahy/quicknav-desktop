@@ -1,0 +1,23 @@
+@import './tokens.css';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-body);
+  color: var(--color-text);
+  background: var(--color-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* BEM naming convention prefix: qc- (quick-lookup) */

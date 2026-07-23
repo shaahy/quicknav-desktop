@@ -1,0 +1,63 @@
+:root {
+  /* Colors */
+  --color-canvas: #F4F3EC;
+  --color-surface: #FFFDF7;
+  --color-surface-subtle: #E8E9E1;
+  --color-text: #1B211D;
+  --color-text-muted: #566158;
+  --color-text-disabled: #747D76;
+  --color-border: #253229;
+  --color-border-muted: #A9AFA9;
+  --color-action: #1F6248;
+  --color-action-hover: #154532;
+  --color-on-action: #FFFFFF;
+  --color-focus: #6D43B5;
+  --color-success: #216E39;
+  --color-warning: #895400;
+  --color-danger: #A52A2A;
+  --color-on-danger: #FFFFFF;
+
+  /* Typography */
+  --font-family-ui: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-family-mono: ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-size-title: 22px;
+  --font-size-heading: 16px;
+  --font-size-body: 14px;
+  --font-size-label: 13px;
+  --font-size-meta: 12px;
+  --font-weight-title: 700;
+  --font-weight-heading: 700;
+  --font-weight-body: 400;
+  --font-weight-label: 600;
+  --font-weight-meta: 400;
+
+  /* Spacing (4px rhythm) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-sidebar: 208px;
+  --spacing-control-height: 36px;
+  --spacing-target-min: 44px;
+
+  /* Rounded corners */
+  --rounded-none: 0px;
+  --rounded-sm: 2px;
+  --rounded-md: 4px;
+}
+
+/* Focus ring — 2px solid focus-color + 2px offset */
+*:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
