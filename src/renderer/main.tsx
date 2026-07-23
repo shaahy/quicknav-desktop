@@ -9,20 +9,30 @@ import './styles/global.css'
  * and passes it as props to AppShell.
  */
 function AppShellWithState() {
-  const { state } = useAppState()
+  const { state, dispatch } = useAppState()
 
   const loadingState: 'loading' | 'ready' | 'error' =
-    state.isLoading ? 'loading' : 'ready'
+    state.isLoading
+      ? 'loading'
+      : state.loadError
+        ? 'error'
+        : 'ready'
 
   const retryLoad = useCallback(() => {
-    window.location.reload()
-  }, [])
+    dispatch({ type: 'RETRY_LOAD' })
+  }, [dispatch])
+
+  const rebuildData = useCallback(() => {
+    dispatch({ type: 'REBUILD_DATA' })
+  }, [dispatch])
 
   return (
     <AppShell
       loadingState={loadingState}
       retryLoad={retryLoad}
       quitApp={() => window.electronAPI.quitApp()}
+      loadError={state.loadError}
+      rebuildData={state.loadRetryCount > 0 ? rebuildData : undefined}
     />
   )
 }

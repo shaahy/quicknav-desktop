@@ -19,6 +19,9 @@ type AppAction =
   | { type: 'SET_CURRENT_VIEW'; viewType: ViewType }
   | { type: 'SET_SEARCH_QUERY'; query: string }
   | { type: 'SET_SAVE_ERROR'; error: string | null }
+  | { type: 'SET_LOAD_ERROR'; error: string }
+  | { type: 'RETRY_LOAD' }
+  | { type: 'REBUILD_DATA' }
 
 // ── State ──
 
@@ -28,6 +31,7 @@ interface AppState {
   searchQuery: string
   isLoading: boolean
   loadError: string | null
+  loadRetryCount: number
   saveError: string | null
 }
 
@@ -47,6 +51,7 @@ const initialState: AppState = {
   searchQuery: '',
   isLoading: true,
   loadError: null,
+  loadRetryCount: 0,
   saveError: null,
 }
 
@@ -60,7 +65,35 @@ function appReducer(state: AppState, action: AppAction): AppState {
         data: action.data,
         isLoading: false,
         loadError: null,
+        loadRetryCount: 0,
         saveError: null,
+      }
+    }
+
+    case 'SET_LOAD_ERROR': {
+      return {
+        ...state,
+        isLoading: false,
+        loadError: action.error,
+      }
+    }
+
+    case 'RETRY_LOAD': {
+      return {
+        ...state,
+        isLoading: true,
+        loadError: null,
+        loadRetryCount: state.loadRetryCount + 1,
+      }
+    }
+
+    case 'REBUILD_DATA': {
+      return {
+        ...state,
+        data: INITIAL_APP_DATA,
+        isLoading: false,
+        loadError: null,
+        loadRetryCount: 0,
       }
     }
 
@@ -381,7 +414,7 @@ const AppContext = createContext<AppContextValue | null>(null)
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState)
 
-  // Load app data on mount
+  // Load app data on mount and on retry
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -390,18 +423,21 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
         if (cancelled) return
         if (result.data) {
           dispatch({ type: 'LOAD', data: result.data })
+        } else if (result.error === 'corrupted') {
+          // Data is corrupted — show blocking error (FR-036a)
+          dispatch({ type: 'SET_LOAD_ERROR', error: 'corrupted' })
         } else {
-          // 'not-found', 'corrupted', or missing data — start fresh
+          // 'not-found' — first launch, start with empty data
           dispatch({ type: 'LOAD', data: INITIAL_APP_DATA })
         }
       } catch {
         if (!cancelled) {
-          dispatch({ type: 'LOAD', data: INITIAL_APP_DATA })
+          dispatch({ type: 'SET_LOAD_ERROR', error: 'unknown' })
         }
       }
     })()
     return () => { cancelled = true }
-  }, [])
+  }, [state.loadRetryCount])
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

@@ -31,6 +31,10 @@ export interface AppShellProps {
   retryLoad: () => void
   /** Called when the user clicks the quit button in error state. */
   quitApp: () => void
+  /** Load error type (shown in error state). */
+  loadError?: string | null
+  /** Called when user chooses to rebuild corrupted data (shown after retry). */
+  rebuildData?: () => void
 }
 
 /**
@@ -45,7 +49,7 @@ export interface AppShellProps {
  * - error:    blocking error feedback with retry + quit buttons
  * - ready:    full app UI (cards grid or empty-state for first-launch)
  */
-export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
+export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildData }: AppShellProps) {
   const { state } = useAppState()
   const dispatch = useAppDispatch()
   const { visibleCards, addCard, updateCard, deleteCard, findDuplicateByPath } = useCards()
@@ -692,7 +696,9 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
           <div className="qc-app-shell__error" role="alert">
             <h2 className="qc-app-shell__error-title">无法加载本地数据</h2>
             <p className="qc-app-shell__error-description">
-              请检查文件权限后重试
+              {loadError === 'corrupted'
+                ? '数据文件损坏，无法读取'
+                : '请检查文件权限后重试'}
             </p>
             <div className="qc-app-shell__error-actions">
               <button
@@ -703,6 +709,15 @@ export function AppShell({ loadingState, retryLoad, quitApp }: AppShellProps) {
               >
                 重试
               </button>
+              {rebuildData && (
+                <button
+                  className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
+                  onClick={rebuildData}
+                  type="button"
+                >
+                  数据已损坏，需重新开始
+                </button>
+              )}
               <button
                 className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
                 onClick={quitApp}
