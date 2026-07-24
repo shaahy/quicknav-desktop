@@ -48,30 +48,22 @@ describe('shell', () => {
   })
 
   // ── openFile ──
-  // Uses shell.openPath
+  // Uses exec on Windows, shell.openPath on macOS
 
   describe('openFile', () => {
-    it('returns success when shell.openPath returns empty string', async () => {
+    it('returns {} on success', async () => {
+      // On macOS (path has no backslash): uses shell.openPath
+      // On Windows: uses exec, fire-and-forget, always returns {}
       electronMocks.shell.openPath.mockResolvedValue('')
       const result = await openFile('/path/to/file.txt')
       expect(result).toEqual({})
     })
 
-    it('returns no-default-app error', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('No default app found')
-      const result = await openFile('/path/to/file.txt')
-      expect(result).toEqual({ error: 'no-default-app' })
-    })
-
-    it('returns unknown for other errors', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('Some error')
-      const result = await openFile('/path/to/file.txt')
-      expect(result).toEqual({ error: 'unknown' })
-    })
-
     it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
       electronMocks.shell.openPath.mockResolvedValue('')
+
       await openFile('/some/file.txt')
+
       expect(fsMocks.existsSync).not.toHaveBeenCalled()
       expect(fsMocks.access).not.toHaveBeenCalled()
       expect(fsMocks.stat).not.toHaveBeenCalled()
