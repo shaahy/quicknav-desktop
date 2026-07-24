@@ -34,14 +34,25 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 
 export async function openFile(absolutePath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
-  // Paths are stored normalized (forward slashes) but Windows needs backslashes.
   const nativePath = process.platform === 'win32'
     ? absolutePath.replace(/\//g, '\\')
     : absolutePath
-  console.log('[openFile] native:', nativePath)
+  console.log('[openFile] path:', nativePath)
   try {
+    if (process.platform === 'win32') {
+      // shell.openPath hangs with Chinese paths on some Windows configs.
+      // Use child_process.exec with cmd /c start — this is Windows' native
+      // file-open mechanism and handles all characters correctly.
+      const { exec } = await import('child_process')
+      const cmd = `start "" "${nativePath}"`
+      console.log('[openFile] exec:', cmd)
+      exec(cmd, { shell: 'cmd.exe', windowsHide: true }, (err) => {
+        if (err) console.error('[openFile] exec error:', err.message)
+        else console.log('[openFile] exec ok')
+      })
+      return {}
+    }
     const error = await shell.openPath(nativePath)
-    console.log('[openFile] result:', JSON.stringify(error))
     if (!error) return {}
     if (error.includes('No default app') || error.includes('no application')) {
       return { error: 'no-default-app' }
