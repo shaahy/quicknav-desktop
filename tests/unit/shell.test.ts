@@ -7,6 +7,7 @@ const electronMocks = vi.hoisted(() => ({
   dialog: { showOpenDialog: vi.fn() },
   shell: {
     openPath: vi.fn<(path: string) => Promise<string>>(),
+    openExternal: vi.fn<(url: string) => Promise<void>>(),
     showItemInFolder: vi.fn(),
   },
 }))
@@ -47,27 +48,32 @@ describe('shell', () => {
   })
 
   // ── openFile ──
+  // Uses shell.openExternal with file:// URL for broad compatibility
 
   describe('openFile', () => {
-    it('returns success (empty error) when shell.openPath succeeds', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('')
+    it('opens file via openExternal with file:// URL', async () => {
+      electronMocks.shell.openExternal.mockResolvedValue(undefined as any)
 
       const result = await openFile('/path/to/file.txt')
 
       expect(result).toEqual({})
-      expect(electronMocks.shell.openPath).toHaveBeenCalledWith('/path/to/file.txt')
+      expect(electronMocks.shell.openExternal).toHaveBeenCalledWith(
+        expect.stringContaining('file://')
+      )
     })
 
-    it('returns no-default-app when shell reports no default app', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('No default app found')
+    it('encodes spaces in file path', async () => {
+      electronMocks.shell.openExternal.mockResolvedValue(undefined as any)
 
-      const result = await openFile('/path/to/file.txt')
+      await openFile('/path/with spaces/file.txt')
 
-      expect(result).toEqual({ error: 'no-default-app' })
+      expect(electronMocks.shell.openExternal).toHaveBeenCalledWith(
+        expect.stringContaining('%20')
+      )
     })
 
-    it('returns unknown for other errors', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('Error: Some random error')
+    it('returns unknown error when openExternal throws', async () => {
+      electronMocks.shell.openExternal.mockRejectedValue(new Error('Failed'))
 
       const result = await openFile('/path/to/file.txt')
 
@@ -75,7 +81,7 @@ describe('shell', () => {
     })
 
     it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
-      electronMocks.shell.openPath.mockResolvedValue('')
+      electronMocks.shell.openExternal.mockResolvedValue(undefined as any)
 
       await openFile('/some/file.txt')
 

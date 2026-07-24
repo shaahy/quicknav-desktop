@@ -107,7 +107,7 @@ describe('CHK019 — no pre-check before shell.openPath / shell.showItemInFolder
     lines = shellSource.split('\n')
   })
 
-  it('openFile must not call fs.existsSync/fs.access/fs.stat before shell.openPath', () => {
+  it('openFile must not call fs.existsSync/fs.access/fs.stat before shell.openExternal', () => {
     const bounds = findFunctionBounds(lines, 'openFile')
     expect(bounds).not.toBeNull()
     if (!bounds) return
@@ -116,7 +116,7 @@ describe('CHK019 — no pre-check before shell.openPath / shell.showItemInFolder
       lines,
       bounds.start,
       bounds.end,
-      'shell.openPath'
+      'shell.openExternal'
     )
 
     if (violations.length > 0) {
@@ -124,7 +124,7 @@ describe('CHK019 — no pre-check before shell.openPath / shell.showItemInFolder
         .map((v) => `  Line ${v.line}: ${v.text}`)
         .join('\n')
       expect.fail(
-        `Found pre-check fs call(s) before shell.openPath in openFile():\n${detail}`
+        `Found pre-check fs call(s) before shell.openExternal in openFile():\n${detail}`
       )
     }
   })

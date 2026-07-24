@@ -374,6 +374,23 @@
       ],
       "createdAt": "2026-07-24T03:44:21.329Z",
       "updatedAt": "2026-07-24T03:44:21.329Z"
+    },
+    {
+      "id": "c6007c68-cd77-488f-beb9-995506dcf953",
+      "name": "四种组合开发流程精简对比矩阵",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/四种组合开发流程对比/四种组合开发流程对比.html",
+        "fileName": "四种组合开发流程对比",
+        "extension": "html",
+        "fileSize": 21790,
+        "mtimeMs": 1784873295796.2385
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T06:11:42.485Z",
+      "updatedAt": "2026-07-24T06:11:42.485Z"
     }
   ],
   "categories": [
@@ -404,6 +421,7 @@
       "viewType": "category:0e59029a-e4ec-41fa-981a-c2a69bb8485d",
       "cardIds": [
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "c6007c68-cd77-488f-beb9-995506dcf953",
         "9d8dd7fa-7845-406a-9b07-18411732f569",
         "66b4da5d-0535-4814-a79c-dc89943bbc02",
         "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
@@ -440,7 +458,8 @@
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
         "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
-        "162fe64a-f260-49f7-b507-4bd4bc213cea"
+        "162fe64a-f260-49f7-b507-4bd4bc213cea",
+        "c6007c68-cd77-488f-beb9-995506dcf953"
       ]
     },
     {

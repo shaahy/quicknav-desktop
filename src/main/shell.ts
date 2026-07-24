@@ -1,6 +1,7 @@
 import { dialog, shell, BrowserWindow } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
+import { pathToFileURL } from 'url'
 import type { FileSelectionResult, OpenResult, LocateResult } from '../shared/types'
 import { HTML_READ_SIZE } from '../shared/constants'
 
@@ -33,17 +34,15 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 }
 
 export async function openFile(absolutePath: string): Promise<OpenResult> {
-  // CRITICAL: Do NOT pre-check file existence with fs.existsSync/fs.access/fs.stat
-  // shell.openPath handles all error cases itself (CHK019, constitution III)
+  // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
+  // Use pathToFileURL for proper encoding of spaces, Chinese chars, etc.
+  // Then shell.openExternal works reliably with ALL third-party apps.
   console.log('[openFile] path:', absolutePath)
   try {
-    const error = await shell.openPath(absolutePath)
-    console.log('[openFile] result:', JSON.stringify(error))
-    if (!error) return {}
-    if (error.includes('No default app') || error.includes('no application')) {
-      return { error: 'no-default-app' }
-    }
-    return { error: 'unknown' }
+    const fileUrl = pathToFileURL(absolutePath).href
+    console.log('[openFile] opening via openExternal:', fileUrl)
+    await shell.openExternal(fileUrl)
+    return {}
   } catch (e) {
     console.error('[openFile] exception:', e)
     return { error: 'unknown' }
