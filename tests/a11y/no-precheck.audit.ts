@@ -107,14 +107,11 @@ describe('CHK019 — no pre-check before shell.openPath / shell.showItemInFolder
     lines = shellSource.split('\n')
   })
 
-  it('openFile must not call fs.existsSync/fs.access/fs.stat before executing', () => {
+  it('openFile must not call fs.existsSync/fs.access/fs.stat before shell.openPath', () => {
     const bounds = findFunctionBounds(lines, 'openFile')
     expect(bounds).not.toBeNull()
     if (!bounds) return
 
-    // openFile uses child_process.exec on Windows and shell.openPath on macOS
-    // Both paths are after the import section, so we check for pre-check calls
-    // anywhere before the exec/shell call
     const violations = hasForbiddenFSCall(
       lines,
       bounds.start,
@@ -127,7 +124,7 @@ describe('CHK019 — no pre-check before shell.openPath / shell.showItemInFolder
         .map((v) => `  Line ${v.line}: ${v.text}`)
         .join('\n')
       expect.fail(
-        `Found pre-check fs call(s) before shell call in openFile():\n${detail}`
+        `Found pre-check fs call(s) before shell.openPath in openFile():\n${detail}`
       )
     }
   })

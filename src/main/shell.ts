@@ -34,22 +34,12 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 
 export async function openFile(absolutePath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
+  // shell.openPath is the standard Electron API — handles all paths correctly
+  // including Chinese characters and spaces.
   console.log('[openFile] path:', absolutePath)
   try {
-    const { platform } = process
-    if (platform === 'win32') {
-      // Use spawn with shell:true + detached to fire-and-forget.
-      // exec opens a visible CMD window which can interfere with Electron.
-      const { spawn } = await import('child_process')
-      spawn('cmd', ['/c', 'start', '', absolutePath], {
-        shell: true,
-        detached: true,
-        stdio: 'ignore',
-      }).unref()
-      return {}
-    }
-    // macOS/Linux: shell.openPath is reliable
     const error = await shell.openPath(absolutePath)
+    console.log('[openFile] result:', JSON.stringify(error))
     if (!error) return {}
     if (error.includes('No default app') || error.includes('no application')) {
       return { error: 'no-default-app' }

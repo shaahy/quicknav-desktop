@@ -48,27 +48,34 @@ describe('shell', () => {
   })
 
   // ── openFile ──
-  // Uses child_process.exec on Windows, shell.openPath on macOS
+  // Uses shell.openPath
 
   describe('openFile', () => {
-    it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
-      // On Windows, openFile uses child_process.exec and the Promise never
-      // resolves in the test because we don't mock exec. But the CHK019 check
-      // happens synchronously BEFORE entering the async code path — verify
-      // that no pre-check fs calls are made before entering the async block.
-      // We test this by calling openFile and checking the mock state immediately
-      // (before the promise resolves).
-      const promise = openFile('C:\\some\\file.txt')
+    it('returns success when shell.openPath returns empty string', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('')
+      const result = await openFile('/path/to/file.txt')
+      expect(result).toEqual({})
+    })
 
-      // These checks run synchronously — if openFile called fs.existsSync
-      // before entering the async block, the mocks would have recorded it
+    it('returns no-default-app error', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('No default app found')
+      const result = await openFile('/path/to/file.txt')
+      expect(result).toEqual({ error: 'no-default-app' })
+    })
+
+    it('returns unknown for other errors', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('Some error')
+      const result = await openFile('/path/to/file.txt')
+      expect(result).toEqual({ error: 'unknown' })
+    })
+
+    it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('')
+      await openFile('/some/file.txt')
       expect(fsMocks.existsSync).not.toHaveBeenCalled()
       expect(fsMocks.access).not.toHaveBeenCalled()
       expect(fsMocks.stat).not.toHaveBeenCalled()
-
-      // Clean up — we don't await because exec never resolves in tests
-      promise.catch(() => {})
-    }, 1000)
+    })
   })
 
   // ── showItemInFolder ──
