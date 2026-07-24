@@ -10,4 +10,9 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow, userDataPath
   ipcMain.handle(IPC_CHANNELS.SHELL_OPEN_FILE, (_e, path: string) => openFile(path))
   ipcMain.handle(IPC_CHANNELS.SHELL_SHOW_IN_FOLDER, (_e, path: string) => showItemInFolder(path))
   ipcMain.handle(IPC_CHANNELS.FILE_READ_HTML_TITLE, (_e, path: string) => readHtmlTitle(path))
+  ipcMain.on('app:quit', () => {
+    const { app } = require('electron')
+    app.isQuitting = true
+    app.quit()
+  })
 }

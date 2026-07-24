@@ -35,12 +35,17 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 export async function openFile(absolutePath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence with fs.existsSync/fs.access/fs.stat
   // shell.openPath handles all error cases itself (CHK019, constitution III)
-  const error = await shell.openPath(absolutePath)
-  if (!error) return {}
-  if (error.includes('No default app') || error.includes('no application')) {
-    return { error: 'no-default-app' }
+  try {
+    const error = await shell.openPath(absolutePath)
+    if (!error) return {}
+    if (error.includes('No default app') || error.includes('no application')) {
+      return { error: 'no-default-app' }
+    }
+    return { error: 'unknown' }
+  } catch (e) {
+    // shell.openPath should not throw, but guard against edge cases
+    return { error: 'unknown' }
   }
-  return { error: 'unknown' }
 }
 
 export async function showItemInFolder(absolutePath: string): Promise<LocateResult> {
