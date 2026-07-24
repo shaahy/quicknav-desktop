@@ -143,20 +143,20 @@ describe('AppShell', () => {
     expect(buttons.length).toBe(0)
   })
 
-  // ── Test 2: error state shows error title with retry and quit buttons ──
-  it('shows error title with retry and quit buttons in error state', () => {
+  // ── Test 2: error overlay shows error title with retry and quit buttons ──
+  it('shows error overlay with retry and quit buttons in error state', () => {
     render(
-      <AppShell loadingState="error" retryLoad={retryLoad} quitApp={quitApp} />
+      <AppShell loadingState="error" loadError="unknown" retryLoad={retryLoad} quitApp={quitApp} />
     )
     expect(screen.getByText('无法加载本地数据')).toBeInTheDocument()
     expect(screen.getByText('重试')).toBeInTheDocument()
     expect(screen.getByText('退出')).toBeInTheDocument()
   })
 
-  // ── Test 3: error state retry button calls retryLoad ──
-  it('retry button in error state calls retryLoad', () => {
+  // ── Test 3: error overlay retry button calls retryLoad ──
+  it('retry button in error overlay calls retryLoad', () => {
     render(
-      <AppShell loadingState="error" retryLoad={retryLoad} quitApp={quitApp} />
+      <AppShell loadingState="error" loadError="unknown" retryLoad={retryLoad} quitApp={quitApp} />
     )
     const retryBtn = screen.getByText('重试')
     fireEvent.click(retryBtn)

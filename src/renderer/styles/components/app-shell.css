@@ -1,4 +1,4 @@
-/* ── AppShell ──
+﻿/* ── AppShell ──
    Layout: topbar (full-width) → body (sidebar 208px + main).
    BEM block: qc-app-shell
 */
@@ -263,4 +263,15 @@
 .qc-app-shell__error-btn--secondary:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+/* ── Error overlay ── */
+.qc-app-shell__error-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 33, 29, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }

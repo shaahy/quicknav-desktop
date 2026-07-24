@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+﻿import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import type { FileSelectionResult, CardFormData, MenuItem, ReorderItem, ViewType } from '@shared/types'
 import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 import { normalizePath } from '@shared/validation'
@@ -688,53 +688,8 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   // ── Error state ──
   // Blocking feedback with retry (initial focus) and quit actions.
 
-  if (loadingState === 'error') {
-    return (
-      <div className="qc-app-shell">
-        <aside className="qc-app-shell__sidebar" aria-label="分类导航">
-          <div className="qc-app-shell__nav-item qc-app-shell__nav-item--active">
-            全部卡片
-          </div>
-        </aside>
-        <main className="qc-app-shell__main">
-          <div className="qc-app-shell__error" role="alert">
-            <h2 className="qc-app-shell__error-title">无法加载本地数据</h2>
-            <p className="qc-app-shell__error-description">
-              {loadError === 'corrupted'
-                ? '数据文件损坏，无法读取'
-                : '请检查文件权限后重试'}
-            </p>
-            <div className="qc-app-shell__error-actions">
-              <button
-                ref={retryRef}
-                className="qc-app-shell__error-btn qc-app-shell__error-btn--primary"
-                onClick={retryLoad}
-                type="button"
-              >
-                重试
-              </button>
-              {rebuildData && (
-                <button
-                  className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
-                  onClick={rebuildData}
-                  type="button"
-                >
-                  数据已损坏，需重新开始
-                </button>
-              )}
-              <button
-                className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
-                onClick={quitApp}
-                type="button"
-              >
-                退出
-              </button>
-            </div>
-          </div>
-        </main>
-      </div>
-    )
-  }
+  const showErrorOverlay = loadingState === 'error' && loadError != null
+
 
   // ── Ready state ──
   // Full app UI: sidebar + search+toolbar row + card grid or reorder or empty-state.
@@ -945,6 +900,26 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
           onRetry={handleSaveErrorRetry}
           onQuit={handleSaveErrorQuit}
         />
+      )}
+      {/* ── Error overlay ── */}
+      {showErrorOverlay && (
+        <div className="qc-app-shell__error-overlay" role="alertdialog">
+          <div className="qc-app-shell__error">
+            <h2 className="qc-app-shell__error-title">无法加载本地数据</h2>
+            <p className="qc-app-shell__error-description">
+              {loadError === 'corrupted'
+                ? '数据文件损坏，无法读取'
+                : '请检查文件权限后重试'}
+            </p>
+            <div className="qc-app-shell__error-actions">
+              <button ref={retryRef} type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--primary" onClick={retryLoad}>重试</button>
+              {rebuildData && (
+                <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary" onClick={rebuildData}>数据已损坏，需要重新开始</button>
+              )}
+              <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary" onClick={quitApp}>退出</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
