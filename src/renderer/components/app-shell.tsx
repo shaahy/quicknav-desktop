@@ -107,6 +107,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   // ── Card form dialog state (S10: file-selection flow) ──
 
   const [pendingFileResult, setPendingFileResult] = useState<FileSelectionResult | null>(null)
+  const [pendingInitialName, setPendingInitialName] = useState<string | null>(null)
   const showFormDialog = pendingFileResult !== null
 
   // ── Action menu state ──
@@ -214,6 +215,21 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   const handleSelectFile = useCallback(async () => {
     const result = await window.electronAPI.selectFile()
     if (result.canceled || !result.file) return
+
+    // FR-003/FR-004: prefill card name from HTML title or filename
+    let initialName: string
+    if (result.file.isHtml) {
+      try {
+        const title = await window.electronAPI.readHtmlTitle(result.file.absolutePath)
+        initialName = title || result.file.fileName
+      } catch {
+        initialName = result.file.fileName
+      }
+    } else {
+      initialName = result.file.fileName
+    }
+
+    setPendingInitialName(initialName)
     setPendingFileResult(result)
   }, [])
 
@@ -869,6 +885,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         <CardFormDialog
           mode="create"
           initialData={null}
+          initialName={pendingInitialName}
           onSave={handleFormSave}
           onClose={handleFormClose}
           existingCardNames={existingCardNames}

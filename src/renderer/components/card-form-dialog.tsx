@@ -22,6 +22,12 @@ interface CardFormDialogProps {
    * For edit mode: current CardFormData to populate fields.
    */
   initialData: CardFormData | null
+  /**
+   * Optional pre-filled name for create mode (FR-003/FR-004).
+   * HTML files: prefill from &lt;title&gt; tag. Other files: prefill from filename without extension.
+   * Ignored in edit mode.
+   */
+  initialName?: string | null
   /** Called with validated form data when user clicks Save. */
   onSave: (data: CardFormData) => void
   /**
@@ -52,6 +58,7 @@ interface CardFormDialogProps {
 export function CardFormDialog({
   mode,
   initialData,
+  initialName,
   onSave,
   onClose,
   filePath,
@@ -62,7 +69,7 @@ export function CardFormDialog({
 
   // ── Form state ──
 
-  const [name, setName] = useState('')
+  const [name, setName] = useState(initialData?.name ?? initialName ?? '')
   const [note, setNote] = useState('')
   const [categoryIds, setCategoryIds] = useState<string[]>([])
   const [nameError, setNameError] = useState<string | null>(null)
@@ -81,14 +88,15 @@ export function CardFormDialog({
       setCategoryIds(initialData.categoryIds)
       setSnapshot({ ...initialData })
     } else {
-      setName('')
+      // FR-003/FR-004: prefill name from HTML title or filename in create mode
+      setName(initialName ?? '')
       setNote('')
       setCategoryIds([])
       setSnapshot(null)
     }
     setNameError(null)
     setNoteError(null)
-  }, [initialData])
+  }, [initialData, initialName])
 
   // ── Effective existing names for uniqueness check ──
   // In edit mode, exclude the card's own name so the user can keep it unchanged.

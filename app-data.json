@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "cards": [
+    {
+      "id": "29a9a57c-7340-4bc5-ae3a-c08b265ffd6e",
+      "name": "完整产品开发流程教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html",
+        "fileName": "完整产品开发流程教程",
+        "extension": "html",
+        "fileSize": 103169,
+        "mtimeMs": 1784628976509.5637
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-23T10:18:12.346Z",
+      "updatedAt": "2026-07-23T10:18:12.346Z"
+    },
+    {
+      "id": "e3c79193-36d9-4928-b9e4-dbc62b63f1fa",
+      "name": "1",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/AI工程化全流程框架调研/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 75441,
+        "mtimeMs": 1784541137897.4766
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-23T10:19:16.267Z",
+      "updatedAt": "2026-07-23T10:19:16.267Z"
+    },
+    {
+      "id": "b79abfa2-54c0-414f-b299-1df260583183",
+      "name": "2",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD-METHOD技能速查/BMAD-METHOD-v6.10.0-全技能速查.html",
+        "fileName": "BMAD-METHOD-v6.10.0-全技能速查",
+        "extension": "html",
+        "fileSize": 59171,
+        "mtimeMs": 1784181958156.5647
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-23T10:19:30.993Z",
+      "updatedAt": "2026-07-23T10:19:30.993Z"
+    },
+    {
+      "id": "5e9bbf22-7919-4904-b62e-106f8b11e640",
+      "name": "3",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/gstack技能速查/gstack-skills-cheatsheet.html",
+        "fileName": "gstack-skills-cheatsheet",
+        "extension": "html",
+        "fileSize": 47314,
+        "mtimeMs": 1784603813824.219
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-23T10:19:41.569Z",
+      "updatedAt": "2026-07-23T10:19:41.569Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+      "name": "AI开发教程",
+      "order": 0,
+      "type": "user",
+      "createdAt": "2026-07-23T10:15:42.586Z"
+    }
+  ],
+  "viewOrders": [
+    {
+      "viewType": "category:0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+      "cardIds": [
+        "29a9a57c-7340-4bc5-ae3a-c08b265ffd6e",
+        "e3c79193-36d9-4928-b9e4-dbc62b63f1fa",
+        "b79abfa2-54c0-414f-b299-1df260583183",
+        "5e9bbf22-7919-4904-b62e-106f8b11e640"
+      ]
+    }
+  ]
+}
