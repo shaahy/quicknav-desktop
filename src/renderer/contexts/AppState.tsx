@@ -448,9 +448,9 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
           dispatch({ type: 'LOAD', data: INITIAL_APP_DATA })
         }
       } catch (e) {
-        console.error('[AppState] load failed, using empty data:', e)
+        console.error('[AppState] load failed:', e)
         if (!cancelled) {
-          dispatch({ type: 'LOAD', data: INITIAL_APP_DATA })
+          dispatch({ type: 'SET_LOAD_ERROR', error: 'unknown' })
         }
       }
     })()
