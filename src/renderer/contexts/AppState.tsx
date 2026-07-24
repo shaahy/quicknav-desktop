@@ -57,7 +57,7 @@ const initialState: AppState = {
 
 // ── Reducer ──
 
-function appReducer(state: AppState, action: AppAction): AppState {
+export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'LOAD': {
       return {
@@ -346,6 +346,14 @@ function appReducer(state: AppState, action: AppAction): AppState {
       const { cardId, categoryId } = action
       const categoryViewType: ViewType = `category:${categoryId}`
 
+      const card = state.data.cards.find(c => c.id === cardId)
+      if (!card) return state
+
+      // Guard: card must have at least 1 user category at all times (FR-016)
+      if (card.categoryIds.includes(categoryId) && card.categoryIds.length === 1) {
+        return state
+      }
+
       // Remove categoryId from the card
       const updatedCards = state.data.cards.map(c => {
         if (c.id === cardId) {
@@ -355,23 +363,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       })
 
       // Remove cardId from the category viewOrder
-      let updatedViewOrders = state.data.viewOrders.map(vo => {
+      const updatedViewOrders = state.data.viewOrders.map(vo => {
         if (vo.viewType === categoryViewType) {
           return { ...vo, cardIds: vo.cardIds.filter(id => id !== cardId) }
         }
         return vo
       })
-
-      // If card now has 0 user categories, add to uncategorized
-      const card = updatedCards.find(c => c.id === cardId)
-      if (card && card.categoryIds.length === 0) {
-        updatedViewOrders = updatedViewOrders.map(vo => {
-          if (vo.viewType === VIEW_UNCATEGORIZED && !vo.cardIds.includes(cardId)) {
-            return { ...vo, cardIds: [...vo.cardIds, cardId] }
-          }
-          return vo
-        })
-      }
 
       return {
         ...state,

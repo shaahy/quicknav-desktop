@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { normalizePath } from '@shared/validation'
 import { CUMULATIVE_FAILURE_THRESHOLD } from '@shared/constants'
 import { useCards } from './useCards'
+import { useAppState } from '../contexts/AppState'
 
 // ── Public API ──
 
@@ -56,6 +57,7 @@ export interface UseFileRepairReturn {
  *   paths (S11 edit-replace, S16 open-failed, S17 locate-failed).
  */
 export function useFileRepair(): UseFileRepairReturn {
+  const { state } = useAppState()
   const { repairFile: cardsRepairFile, findDuplicateByPath } = useCards()
   const failureCountsRef = useRef<Map<string, number>>(new Map())
 
@@ -79,6 +81,11 @@ export function useFileRepair(): UseFileRepairReturn {
 
   const repairFile = useCallback(
     async (cardId: string): Promise<RepairResult> => {
+      // 0. Verify the card exists before proceeding
+      if (!state.data.cards.some(c => c.id === cardId)) {
+        return { result: 'canceled' }
+      }
+
       // 1. Open native file-selection dialog
       const fileResult = await window.electronAPI.selectFile()
       if (fileResult.canceled || !fileResult.file) {
@@ -107,7 +114,7 @@ export function useFileRepair(): UseFileRepairReturn {
 
       return { result: 'success' }
     },
-    [cardsRepairFile, findDuplicateByPath, resetFailureCount]
+    [cardsRepairFile, findDuplicateByPath, resetFailureCount, state.data.cards]
   )
 
   return {

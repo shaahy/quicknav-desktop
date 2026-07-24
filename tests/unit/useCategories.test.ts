@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import type { Card, Category } from '../../src/shared/types'
 import { useCategories } from '../../src/renderer/hooks/useCategories'
+import { appReducer } from '../../src/renderer/contexts/AppState'
 
 // ── Hoisted mocks ──
 
@@ -41,10 +42,14 @@ const mocks = vi.hoisted(() => {
 
 // ── Module mocks ──
 
-vi.mock('../../src/renderer/contexts/AppState', () => ({
-  useAppState: () => ({ state: mocks.state }),
-  useAppDispatch: () => mocks.dispatch,
-}))
+vi.mock('../../src/renderer/contexts/AppState', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/renderer/contexts/AppState')>()
+  return {
+    ...actual,
+    useAppState: () => ({ state: mocks.state }),
+    useAppDispatch: () => mocks.dispatch,
+  }
+})
 
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react')
@@ -521,6 +526,165 @@ describe('useCategories', () => {
       const { uncategorizedCards } = useCategories()
       expect(uncategorizedCards).toHaveLength(1)
       expect(uncategorizedCards[0].id).toBe('card-1')
+    })
+  })
+
+  // ── FR-016: REMOVE_CARD_FROM_CATEGORY reducer guard ──
+
+  describe('REMOVE_CARD_FROM_CATEGORY', () => {
+    const defaultState = {
+      data: {
+        version: 1 as const,
+        cards: [] as Card[],
+        categories: [] as Category[],
+        viewOrders: [
+          { viewType: 'allCards' as const, cardIds: [] as string[] },
+          { viewType: 'uncategorized' as const, cardIds: [] as string[] },
+        ],
+      },
+      currentView: 'allCards' as const,
+      searchQuery: '',
+      isLoading: false,
+      loadError: null as string | null,
+      loadRetryCount: 0,
+      saveError: null as string | null,
+    }
+
+    it('blocks removing a card from its only category', () => {
+      const state = {
+        ...defaultState,
+        data: {
+          ...defaultState.data,
+          cards: [
+            makeCard({ id: 'card-1', name: 'Lone Card', categoryIds: ['cat-1'] }),
+          ],
+          categories: [
+            makeCategory({ id: 'cat-1', name: 'Only Category' }),
+          ],
+          viewOrders: [
+            { viewType: 'allCards' as const, cardIds: ['card-1'] },
+            { viewType: 'category:cat-1' as const, cardIds: ['card-1'] },
+            { viewType: 'uncategorized' as const, cardIds: [] },
+          ],
+        },
+      }
+
+      const next = appReducer(state, {
+        type: 'REMOVE_CARD_FROM_CATEGORY',
+        cardId: 'card-1',
+        categoryId: 'cat-1',
+      })
+
+      // Card must retain its only category
+      expect(next.data.cards[0].categoryIds).toEqual(['cat-1'])
+      // Card still in that category's viewOrder
+      const catViewOrder = next.data.viewOrders.find(
+        vo => vo.viewType === 'category:cat-1'
+      )
+      expect(catViewOrder!.cardIds).toContain('card-1')
+      // Card not moved to uncategorized
+      const uncatViewOrder = next.data.viewOrders.find(
+        vo => vo.viewType === 'uncategorized'
+      )
+      expect(uncatViewOrder!.cardIds).not.toContain('card-1')
+    })
+
+    it('succeeds removing a card from a category when it has 2+ categories', () => {
+      const state = {
+        ...defaultState,
+        data: {
+          ...defaultState.data,
+          cards: [
+            makeCard({
+              id: 'card-1',
+              name: 'Multi Cat Card',
+              categoryIds: ['cat-1', 'cat-2'],
+            }),
+          ],
+          categories: [
+            makeCategory({ id: 'cat-1', name: 'Work' }),
+            makeCategory({ id: 'cat-2', name: 'Personal' }),
+          ],
+          viewOrders: [
+            { viewType: 'allCards' as const, cardIds: ['card-1'] },
+            { viewType: 'category:cat-1' as const, cardIds: ['card-1'] },
+            { viewType: 'category:cat-2' as const, cardIds: ['card-1'] },
+            { viewType: 'uncategorized' as const, cardIds: [] },
+          ],
+        },
+      }
+
+      const next = appReducer(state, {
+        type: 'REMOVE_CARD_FROM_CATEGORY',
+        cardId: 'card-1',
+        categoryId: 'cat-1',
+      })
+
+      // Card still has the other category
+      expect(next.data.cards[0].categoryIds).toEqual(['cat-2'])
+      // Card removed from cat-1 viewOrder
+      const cat1Vo = next.data.viewOrders.find(
+        vo => vo.viewType === 'category:cat-1'
+      )
+      expect(cat1Vo!.cardIds).not.toContain('card-1')
+      // Card still in cat-2 viewOrder
+      const cat2Vo = next.data.viewOrders.find(
+        vo => vo.viewType === 'category:cat-2'
+      )
+      expect(cat2Vo!.cardIds).toContain('card-1')
+    })
+
+    it('removes card from category viewOrder after successful removal', () => {
+      const state = {
+        ...defaultState,
+        data: {
+          ...defaultState.data,
+          cards: [
+            makeCard({
+              id: 'card-1',
+              name: 'Card A',
+              categoryIds: ['cat-1', 'cat-2'],
+            }),
+            makeCard({
+              id: 'card-2',
+              name: 'Card B',
+              categoryIds: ['cat-1'],
+            }),
+          ],
+          categories: [
+            makeCategory({ id: 'cat-1', name: 'Work' }),
+            makeCategory({ id: 'cat-2', name: 'Personal' }),
+          ],
+          viewOrders: [
+            { viewType: 'allCards' as const, cardIds: ['card-1', 'card-2'] },
+            { viewType: 'category:cat-1' as const, cardIds: ['card-1', 'card-2'] },
+            { viewType: 'category:cat-2' as const, cardIds: ['card-1'] },
+            { viewType: 'uncategorized' as const, cardIds: [] },
+          ],
+        },
+      }
+
+      const next = appReducer(state, {
+        type: 'REMOVE_CARD_FROM_CATEGORY',
+        cardId: 'card-1',
+        categoryId: 'cat-1',
+      })
+
+      // cat-1 viewOrder no longer contains card-1
+      const cat1Vo = next.data.viewOrders.find(
+        vo => vo.viewType === 'category:cat-1'
+      )
+      expect(cat1Vo!.cardIds).toEqual(['card-2'])
+      // cat-2 viewOrder unchanged for card-1
+      const cat2Vo = next.data.viewOrders.find(
+        vo => vo.viewType === 'category:cat-2'
+      )
+      expect(cat2Vo!.cardIds).toEqual(['card-1'])
+      // allCards viewOrder unaffected
+      const allVo = next.data.viewOrders.find(
+        vo => vo.viewType === 'allCards'
+      )
+      expect(allVo!.cardIds).toEqual(['card-1', 'card-2'])
     })
   })
 })
