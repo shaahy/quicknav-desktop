@@ -919,7 +919,9 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
               {rebuildData && (
                 <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary" onClick={rebuildData}>数据已损坏，需要重新开始</button>
               )}
-              <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary" onClick={() => { console.log('[overlay] quit clicked'); window.electronAPI.quitApp() }}>退出</button>
+              <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
+                ref={(el) => { if (el) el.onmousedown = () => { console.log('[native] quit'); window.electronAPI.quitApp() } }}
+              >退出</button>
             </div>
           </div>
         </div>
