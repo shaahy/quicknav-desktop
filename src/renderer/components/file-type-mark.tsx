@@ -88,7 +88,7 @@ export function FileTypeMark({ extension, fileName }: FileTypeMarkProps) {
   return (
     <span className="qc-file-type-mark" title={fileName}>
       <span className="qc-file-type-mark__icon" aria-hidden="true">{icon}</span>
-      <span className="qc-file-type-mark__ext">{extension}</span>
+      <span className="qc-file-type-mark__ext">{extension.toUpperCase()}</span>
     </span>
   )
 }

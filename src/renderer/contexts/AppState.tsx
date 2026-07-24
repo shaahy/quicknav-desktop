@@ -60,9 +60,28 @@ const initialState: AppState = {
 export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'LOAD': {
+      const loadedData = action.data
+
+      // Ensure viewOrders always includes VIEW_ALL_CARDS and VIEW_UNCATEGORIZED
+      // (fix for legacy/stale data that may lack these entries).
+      if (!loadedData.viewOrders.some(vo => vo.viewType === VIEW_ALL_CARDS)) {
+        loadedData.viewOrders.push({
+          viewType: VIEW_ALL_CARDS,
+          cardIds: loadedData.cards.map(c => c.id),
+        })
+      }
+      if (!loadedData.viewOrders.some(vo => vo.viewType === VIEW_UNCATEGORIZED)) {
+        loadedData.viewOrders.push({
+          viewType: VIEW_UNCATEGORIZED,
+          cardIds: loadedData.cards
+            .filter(c => c.categoryIds.length === 0)
+            .map(c => c.id),
+        })
+      }
+
       return {
         ...state,
-        data: action.data,
+        data: loadedData,
         isLoading: false,
         loadError: null,
         loadRetryCount: 0,

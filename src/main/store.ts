@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import type { AppData, IpcResult } from '../shared/types'
-import { APP_DATA_FILENAME } from '../shared/constants'
+import { APP_DATA_FILENAME, VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '../shared/constants'
 
 export type SaveResult =
   | { success: true }
@@ -12,7 +12,15 @@ export function getDataPath(userDataPath: string): string {
 }
 
 export function emptyAppData(): AppData {
-  return { version: 1, cards: [], categories: [], viewOrders: [] }
+  return {
+    version: 1,
+    cards: [],
+    categories: [],
+    viewOrders: [
+      { viewType: VIEW_ALL_CARDS, cardIds: [] },
+      { viewType: VIEW_UNCATEGORIZED, cardIds: [] },
+    ],
+  }
 }
 
 export function loadAppData(userDataPath: string): IpcResult<AppData> {

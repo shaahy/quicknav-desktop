@@ -9,7 +9,6 @@ import { useSearch } from '../hooks/useSearch'
 import { useFileRepair } from '../hooks/useFileRepair'
 import { CategoryNav } from './category-nav'
 import type { CategoryNavView } from './category-nav'
-import { ViewHeader } from './view-header'
 import { ToolbarButton } from './toolbar-button'
 import { FileCard } from './file-card'
 import { EmptyState } from './empty-state'
@@ -68,17 +67,6 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   } = useFileRepair()
 
   const retryRef = useRef<HTMLButtonElement>(null)
-
-  // ── View title derived from currentView ──
-
-  const viewTitle = useMemo<string>(() => {
-    if (state.currentView === VIEW_ALL_CARDS) return '全部卡片'
-    if (state.currentView === VIEW_UNCATEGORIZED) return '未分类'
-    const cat = state.data.categories.find(
-      c => state.currentView === `category:${c.id}`
-    )
-    return cat?.name ?? '全部卡片'
-  }, [state.currentView, state.data.categories])
 
   // ── CategoryNav views ──
 
@@ -749,7 +737,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   }
 
   // ── Ready state ──
-  // Full app UI: sidebar + view-header + toolbar + card grid or reorder or empty-state.
+  // Full app UI: sidebar + search+toolbar row + card grid or reorder or empty-state.
 
   const hasCards = displayCards.length > 0
 
@@ -793,18 +781,13 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         )}
       </aside>
 
-      <main className="qc-app-shell__main" aria-labelledby="view-header-title">
-        <ViewHeader
-          title={viewTitle}
-          cardCount={displayCards.length}
-          showSortInfo={isCardReorderMode}
-        />
-
-        <GlobalSearch />
+      <main className="qc-app-shell__main" aria-label="卡片列表">
 
         <div className="qc-app-shell__toolbar">
+          <GlobalSearch />
+
           {isCardReorderMode ? (
-            <>
+            <div className="qc-app-shell__toolbar-buttons">
               <ToolbarButton
                 label="完成"
                 variant="primary"
@@ -815,11 +798,11 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
                 variant="secondary"
                 onClick={handleCardReorderCancel}
               />
-            </>
+            </div>
           ) : (
-            <>
+            <div className="qc-app-shell__toolbar-buttons">
               <ToolbarButton
-                label="选择文件"
+                label="新建卡片"
                 variant="primary"
                 onClick={handleSelectFile}
               />
@@ -830,7 +813,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
                   onClick={handleCardReorderStart}
                 />
               )}
-            </>
+            </div>
           )}
         </div>
 
@@ -866,7 +849,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         ) : (
           <EmptyState
             variant={isCategoryView ? 'category-empty' : 'first-launch'}
-            primaryAction={{ label: '选择文件', onClick: handleSelectFile }}
+            primaryAction={{ label: '新建卡片', onClick: handleSelectFile }}
           />
         )}
 

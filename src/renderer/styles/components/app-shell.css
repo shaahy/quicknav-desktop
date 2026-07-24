@@ -45,41 +45,35 @@
   min-width: 0;
 }
 
-/* ── Toolbar ── */
+/* ── Toolbar (search + buttons row) ── */
 
 .qc-app-shell__toolbar {
-  padding: var(--spacing-3) var(--spacing-6);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-6);
   border-bottom: 1px solid var(--color-border-muted);
+  background: var(--color-surface);
+}
+
+.qc-app-shell__toolbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-shrink: 0;
 }
 
 /* ── Card grid ──
-   Responsive: 3 cols ≥1024px, 2 cols 760-1023px, 1 col <760px.
+   Fixed card width 340px, auto-fill columns, gap 12px.
 */
 
 .qc-app-shell__grid {
   display: grid;
-  gap: var(--spacing-4);
+  grid-template-columns: repeat(auto-fill, 340px);
+  gap: 12px;
   padding: var(--spacing-4) var(--spacing-6);
   flex: 1;
   align-content: start;
-}
-
-@media (min-width: 1024px) {
-  .qc-app-shell__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 760px) and (max-width: 1023.98px) {
-  .qc-app-shell__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 759.98px) {
-  .qc-app-shell__grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ── Sidebar reorder mode ── */

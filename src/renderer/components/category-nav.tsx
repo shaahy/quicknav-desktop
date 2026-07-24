@@ -214,6 +214,25 @@ export function CategoryNav({
     setDeletingCategoryId(null)
   }, [])
 
+  // ── Card counts per view ──
+
+  const cardCounts = useMemo(() => {
+    const totalCards = state.data.cards.length
+
+    const perCategory = new Map<string, number>()
+    for (const card of state.data.cards) {
+      for (const catId of card.categoryIds) {
+        perCategory.set(catId, (perCategory.get(catId) ?? 0) + 1)
+      }
+    }
+
+    const uncategorizedCount = state.data.cards.filter(
+      c => c.categoryIds.length === 0
+    ).length
+
+    return { totalCards, perCategory, uncategorizedCount }
+  }, [state.data.cards])
+
   // ── Check if we should show inline rename (only when no callback provided) ──
 
   const showInlineRename = !onRenameCategory
@@ -283,6 +302,13 @@ export function CategoryNav({
                       setMenuAnchor(rect)
                     }
                   : undefined
+              }
+              cardCount={
+                view.id === VIEW_ALL_CARDS
+                  ? cardCounts.totalCards
+                  : view.id === VIEW_UNCATEGORIZED
+                    ? cardCounts.uncategorizedCount
+                    : cardCounts.perCategory.get(extractCategoryId(view.id)) ?? 0
               }
             />
           )

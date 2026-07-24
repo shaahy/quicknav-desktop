@@ -22,6 +22,8 @@ interface CategoryItemProps {
    * Passes the button's DOMRect for positioning the parent's ActionMenu.
    */
   onShowMenu?: (anchorRect: DOMRect) => void
+  /** Optional card count shown next to the category name (e.g. "12") */
+  cardCount?: number
 }
 
 // ── Component ──
@@ -50,6 +52,7 @@ export function CategoryItem({
   onClick,
   menuActions,
   onShowMenu,
+  cardCount,
 }: CategoryItemProps) {
   // ── Keyboard activation (Enter / Space) ──
 
@@ -93,7 +96,12 @@ export function CategoryItem({
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
-      <span className="qc-category-item__name">{item.name}</span>
+      <span className="qc-category-item__label-group">
+        <span className="qc-category-item__name">{item.name}</span>
+        {cardCount !== undefined && cardCount >= 0 && (
+          <span className="qc-category-item__count">({cardCount})</span>
+        )}
+      </span>
 
       {hasMenu && (
         <button

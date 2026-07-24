@@ -2,25 +2,8 @@
   "version": 1,
   "cards": [
     {
-      "id": "29a9a57c-7340-4bc5-ae3a-c08b265ffd6e",
-      "name": "完整产品开发流程教程",
-      "note": null,
-      "fileReference": {
-        "absolutePath": "E:/元梦工作空间/A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html",
-        "fileName": "完整产品开发流程教程",
-        "extension": "html",
-        "fileSize": 103169,
-        "mtimeMs": 1784628976509.5637
-      },
-      "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
-      ],
-      "createdAt": "2026-07-23T10:18:12.346Z",
-      "updatedAt": "2026-07-23T10:18:12.346Z"
-    },
-    {
-      "id": "e3c79193-36d9-4928-b9e4-dbc62b63f1fa",
-      "name": "1",
+      "id": "9d8dd7fa-7845-406a-9b07-18411732f569",
+      "name": "六套框架选型与实战SOP",
       "note": null,
       "fileReference": {
         "absolutePath": "E:/元梦工作空间/A 教程集合/AI工程化全流程框架调研/index.html",
@@ -32,12 +15,12 @@
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
-      "createdAt": "2026-07-23T10:19:16.267Z",
-      "updatedAt": "2026-07-23T10:19:16.267Z"
+      "createdAt": "2026-07-24T03:04:02.679Z",
+      "updatedAt": "2026-07-24T03:05:00.673Z"
     },
     {
-      "id": "b79abfa2-54c0-414f-b299-1df260583183",
-      "name": "2",
+      "id": "60f3844d-762f-427a-8324-3d1a9d17cab5",
+      "name": "BMAD技能速查",
       "note": null,
       "fileReference": {
         "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD-METHOD技能速查/BMAD-METHOD-v6.10.0-全技能速查.html",
@@ -47,14 +30,14 @@
         "mtimeMs": 1784181958156.5647
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
-      "createdAt": "2026-07-23T10:19:30.993Z",
-      "updatedAt": "2026-07-23T10:19:30.993Z"
+      "createdAt": "2026-07-24T03:05:22.927Z",
+      "updatedAt": "2026-07-24T03:06:54.146Z"
     },
     {
-      "id": "5e9bbf22-7919-4904-b62e-106f8b11e640",
-      "name": "3",
+      "id": "42dffc58-5da3-4f25-898d-41950ee3771a",
+      "name": "gstack 技能速查",
       "note": null,
       "fileReference": {
         "absolutePath": "E:/元梦工作空间/A 教程集合/gstack技能速查/gstack-skills-cheatsheet.html",
@@ -64,10 +47,282 @@
         "mtimeMs": 1784603813824.219
       },
       "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:05:37.560Z",
+      "updatedAt": "2026-07-24T03:06:59.072Z"
+    },
+    {
+      "id": "d5b8e80b-aa43-4ab9-b6af-fa2c33942041",
+      "name": "Matt Pocock Skills 技能速查",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/Matt Pocock Skills 技能速查/mattpocock-skills-cheatsheet.html",
+        "fileName": "mattpocock-skills-cheatsheet",
+        "extension": "html",
+        "fileSize": 48068,
+        "mtimeMs": 1784603870602.898
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:06:15.143Z",
+      "updatedAt": "2026-07-24T03:06:38.504Z"
+    },
+    {
+      "id": "66b4da5d-0535-4814-a79c-dc89943bbc02",
+      "name": "Matt Pocock Skills 工程实战教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/Matt Pocock Skill双场景工程实战教程/Matt-Pocock-Skills-Codex双场景工程实战教程.html",
+        "fileName": "Matt-Pocock-Skills-Codex双场景工程实战教程",
+        "extension": "html",
+        "fileSize": 81437,
+        "mtimeMs": 1784522403179.639
+      },
+      "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
-      "createdAt": "2026-07-23T10:19:41.569Z",
-      "updatedAt": "2026-07-23T10:19:41.569Z"
+      "createdAt": "2026-07-24T03:07:23.064Z",
+      "updatedAt": "2026-07-24T03:07:23.064Z"
+    },
+    {
+      "id": "9c800c56-cc36-479d-9075-7709ae76357c",
+      "name": "Superpowers 技能速查",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/obra-superpowers技能速查/obra-superpowers-v6.1.1-14技能速查.html",
+        "fileName": "obra-superpowers-v6.1.1-14技能速查",
+        "extension": "html",
+        "fileSize": 92603,
+        "mtimeMs": 1784604037707.826
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:07:37.032Z",
+      "updatedAt": "2026-07-24T03:07:37.032Z"
+    },
+    {
+      "id": "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
+      "name": "OpenSpec 技能速查",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/OpenSpec技能速查/OpenSpec-OPSX-技能速查.html",
+        "fileName": "OpenSpec-OPSX-技能速查",
+        "extension": "html",
+        "fileSize": 44336,
+        "mtimeMs": 1784604344070.2896
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:07:49.920Z",
+      "updatedAt": "2026-07-24T03:07:49.920Z"
+    },
+    {
+      "id": "5c670b11-26c3-483b-a413-f81e0edd25cd",
+      "name": "pm-skills 技能速查",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/PM Skills技能速查/phuryn-pm-skills-v2.1.0-中文速查.html",
+        "fileName": "phuryn-pm-skills-v2.1.0-中文速查",
+        "extension": "html",
+        "fileSize": 107292,
+        "mtimeMs": 1784603686633.454
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:08:06.480Z",
+      "updatedAt": "2026-07-24T03:08:06.480Z"
+    },
+    {
+      "id": "27f72c0a-0654-49c0-a872-966b0688c4d4",
+      "name": "Spec Kit  技能速查",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/Spec-Kit技能速查/Spec-Kit-v0.8.15-技能速查.html",
+        "fileName": "Spec-Kit-v0.8.15-技能速查",
+        "extension": "html",
+        "fileSize": 34359,
+        "mtimeMs": 1784603658521.2642
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "createdAt": "2026-07-24T03:08:19.208Z",
+      "updatedAt": "2026-07-24T03:08:19.208Z"
+    },
+    {
+      "id": "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
+      "name": "AGENTS.md",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/AGENTS.md",
+        "fileName": "AGENTS",
+        "extension": "md",
+        "fileSize": 1663,
+        "mtimeMs": 1783564698791.4272
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "createdAt": "2026-07-24T03:08:40.608Z",
+      "updatedAt": "2026-07-24T03:08:40.608Z"
+    },
+    {
+      "id": "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
+      "name": "Bmad 产物地图",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD-产物地图-流程教程.html",
+        "fileName": "BMAD-产物地图-流程教程",
+        "extension": "html",
+        "fileSize": 54036,
+        "mtimeMs": 1783769241597.9482
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:09:01.913Z",
+      "updatedAt": "2026-07-24T03:09:01.913Z"
+    },
+    {
+      "id": "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
+      "name": "防止需求遗漏的流程改进方案",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/防止需求遗漏的流程改进方案.md",
+        "fileName": "防止需求遗漏的流程改进方案",
+        "extension": "md",
+        "fileSize": 7683,
+        "mtimeMs": 1784857467051.394
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "createdAt": "2026-07-24T03:09:09.415Z",
+      "updatedAt": "2026-07-24T03:09:09.415Z"
+    },
+    {
+      "id": "b71406d2-962c-4799-87c8-59c48c9c2a38",
+      "name": "工作记录",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/工作记录.md",
+        "fileName": "工作记录",
+        "extension": "md",
+        "fileSize": 2427,
+        "mtimeMs": 1784861965756.111
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "createdAt": "2026-07-24T03:09:15.360Z",
+      "updatedAt": "2026-07-24T03:09:15.360Z"
+    },
+    {
+      "id": "9ee542e9-9dd2-4ac5-b956-2e07e692b506",
+      "name": "内网资源总览",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/内网资源总览.md",
+        "fileName": "内网资源总览",
+        "extension": "md",
+        "fileSize": 1811,
+        "mtimeMs": 1783653967892.3474
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "createdAt": "2026-07-24T03:09:20.560Z",
+      "updatedAt": "2026-07-24T03:09:20.560Z"
+    },
+    {
+      "id": "27c9b342-0fc1-4306-a748-a432afb16aa4",
+      "name": "BMAD Bug 修复与功能 Fix 教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD Bug与功能Fix教程/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 41594,
+        "mtimeMs": 1784691797500.5413
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:10:42.761Z",
+      "updatedAt": "2026-07-24T03:10:42.761Z"
+    },
+    {
+      "id": "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
+      "name": "BMAD Quick Dev 增量开发教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 47879,
+        "mtimeMs": 1784691337518.5652
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:11:08.664Z",
+      "updatedAt": "2026-07-24T03:12:07.392Z"
+    },
+    {
+      "id": "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
+      "name": "BMAD 新产品 0→1 完整教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD新产品0-1完整流程教程/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 55966,
+        "mtimeMs": 1784695466353.7896
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:11:24.720Z",
+      "updatedAt": "2026-07-24T03:11:24.720Z"
+    },
+    {
+      "id": "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
+      "name": "BMAD 已上线 V1 增量开发教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/BMAD已上线V1增量开发教程/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 59626,
+        "mtimeMs": 1784690702440.8152
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:11:43.376Z",
+      "updatedAt": "2026-07-24T03:11:43.376Z"
+    },
+    {
+      "id": "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+      "name": "完整产品开发流程教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html",
+        "fileName": "完整产品开发流程教程",
+        "extension": "html",
+        "fileSize": 156735,
+        "mtimeMs": 1784859671892.7832
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:29:46.336Z",
+      "updatedAt": "2026-07-24T03:29:46.336Z"
     }
   ],
   "categories": [
@@ -77,16 +332,83 @@
       "order": 0,
       "type": "user",
       "createdAt": "2026-07-23T10:15:42.586Z"
+    },
+    {
+      "id": "0a7f5a42-4e52-422c-9f4d-61e72e430ee8",
+      "name": "技能速查",
+      "order": 1,
+      "type": "user",
+      "createdAt": "2026-07-24T03:06:24.991Z"
+    },
+    {
+      "id": "572e876b-8996-46da-b618-8d5380a94045",
+      "name": "工作文档",
+      "order": 2,
+      "type": "user",
+      "createdAt": "2026-07-24T03:04:28.023Z"
     }
   ],
   "viewOrders": [
     {
       "viewType": "category:0e59029a-e4ec-41fa-981a-c2a69bb8485d",
       "cardIds": [
-        "29a9a57c-7340-4bc5-ae3a-c08b265ffd6e",
-        "e3c79193-36d9-4928-b9e4-dbc62b63f1fa",
-        "b79abfa2-54c0-414f-b299-1df260583183",
-        "5e9bbf22-7919-4904-b62e-106f8b11e640"
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "9d8dd7fa-7845-406a-9b07-18411732f569",
+        "66b4da5d-0535-4814-a79c-dc89943bbc02",
+        "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
+        "27c9b342-0fc1-4306-a748-a432afb16aa4",
+        "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
+        "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
+        "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5"
+      ]
+    },
+    {
+      "viewType": "allCards",
+      "cardIds": [
+        "9d8dd7fa-7845-406a-9b07-18411732f569",
+        "60f3844d-762f-427a-8324-3d1a9d17cab5",
+        "42dffc58-5da3-4f25-898d-41950ee3771a",
+        "d5b8e80b-aa43-4ab9-b6af-fa2c33942041",
+        "66b4da5d-0535-4814-a79c-dc89943bbc02",
+        "9c800c56-cc36-479d-9075-7709ae76357c",
+        "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
+        "5c670b11-26c3-483b-a413-f81e0edd25cd",
+        "27f72c0a-0654-49c0-a872-966b0688c4d4",
+        "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
+        "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
+        "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
+        "b71406d2-962c-4799-87c8-59c48c9c2a38",
+        "9ee542e9-9dd2-4ac5-b956-2e07e692b506",
+        "27c9b342-0fc1-4306-a748-a432afb16aa4",
+        "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
+        "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
+        "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546"
+      ]
+    },
+    {
+      "viewType": "uncategorized",
+      "cardIds": []
+    },
+    {
+      "viewType": "category:572e876b-8996-46da-b618-8d5380a94045",
+      "cardIds": [
+        "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
+        "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
+        "b71406d2-962c-4799-87c8-59c48c9c2a38",
+        "9ee542e9-9dd2-4ac5-b956-2e07e692b506"
+      ]
+    },
+    {
+      "viewType": "category:0a7f5a42-4e52-422c-9f4d-61e72e430ee8",
+      "cardIds": [
+        "d5b8e80b-aa43-4ab9-b6af-fa2c33942041",
+        "60f3844d-762f-427a-8324-3d1a9d17cab5",
+        "42dffc58-5da3-4f25-898d-41950ee3771a",
+        "9c800c56-cc36-479d-9075-7709ae76357c",
+        "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
+        "5c670b11-26c3-483b-a413-f81e0edd25cd",
+        "27f72c0a-0654-49c0-a872-966b0688c4d4"
       ]
     }
   ]

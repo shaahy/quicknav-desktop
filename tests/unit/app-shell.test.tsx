@@ -163,12 +163,12 @@ describe('AppShell', () => {
     expect(retryLoad).toHaveBeenCalledTimes(1)
   })
 
-  // ── Test 4: ready + no cards shows empty-state with "选择文件" ──
-  it('shows empty state with select-file button when ready and no cards', () => {
+  // ── Test 4: ready + no cards shows empty-state with "新建卡片" ──
+  it('shows empty state with new-card button when ready and no cards', () => {
     render(
       <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
     )
-    expect(screen.getAllByText('选择文件').length).toBe(2)
+    expect(screen.getAllByText('新建卡片').length).toBe(2)
     // Should not render any file card articles
     const articles = document.querySelectorAll('[role="article"]')
     expect(articles.length).toBe(0)

@@ -46,6 +46,16 @@ export function FileCard({
       aria-posinset={index}
       aria-setsize={total}
     >
+      {/* More button — top-right corner */}
+      <button
+        className="qc-file-card__more-btn"
+        type="button"
+        aria-label={`更多操作：${card.name}`}
+        onClick={handleMenu}
+      >
+        ···
+      </button>
+
       {/* ✅ WCAG: axe DevTools scan passed */}
       <div
         className="qc-file-card__body"
@@ -57,24 +67,18 @@ export function FileCard({
       >
         <h3 className="qc-file-card__name">{card.name}</h3>
 
-        <FileTypeMark
-          extension={card.fileReference.extension}
-          fileName={card.fileReference.fileName}
-        />
-
         {card.note && (
           <p className="qc-file-card__note">{card.note}</p>
         )}
       </div>
 
-      <button
-        className="qc-file-card__more-btn"
-        type="button"
-        aria-label={`更多操作：${card.name}`}
-        onClick={handleMenu}
-      >
-        更多
-      </button>
+      {/* File type — bottom-left */}
+      <footer className="qc-file-card__footer">
+        <FileTypeMark
+          extension={card.fileReference.extension}
+          fileName={card.fileReference.fileName}
+        />
+      </footer>
     </article>
   )
 }
