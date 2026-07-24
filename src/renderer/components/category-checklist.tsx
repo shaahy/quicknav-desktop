@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { RESERVED_NAMES } from '../../shared/constants'
 import type { Category } from '../../shared/types'
 import '../styles/components/category-checklist.css'
@@ -10,8 +10,6 @@ interface CategoryChecklistProps {
   selectedIds: string[]
   /** Called with the updated selection array on toggle. */
   onChange: (ids: string[]) => void
-  /** Called when the user clicks "+ 新建类别". */
-  onCreateNew: () => void
 }
 
 /**
@@ -27,9 +25,7 @@ export function CategoryChecklist({
   categories,
   selectedIds,
   onChange,
-  onCreateNew,
 }: CategoryChecklistProps) {
-  const createBtnRef = useRef<HTMLButtonElement>(null)
   const uncategorizedLabel = RESERVED_NAMES[1] // '未分类'
 
   const handleToggle = useCallback(
@@ -41,13 +37,6 @@ export function CategoryChecklist({
     },
     [selectedIds, onChange]
   )
-
-  // Auto-focus the "新建类别" button when there are no user categories.
-  useEffect(() => {
-    if (categories.length === 0 && createBtnRef.current) {
-      createBtnRef.current.focus()
-    }
-  }, [categories.length])
 
   return (
     <div
@@ -98,15 +87,6 @@ export function CategoryChecklist({
         </div>
       )}
 
-      {/* Create button */}
-      <button
-        ref={createBtnRef}
-        type="button"
-        className="qc-category-checklist__create-btn"
-        onClick={onCreateNew}
-      >
-        + 新建类别
-      </button>
     </div>
   )
 }

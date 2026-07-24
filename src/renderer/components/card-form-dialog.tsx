@@ -228,10 +228,6 @@ export function CardFormDialog({
                 categories={categories}
                 selectedIds={categoryIds}
                 onChange={setCategoryIds}
-                onCreateNew={() => {
-                  // Parent should provide CategoryEditorPopover integration.
-                  // Currently a no-op placeholder.
-                }}
               />
             </div>
 
