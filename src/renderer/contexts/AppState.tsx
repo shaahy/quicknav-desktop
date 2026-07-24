@@ -436,6 +436,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     ;(async () => {
       try {
         const result = await window.electronAPI.getAppData()
+        console.log('[AppState] getAppData result:', JSON.stringify({ success: result.success, hasData: !!result.data, error: result.error }))
         if (cancelled) return
         if (result.data) {
           dispatch({ type: 'LOAD', data: result.data })
