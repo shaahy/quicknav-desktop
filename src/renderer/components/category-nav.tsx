@@ -241,28 +241,27 @@ export function CategoryNav({
 
   return (
     <nav className="qc-category-nav" role="navigation" aria-label="类别导航">
-      {/* Header */}
+      {/* Header — height aligned with main toolbar */}
       <div className="qc-category-nav__header">
         <h2 className="qc-category-nav__title">类别</h2>
-        <button
-          className="qc-category-nav__add-btn"
-          type="button"
-          aria-label="新建类别"
-          onClick={onCreateCategory}
-        >
-          +
-        </button>
-      </div>
-
-      {/* "整理类别" button */}
-      <div className="qc-category-nav__reorder-bar">
-        <button
-          type="button"
-          className="qc-category-nav__reorder-btn"
-          onClick={onReorderCategories}
-        >
-          整理类别
-        </button>
+        <div className="qc-category-nav__actions">
+          <button
+            type="button"
+            className="qc-category-nav__icon-btn"
+            aria-label="整理类别"
+            onClick={onReorderCategories}
+          >
+            ≡
+          </button>
+          <button
+            className="qc-category-nav__add-btn"
+            type="button"
+            aria-label="新建类别"
+            onClick={onCreateCategory}
+          >
+            +
+          </button>
+        </div>
       </div>
 
       {/* Views list */}

@@ -323,6 +323,57 @@
       ],
       "createdAt": "2026-07-24T03:29:46.336Z",
       "updatedAt": "2026-07-24T03:29:46.336Z"
+    },
+    {
+      "id": "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
+      "name": "OpenSpec 使用场景与实战教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/OpenSpec使用场景与实战教程/OpenSpec使用场景与实战教程.html",
+        "fileName": "OpenSpec使用场景与实战教程",
+        "extension": "html",
+        "fileSize": 82249,
+        "mtimeMs": 1784863870749.0557
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:43:46.145Z",
+      "updatedAt": "2026-07-24T03:43:46.145Z"
+    },
+    {
+      "id": "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
+      "name": "Spec Kit Flow-Forward｜增量开发实战",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html",
+        "fileName": "Spec-Kit-Flow-Forward-使用场景与实战教程",
+        "extension": "html",
+        "fileSize": 78085,
+        "mtimeMs": 1784864427114.746
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:44:03.794Z",
+      "updatedAt": "2026-07-24T03:44:03.794Z"
+    },
+    {
+      "id": "162fe64a-f260-49f7-b507-4bd4bc213cea",
+      "name": "Spec Kit 使用场景与实战教程",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/Spec-Kit使用场景与实战教程/Spec-Kit使用场景与实战教程.html",
+        "fileName": "Spec-Kit使用场景与实战教程",
+        "extension": "html",
+        "fileSize": 71665,
+        "mtimeMs": 1784863888324.072
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "createdAt": "2026-07-24T03:44:21.329Z",
+      "updatedAt": "2026-07-24T03:44:21.329Z"
     }
   ],
   "categories": [
@@ -359,7 +410,10 @@
         "27c9b342-0fc1-4306-a748-a432afb16aa4",
         "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
-        "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5"
+        "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
+        "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
+        "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
+        "162fe64a-f260-49f7-b507-4bd4bc213cea"
       ]
     },
     {
@@ -383,7 +437,10 @@
         "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
         "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
-        "238f1926-f7f5-4dd5-9fa0-196d4b570546"
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
+        "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
+        "162fe64a-f260-49f7-b507-4bd4bc213cea"
       ]
     },
     {
