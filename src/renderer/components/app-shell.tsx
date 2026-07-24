@@ -693,6 +693,18 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
   const showErrorOverlay = loadingState === 'error' && loadError != null
 
+  // Keyboard shortcut: Ctrl+Q to quit
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'q') {
+        console.log('[keyboard] Ctrl+Q → quit')
+        window.electronAPI.quitApp()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
 
   // ── Ready state ──
   // Full app UI: sidebar + search+toolbar row + card grid or reorder or empty-state.
