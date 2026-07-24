@@ -30,7 +30,10 @@ function AppShellWithState() {
     <AppShell
       loadingState={loadingState}
       retryLoad={retryLoad}
-      quitApp={() => window.electronAPI.quitApp()}
+      quitApp={() => {
+        console.log('[main.tsx] quitApp called')
+        window.electronAPI.quitApp()
+      }}
       loadError={state.loadError}
       rebuildData={state.loadRetryCount > 0 ? rebuildData : undefined}
     />

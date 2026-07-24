@@ -9,7 +9,10 @@ const electronAPI: ElectronAPI = {
   readHtmlTitle: (filePath: string) => ipcRenderer.invoke(IPC_CHANNELS.FILE_READ_HTML_TITLE, filePath),
   getAppData: () => ipcRenderer.invoke(IPC_CHANNELS.STORE_LOAD),
   saveAppData: (data) => ipcRenderer.invoke(IPC_CHANNELS.STORE_SAVE, data),
-  quitApp: () => ipcRenderer.send('app:quit'),
+  quitApp: () => {
+    console.log('[preload] quitApp called, sending app:quit')
+    ipcRenderer.send('app:quit')
+  },
   getPlatform: () => process.platform as 'win32' | 'darwin',
 }
 

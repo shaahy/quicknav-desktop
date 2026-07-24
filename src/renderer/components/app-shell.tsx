@@ -546,6 +546,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   }, [dispatch])
 
   const handleSaveErrorQuit = useCallback(() => {
+    console.log('[app-shell] quitApp called')
     quitApp()
   }, [quitApp])
 
