@@ -1,7 +1,6 @@
 import { dialog, shell, BrowserWindow } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
-import { pathToFileURL } from 'url'
 import type { FileSelectionResult, OpenResult, LocateResult } from '../shared/types'
 import { HTML_READ_SIZE } from '../shared/constants'
 
@@ -35,16 +34,37 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 
 export async function openFile(absolutePath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
-  // Use pathToFileURL for proper encoding of spaces, Chinese chars, etc.
-  // Then shell.openExternal works reliably with ALL third-party apps.
   console.log('[openFile] path:', absolutePath)
   try {
-    const fileUrl = pathToFileURL(absolutePath).href
-    console.log('[openFile] opening via openExternal:', fileUrl)
-    await shell.openExternal(fileUrl)
-    return {}
-  } catch (e) {
-    console.error('[openFile] exception:', e)
+    const { platform } = process
+    if (platform === 'win32') {
+      // Windows: use child_process.exec to launch via cmd start
+      // This is the most reliable method for all file types and third-party apps
+      const { exec } = await import('child_process')
+      return await new Promise((resolve) => {
+        const cmd = `start "" "${absolutePath}"`
+        console.log('[openFile] exec:', cmd)
+        exec(cmd, { shell: 'cmd.exe' }, (err) => {
+          if (err) {
+            console.error('[openFile] exec error:', err.message)
+            resolve({ error: 'unknown' })
+          } else {
+            console.log('[openFile] exec success')
+            resolve({})
+          }
+        })
+      })
+    }
+    // macOS/Linux: shell.openPath is reliable
+    const error = await shell.openPath(absolutePath)
+    console.log('[openFile] result:', JSON.stringify(error))
+    if (!error) return {}
+    if (error.includes('No default app') || error.includes('no application')) {
+      return { error: 'no-default-app' }
+    }
+    return { error: 'unknown' }
+  } catch (e: any) {
+    console.error('[openFile] exception:', e?.message ?? e)
     return { error: 'unknown' }
   }
 }

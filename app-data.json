@@ -155,23 +155,6 @@
       "updatedAt": "2026-07-24T03:08:19.208Z"
     },
     {
-      "id": "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
-      "name": "AGENTS.md",
-      "note": null,
-      "fileReference": {
-        "absolutePath": "E:/元梦工作空间/A 教程集合/AGENTS.md",
-        "fileName": "AGENTS",
-        "extension": "md",
-        "fileSize": 1663,
-        "mtimeMs": 1783564698791.4272
-      },
-      "categoryIds": [
-        "572e876b-8996-46da-b618-8d5380a94045"
-      ],
-      "createdAt": "2026-07-24T03:08:40.608Z",
-      "updatedAt": "2026-07-24T03:08:40.608Z"
-    },
-    {
       "id": "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
       "name": "Bmad 产物地图",
       "note": null,
@@ -187,57 +170,6 @@
       ],
       "createdAt": "2026-07-24T03:09:01.913Z",
       "updatedAt": "2026-07-24T03:09:01.913Z"
-    },
-    {
-      "id": "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
-      "name": "防止需求遗漏的流程改进方案",
-      "note": null,
-      "fileReference": {
-        "absolutePath": "E:/元梦工作空间/A 教程集合/防止需求遗漏的流程改进方案.md",
-        "fileName": "防止需求遗漏的流程改进方案",
-        "extension": "md",
-        "fileSize": 7683,
-        "mtimeMs": 1784857467051.394
-      },
-      "categoryIds": [
-        "572e876b-8996-46da-b618-8d5380a94045"
-      ],
-      "createdAt": "2026-07-24T03:09:09.415Z",
-      "updatedAt": "2026-07-24T03:09:09.415Z"
-    },
-    {
-      "id": "b71406d2-962c-4799-87c8-59c48c9c2a38",
-      "name": "工作记录",
-      "note": null,
-      "fileReference": {
-        "absolutePath": "E:/元梦工作空间/A 教程集合/工作记录.md",
-        "fileName": "工作记录",
-        "extension": "md",
-        "fileSize": 2427,
-        "mtimeMs": 1784861965756.111
-      },
-      "categoryIds": [
-        "572e876b-8996-46da-b618-8d5380a94045"
-      ],
-      "createdAt": "2026-07-24T03:09:15.360Z",
-      "updatedAt": "2026-07-24T03:09:15.360Z"
-    },
-    {
-      "id": "9ee542e9-9dd2-4ac5-b956-2e07e692b506",
-      "name": "内网资源总览",
-      "note": null,
-      "fileReference": {
-        "absolutePath": "E:/元梦工作空间/A 教程集合/内网资源总览.md",
-        "fileName": "内网资源总览",
-        "extension": "md",
-        "fileSize": 1811,
-        "mtimeMs": 1783653967892.3474
-      },
-      "categoryIds": [
-        "572e876b-8996-46da-b618-8d5380a94045"
-      ],
-      "createdAt": "2026-07-24T03:09:20.560Z",
-      "updatedAt": "2026-07-24T03:09:20.560Z"
     },
     {
       "id": "27c9b342-0fc1-4306-a748-a432afb16aa4",
@@ -391,6 +323,23 @@
       ],
       "createdAt": "2026-07-24T06:11:42.485Z",
       "updatedAt": "2026-07-24T06:11:42.485Z"
+    },
+    {
+      "id": "435af054-848e-428d-b5d8-954c45f8e9c6",
+      "name": "工作记录",
+      "note": null,
+      "fileReference": {
+        "absolutePath": "E:/元梦工作空间/A 教程集合/工作记录.md",
+        "fileName": "工作记录",
+        "extension": "md",
+        "fileSize": 2427,
+        "mtimeMs": 1784861965756.111
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "createdAt": "2026-07-24T06:20:03.628Z",
+      "updatedAt": "2026-07-24T06:20:03.628Z"
     }
   ],
   "categories": [
@@ -446,11 +395,7 @@
         "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
         "5c670b11-26c3-483b-a413-f81e0edd25cd",
         "27f72c0a-0654-49c0-a872-966b0688c4d4",
-        "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
         "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
-        "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
-        "b71406d2-962c-4799-87c8-59c48c9c2a38",
-        "9ee542e9-9dd2-4ac5-b956-2e07e692b506",
         "27c9b342-0fc1-4306-a748-a432afb16aa4",
         "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
@@ -459,7 +404,8 @@
         "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
         "162fe64a-f260-49f7-b507-4bd4bc213cea",
-        "c6007c68-cd77-488f-beb9-995506dcf953"
+        "c6007c68-cd77-488f-beb9-995506dcf953",
+        "435af054-848e-428d-b5d8-954c45f8e9c6"
       ]
     },
     {
@@ -469,10 +415,7 @@
     {
       "viewType": "category:572e876b-8996-46da-b618-8d5380a94045",
       "cardIds": [
-        "5fcf4b99-bf19-417c-be7a-f1fbda44e44b",
-        "37c83adf-2cac-473d-a6b8-9772c0aeaf0f",
-        "b71406d2-962c-4799-87c8-59c48c9c2a38",
-        "9ee542e9-9dd2-4ac5-b956-2e07e692b506"
+        "435af054-848e-428d-b5d8-954c45f8e9c6"
       ]
     },
     {
