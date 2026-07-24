@@ -34,11 +34,13 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
 
 export async function openFile(absolutePath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
-  // shell.openPath is the standard Electron API — handles all paths correctly
-  // including Chinese characters and spaces.
-  console.log('[openFile] path:', absolutePath)
+  // Paths are stored normalized (forward slashes) but Windows needs backslashes.
+  const nativePath = process.platform === 'win32'
+    ? absolutePath.replace(/\//g, '\\')
+    : absolutePath
+  console.log('[openFile] native:', nativePath)
   try {
-    const error = await shell.openPath(absolutePath)
+    const error = await shell.openPath(nativePath)
     console.log('[openFile] result:', JSON.stringify(error))
     if (!error) return {}
     if (error.includes('No default app') || error.includes('no application')) {
