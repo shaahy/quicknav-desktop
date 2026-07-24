@@ -438,7 +438,9 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
       const card = state.data.cards.find(c => c.id === cardId)
       if (!card) return
       try {
+        console.log('[handleOpenFile] opening:', card.fileReference.absolutePath)
         const result = await window.electronAPI.openFile(card.fileReference.absolutePath)
+        console.log('[handleOpenFile] result:', JSON.stringify(result))
         if (result && result.error) {
           const count = incrementFailure(cardId)
           setErrorDialogState({
@@ -450,8 +452,8 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         } else {
           resetFailureCount(cardId)
         }
-      } catch {
-        // Unexpected JS error — treat as open-failed
+      } catch (e) {
+        console.error('[handleOpenFile] exception:', e)
         incrementFailure(cardId)
         setErrorDialogState({
           variant: 'open-failed',
