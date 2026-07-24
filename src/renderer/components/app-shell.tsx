@@ -743,7 +743,27 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
   return (
     <div className="qc-app-shell">
-      <aside className="qc-app-shell__sidebar" aria-label="分类导航">
+      {/* ── Top bar (full width): search + buttons ── */}
+      <header className="qc-app-shell__topbar">
+        <GlobalSearch />
+        {isCardReorderMode ? (
+          <div className="qc-app-shell__toolbar-buttons">
+            <ToolbarButton label="完成" variant="primary" onClick={handleCardReorderDone} />
+            <ToolbarButton label="取消" variant="secondary" onClick={handleCardReorderCancel} />
+          </div>
+        ) : (
+          <div className="qc-app-shell__toolbar-buttons">
+            <ToolbarButton label="新建卡片" variant="primary" onClick={handleSelectFile} />
+            {hasCards && (
+              <ToolbarButton label="整理排序" variant="secondary" onClick={handleCardReorderStart} />
+            )}
+          </div>
+        )}
+      </header>
+
+      {/* ── Body: sidebar + main ── */}
+      <div className="qc-app-shell__body">
+        <aside className="qc-app-shell__sidebar" aria-label="分类导航">
         {isCategoryReorderMode ? (
           <div className="qc-app-shell__sidebar-reorder">
             <div className="qc-app-shell__sidebar-reorder-header">
@@ -781,41 +801,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         )}
       </aside>
 
-      <main className="qc-app-shell__main" aria-label="卡片列表">
-
-        <div className="qc-app-shell__toolbar">
-          <GlobalSearch />
-
-          {isCardReorderMode ? (
-            <div className="qc-app-shell__toolbar-buttons">
-              <ToolbarButton
-                label="完成"
-                variant="primary"
-                onClick={handleCardReorderDone}
-              />
-              <ToolbarButton
-                label="取消"
-                variant="secondary"
-                onClick={handleCardReorderCancel}
-              />
-            </div>
-          ) : (
-            <div className="qc-app-shell__toolbar-buttons">
-              <ToolbarButton
-                label="新建卡片"
-                variant="primary"
-                onClick={handleSelectFile}
-              />
-              {hasCards && (
-                <ToolbarButton
-                  label="整理排序"
-                  variant="secondary"
-                  onClick={handleCardReorderStart}
-                />
-              )}
-            </div>
-          )}
-        </div>
+        <main className="qc-app-shell__main" aria-label="卡片列表">
 
         {isCardReorderMode ? (
           <div className="qc-app-shell__reorder-area">
@@ -860,7 +846,9 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
           visible={statusBarState.visible}
           onDismiss={dismissStatusBar}
         />
-      </main>
+        </main>
+      </div>
+      {/* /qc-app-shell__body */}
 
       {/* ── Dialogs and overlays ── */}
 
