@@ -38,26 +38,18 @@ export async function openFile(absolutePath: string): Promise<OpenResult> {
   try {
     const { platform } = process
     if (platform === 'win32') {
-      // Windows: use child_process.exec to launch via cmd start
-      // This is the most reliable method for all file types and third-party apps
-      const { exec } = await import('child_process')
-      return await new Promise((resolve) => {
-        const cmd = `start "" "${absolutePath}"`
-        console.log('[openFile] exec:', cmd)
-        exec(cmd, { shell: 'cmd.exe' }, (err) => {
-          if (err) {
-            console.error('[openFile] exec error:', err.message)
-            resolve({ error: 'unknown' })
-          } else {
-            console.log('[openFile] exec success')
-            resolve({})
-          }
-        })
-      })
+      // Use spawn with shell:true + detached to fire-and-forget.
+      // exec opens a visible CMD window which can interfere with Electron.
+      const { spawn } = await import('child_process')
+      spawn('cmd', ['/c', 'start', '', absolutePath], {
+        shell: true,
+        detached: true,
+        stdio: 'ignore',
+      }).unref()
+      return {}
     }
     // macOS/Linux: shell.openPath is reliable
     const error = await shell.openPath(absolutePath)
-    console.log('[openFile] result:', JSON.stringify(error))
     if (!error) return {}
     if (error.includes('No default app') || error.includes('no application')) {
       return { error: 'no-default-app' }
