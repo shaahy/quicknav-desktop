@@ -7,7 +7,7 @@ export function registerIpcHandlers(getWindow: () => BrowserWindow, userDataPath
   ipcMain.handle(IPC_CHANNELS.STORE_LOAD, () => {
     console.log('[ipc] store:load, path:', userDataPath)
     const result = loadAppData(userDataPath)
-    console.log('[ipc] store:load result:', JSON.stringify({ success: result.success, hasData: !!result.data, error: result.error }))
+    console.log('[ipc] store:load result:', JSON.stringify({ success: result.success, hasData: !!((result as any).data), error: (result as any).error }))
     return result
   })
   ipcMain.handle(IPC_CHANNELS.STORE_SAVE, (_e, data) => saveAppData(userDataPath, data))
