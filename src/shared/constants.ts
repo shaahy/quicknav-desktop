@@ -17,8 +17,8 @@ export const CUMULATIVE_FAILURE_THRESHOLD = 3
 
 export const MIN_WINDOW_WIDTH = 760
 export const MIN_WINDOW_HEIGHT = 560
-export const DEFAULT_WINDOW_WIDTH = 1024
-export const DEFAULT_WINDOW_HEIGHT = 720
+export const DEFAULT_WINDOW_WIDTH = 1340
+export const DEFAULT_WINDOW_HEIGHT = 880
 export const SIDEBAR_WIDTH = 208
 export const CONTROL_HEIGHT = 36
 export const TARGET_MIN = 44
