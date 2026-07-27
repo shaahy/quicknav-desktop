@@ -27,6 +27,8 @@ export const HTML_READ_SIZE = 65536 // 64KB
 
 export const IPC_CHANNELS = {
   FILE_SELECT: 'file:select',
+  FOLDER_SELECT_FOR_SCAN: 'folder:selectForScan',
+  FOLDER_SCAN: 'folder:scan',
   FILE_READ_HTML_TITLE: 'file:readHtmlTitle',
   SHELL_OPEN_FILE: 'shell:openFile',
   SHELL_SHOW_IN_FOLDER: 'shell:showItemInFolder',

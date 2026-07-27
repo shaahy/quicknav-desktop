@@ -1,5 +1,13 @@
 ﻿import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import type { FileSelectionResult, CardFormData, MenuItem, ReorderItem, ViewType } from '@shared/types'
+import type {
+  BatchAddResult,
+  BatchCardInput,
+  FileSelectionResult,
+  CardFormData,
+  MenuItem,
+  ReorderItem,
+  ViewType,
+} from '@shared/types'
 import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 import { normalizePath } from '@shared/validation'
 import { useAppState, useAppDispatch } from '../contexts/AppState'
@@ -21,6 +29,7 @@ import { GlobalSearch } from './global-search'
 import { ErrorDialog } from './error-dialog'
 import { DuplicateDialog } from './duplicate-dialog'
 import { StatusBar } from './status-bar'
+import { ScanDialog } from './scan-dialog'
 import '../styles/components/app-shell.css'
 
 export interface AppShellProps {
@@ -51,7 +60,14 @@ export interface AppShellProps {
 export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildData }: AppShellProps) {
   const { state } = useAppState()
   const dispatch = useAppDispatch()
-  const { visibleCards, addCard, updateCard, deleteCard, findDuplicateByPath } = useCards()
+  const {
+    visibleCards,
+    addCard,
+    addCardsBatch,
+    updateCard,
+    deleteCard,
+    findDuplicateByPath,
+  } = useCards()
   const {
     categories,
     addCategory,
@@ -97,6 +113,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   const [pendingFileResult, setPendingFileResult] = useState<FileSelectionResult | null>(null)
   const [pendingInitialName, setPendingInitialName] = useState<string | null>(null)
   const showFormDialog = pendingFileResult !== null
+  const [showScanDialog, setShowScanDialog] = useState(false)
 
   // ── Action menu state ──
 
@@ -202,13 +219,17 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
   const handleSelectFile = useCallback(async () => {
     const result = await window.electronAPI.selectFile()
+    if (result.error) {
+      showStatusBar(result.error)
+      return
+    }
     if (result.canceled || !result.file) return
 
     // FR-003/FR-004: prefill card name from HTML title or filename
     let initialName: string
     if (result.file.isHtml) {
       try {
-        const title = await window.electronAPI.readHtmlTitle(result.file.absolutePath)
+        const title = await window.electronAPI.readHtmlTitle(result.file.relativePath)
         initialName = title || result.file.fileName
       } catch {
         initialName = result.file.fileName
@@ -219,7 +240,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
     setPendingInitialName(initialName)
     setPendingFileResult(result)
-  }, [])
+  }, [showStatusBar])
 
   const handleFormSave = useCallback(
     async (data: CardFormData) => {
@@ -234,7 +255,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
       } else {
         // Duplicate detected — find the existing card
         const platform = window.electronAPI.getPlatform()
-        const normalized = normalizePath(pendingFileResult.file.absolutePath, platform)
+        const normalized = normalizePath(pendingFileResult.file.relativePath, platform)
         const duplicate = findDuplicateByPath(normalized)
         if (duplicate) {
           setPendingFileResult(null)
@@ -256,6 +277,17 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
       setPendingFileResult(null)
     },
     []
+  )
+
+  const handleBatchAdd = useCallback(
+    async (inputs: BatchCardInput[]): Promise<BatchAddResult> => {
+      const result = await addCardsBatch(inputs)
+      if (!result.error) {
+        showStatusBar(`已批量添加 ${result.addedCount} 张卡片`)
+      }
+      return result
+    },
+    [addCardsBatch, showStatusBar]
   )
 
   // ── Action menu (S11 / S14) ──
@@ -318,7 +350,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         onClick: () => {
           if (card) {
             window.electronAPI
-              .showItemInFolder(card.fileReference.absolutePath)
+              .showItemInFolder(card.fileReference.relativePath)
               .then((locateResult) => {
                 if (locateResult && locateResult.error) {
                   const count = incrementFailure(menuCardId)
@@ -438,9 +470,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
       const card = state.data.cards.find(c => c.id === cardId)
       if (!card) return
       try {
-        console.log('[handleOpenFile] opening:', card.fileReference.absolutePath)
-        const result = await window.electronAPI.openFile(card.fileReference.absolutePath)
-        console.log('[handleOpenFile] result:', JSON.stringify(result))
+        const result = await window.electronAPI.openFile(card.fileReference.relativePath)
         if (result && result.error) {
           const count = incrementFailure(cardId)
           setErrorDialogState({
@@ -452,8 +482,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         } else {
           resetFailureCount(cardId)
         }
-      } catch (e) {
-        console.error('[handleOpenFile] exception:', e)
+      } catch {
         incrementFailure(cardId)
         setErrorDialogState({
           variant: 'open-failed',
@@ -480,6 +509,8 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
           existingCardName: repairResult.duplicateCardName!,
           sourceCardId: cardId,
         })
+      } else if (repairResult.result === 'error') {
+        showStatusBar(repairResult.errorMessage || '无法选择该文件')
       }
       // 'canceled' — no action needed
     },
@@ -546,7 +577,6 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   }, [dispatch])
 
   const handleSaveErrorQuit = useCallback(() => {
-    console.log('[app-shell] quitApp called')
     quitApp()
   }, [quitApp])
 
@@ -668,6 +698,19 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
     }
   }, [loadingState])
 
+  // Keyboard shortcut: Ctrl+Q to quit.
+  // Keep this hook before every conditional return so the hook order is stable
+  // when the shell transitions from loading to ready.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'q') {
+        quitApp()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [quitApp])
+
   // ── Loading state ──
   // Shell skeleton with non-interactive loading indicator.
 
@@ -693,19 +736,6 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
   const showErrorOverlay = loadingState === 'error' && loadError != null
 
-  // Keyboard shortcut: Ctrl+Q to quit
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'q') {
-        console.log('[keyboard] Ctrl+Q → quit')
-        window.electronAPI.quitApp()
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
-
-
   // ── Ready state ──
   // Full app UI: sidebar + search+toolbar row + card grid or reorder or empty-state.
 
@@ -727,6 +757,11 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
             {hasCards && (
               <ToolbarButton label="整理排序" variant="secondary" onClick={handleCardReorderStart} />
             )}
+            <ToolbarButton
+              label="扫描"
+              variant="secondary"
+              onClick={() => setShowScanDialog(true)}
+            />
           </div>
         )}
       </header>
@@ -833,6 +868,15 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         />
       )}
 
+      {showScanDialog && (
+        <ScanDialog
+          cards={state.data.cards}
+          categories={categories}
+          onAdd={handleBatchAdd}
+          onClose={() => setShowScanDialog(false)}
+        />
+      )}
+
       {menuCardId && menuAnchor && (
         <ActionMenu
           items={menuItems}
@@ -845,7 +889,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
         <CardFormDialog
           mode="edit"
           initialData={editInitialData}
-          filePath={editingCard?.fileReference.absolutePath}
+          filePath={editingCard?.fileReference.relativePath}
           onSave={handleEditSave}
           onClose={handleEditClose}
           existingCardNames={existingCardNames}
@@ -931,9 +975,13 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
               {rebuildData && (
                 <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary" onClick={rebuildData}>数据已损坏，需要重新开始</button>
               )}
-              <button type="button" className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
-                ref={(el) => { if (el) el.onmousedown = () => { console.log('[native] quit'); window.electronAPI.quitApp() } }}
-              >退出</button>
+              <button
+                type="button"
+                className="qc-app-shell__error-btn qc-app-shell__error-btn--secondary"
+                onClick={quitApp}
+              >
+                退出
+              </button>
             </div>
           </div>
         </div>

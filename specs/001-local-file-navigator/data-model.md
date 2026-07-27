@@ -72,7 +72,7 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 
 | Field | Type | Required | Constraints |
 |-------|------|----------|-------------|
-| `absolutePath` | string | ✅ | 系统绝对路径，Windows 反斜杠归一化为正斜杠，盘符大写；macOS POSIX 路径 NFC 正规化 |
+| `relativePath` | string | ✅ | 相对于 `app-data.json` 所在工具目录的路径，分隔符归一化为正斜杠并使用 Unicode NFC；允许 `../` 指向工具目录外的同盘文件，Windows 跨盘文件不允许创建卡片 |
 | `fileName` | string | ✅ | 不含扩展名的文件名（用于默认卡片名回退） |
 | `extension` | string | ❌ | 扩展名（不含点），用于 file-type-mark |
 | `fileSize` | number | ❌ | 字节数，辅助唯一性校验 |
@@ -80,7 +80,7 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 | `platformId` | string | ❌ | 平台特定标识符，V1 不强制使用 |
 
 **Identity rule** (from research Decision 4):
-- 主键 = `normalizePath(absolutePath)` — 路径归一化 + Unicode NFC
+- 主键 = `normalizePath(relativePath)` — 相对路径归一化 + Unicode NFC
 - 唯一性辅助校验 = `{fileSize, mtimeMs}` 组合（快速交叉验证，不做文件哈希）
 
 ### ViewOrder

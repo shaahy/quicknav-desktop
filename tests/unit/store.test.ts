@@ -30,7 +30,7 @@ describe('store', () => {
     const data = emptyAppData()
     data.cards.push({
       id: 'test-id', name: 'test', note: null,
-      fileReference: { absolutePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
+      fileReference: { relativePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
       categoryIds: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     })
     const saveResult = saveAppData(tmpDir, data)
@@ -39,6 +39,43 @@ describe('store', () => {
     expect(loadResult.success).toBe(true)
     if (loadResult.success) {
       expect(loadResult.data!.cards).toHaveLength(1)
+    }
+  })
+
+  it('loads version 1 absolute paths as version 2 relative paths', () => {
+    fs.mkdirSync(tmpDir, { recursive: true })
+    const absolutePath = path.resolve(tmpDir, '..', 'tutorials', 'guide.html')
+    const legacyData = {
+      version: 1,
+      cards: [{
+        id: 'legacy-id',
+        name: 'Legacy',
+        note: null,
+        fileReference: {
+          absolutePath,
+          fileName: 'guide',
+          extension: 'html',
+          fileSize: 100,
+          mtimeMs: 0,
+        },
+        categoryIds: [],
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      }],
+      categories: [],
+      viewOrders: [],
+    }
+    fs.writeFileSync(getDataPath(tmpDir), JSON.stringify(legacyData), 'utf-8')
+
+    const result = loadAppData(tmpDir)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.version).toBe(2)
+      expect(result.data.cards[0].fileReference.relativePath).toBe(
+        path.relative(tmpDir, absolutePath).replace(/\\/g, '/'),
+      )
+      expect(result.data.cards[0].fileReference).not.toHaveProperty('absolutePath')
     }
   })
 
@@ -114,7 +151,7 @@ describe('store', () => {
       id: 'existing-id',
       name: 'Original File',
       note: null,
-      fileReference: { absolutePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
+      fileReference: { relativePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
       categoryIds: [],
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',

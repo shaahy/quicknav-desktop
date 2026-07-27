@@ -13,7 +13,7 @@ export function getDataPath(userDataPath: string): string {
 
 export function emptyAppData(): AppData {
   return {
-    version: 1,
+    version: 2,
     cards: [],
     categories: [],
     viewOrders: [
@@ -30,10 +30,42 @@ export function loadAppData(userDataPath: string): IpcResult<AppData> {
       return { success: true, data: emptyAppData() }
     }
     const raw = fs.readFileSync(filePath, 'utf-8')
-    const data = JSON.parse(raw) as AppData
-    if (data.version !== 1 || !Array.isArray(data.cards) || !Array.isArray(data.categories)) {
+    const parsed = JSON.parse(raw) as any
+    if (
+      (parsed.version !== 1 && parsed.version !== 2) ||
+      !Array.isArray(parsed.cards) ||
+      !Array.isArray(parsed.categories)
+    ) {
       return { success: false, error: 'corrupted' }
     }
+    if (
+      parsed.cards.some((card: any) =>
+        parsed.version === 1
+          ? typeof card.fileReference?.absolutePath !== 'string'
+          : typeof card.fileReference?.relativePath !== 'string'
+      )
+    ) {
+      return { success: false, error: 'corrupted' }
+    }
+    const data: AppData = parsed.version === 1
+      ? {
+          ...parsed,
+          version: 2,
+          cards: parsed.cards.map((card: any) => {
+            const { absolutePath, ...fileMetadata } = card.fileReference
+            return {
+              ...card,
+              fileReference: {
+                ...fileMetadata,
+                relativePath: path
+                  .relative(userDataPath, absolutePath)
+                  .replace(/\\/g, '/')
+                  .normalize('NFC'),
+              },
+            }
+          }),
+        }
+      : parsed
     return { success: true, data }
   } catch (e) {
     return { success: false, error: 'corrupted' }

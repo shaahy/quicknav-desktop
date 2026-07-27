@@ -19,7 +19,7 @@ export interface Category {
 }
 
 export interface FileReference {
-  absolutePath: string    // normalized: forward slashes, uppercase drive letter, NFC
+  relativePath: string    // relative to app-data.json directory; forward slashes, NFC
   fileName: string        // without extension
   extension: string       // without dot, '' if none
   fileSize: number        // bytes, for identity check
@@ -34,7 +34,7 @@ export interface ViewOrder {
 }
 
 export interface AppData {
-  version: 1
+  version: 2
   cards: Card[]
   categories: Category[]
   viewOrders: ViewOrder[]
@@ -56,13 +56,51 @@ export type IpcResult<T> =
 export interface FileSelectionResult {
   canceled: boolean
   file?: {
-    absolutePath: string
+    relativePath: string
     fileName: string
     extension: string
     fileSize: number
     mtimeMs: number
     isHtml: boolean
   }
+  error?: string
+}
+
+export type ScanFileType = 'html' | 'word' | 'powerpoint' | 'excel' | 'markdown'
+
+export interface ScanFolderSelectionResult {
+  canceled: boolean
+  folder?: {
+    relativePath: string
+    displayPath: string
+  }
+  error?: string
+}
+
+export interface ScannedFile {
+  relativePath: string
+  fileName: string
+  extension: string
+  fileSize: number
+  mtimeMs: number
+  isHtml: boolean
+  suggestedName: string
+}
+
+export interface ScanFolderResult {
+  files: ScannedFile[]
+  skippedEntries: number
+  error?: string
+}
+
+export interface BatchCardInput {
+  file: ScannedFile
+  name: string
+  categoryIds: string[]
+}
+
+export interface BatchAddResult {
+  addedCount: number
   error?: string
 }
 
@@ -116,6 +154,8 @@ export interface ConfirmationData {
 
 export interface ElectronAPI {
   selectFile(): Promise<FileSelectionResult>
+  selectScanFolder(): Promise<ScanFolderSelectionResult>
+  scanFolder(relativePath: string, fileTypes: ScanFileType[]): Promise<ScanFolderResult>
   openFile(path: string): Promise<OpenResult>
   showItemInFolder(path: string): Promise<LocateResult>
   readHtmlTitle(path: string): Promise<string | null>

@@ -60,7 +60,7 @@
 **Decision**: 路径归一化 + 文件元信息双重校验
 
 **Algorithm**:
-1. 主键: 绝对路径归一化（`path.resolve()` + Unicode 正规化 NFC）
+1. 主键: 相对于 `app-data.json` 所在目录的路径归一化（正斜杠 + Unicode NFC）
 2. 辅助校验（防路径别名）: 文件大小 (bytes) + 修改时间 (mtime ms) 组合
 3. 跨平台: Windows 路径反斜杠归一化、盘符大写；macOS 使用 POSIX 路径
 4. 不校验文件哈希——对任意大小的文件延迟不可控

@@ -1,10 +1,62 @@
 import { dialog, shell, BrowserWindow } from 'electron'
 import * as fs from 'fs'
 import * as path from 'path'
-import type { FileSelectionResult, OpenResult, LocateResult } from '../shared/types'
+import type {
+  FileSelectionResult,
+  OpenResult,
+  LocateResult,
+  ScanFileType,
+  ScanFolderResult,
+  ScanFolderSelectionResult,
+  ScannedFile,
+} from '../shared/types'
 import { HTML_READ_SIZE } from '../shared/constants'
 
-export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelectionResult> {
+const DEV_RENDERER_ENV_KEYS = ['ELECTRON_RENDERER_URL', 'VITE_DEV_SERVER_URL'] as const
+let openPathQueue: Promise<void> = Promise.resolve()
+
+function resolveFromDataDir(dataDir: string, relativePath: string): string {
+  return path.resolve(dataDir, relativePath)
+}
+
+function makeRelativeToDataDir(dataDir: string, absolutePath: string): string | null {
+  const relativePath = path.relative(dataDir, absolutePath)
+  // Windows has no relative path between different drive letters.
+  if (path.isAbsolute(relativePath)) return null
+  return relativePath.replace(/\\/g, '/').normalize('NFC')
+}
+
+const SCAN_EXTENSIONS: Record<ScanFileType, ReadonlySet<string>> = {
+  html: new Set(['html', 'htm']),
+  word: new Set(['doc', 'docx']),
+  powerpoint: new Set(['ppt', 'pptx']),
+  excel: new Set(['xls', 'xlsx']),
+  markdown: new Set(['md']),
+}
+
+function readHtmlTitleFromAbsolutePath(absolutePath: string): string | null {
+  try {
+    const fd = fs.openSync(absolutePath, 'r')
+    try {
+      const buffer = Buffer.alloc(HTML_READ_SIZE)
+      const bytesRead = fs.readSync(fd, buffer, 0, HTML_READ_SIZE, 0)
+      const content = buffer.subarray(0, bytesRead).toString('utf-8')
+      const match = content.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
+      if (!match || !match[1]) return null
+      const title = match[1].trim()
+      return title || null
+    } finally {
+      fs.closeSync(fd)
+    }
+  } catch {
+    return null
+  }
+}
+
+export async function selectFile(
+  parentWindow: BrowserWindow,
+  dataDir: string,
+): Promise<FileSelectionResult> {
   const result = await dialog.showOpenDialog(parentWindow, {
     properties: ['openFile'],
     title: '选择文件'
@@ -16,10 +68,17 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
   try {
     const stat = fs.statSync(filePath)
     const ext = path.extname(filePath).replace('.', '').toLowerCase()
+    const relativePath = makeRelativeToDataDir(dataDir, filePath)
+    if (relativePath === null) {
+      return {
+        canceled: false,
+        error: '所选文件与工具不在同一磁盘，无法创建相对路径',
+      }
+    }
     return {
       canceled: false,
       file: {
-        absolutePath: filePath,
+        relativePath,
         fileName: path.basename(filePath, path.extname(filePath)),
         extension: ext,
         fileSize: stat.size,
@@ -32,58 +91,194 @@ export async function selectFile(parentWindow: BrowserWindow): Promise<FileSelec
   }
 }
 
-export async function openFile(absolutePath: string): Promise<OpenResult> {
+export async function selectScanFolder(
+  parentWindow: BrowserWindow,
+  dataDir: string,
+): Promise<ScanFolderSelectionResult> {
+  const result = await dialog.showOpenDialog(parentWindow, {
+    properties: ['openDirectory'],
+    title: '选择扫描文件夹',
+  })
+  if (result.canceled || result.filePaths.length === 0) {
+    return { canceled: true }
+  }
+
+  const displayPath = result.filePaths[0]
+  const relativePath = makeRelativeToDataDir(dataDir, displayPath)
+  if (relativePath === null) {
+    return {
+      canceled: false,
+      error: '所选文件夹与工具不在同一磁盘，无法创建相对路径',
+    }
+  }
+
+  return {
+    canceled: false,
+    folder: {
+      relativePath,
+      displayPath,
+    },
+  }
+}
+
+export async function scanFolder(
+  relativeFolderPath: string,
+  fileTypes: ScanFileType[],
+  dataDir: string,
+): Promise<ScanFolderResult> {
+  const selectedExtensions = new Set<string>()
+  for (const fileType of fileTypes) {
+    const extensions = SCAN_EXTENSIONS[fileType]
+    if (!extensions) continue
+    for (const extension of extensions) selectedExtensions.add(extension)
+  }
+  if (selectedExtensions.size === 0) {
+    return { files: [], skippedEntries: 0, error: '请至少选择一种扫描类型' }
+  }
+
+  const rootPath = resolveFromDataDir(dataDir, relativeFolderPath)
+  const files: ScannedFile[] = []
+  let skippedEntries = 0
+
+  const visit = async (directoryPath: string): Promise<void> => {
+    let entries: fs.Dirent[]
+    try {
+      entries = await fs.promises.readdir(directoryPath, { withFileTypes: true })
+    } catch {
+      skippedEntries += 1
+      return
+    }
+
+    entries.sort((left, right) => left.name.localeCompare(right.name, 'zh-CN'))
+    for (const entry of entries) {
+      const absolutePath = path.join(directoryPath, entry.name)
+      if (entry.isSymbolicLink()) {
+        skippedEntries += 1
+        continue
+      }
+      if (entry.isDirectory()) {
+        await visit(absolutePath)
+        continue
+      }
+      if (!entry.isFile()) continue
+
+      const extension = path.extname(entry.name).replace('.', '').toLowerCase()
+      if (!selectedExtensions.has(extension)) continue
+
+      try {
+        const stat = await fs.promises.stat(absolutePath)
+        const relativePath = makeRelativeToDataDir(dataDir, absolutePath)
+        if (relativePath === null) {
+          skippedEntries += 1
+          continue
+        }
+        const fileName = path.basename(entry.name, path.extname(entry.name))
+        const isHtml = extension === 'html' || extension === 'htm'
+        const suggestedName = isHtml
+          ? readHtmlTitleFromAbsolutePath(absolutePath) || fileName
+          : fileName
+        files.push({
+          relativePath,
+          fileName,
+          extension,
+          fileSize: stat.size,
+          mtimeMs: stat.mtimeMs,
+          isHtml,
+          suggestedName,
+        })
+      } catch {
+        skippedEntries += 1
+      }
+    }
+  }
+
+  try {
+    const rootStat = await fs.promises.stat(rootPath)
+    if (!rootStat.isDirectory()) {
+      return { files: [], skippedEntries: 0, error: '所选路径不是文件夹' }
+    }
+  } catch {
+    return { files: [], skippedEntries: 0, error: '无法访问所选文件夹' }
+  }
+
+  await visit(rootPath)
+  files.sort((left, right) => left.relativePath.localeCompare(right.relativePath, 'zh-CN'))
+  return { files, skippedEntries }
+}
+
+export async function openFile(relativePath: string, dataDir: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
+  const absolutePath = resolveFromDataDir(dataDir, relativePath)
   const nativePath = process.platform === 'win32'
     ? absolutePath.replace(/\//g, '\\')
     : absolutePath
-  console.log('[openFile] path:', nativePath)
-  try {
-    if (process.platform === 'win32') {
-      // shell.openPath hangs with Chinese paths on some Windows configs.
-      // Use child_process.exec with cmd /c start — this is Windows' native
-      // file-open mechanism and handles all characters correctly.
-      const { exec } = await import('child_process')
-      const cmd = `start "" "${nativePath}"`
-      console.log('[openFile] exec:', cmd)
-      exec(cmd, { shell: 'cmd.exe', windowsHide: true }, (err) => {
-        if (err) console.error('[openFile] exec error:', err.message)
-        else console.log('[openFile] exec ok')
-      })
-      return {}
+
+  const task = openPathQueue.then(async () => {
+    const savedValues = DEV_RENDERER_ENV_KEYS.map(key => [key, process.env[key]] as const)
+    const savedNodeEnv = process.env.NODE_ENV
+    for (const key of DEV_RENDERER_ENV_KEYS) {
+      delete process.env[key]
     }
-    const error = await shell.openPath(nativePath)
+    process.env.NODE_ENV = 'production'
+
+    try {
+      // Electron-based default apps must not inherit this app's development URL.
+      // Otherwise they may load our Vite renderer instead of the requested file.
+      return await shell.openPath(nativePath)
+    } finally {
+      for (const [key, value] of savedValues) {
+        if (value === undefined) {
+          delete process.env[key]
+        } else {
+          process.env[key] = value
+        }
+      }
+      if (savedNodeEnv === undefined) {
+        delete process.env.NODE_ENV
+      } else {
+        process.env.NODE_ENV = savedNodeEnv
+      }
+    }
+  })
+  openPathQueue = task.then(
+    () => undefined,
+    () => undefined,
+  )
+
+  try {
+    const error = await task
     if (!error) return {}
-    if (error.includes('No default app') || error.includes('no application')) {
+    const normalizedError = error.toLowerCase()
+    if (
+      normalizedError.includes('no default app') ||
+      normalizedError.includes('no application') ||
+      normalizedError.includes('not associated') ||
+      normalizedError.includes('没有关联') ||
+      normalizedError.includes('未关联')
+    ) {
       return { error: 'no-default-app' }
     }
     return { error: 'unknown' }
-  } catch (e: any) {
-    console.error('[openFile] exception:', e?.message ?? e)
+  } catch {
     return { error: 'unknown' }
   }
 }
 
-export async function showItemInFolder(absolutePath: string): Promise<LocateResult> {
+export async function showItemInFolder(
+  relativePath: string,
+  dataDir: string,
+): Promise<LocateResult> {
   // Do NOT pre-check file existence (CHK019)
   // shell.showItemInFolder returns void in Electron 33, so we cannot detect failure
+  const absolutePath = resolveFromDataDir(dataDir, relativePath)
   shell.showItemInFolder(absolutePath)
   return {}
 }
 
-export async function readHtmlTitle(absolutePath: string): Promise<string | null> {
-  try {
-    const fd = fs.openSync(absolutePath, 'r')
-    const buffer = Buffer.alloc(HTML_READ_SIZE)
-    fs.readSync(fd, buffer, 0, HTML_READ_SIZE, 0)
-    fs.closeSync(fd)
-    const content = buffer.toString('utf-8')
-    const match = content.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
-    if (!match || !match[1]) return null
-    const title = match[1].trim()
-    return title || null
-  } catch {
-    // Binary or non-UTF8 file: return null, caller falls back to fileName
-    return null
-  }
+export async function readHtmlTitle(
+  relativePath: string,
+  dataDir: string,
+): Promise<string | null> {
+  const absolutePath = resolveFromDataDir(dataDir, relativePath)
+  return readHtmlTitleFromAbsolutePath(absolutePath)
 }

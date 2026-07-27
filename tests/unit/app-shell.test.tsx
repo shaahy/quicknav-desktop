@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { cleanup, render, screen, fireEvent } from '@testing-library/react'
+import { cleanup, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { AppShell } from '../../src/renderer/components/app-shell'
 import type { Card, Category, ViewType } from '../../src/shared/types'
 
@@ -12,7 +12,7 @@ import type { Card, Category, ViewType } from '../../src/shared/types'
 
 const mockStateRef = vi.hoisted(() => ({
   data: {
-    version: 1 as const,
+    version: 2 as const,
     cards: [] as any[],
     categories: [] as any[],
     viewOrders: [
@@ -41,6 +41,7 @@ vi.mock('../../src/renderer/hooks/useCards', () => ({
   useCards: () => ({
     visibleCards: mockVisibleCards.current,
     addCard: vi.fn(),
+    addCardsBatch: vi.fn(),
     updateCard: vi.fn(),
     deleteCard: vi.fn(),
     repairFile: vi.fn(),
@@ -80,7 +81,7 @@ function makeCard(id: string, name: string): Card {
     name,
     note: null,
     fileReference: {
-      absolutePath: `C:/test/${name}.pdf`,
+      relativePath: `C:/test/${name}.pdf`,
       fileName: name,
       extension: 'pdf',
       fileSize: 1024,
@@ -111,7 +112,7 @@ describe('AppShell', () => {
     quitApp = vi.fn()
     // Reset shared mutable state
     mockStateRef.data = {
-      version: 1,
+      version: 2,
       cards: [],
       categories: [],
       viewOrders: [
@@ -130,6 +131,7 @@ describe('AppShell', () => {
 
   afterEach(() => {
     cleanup()
+    vi.restoreAllMocks()
   })
 
   // ── Test 1: loading state shows loading text, no interactive controls ──
@@ -141,6 +143,21 @@ describe('AppShell', () => {
     // No buttons or focusable controls in loading state
     const buttons = document.querySelectorAll('button')
     expect(buttons.length).toBe(0)
+  })
+
+  it('transitions from loading to ready without changing the hook order', () => {
+    const { rerender } = render(
+      <AppShell loadingState="loading" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    expect(screen.getByText('正在加载本地数据...')).toBeInTheDocument()
+
+    expect(() => {
+      rerender(
+        <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+      )
+    }).not.toThrow()
+    expect(screen.getAllByText('新建卡片').length).toBe(2)
   })
 
   // ── Test 2: error overlay shows error title with retry and quit buttons ──
@@ -163,6 +180,16 @@ describe('AppShell', () => {
     expect(retryLoad).toHaveBeenCalledTimes(1)
   })
 
+  it('quit button in error overlay calls quitApp', () => {
+    render(
+      <AppShell loadingState="error" loadError="unknown" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    fireEvent.click(screen.getByText('退出'))
+
+    expect(quitApp).toHaveBeenCalledTimes(1)
+  })
+
   // ── Test 4: ready + no cards shows empty-state with "新建卡片" ──
   it('shows empty state with new-card button when ready and no cards', () => {
     render(
@@ -172,6 +199,38 @@ describe('AppShell', () => {
     // Should not render any file card articles
     const articles = document.querySelectorAll('[role="article"]')
     expect(articles.length).toBe(0)
+  })
+
+  it('opens the scan dialog from the top toolbar', () => {
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: '扫描' }))
+
+    expect(
+      screen.getByRole('dialog', { name: '扫描批量添加卡片' })
+    ).toBeInTheDocument()
+    expect(screen.getByText('扫描类型（可多选）')).toBeInTheDocument()
+  })
+
+  it('places the scan button after organize when cards exist', () => {
+    const card = makeCard('card-1', '文档一')
+    mockStateRef.data.cards = [card]
+    mockStateRef.data.viewOrders = [
+      { viewType: 'allCards', cardIds: ['card-1'] },
+      { viewType: 'uncategorized', cardIds: [] },
+    ]
+    mockVisibleCards.current = [card]
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    const toolbar = document.querySelector('.qc-app-shell__toolbar-buttons')
+    const labels = Array.from(toolbar?.querySelectorAll('button') ?? [])
+      .map(button => button.textContent)
+    expect(labels).toEqual(['新建卡片', '整理排序', '扫描'])
   })
 
   // ── Test 5: ready + has cards shows file card grid with correct count ──
@@ -194,5 +253,50 @@ describe('AppShell', () => {
     )
     const articles = screen.getAllByRole('article')
     expect(articles.length).toBe(3)
+  })
+
+  it('passes the exact relative markdown path to electronAPI when 工作记录 is opened', async () => {
+    const workRecord = makeCard('work-record', '工作记录')
+    workRecord.fileReference = {
+      ...workRecord.fileReference,
+      relativePath: '../A 教程集合/工作记录.md',
+      fileName: '工作记录',
+      extension: 'md',
+    }
+    mockStateRef.data.cards = [workRecord]
+    mockStateRef.data.viewOrders = [
+      { viewType: 'allCards', cardIds: ['work-record'] },
+      { viewType: 'uncategorized', cardIds: [] },
+    ]
+    mockVisibleCards.current = [workRecord]
+    const openFile = vi.spyOn(window.electronAPI, 'openFile').mockResolvedValue({})
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: '打开：工作记录' }))
+
+    await waitFor(() => {
+      expect(openFile).toHaveBeenCalledWith(
+        '../A 教程集合/工作记录.md',
+      )
+    })
+  })
+
+  it('shows the file-selection error without opening the card form', async () => {
+    vi.spyOn(window.electronAPI, 'selectFile').mockResolvedValue({
+      canceled: false,
+      error: '所选文件与工具不在同一磁盘，无法创建相对路径',
+    })
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+    fireEvent.click(screen.getAllByText('新建卡片')[0])
+
+    expect(
+      await screen.findByText('所选文件与工具不在同一磁盘，无法创建相对路径'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })

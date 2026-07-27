@@ -23,7 +23,7 @@ const mocks = vi.hoisted(() => {
     saveError: string | null
   } = {
     data: {
-      version: 1,
+      version: 2,
       cards: [],
       categories: [],
       viewOrders: [
@@ -77,7 +77,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
     name: 'Test Card',
     note: null,
     fileReference: {
-      absolutePath: '/test.txt',
+      relativePath: '/test.txt',
       fileName: 'test',
       extension: 'txt',
       fileSize: 100,
@@ -92,7 +92,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
 
 function resetState(): void {
   mocks.state.data = {
-    version: 1,
+    version: 2,
     cards: [],
     categories: [],
     viewOrders: [
@@ -128,7 +128,7 @@ describe('useFileRepair', () => {
         makeCard({
           id: 'card-1',
           fileReference: {
-            absolutePath: '/old/path.txt',
+            relativePath: '/old/path.txt',
             fileName: 'old',
             extension: 'txt',
             fileSize: 100,
@@ -144,7 +144,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,
@@ -162,7 +162,7 @@ describe('useFileRepair', () => {
         cardId: 'card-1',
         updates: {
           fileReference: {
-            absolutePath: '/new/path.pdf',
+            relativePath: '/new/path.pdf',
             fileName: 'new',
             extension: 'pdf',
             fileSize: 5000,
@@ -182,7 +182,7 @@ describe('useFileRepair', () => {
           note: 'Important notes about this file',
           categoryIds: ['cat-1'],
           fileReference: {
-            absolutePath: '/old/path.txt',
+            relativePath: '/old/path.txt',
             fileName: 'old',
             extension: 'txt',
             fileSize: 100,
@@ -199,7 +199,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,
@@ -219,7 +219,7 @@ describe('useFileRepair', () => {
       const updates = (updateCall[0] as { updates: Record<string, unknown> }).updates
       expect(updates).toEqual({
         fileReference: expect.objectContaining({
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
         }),
       })
       expect(updates.name).toBeUndefined()
@@ -249,7 +249,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,
@@ -287,7 +287,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,
@@ -312,7 +312,7 @@ describe('useFileRepair', () => {
           id: 'card-2',
           name: 'Existing Card',
           fileReference: {
-            absolutePath: '/shared/file.pdf',
+            relativePath: '/shared/file.pdf',
             fileName: 'file',
             extension: 'pdf',
             fileSize: 3000,
@@ -328,7 +328,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/shared/file.pdf',
+          relativePath: '/shared/file.pdf',
           fileName: 'file',
           extension: 'pdf',
           fileSize: 3000,
@@ -359,7 +359,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/some/file.pdf',
+          relativePath: '/some/file.pdf',
           fileName: 'file',
           extension: 'pdf',
           fileSize: 1000,
@@ -376,6 +376,23 @@ describe('useFileRepair', () => {
       expect(mocks.dispatch).not.toHaveBeenCalled()
     })
 
+    it('returns the file-selection error without changing the card', async () => {
+      mocks.state.data.cards = [makeCard({ id: 'card-1', name: 'My Card' })]
+      mocks.electronAPI.selectFile.mockResolvedValue({
+        canceled: false,
+        error: '所选文件与工具不在同一磁盘，无法创建相对路径',
+      })
+
+      const { result } = renderHook(() => useFileRepair())
+      const repairResult = await result.current.repairFile('card-1')
+
+      expect(repairResult).toEqual({
+        result: 'error',
+        errorMessage: '所选文件与工具不在同一磁盘，无法创建相对路径',
+      })
+      expect(mocks.dispatch).not.toHaveBeenCalled()
+    })
+
     // ── Test 7 ──
 
     it('normalizes the new path before duplicate check', async () => {
@@ -386,7 +403,7 @@ describe('useFileRepair', () => {
           id: 'card-2',
           name: 'Existing Card',
           fileReference: {
-            absolutePath: 'C:/Users/test/document.pdf',
+            relativePath: 'C:/Users/test/document.pdf',
             fileName: 'document',
             extension: 'pdf',
             fileSize: 2048,
@@ -403,7 +420,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: 'c:\\Users\\test\\document.pdf',
+          relativePath: 'c:\\Users\\test\\document.pdf',
           fileName: 'document',
           extension: 'pdf',
           fileSize: 2048,
@@ -437,7 +454,7 @@ describe('useFileRepair', () => {
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,

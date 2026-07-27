@@ -21,7 +21,7 @@ function createCard(overrides: Partial<Card> = {}): Card {
     name: '测试卡片',
     note: '第一行备注\n第二行备注\n第三行备注',
     fileReference: {
-      absolutePath: 'C:/test/file.pdf',
+      relativePath: 'C:/test/file.pdf',
       fileName: 'file',
       extension: 'pdf',
       fileSize: 1024,
@@ -141,6 +141,26 @@ describe('FileCard', () => {
     expect(onOpenFile).toHaveBeenCalledWith('card-1')
   })
 
+  it('file-type footer click opens the card', () => {
+    const card = createCard()
+    render(
+      <FileCard
+        card={card}
+        index={0}
+        total={5}
+        viewType={VIEW_ALL}
+        onOpenFile={onOpenFile}
+        onShowMenu={onShowMenu}
+        isReorderMode={false}
+      />
+    )
+
+    fireEvent.click(screen.getByTestId('file-type-mark'))
+
+    expect(onOpenFile).toHaveBeenCalledTimes(1)
+    expect(onOpenFile).toHaveBeenCalledWith('card-1')
+  })
+
   // ── Test 6: card body Enter key calls onOpenFile ──
   it('card body Enter key calls onOpenFile', () => {
     const card = createCard()
@@ -182,6 +202,25 @@ describe('FileCard', () => {
     expect(onOpenFile).not.toHaveBeenCalled()
   })
 
+  it('does not open from the file-type footer in reorder mode', () => {
+    const card = createCard()
+    render(
+      <FileCard
+        card={card}
+        index={0}
+        total={5}
+        viewType={VIEW_ALL}
+        onOpenFile={onOpenFile}
+        onShowMenu={onShowMenu}
+        isReorderMode={true}
+      />
+    )
+
+    fireEvent.click(screen.getByTestId('file-type-mark'))
+
+    expect(onOpenFile).not.toHaveBeenCalled()
+  })
+
   // ── Test 8: more button click calls onShowMenu ──
   it('more button click calls onShowMenu', () => {
     const card = createCard()
@@ -200,6 +239,7 @@ describe('FileCard', () => {
     fireEvent.click(moreBtn)
     expect(onShowMenu).toHaveBeenCalledTimes(1)
     expect(onShowMenu).toHaveBeenCalledWith('card-1', expect.any(Object))
+    expect(onOpenFile).not.toHaveBeenCalled()
   })
 
   // ── Test 9: has correct ARIA: role="article", aria-posinset, aria-setsize ──

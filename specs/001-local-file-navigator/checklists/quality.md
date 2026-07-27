@@ -61,7 +61,7 @@
 
 ## 7. 安全性 (Security)
 
-- [ ] CHK035 — JSON 数据文件 (`app-data.json`) 存储了所有文件绝对路径——是否有明文路径泄露风险？是否需要定义路径混淆或加密需求？[Gap, Security]
+- [ ] CHK035 — JSON 数据文件 (`app-data.json`) 存储的相对路径可能包含 `../` 和目录名称——是否有明文路径泄露风险？是否需要定义路径混淆或加密需求？[Gap, Security]
 - [ ] CHK036 — 应用通过 `shell.openPath` 可执行任意文件——spec 依赖操作系统安全提示（X04）作为唯一安全边界。是否需要定义应用层面的可执行文件白名单/黑名单？[Gap, Security, Spec §FR-026]
 - [ ] CHK037 — `readHtmlTitle` 读取 HTML 文件前 64KB——是否考虑了恶意 HTML 文件（极大文件、二进制伪装的 .html）对读取性能或安全的影响？[Gap, Security]
 - [ ] CHK038 — 是否需要定义应用数据文件的完整性校验需求（如 JSON schema validation 之外的文件篡改检测）？[Gap, Security]

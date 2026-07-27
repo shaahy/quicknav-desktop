@@ -4,5 +4,6 @@ out/
 .worktrees/
 _bmad-output/
 *.log
+*.backup.json
 .env
 .env.local

@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => {
     searchQuery: string
   } = {
     data: {
-      version: 1,
+      version: 2,
       cards: [],
       categories: [],
       viewOrders: [
@@ -77,7 +77,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
     name: 'Test Card',
     note: null,
     fileReference: {
-      absolutePath: '/test.txt',
+      relativePath: '/test.txt',
       fileName: 'test',
       extension: 'txt',
       fileSize: 100,
@@ -95,7 +95,7 @@ const RESERVED_UNCATEGORIZED = '未分类'
 
 function resetState(): void {
   mocks.state.data = {
-    version: 1,
+    version: 2,
     cards: [],
     categories: [],
     viewOrders: [
@@ -534,7 +534,7 @@ describe('useCategories', () => {
   describe('REMOVE_CARD_FROM_CATEGORY', () => {
     const defaultState = {
       data: {
-        version: 1 as const,
+        version: 2 as const,
         cards: [] as Card[],
         categories: [] as Category[],
         viewOrders: [

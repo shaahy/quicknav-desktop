@@ -42,7 +42,7 @@ interface FileSelectionResult {
   success: boolean;
   canceled: boolean;
   file?: {
-    absolutePath: string;     // 归一化绝对路径
+    relativePath: string;     // 相对于 app-data.json 所在目录的归一化路径
     fileName: string;          // 不含扩展名
     extension: string;         // 扩展名（不含点）
     fileSize: number;          // 字节
@@ -58,13 +58,15 @@ interface FileSelectionResult {
 - 取消: `{ success: false, canceled: true }`
 - 失败: `{ success: false, error: "..." }`
 - 成功后自动读取文件元信息（fs.statSync）
+- Main 进程以 `app-data.json` 所在目录为基准，把选择结果转换成相对路径
+- Windows 所选文件与工具目录不在同一盘符时，返回明确错误且不创建卡片
 - 不在此阶段读取 HTML title（留给 `readHtmlTitle`）
 
 ## X02: openFile — 系统默认方式打开
 
 ```
 IPC: 'shell:openFile'
-Renderer → Main: { absolutePath: string }
+Renderer → Main: { relativePath: string }
 Main → Renderer: OpenResult
 ```
 
@@ -76,7 +78,7 @@ interface OpenResult {
 ```
 
 **Behavior**:
-- 调用 `shell.openPath(absolutePath)` — Electron API
+- Main 进程先以 `app-data.json` 所在目录解析绝对路径，再调用 `shell.openPath(resolvedPath)`
 - 成功: `{ success: true }` (shell.openPath 返回空字符串表示成功)
 - 失败: 解析 `shell.openPath` 的错误码
 - 不预检查文件是否存在（spec FR-026: 不预判文件状态）
@@ -85,7 +87,7 @@ interface OpenResult {
 
 ```
 IPC: 'shell:showItemInFolder'
-Renderer → Main: { absolutePath: string }
+Renderer → Main: { relativePath: string }
 Main → Renderer: LocateResult
 ```
 
@@ -97,7 +99,7 @@ interface LocateResult {
 ```
 
 **Behavior**:
-- 调用 `shell.showItemInFolder(absolutePath)`
+- Main 进程先解析相对路径，再调用 `shell.showItemInFolder(resolvedPath)`
 - Windows: 资源管理器中定位
 - macOS: Finder 中定位
 - 不预检查文件存在
@@ -114,12 +116,13 @@ Electron `shell.openPath` 会自然触发这些提示，应用不需要（也不
 
 ```
 IPC: 'file:readHtmlTitle'
-Renderer → Main: { absolutePath: string }
+Renderer → Main: { relativePath: string }
 Main → Renderer: string | null
 ```
 
 **Behavior**:
 - 仅在 `selectFile` 返回 `isHtml: true` 时调用
+- Main 进程先以 `app-data.json` 所在目录解析相对路径
 - 读取文件前 64KB 并解析 `<title>...</title>`
 - 返回去除首尾空格后的内容
 - 无法读取、缺少 `<title>`、标题为空或仅含空白 → `null`

@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => {
     searchQuery: string
   } = {
     data: {
-      version: 1,
+      version: 2,
       cards: [],
       categories: [],
       viewOrders: [
@@ -66,7 +66,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
     name: 'Test Card',
     note: null,
     fileReference: {
-      absolutePath: '/test.txt',
+      relativePath: '/test.txt',
       fileName: 'test',
       extension: 'txt',
       fileSize: 100,
@@ -81,7 +81,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
 
 function resetState(): void {
   mocks.state.data = {
-    version: 1,
+    version: 2,
     cards: [],
     categories: [],
     viewOrders: [
@@ -115,7 +115,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: 'C:\\Users\\test\\document.pdf',
+          relativePath: 'C:\\Users\\test\\document.pdf',
           fileName: 'document',
           extension: 'pdf',
           fileSize: 2048,
@@ -131,7 +131,7 @@ describe('useCards', () => {
       expect(result!.note).toBeNull()
       expect(result!.categoryIds).toEqual(['cat-1'])
       // path should be normalized (backslash -> forward slash, drive letter uppercased)
-      expect(result!.fileReference.absolutePath).toBe('C:/Users/test/document.pdf')
+      expect(result!.fileReference.relativePath).toBe('C:/Users/test/document.pdf')
       expect(result!.fileReference.fileName).toBe('document')
       expect(result!.fileReference.extension).toBe('pdf')
       expect(result!.fileReference.fileSize).toBe(2048)
@@ -169,7 +169,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: '/Users/test/page.html',
+          relativePath: '/Users/test/page.html',
           fileName: 'page',
           extension: 'html',
           fileSize: 5000,
@@ -190,7 +190,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: '/Users/test/report.pdf',
+          relativePath: '/Users/test/report.pdf',
           fileName: 'report',
           extension: 'pdf',
           fileSize: 5000,
@@ -222,7 +222,7 @@ describe('useCards', () => {
           id: 'existing-1',
           name: 'Existing Doc',
           fileReference: {
-            absolutePath: 'C:/Users/test/existing.txt',
+            relativePath: 'C:/Users/test/existing.txt',
             fileName: 'existing',
             extension: 'txt',
             fileSize: 512,
@@ -238,7 +238,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: 'c:\\Users\\test\\existing.txt',
+          relativePath: 'c:\\Users\\test\\existing.txt',
           fileName: 'existing',
           extension: 'txt',
           fileSize: 512,
@@ -258,7 +258,7 @@ describe('useCards', () => {
         makeCard({
           id: 'existing-1',
           fileReference: {
-            absolutePath: 'C:/different/path.txt',
+            relativePath: 'C:/different/path.txt',
             fileName: 'path',
             extension: 'txt',
             fileSize: 100,
@@ -272,7 +272,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: 'C:/Users/test/new.txt',
+          relativePath: 'C:/Users/test/new.txt',
           fileName: 'new',
           extension: 'txt',
           fileSize: 200,
@@ -283,6 +283,164 @@ describe('useCards', () => {
       const result = await addCard(fileResult, 'New File', ['cat-1'])
       expect(result).not.toBeNull()
       expect(mocks.dispatch).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('addCardsBatch', () => {
+    beforeEach(() => {
+      mocks.state.data.categories = [
+        {
+          id: 'cat-a',
+          name: '类别 A',
+          order: 0,
+          type: 'user',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'cat-b',
+          name: '类别 B',
+          order: 1,
+          type: 'user',
+          createdAt: '2024-01-01T00:00:00.000Z',
+        },
+      ]
+      mocks.state.data.viewOrders = [
+        { viewType: 'allCards', cardIds: [] },
+        { viewType: 'category:cat-a', cardIds: [] },
+        { viewType: 'category:cat-b', cardIds: [] },
+        { viewType: 'uncategorized', cardIds: [] },
+      ]
+    })
+
+    it('persists the whole batch once and updates every related view order', async () => {
+      mocks.randomUUID
+        .mockReturnValueOnce('00000000-0000-0000-0000-000000000011')
+        .mockReturnValueOnce('00000000-0000-0000-0000-000000000012')
+      const { addCardsBatch } = useCards()
+
+      const result = await addCardsBatch([
+        {
+          file: {
+            relativePath: 'docs/a.md',
+            fileName: 'a',
+            extension: 'md',
+            fileSize: 10,
+            mtimeMs: 100,
+            isHtml: false,
+            suggestedName: 'a',
+          },
+          name: '文档 A',
+          categoryIds: ['cat-a'],
+        },
+        {
+          file: {
+            relativePath: 'docs/b.docx',
+            fileName: 'b',
+            extension: 'docx',
+            fileSize: 20,
+            mtimeMs: 200,
+            isHtml: false,
+            suggestedName: 'b',
+          },
+          name: '文档 B',
+          categoryIds: ['cat-a', 'cat-b'],
+        },
+      ])
+
+      expect(result).toEqual({ addedCount: 2 })
+      expect(mocks.electronAPI.saveAppData).toHaveBeenCalledTimes(1)
+      const savedData = mocks.electronAPI.saveAppData.mock.calls[0][0]
+      expect(savedData.cards).toHaveLength(2)
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'allCards'
+        ).cardIds
+      ).toEqual([
+        '00000000-0000-0000-0000-000000000011',
+        '00000000-0000-0000-0000-000000000012',
+      ])
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'category:cat-a'
+        ).cardIds
+      ).toHaveLength(2)
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'category:cat-b'
+        ).cardIds
+      ).toEqual(['00000000-0000-0000-0000-000000000012'])
+      expect(mocks.dispatch).toHaveBeenCalledTimes(1)
+      expect(mocks.dispatch).toHaveBeenCalledWith({
+        type: 'ADD_CARDS_BATCH',
+        cards: expect.arrayContaining([
+          expect.objectContaining({ name: '文档 A' }),
+          expect.objectContaining({ name: '文档 B' }),
+        ]),
+      })
+    })
+
+    it('does not update renderer state when the single persistence call fails', async () => {
+      mocks.electronAPI.saveAppData.mockResolvedValueOnce({
+        success: false,
+        error: 'locked',
+      })
+      const { addCardsBatch } = useCards()
+
+      const result = await addCardsBatch([
+        {
+          file: {
+            relativePath: 'docs/a.md',
+            fileName: 'a',
+            extension: 'md',
+            fileSize: 10,
+            mtimeMs: 100,
+            isHtml: false,
+            suggestedName: 'a',
+          },
+          name: '文档 A',
+          categoryIds: ['cat-a'],
+        },
+      ])
+
+      expect(result).toEqual({ addedCount: 0, error: 'locked' })
+      expect(mocks.electronAPI.saveAppData).toHaveBeenCalledTimes(1)
+      expect(mocks.dispatch).not.toHaveBeenCalled()
+    })
+
+    it('rejects duplicate names inside the batch before persistence', async () => {
+      const { addCardsBatch } = useCards()
+      const baseFile = {
+        extension: 'md',
+        fileSize: 10,
+        mtimeMs: 100,
+        isHtml: false,
+        suggestedName: 'duplicate',
+      }
+
+      const result = await addCardsBatch([
+        {
+          file: {
+            ...baseFile,
+            relativePath: 'docs/a.md',
+            fileName: 'a',
+          },
+          name: '重复名称',
+          categoryIds: ['cat-a'],
+        },
+        {
+          file: {
+            ...baseFile,
+            relativePath: 'docs/b.md',
+            fileName: 'b',
+          },
+          name: '重复名称',
+          categoryIds: ['cat-a'],
+        },
+      ])
+
+      expect(result.error).toContain('重复')
+      expect(mocks.electronAPI.saveAppData).not.toHaveBeenCalled()
+      expect(mocks.dispatch).not.toHaveBeenCalled()
     })
   })
 
@@ -515,7 +673,7 @@ describe('useCards', () => {
           note: 'Some notes',
           categoryIds: ['cat-1'],
           fileReference: {
-            absolutePath: '/old/path.txt',
+            relativePath: '/old/path.txt',
             fileName: 'old',
             extension: 'txt',
             fileSize: 100,
@@ -534,7 +692,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: '/new/path.pdf',
+          relativePath: '/new/path.pdf',
           fileName: 'new',
           extension: 'pdf',
           fileSize: 5000,
@@ -551,7 +709,7 @@ describe('useCards', () => {
         cardId: 'card-1',
         updates: {
           fileReference: {
-            absolutePath: '/new/path.pdf',
+            relativePath: '/new/path.pdf',
             fileName: 'new',
             extension: 'pdf',
             fileSize: 5000,
@@ -571,7 +729,7 @@ describe('useCards', () => {
       // categoryIds preserved
       expect(updatedCard.categoryIds).toEqual(['cat-1'])
       // fileReference updated
-      expect(updatedCard.fileReference.absolutePath).toBe('/new/path.pdf')
+      expect(updatedCard.fileReference.relativePath).toBe('/new/path.pdf')
       expect(updatedCard.fileReference.fileName).toBe('new')
       expect(updatedCard.fileReference.extension).toBe('pdf')
       expect(updatedCard.fileReference.fileSize).toBe(5000)
@@ -588,7 +746,7 @@ describe('useCards', () => {
       const fileResult = {
         canceled: false,
         file: {
-          absolutePath: 'c:\\Users\\test\\repaired.docx',
+          relativePath: 'c:\\Users\\test\\repaired.docx',
           fileName: 'repaired',
           extension: 'docx',
           fileSize: 3000,
@@ -604,7 +762,7 @@ describe('useCards', () => {
         cardId: 'card-1',
         updates: {
           fileReference: expect.objectContaining({
-            absolutePath: 'C:/Users/test/repaired.docx',
+            relativePath: 'C:/Users/test/repaired.docx',
           }),
         },
       })
@@ -644,7 +802,7 @@ describe('useCards', () => {
       mocks.state.data.cards = [
         makeCard({
           id: 'card-1',
-          fileReference: { absolutePath: '/same/path.txt', fileName: 'path', extension: 'txt', fileSize: 100, mtimeMs: 0 },
+          fileReference: { relativePath: '/same/path.txt', fileName: 'path', extension: 'txt', fileSize: 100, mtimeMs: 0 },
         }),
       ]
 
@@ -658,7 +816,7 @@ describe('useCards', () => {
       mocks.state.data.cards = [
         makeCard({
           id: 'card-1',
-          fileReference: { absolutePath: '/other/path.txt', fileName: 'other', extension: 'txt', fileSize: 100, mtimeMs: 0 },
+          fileReference: { relativePath: '/other/path.txt', fileName: 'other', extension: 'txt', fileSize: 100, mtimeMs: 0 },
         }),
       ]
 

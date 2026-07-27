@@ -65,20 +65,22 @@ export function FileCard({
         onClick={handleOpen}
         onKeyDown={handleKeyDown}
       >
-        <h3 className="qc-file-card__name">{card.name}</h3>
+        <div className="qc-file-card__content">
+          <h3 className="qc-file-card__name">{card.name}</h3>
 
-        {card.note && (
-          <p className="qc-file-card__note">{card.note}</p>
-        )}
+          {card.note && (
+            <p className="qc-file-card__note">{card.note}</p>
+          )}
+        </div>
+
+        {/* File type — bottom-left, part of the card open target */}
+        <footer className="qc-file-card__footer">
+          <FileTypeMark
+            extension={card.fileReference.extension}
+            fileName={card.fileReference.fileName}
+          />
+        </footer>
       </div>
-
-      {/* File type — bottom-left */}
-      <footer className="qc-file-card__footer">
-        <FileTypeMark
-          extension={card.fileReference.extension}
-          fileName={card.fileReference.fileName}
-        />
-      </footer>
     </article>
   )
 }

@@ -7,6 +7,7 @@ import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
 type AppAction =
   | { type: 'LOAD'; data: AppData }
   | { type: 'ADD_CARD'; card: Card }
+  | { type: 'ADD_CARDS_BATCH'; cards: Card[] }
   | { type: 'UPDATE_CARD'; cardId: string; updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference' | 'categoryIds'>> }
   | { type: 'DELETE_CARD'; cardId: string }
   | { type: 'ADD_CATEGORY'; category: Category }
@@ -36,7 +37,7 @@ interface AppState {
 }
 
 const INITIAL_APP_DATA: AppData = {
-  version: 1,
+  version: 2,
   cards: [],
   categories: [],
   viewOrders: [
@@ -133,6 +134,33 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         data: {
           ...state.data,
           cards: [...state.data.cards, card],
+          viewOrders: updatedViewOrders,
+        },
+      }
+    }
+
+    case 'ADD_CARDS_BATCH': {
+      const { cards } = action
+      if (cards.length === 0) return state
+
+      const updatedViewOrders = state.data.viewOrders.map(vo => {
+        const appendedIds = cards
+          .filter(card => {
+            if (vo.viewType === VIEW_ALL_CARDS) return true
+            if (vo.viewType === VIEW_UNCATEGORIZED) return card.categoryIds.length === 0
+            return card.categoryIds.some(categoryId => vo.viewType === `category:${categoryId}`)
+          })
+          .map(card => card.id)
+        return appendedIds.length > 0
+          ? { ...vo, cardIds: [...vo.cardIds, ...appendedIds] }
+          : vo
+      })
+
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          cards: [...state.data.cards, ...cards],
           viewOrders: updatedViewOrders,
         },
       }

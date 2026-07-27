@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import * as path from 'path'
 import { HTML_READ_SIZE } from '../../src/shared/constants'
 
 // ── Hoisted mocks ──
@@ -20,6 +21,10 @@ const fsMocks = vi.hoisted(() => ({
   existsSync: vi.fn(),
   access: vi.fn(),
   stat: vi.fn(),
+  promises: {
+    readdir: vi.fn(),
+    stat: vi.fn(),
+  },
 }))
 
 // ── Module mocks ──
@@ -34,11 +39,20 @@ vi.mock('fs', () => fsMocks)
 
 // ── Imports (get mocked modules) ──
 
-import { selectFile, openFile, showItemInFolder, readHtmlTitle } from '../../src/main/shell'
+import {
+  selectFile,
+  selectScanFolder,
+  scanFolder,
+  openFile,
+  showItemInFolder,
+  readHtmlTitle,
+} from '../../src/main/shell'
 
 // ── Tests ──
 
 describe('shell', () => {
+  const dataDir = path.resolve('quick-nav-data')
+
   beforeEach(() => {
     vi.clearAllMocks()
 
@@ -48,21 +62,104 @@ describe('shell', () => {
   })
 
   // ── openFile ──
-  // Uses exec on Windows, shell.openPath on macOS
+  // Uses Electron's OS integration and never pre-checks the file.
 
   describe('openFile', () => {
-    it('returns {} on success', async () => {
-      // On macOS (path has no backslash): uses shell.openPath
-      // On Windows: uses exec, fire-and-forget, always returns {}
+    it('opens a Chinese markdown path with the system default application', async () => {
       electronMocks.shell.openPath.mockResolvedValue('')
-      const result = await openFile('/path/to/file.txt')
+
+      const relativePath = '../A 教程集合/工作记录.md'
+      const result = await openFile(relativePath, dataDir)
+
       expect(result).toEqual({})
+      expect(electronMocks.shell.openPath).toHaveBeenCalledWith(
+        path.resolve(dataDir, relativePath),
+      )
+    })
+
+    it('resolves the same stored path against the current tool directory', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('')
+      const firstDataDir = path.resolve('clone-a')
+      const secondDataDir = path.resolve('clone-b')
+
+      await openFile('tutorials/guide.html', firstDataDir)
+      await openFile('tutorials/guide.html', secondDataDir)
+
+      expect(electronMocks.shell.openPath).toHaveBeenNthCalledWith(
+        1,
+        path.resolve(firstDataDir, 'tutorials/guide.html'),
+      )
+      expect(electronMocks.shell.openPath).toHaveBeenNthCalledWith(
+        2,
+        path.resolve(secondDataDir, 'tutorials/guide.html'),
+      )
+    })
+
+    it('does not leak the Electron dev renderer URL into the default application', async () => {
+      const originalRendererUrl = process.env.ELECTRON_RENDERER_URL
+      const originalNodeEnv = process.env.NODE_ENV
+      let inheritedRendererUrl: string | undefined
+      let inheritedNodeEnv: string | undefined
+      process.env.ELECTRON_RENDERER_URL = 'http://localhost:5173'
+      process.env.NODE_ENV = 'development'
+      electronMocks.shell.openPath.mockImplementation(async () => {
+        inheritedRendererUrl = process.env.ELECTRON_RENDERER_URL
+        inheritedNodeEnv = process.env.NODE_ENV
+        return ''
+      })
+
+      try {
+        const result = await openFile('../A 教程集合/工作记录.md', dataDir)
+
+        expect(result).toEqual({})
+        expect(inheritedRendererUrl).toBeUndefined()
+        expect(inheritedNodeEnv).toBe('production')
+        expect(process.env.ELECTRON_RENDERER_URL).toBe('http://localhost:5173')
+        expect(process.env.NODE_ENV).toBe('development')
+      } finally {
+        if (originalRendererUrl === undefined) {
+          delete process.env.ELECTRON_RENDERER_URL
+        } else {
+          process.env.ELECTRON_RENDERER_URL = originalRendererUrl
+        }
+        if (originalNodeEnv === undefined) {
+          delete process.env.NODE_ENV
+        } else {
+          process.env.NODE_ENV = originalNodeEnv
+        }
+      }
+    })
+
+    it('maps a missing default application to no-default-app', async () => {
+      electronMocks.shell.openPath.mockResolvedValue(
+        'No application is associated with the specified file for this operation.',
+      )
+
+      const result = await openFile('../notes/work.md', dataDir)
+
+      expect(result).toEqual({ error: 'no-default-app' })
+    })
+
+    it('maps other system launch failures to unknown', async () => {
+      electronMocks.shell.openPath.mockResolvedValue('Access denied')
+
+      const result = await openFile('../notes/work.md', dataDir)
+
+      expect(result).toEqual({ error: 'unknown' })
+    })
+
+    it('maps an unexpected shell exception to unknown', async () => {
+      electronMocks.shell.openPath.mockRejectedValue(new Error('shell unavailable'))
+
+      const result = await openFile('../notes/work.md', dataDir)
+
+      expect(result).toEqual({ error: 'unknown' })
     })
 
     it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
       electronMocks.shell.openPath.mockResolvedValue('')
 
-      await openFile('/some/file.txt')
+      await openFile('../some/file.txt', dataDir)
 
       expect(fsMocks.existsSync).not.toHaveBeenCalled()
       expect(fsMocks.access).not.toHaveBeenCalled()
@@ -74,10 +171,12 @@ describe('shell', () => {
 
   describe('showItemInFolder', () => {
     it('returns success when called', async () => {
-      const result = await showItemInFolder('/path/to/file.txt')
+      const result = await showItemInFolder('tutorials/file.txt', dataDir)
 
       expect(result).toEqual({})
-      expect(electronMocks.shell.showItemInFolder).toHaveBeenCalledWith('/path/to/file.txt')
+      expect(electronMocks.shell.showItemInFolder).toHaveBeenCalledWith(
+        path.resolve(dataDir, 'tutorials/file.txt'),
+      )
     })
   })
 
@@ -93,7 +192,7 @@ describe('shell', () => {
         },
       )
 
-      const result = await readHtmlTitle('/path/to/page.html')
+      const result = await readHtmlTitle('tutorials/page.html', dataDir)
 
       expect(result).toBe('My Page Title')
     })
@@ -107,7 +206,7 @@ describe('shell', () => {
         },
       )
 
-      const result = await readHtmlTitle('/path/to/page.html')
+      const result = await readHtmlTitle('tutorials/page.html', dataDir)
 
       expect(result).toBeNull()
     })
@@ -117,7 +216,7 @@ describe('shell', () => {
         throw new Error('Invalid or binary file')
       })
 
-      const result = await readHtmlTitle('/path/to/binary.bin')
+      const result = await readHtmlTitle('tutorials/binary.bin', dataDir)
 
       expect(result).toBeNull()
     })
@@ -128,20 +227,21 @@ describe('shell', () => {
   describe('selectFile', () => {
     it('returns file metadata when user selects a file', async () => {
       const mockWindow = {} as any
+      const selectedPath = path.resolve(dataDir, 'tutorials/document.pdf')
       electronMocks.dialog.showOpenDialog.mockResolvedValue({
         canceled: false,
-        filePaths: ['/path/to/document.pdf'],
+        filePaths: [selectedPath],
       })
       fsMocks.statSync.mockReturnValue({
         size: 12345,
         mtimeMs: 67890,
       } as any)
 
-      const result = await selectFile(mockWindow)
+      const result = await selectFile(mockWindow, dataDir)
 
       expect(result.canceled).toBe(false)
       expect(result.file).toBeDefined()
-      expect(result.file!.absolutePath).toBe('/path/to/document.pdf')
+      expect(result.file!.relativePath).toBe('tutorials/document.pdf')
       expect(result.file!.fileName).toBe('document')
       expect(result.file!.extension).toBe('pdf')
       expect(result.file!.fileSize).toBe(12345)
@@ -156,10 +256,141 @@ describe('shell', () => {
         filePaths: [],
       })
 
-      const result = await selectFile(mockWindow)
+      const result = await selectFile(mockWindow, dataDir)
 
       expect(result.canceled).toBe(true)
       expect(result.file).toBeUndefined()
+    })
+
+    it('allows selecting a file outside the tool directory', async () => {
+      const mockWindow = {} as any
+      const selectedPath = path.resolve(dataDir, '..', 'personal', 'notes.md')
+      electronMocks.dialog.showOpenDialog.mockResolvedValue({
+        canceled: false,
+        filePaths: [selectedPath],
+      })
+      fsMocks.statSync.mockReturnValue({ size: 10, mtimeMs: 20 } as any)
+
+      const result = await selectFile(mockWindow, dataDir)
+
+      expect(result.file?.relativePath).toBe(
+        path.relative(dataDir, selectedPath).replace(/\\/g, '/'),
+      )
+      expect(result.file?.relativePath.startsWith('../')).toBe(true)
+    })
+
+    it.runIf(process.platform === 'win32')(
+      'rejects a file on a different Windows drive',
+      async () => {
+        const mockWindow = {} as any
+        electronMocks.dialog.showOpenDialog.mockResolvedValue({
+          canceled: false,
+          filePaths: ['C:\\personal\\notes.md'],
+        })
+        fsMocks.statSync.mockReturnValue({ size: 10, mtimeMs: 20 } as any)
+
+        const result = await selectFile(mockWindow, 'E:\\quick-nav')
+
+        expect(result.file).toBeUndefined()
+        expect(result.error).toBe('所选文件与工具不在同一磁盘，无法创建相对路径')
+      },
+    )
+  })
+
+  describe('folder scanning', () => {
+    it('selects a folder and stores a path relative to the data directory', async () => {
+      const mockWindow = {} as any
+      const selectedPath = path.resolve(dataDir, '..', 'documents')
+      electronMocks.dialog.showOpenDialog.mockResolvedValue({
+        canceled: false,
+        filePaths: [selectedPath],
+      })
+
+      const result = await selectScanFolder(mockWindow, dataDir)
+
+      expect(result).toEqual({
+        canceled: false,
+        folder: {
+          relativePath: path.relative(dataDir, selectedPath).replace(/\\/g, '/'),
+          displayPath: selectedPath,
+        },
+      })
+      expect(electronMocks.dialog.showOpenDialog).toHaveBeenCalledWith(
+        mockWindow,
+        expect.objectContaining({ properties: ['openDirectory'] }),
+      )
+    })
+
+    it('recursively scans selected file types and skips symbolic links', async () => {
+      const rootPath = path.resolve(dataDir, 'documents')
+      const nestedPath = path.join(rootPath, 'nested')
+      const dirent = (
+        name: string,
+        kind: 'file' | 'directory' | 'symlink',
+      ) => ({
+        name,
+        isFile: () => kind === 'file',
+        isDirectory: () => kind === 'directory',
+        isSymbolicLink: () => kind === 'symlink',
+      })
+
+      fsMocks.promises.stat.mockImplementation(async (targetPath: string) => ({
+        isDirectory: () => targetPath === rootPath,
+        size: targetPath.endsWith('.html') ? 200 : 100,
+        mtimeMs: 123,
+      }))
+      fsMocks.promises.readdir.mockImplementation(async (targetPath: string) => {
+        if (targetPath === rootPath) {
+          return [
+            dirent('page.html', 'file'),
+            dirent('readme.md', 'file'),
+            dirent('slides.pptx', 'file'),
+            dirent('nested', 'directory'),
+            dirent('linked', 'symlink'),
+          ]
+        }
+        if (targetPath === nestedPath) {
+          return [dirent('note.md', 'file')]
+        }
+        throw new Error('unexpected directory')
+      })
+      fsMocks.readSync.mockImplementation(
+        (_fd: number, buffer: Buffer) => {
+          const content = '<title>HTML 标题</title>'
+          buffer.write(content, 'utf-8')
+          return Buffer.byteLength(content, 'utf-8')
+        },
+      )
+
+      const result = await scanFolder(
+        'documents',
+        ['html', 'markdown'],
+        dataDir,
+      )
+
+      expect(result.error).toBeUndefined()
+      expect(result.skippedEntries).toBe(1)
+      expect(result.files).toHaveLength(3)
+      expect(result.files.map(file => file.extension).sort()).toEqual([
+        'html',
+        'md',
+        'md',
+      ])
+      expect(result.files.find(file => file.extension === 'html')?.suggestedName)
+        .toBe('HTML 标题')
+      expect(result.files.some(file => file.fileName === 'slides')).toBe(false)
+      expect(result.files.some(file => file.fileName === 'note')).toBe(true)
+    })
+
+    it('rejects a scan when no file type is selected', async () => {
+      const result = await scanFolder('documents', [], dataDir)
+
+      expect(result).toEqual({
+        files: [],
+        skippedEntries: 0,
+        error: '请至少选择一种扫描类型',
+      })
+      expect(fsMocks.promises.readdir).not.toHaveBeenCalled()
     })
   })
 })

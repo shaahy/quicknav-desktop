@@ -1,6 +1,16 @@
 import { useMemo, useCallback } from 'react'
-import type { Card, FileSelectionResult } from '@shared/types'
-import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
+import type {
+  BatchAddResult,
+  BatchCardInput,
+  Card,
+  FileSelectionResult,
+} from '@shared/types'
+import {
+  MAX_CARD_NAME,
+  MAX_CARDS,
+  VIEW_ALL_CARDS,
+  VIEW_UNCATEGORIZED,
+} from '@shared/constants'
 import { normalizePath, isHtmlFile } from '@shared/validation'
 import { useAppState, useAppDispatch } from '../contexts/AppState'
 
@@ -28,7 +38,7 @@ export function useCards() {
 
   const findDuplicateByPath = useCallback(
     (normalizedPath: string): Card | undefined => {
-      return state.data.cards.find(c => c.fileReference.absolutePath === normalizedPath)
+      return state.data.cards.find(c => c.fileReference.relativePath === normalizedPath)
     },
     [state.data.cards]
   )
@@ -42,7 +52,7 @@ export function useCards() {
       if (fileResult.canceled || !fileResult.file) return null
 
       const platform = window.electronAPI.getPlatform()
-      const normalized = normalizePath(fileResult.file.absolutePath, platform)
+      const normalized = normalizePath(fileResult.file.relativePath, platform)
 
       const existing = findDuplicateByPath(normalized)
       if (existing) return null
@@ -50,7 +60,7 @@ export function useCards() {
       let cardName = name
       if (!cardName && isHtmlFile(fileResult.file.extension)) {
         try {
-          const htmlTitle = await window.electronAPI.readHtmlTitle(fileResult.file.absolutePath)
+          const htmlTitle = await window.electronAPI.readHtmlTitle(fileResult.file.relativePath)
           if (htmlTitle) cardName = htmlTitle
         } catch {
           // ignore HTML title read failures
@@ -71,7 +81,7 @@ export function useCards() {
         name: cardName,
         note: null,
         fileReference: {
-          absolutePath: normalized,
+          relativePath: normalized,
           fileName: fileResult.file.fileName,
           extension: fileResult.file.extension,
           fileSize: fileResult.file.fileSize,
@@ -110,6 +120,101 @@ export function useCards() {
       return card
     },
     [state.data, dispatch, findDuplicateByPath]
+  )
+
+  const addCardsBatch = useCallback(
+    async (inputs: BatchCardInput[]): Promise<BatchAddResult> => {
+      if (inputs.length === 0) {
+        return { addedCount: 0, error: '没有可添加的卡片' }
+      }
+      if (state.data.cards.length + inputs.length > MAX_CARDS) {
+        return { addedCount: 0, error: `卡片总数不能超过 ${MAX_CARDS}` }
+      }
+
+      const platform = window.electronAPI.getPlatform()
+      const existingPaths = new Set(
+        state.data.cards.map(card =>
+          normalizePath(card.fileReference.relativePath, platform)
+        )
+      )
+      const existingNames = new Set(state.data.cards.map(card => card.name))
+      const validCategoryIds = new Set(state.data.categories.map(category => category.id))
+      const batchPaths = new Set<string>()
+      const batchNames = new Set<string>()
+
+      for (const input of inputs) {
+        const name = input.name.trim()
+        const normalizedPath = normalizePath(input.file.relativePath, platform)
+        if (!name || name.length > MAX_CARD_NAME || /[\r\n]/.test(name)) {
+          return { addedCount: 0, error: `卡片名称“${input.name}”无效` }
+        }
+        if (existingNames.has(name) || batchNames.has(name)) {
+          return { addedCount: 0, error: `卡片名称“${name}”重复` }
+        }
+        if (existingPaths.has(normalizedPath) || batchPaths.has(normalizedPath)) {
+          return { addedCount: 0, error: `文件“${input.file.fileName}”已经添加` }
+        }
+        if (
+          input.categoryIds.length === 0 ||
+          input.categoryIds.some(categoryId => !validCategoryIds.has(categoryId))
+        ) {
+          return { addedCount: 0, error: `请为“${name}”选择有效类别` }
+        }
+        batchNames.add(name)
+        batchPaths.add(normalizedPath)
+      }
+
+      const now = new Date().toISOString()
+      const cards: Card[] = inputs.map(input => ({
+        id: crypto.randomUUID(),
+        name: input.name.trim(),
+        note: null,
+        fileReference: {
+          relativePath: normalizePath(input.file.relativePath, platform),
+          fileName: input.file.fileName,
+          extension: input.file.extension,
+          fileSize: input.file.fileSize,
+          mtimeMs: input.file.mtimeMs,
+        },
+        categoryIds: [...input.categoryIds],
+        createdAt: now,
+        updatedAt: now,
+      }))
+
+      const updatedData = {
+        ...state.data,
+        cards: [...state.data.cards, ...cards],
+        viewOrders: state.data.viewOrders.map(viewOrder => {
+          const appendedIds = cards
+            .filter(card => {
+              if (viewOrder.viewType === VIEW_ALL_CARDS) return true
+              if (viewOrder.viewType === VIEW_UNCATEGORIZED) {
+                return card.categoryIds.length === 0
+              }
+              return card.categoryIds.some(
+                categoryId => viewOrder.viewType === `category:${categoryId}`
+              )
+            })
+            .map(card => card.id)
+          return appendedIds.length > 0
+            ? { ...viewOrder, cardIds: [...viewOrder.cardIds, ...appendedIds] }
+            : viewOrder
+        }),
+      }
+
+      try {
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          return { addedCount: 0, error: saveResult.error }
+        }
+      } catch {
+        return { addedCount: 0, error: 'unknown' }
+      }
+
+      dispatch({ type: 'ADD_CARDS_BATCH', cards })
+      return { addedCount: cards.length }
+    },
+    [state.data, dispatch]
   )
 
   const updateCard = useCallback(
@@ -218,10 +323,10 @@ export function useCards() {
       if (fileResult.canceled || !fileResult.file) return
 
       const platform = window.electronAPI.getPlatform()
-      const normalized = normalizePath(fileResult.file.absolutePath, platform)
+      const normalized = normalizePath(fileResult.file.relativePath, platform)
 
       const fileReference = {
-        absolutePath: normalized,
+        relativePath: normalized,
         fileName: fileResult.file.fileName,
         extension: fileResult.file.extension,
         fileSize: fileResult.file.fileSize,
@@ -236,6 +341,7 @@ export function useCards() {
   return {
     visibleCards,
     addCard,
+    addCardsBatch,
     updateCard,
     deleteCard,
     repairFile,

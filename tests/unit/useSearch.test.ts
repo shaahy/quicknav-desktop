@@ -11,7 +11,7 @@ import type { Card } from '../../src/shared/types'
 const mockState = vi.hoisted(() => ({
   searchQuery: '',
   data: {
-    version: 1 as const,
+    version: 2 as const,
     cards: [] as Card[],
     categories: [] as Array<{ id: string; name: string; order: number; type: 'user'; createdAt: string }>,
     viewOrders: [] as Array<{ viewType: string; cardIds: string[] }>,
@@ -36,7 +36,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
     name: 'Test Card',
     note: null,
     fileReference: {
-      absolutePath: '/test.txt',
+      relativePath: '/test.txt',
       fileName: 'test',
       extension: 'txt',
       fileSize: 100,
@@ -52,7 +52,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
 function resetState(): void {
   mockState.searchQuery = ''
   mockState.data = {
-    version: 1,
+    version: 2,
     cards: [],
     categories: [],
     viewOrders: [

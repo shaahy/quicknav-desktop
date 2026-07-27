@@ -1,7 +1,10 @@
 import { app, BrowserWindow, Tray, Menu, nativeImage } from 'electron'
 import * as path from 'path'
 import { registerIpcHandlers } from './ipc'
+import { installBrokenPipeGuards } from './stdio'
 import { DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT } from '../shared/constants'
+
+installBrokenPipeGuards()
 
 function getDataDir(): string {
   // 生产模式: 数据文件放在 exe 同目录下，方便打包分发

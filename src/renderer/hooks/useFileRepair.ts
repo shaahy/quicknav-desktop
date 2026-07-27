@@ -8,7 +8,7 @@ import { useAppState } from '../contexts/AppState'
 
 export interface RepairResult {
   /** Outcome of the repair attempt. */
-  result: 'success' | 'duplicate' | 'canceled'
+  result: 'success' | 'duplicate' | 'canceled' | 'error'
   /**
    * Set when `result === 'duplicate'` — the ID of the card that already
    * references the selected file.
@@ -16,6 +16,8 @@ export interface RepairResult {
   duplicateCardId?: string
   /** Set when `result === 'duplicate'` — the name of the existing card. */
   duplicateCardName?: string
+  /** Set when file selection fails before a new reference can be created. */
+  errorMessage?: string
 }
 
 export interface UseFileRepairReturn {
@@ -88,13 +90,16 @@ export function useFileRepair(): UseFileRepairReturn {
 
       // 1. Open native file-selection dialog
       const fileResult = await window.electronAPI.selectFile()
+      if (fileResult.error) {
+        return { result: 'error', errorMessage: fileResult.error }
+      }
       if (fileResult.canceled || !fileResult.file) {
         return { result: 'canceled' }
       }
 
       // 2. Normalize and check duplicates (skip self)
       const platform = window.electronAPI.getPlatform()
-      const normalized = normalizePath(fileResult.file.absolutePath, platform)
+      const normalized = normalizePath(fileResult.file.relativePath, platform)
       // Pass normalized path; the underlying cardsRepairFile also normalizes
       // internally, but we need it here for the duplicate check.
       const duplicate = findDuplicateByPath(normalized)
