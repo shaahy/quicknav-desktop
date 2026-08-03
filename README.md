@@ -13,6 +13,89 @@
 
 `node_modules/`、构建产物、测试结果、本机 Agent 设置和 Edge QA 浏览器配置不会进入 Git。
 
+## 教程与资料目录
+
+<!-- tutorial-catalog:start -->
+> 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
+
+当前共 **42 张卡片**、**7 个分类**；其中 **38 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+
+### AI开发教程（22）
+
+- [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
+- [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
+- [Matt Pocock Skills 工程实战教程](<A 教程集合/Matt Pocock Skill双场景工程实战教程/Matt-Pocock-Skills-Codex双场景工程实战教程.html>) · HTML
+- [Bmad 产物地图](<A 教程集合/BMAD-产物地图-流程教程.html>) · HTML
+- [BMAD Bug 修复与功能 Fix 教程](<A 教程集合/BMAD Bug与功能Fix教程/index.html>) · HTML
+- [BMAD Quick Dev 增量开发教程](<A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html>) · HTML
+- [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
+- [BMAD 已上线 V1 增量开发教程](<A 教程集合/BMAD已上线V1增量开发教程/index.html>) · HTML
+- [OpenSpec 使用场景与实战教程](<A 教程集合/OpenSpec使用场景与实战教程/OpenSpec使用场景与实战教程.html>) · HTML
+- [Spec Kit Flow-Forward｜增量开发实战](<A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html>) · HTML
+- [Spec Kit 使用场景与实战教程](<A 教程集合/Spec-Kit使用场景与实战教程/Spec-Kit使用场景与实战教程.html>) · HTML
+- [Matt Pocock Skills 实战教程](<A 教程集合/Matt Pocock Skills实战教程/Matt-Pocock-Skills实战教程.html>) · HTML
+- [Bug 修复：三种 AI 开发方式怎么选](<A 教程集合/MVP-Bug与功能修复三种方式对比/MVP-Bug与功能修复方式全面对比.html>) · HTML
+- [增量迭代：五种开发方式怎么选](<A 教程集合/MVP-V1.0增量迭代方式对比教程/index.html>) · HTML
+- [OpenSpec 增量开发实战](<A 教程集合/OpenSpec已上线MVP-V1增量开发实战教程/OpenSpec已上线MVP-V1增量开发实战教程.html>) · HTML
+- [Superpowers 增量开发实战](<A 教程集合/Superpowers上线MVP增量开发教程/superpowers-mvp-incremental-development.html>) · HTML
+- [两种 BMAD 产品设计交付](<A 教程集合/两种BMAD产品设计交付.html>) · HTML
+- [四种组合开发流程对比](<A 教程集合/四种组合开发流程对比.html>) · HTML
+- [Langflow 教程](<A 教程集合/langflow-complete-tutorial.html>) · HTML
+- [n8n 自动化工程手册](<A 教程集合/n8n-complete-guide.html>) · HTML
+- [Ollama 教程](<A 教程集合/ollama-guide.html>) · HTML
+- [Agent Skill 实战教程](<A 教程集合/Agent Skill实战教程/Agent Skill实战教程.html>) · HTML
+
+### 技能速查（9）
+
+- [Matt Pocock Skills 技能速查](<A 教程集合/Matt Pocock Skills 技能速查/mattpocock-skills-cheatsheet.html>) · HTML
+- [BMAD技能速查](<A 教程集合/BMAD-METHOD技能速查/BMAD-METHOD-v6.10.0-全技能速查.html>) · HTML
+- [gstack 技能速查](<A 教程集合/gstack技能速查/gstack-skills-cheatsheet.html>) · HTML
+- [Superpowers 技能速查](<A 教程集合/obra-superpowers技能速查/obra-superpowers-v6.1.1-14技能速查.html>) · HTML
+- [OpenSpec 技能速查](<A 教程集合/OpenSpec技能速查/OpenSpec-OPSX-技能速查.html>) · HTML
+- [pm-skills 技能速查](<A 教程集合/PM Skills技能速查/phuryn-pm-skills-v2.1.0-中文速查.html>) · HTML
+- [Spec Kit  技能速查](<A 教程集合/Spec-Kit技能速查/Spec-Kit-v0.8.15-技能速查.html>) · HTML
+- [OpenMontage｜技能速查 + 工作流程图](<A 教程集合/openmontage-skill-quicklook.html>) · HTML
+- [Agent Skills 技能速查](<A 教程集合/Agent Skills技能速查/Agent Skills 技能速查.html>) · HTML
+
+### 新产品开发（4）
+
+- [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
+- [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
+- [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
+- [两种 BMAD 产品设计交付](<A 教程集合/两种BMAD产品设计交付.html>) · HTML
+
+### 增量开发（6）
+
+- [增量迭代：五种开发方式怎么选](<A 教程集合/MVP-V1.0增量迭代方式对比教程/index.html>) · HTML
+- [BMAD Quick Dev 增量开发教程](<A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html>) · HTML
+- [BMAD 已上线 V1 增量开发教程](<A 教程集合/BMAD已上线V1增量开发教程/index.html>) · HTML
+- [Spec Kit Flow-Forward｜增量开发实战](<A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html>) · HTML
+- [OpenSpec 增量开发实战](<A 教程集合/OpenSpec已上线MVP-V1增量开发实战教程/OpenSpec已上线MVP-V1增量开发实战教程.html>) · HTML
+- [Superpowers 增量开发实战](<A 教程集合/Superpowers上线MVP增量开发教程/superpowers-mvp-incremental-development.html>) · HTML
+
+### bug修复（2）
+
+- [Bug 修复：三种 AI 开发方式怎么选](<A 教程集合/MVP-Bug与功能修复三种方式对比/MVP-Bug与功能修复方式全面对比.html>) · HTML
+- [BMAD Bug 修复与功能 Fix 教程](<A 教程集合/BMAD Bug与功能Fix教程/index.html>) · HTML
+
+### 工作文档（9）
+
+- [工作记录](<A 教程集合/工作记录.md>) · MD
+- [AGENTS-卡帕西-开发用](<A 教程集合/AGENTS-卡帕西版本-开发用.md>) · MD
+- [AGENTS-日常工作](<A 教程集合/AGENTS-日常工作用.md>) · MD
+- 内网资源总览 · MD · **本机/外部工作区资料，未随本仓库同步**
+- [原型提示词](<A 教程集合/原型提示词.txt>) · TXT
+- CI-CD标准化流程文档 · MD · **本机/外部工作区资料，未随本仓库同步**
+- 16个场景内容 · MD · **本机/外部工作区资料，未随本仓库同步**
+- 四个阶段规划 · MD · **本机/外部工作区资料，未随本仓库同步**
+- [常用提示词](<A 教程集合/常用提示词.md>) · MD
+
+### 其它（2）
+
+- [Github开源项目榜](<A 教程集合/github-top-repos-100k-stars.html>) · HTML
+- [GitHub 项目管理实战教程](<A 教程集合/github-tutorial.html>) · HTML
+<!-- tutorial-catalog:end -->
+
 ## 运行环境
 
 本项目面向 Windows 10/11。首次在一台电脑上使用时，需要：
@@ -84,35 +167,27 @@ git diff --check
 - `A 教程集合/` 中重新出现 Edge QA 浏览器配置目录；
 - 待跟踪文件中出现 50 MiB 及以上的大文件。
 
-## 首次上传 GitHub（手动操作）
+## GitHub 仓库与协作权限
 
-建议在 GitHub 网站创建私有仓库。创建时保持仓库为空，不要勾选自动生成 README、`.gitignore` 或 License。
+当前仓库为公开仓库：[`shaahy/quicknav-desktop`](https://github.com/shaahy/quicknav-desktop)。任何人都可以直接克隆和读取仓库内容，不需要由仓库所有者逐一邀请。
 
-完成本地文件审查和提交后，在 PowerShell 中手动执行：
+公开访问只代表可读取。其他人若要向本仓库 `push`，仍需由仓库所有者在 GitHub 仓库的 `Settings → Collaborators` 中授予协作者权限。
 
 ```powershell
-git status
-git add --all
-git status
-git commit -m "chore: 整理项目并纳入教程内容"
-git remote add origin https://github.com/<你的账号>/<仓库名>.git
-git remote -v
-git push -u origin master
+git clone https://github.com/shaahy/quicknav-desktop.git
 ```
 
-执行 `git add --all` 后必须再次检查 `git status`，确认没有缓存、凭据、无关数据库或意外的大文件，再执行提交。
-
-如果 Git Credential Manager 打开浏览器，请在浏览器中完成 GitHub 登录授权。不要在命令或文件中保存 GitHub 密码和访问令牌。
+不要共享 GitHub 密码、个人访问令牌或一次性设备码。协作者应使用各自的 GitHub 账号进行身份验证。
 
 ## 在另一台电脑使用
 
 1. 安装 Git for Windows 和 Node.js 24。
-2. 打开 PowerShell，克隆私有仓库。
+2. 打开 PowerShell，克隆公开仓库。
 3. 进入仓库目录，双击 `启动速查.bat`，或在 PowerShell 中运行该 BAT。
 
 ```powershell
-git clone https://github.com/<你的账号>/<仓库名>.git
-cd <仓库名>
+git clone https://github.com/shaahy/quicknav-desktop.git
+cd quicknav-desktop
 .\启动速查.bat
 ```
 
@@ -193,7 +268,20 @@ npm run build
 ## 添加新教程
 
 1. 将 Markdown、HTML、图片或必要源码放入 `A 教程集合/` 的清晰子目录。
-2. 不要复制浏览器用户数据目录、缓存、日志、数据库 journal 或其他项目的 `.git`。
-3. 运行仓库体检脚本。
-4. 使用 `git status` 审核新增文件后再提交。
-5. 二进制文件达到 50 MiB 时先评估 Git LFS，不要直接提交。
+2. 在速查工具中添加或更新卡片与分类，确认 `app-data.json` 已保存。
+3. 刷新 README 教程目录：
+
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1
+   ```
+
+4. 不要复制浏览器用户数据目录、缓存、日志、数据库 journal 或其他项目的 `.git`。
+5. 运行仓库体检和目录一致性检查：
+
+   ```powershell
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-repository-hygiene.ps1
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1 -Check
+   ```
+
+6. 使用 `git status` 审核新增文件后再提交。
+7. 二进制文件达到 50 MiB 时先评估 Git LFS，不要直接提交。
