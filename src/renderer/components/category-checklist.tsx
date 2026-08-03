@@ -26,7 +26,7 @@ export function CategoryChecklist({
   selectedIds,
   onChange,
 }: CategoryChecklistProps) {
-  const uncategorizedLabel = RESERVED_NAMES[1] // '未分类'
+  const uncategorizedLabel = RESERVED_NAMES[2] // '未分类'
 
   const handleToggle = useCallback(
     (id: string) => {

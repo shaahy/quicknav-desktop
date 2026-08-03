@@ -1,0 +1,41 @@
+为“文旅中国·数字文创卡”制作三端高保真、 
+可交互、可完整演示的 HTML 原型，用于团队内部演示和评审：
+1. 功能与页面完整；
+2. 用户体验流程完整；
+3. 视觉与交互严格符合 UX 规范。
+
+【重要文件读取】
+
+最终 PRD.md：
+E:\元梦工作空间\权益卡PRD\_bmad-output\planning-artifacts\prds\prd-权益卡PRD-2026-07-15\prd.md
+
+设计规范 design.md
+E:\元梦工作空间\权益卡PRD\_bmad-output\planning-artifacts\ux-designs\ux-权益卡PRD-2026-07-16\DESIGN.md
+
+用户体验 
+E:\元梦工作空间\权益卡PRD\_bmad-output\planning-artifacts\ux-designs\ux-权益卡PRD-2026-07-16\EXPERIENCE.md 
+
+【工作模式】
+- 禁止修改PRD与UX文件。
+- DESIGN.md 是视觉事实源。
+- EXPERIENCE.md 是行为事实源。
+- 原型不得创造 PRD 未定义的新业务。
+- 如果原型制作中发现 PRD 或 UX 冲突，先汇报，不得擅自修改。
+
+【交付及要求】
+- 在现有工作区新增： prototypes-simple文件夹，结构化存放html文件。
+- 按三端及功能块页面设计html文件。
+- 用户 H5、核销小程序、运营 Web 均为可点击、可输入、可切换状态的完整交互原型。
+- 完整覆盖prd中的所有功能及异常处理等。
+- 严格使用 DESIGN.md 设计规范设计原型。
+- 验证用户体验流程完整（参考EXPERIENCE.md）
+
+【测试验证】
+
+原型制作完成后，必须自行进行1轮全面测试与核对。
+- 严格依据 PRD.md 逐项检查三端页面、功能、权限、业务流程、异常处理和状态是否完整实现，确保无功能遗漏、无页面遗漏、无流程断裂，所有核心业务均可形成完整闭环；
+- 严格依据 EXPERIENCE.md 验证用户体验流程和交互行为。
+- 严格依据 DESIGN.md 检查视觉是否符合设计规范。
+- 发现问题后必须立即修复并重新验证，直至原型能够完整、稳定、准确地演示后方可交付。
+
+

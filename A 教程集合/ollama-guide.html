@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Windows 主线的 Ollama 零基础到实战教程：安装、CLI、Modelfile、REST API、结构化输出、工具调用与排错。">
+  <title>Ollama 本地 AI 实验手册｜Windows 主线</title>
+  <style>
+    :root{--paper:#f3efe4;--paper-2:#e9e2d3;--ink:#171b18;--muted:#5d655f;--line:#c9c2b4;--card:#fbf8ef;--green:#155b43;--green-2:#0d3e30;--lime:#c8f15a;--amber:#d98b24;--red:#9e3c2f;--code:#10241c;--code-ink:#ddf7e9;--shadow:0 14px 40px rgba(28,34,29,.10);--radius:18px;--sidebar:290px}
+    html[data-theme="dark"]{--paper:#101512;--paper-2:#171e1a;--ink:#edf2ea;--muted:#aeb8b0;--line:#344039;--card:#18211c;--green:#78d4a8;--green-2:#b8ead2;--lime:#bfe951;--amber:#f2b35c;--red:#f08b7d;--code:#07110d;--code-ink:#d9f8e8;--shadow:0 16px 48px rgba(0,0,0,.28)}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:24px}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif;line-height:1.78}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.23;background-image:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0);background-size:24px 24px;z-index:-1}
+    a{color:var(--green);text-underline-offset:3px}.skip{position:fixed;left:12px;top:-60px;padding:10px 14px;background:var(--ink);color:var(--paper);z-index:99}.skip:focus{top:12px}
+    .progress{position:fixed;left:0;top:0;width:0;height:4px;background:var(--lime);z-index:100;box-shadow:0 0 14px var(--lime)}
+    .layout{display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr);min-height:100vh}
+    aside{position:sticky;top:0;height:100vh;padding:26px 20px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 91%,transparent);backdrop-filter:blur(14px);overflow:auto;z-index:20}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:20px}.mark{width:44px;height:44px;border:2px solid var(--ink);border-radius:50% 50% 46% 46%;display:grid;place-items:center;background:var(--lime);color:#142014;font-weight:900;font-family:Georgia,serif}.brand b{display:block;font-family:Georgia,"STSong",serif;font-size:20px}.brand small{color:var(--muted)}
+    .search{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin:12px 0 16px}.search input{min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--ink);font:inherit}.search kbd{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--muted)}
+    nav a{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;margin:2px 0;border-radius:9px;color:var(--muted);text-decoration:none;font-size:13px;line-height:1.4}nav a span{font-family:Georgia,serif;color:var(--green);min-width:22px}nav a:hover,nav a.active{background:var(--paper-2);color:var(--ink)}
+    .side-actions{display:flex;gap:8px;margin-top:18px}.icon-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 10px;cursor:pointer}.icon-btn:hover{transform:translateY(-1px)}
+    main{min-width:0}.hero{min-height:88vh;padding:80px clamp(24px,7vw,110px) 60px;display:flex;align-items:center;border-bottom:1px solid var(--line);position:relative;overflow:hidden}.hero:after{content:"LOCAL\A FIRST";white-space:pre;position:absolute;right:-18px;bottom:-35px;font:900 clamp(80px,15vw,220px)/.72 Georgia,serif;color:var(--paper-2);z-index:-1;letter-spacing:-.08em}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;padding:7px 11px;border:1px solid var(--ink);border-radius:999px;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:800}.dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 4px color-mix(in srgb,var(--lime) 28%,transparent)}
+    h1,h2,h3{font-family:Georgia,"STSong",serif;line-height:1.15}h1{font-size:clamp(48px,8vw,108px);letter-spacing:-.065em;margin:24px 0 12px;max-width:950px}h1 em{font-style:normal;color:var(--green)}.lead{max-width:760px;font-size:clamp(18px,2vw,25px);color:var(--muted);line-height:1.65}.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}.pill{padding:7px 11px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:12px;font-weight:700}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.btn{border:1px solid var(--ink);border-radius:10px;padding:11px 16px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:800;cursor:pointer}.btn.alt{background:transparent;color:var(--ink)}
+    .content{width:min(1020px,calc(100% - 48px));margin:auto;padding:58px 0 100px}.section{padding:58px 0;border-bottom:1px solid var(--line)}.chapter{font:800 12px/1 Georgia,serif;color:var(--green);letter-spacing:.16em;text-transform:uppercase}.section h2{font-size:clamp(34px,5vw,58px);letter-spacing:-.045em;margin:14px 0 22px}.section h3{font-size:26px;margin:38px 0 14px}.lede{font-size:20px;color:var(--muted);max-width:800px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}.card h3,.card h4{margin:0 0 8px}.card p:last-child{margin-bottom:0}.card.good{border-top:5px solid var(--green)}.card.bad{border-top:5px solid var(--red)}.card.warn{border-top:5px solid var(--amber)}
+    .workflow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:30px 0}.flow-step{position:relative;padding:18px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px}.flow-step:not(:last-child):after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);z-index:2;color:var(--green);font-size:22px;font-weight:900}.flow-step b{display:block;font:800 28px/1 Georgia,serif;color:var(--green);margin-bottom:9px}.flow-step small{color:var(--muted)}
+    .callout{margin:20px 0;padding:16px 18px 16px 52px;border:1px solid var(--line);border-radius:14px;background:var(--card);position:relative}.callout:before{position:absolute;left:17px;top:15px;font-size:20px}.callout.tip:before{content:"✓";color:var(--green)}.callout.warn:before{content:"!";color:var(--amber);font-weight:900}.callout.danger:before{content:"×";color:var(--red);font-weight:900}.callout strong{display:block;margin-bottom:3px}
+    .lab{margin:30px 0;border:2px solid var(--ink);border-radius:20px;overflow:hidden;background:var(--card);box-shadow:8px 8px 0 var(--paper-2)}.lab-head{padding:18px 22px;background:var(--ink);color:var(--paper);display:flex;justify-content:space-between;gap:16px;align-items:center}.lab-head b{font:800 19px Georgia,serif}.lab-head span{font-size:12px;color:var(--lime)}.lab-body{padding:22px}.checkline{display:flex;gap:10px;align-items:flex-start;margin:10px 0}.checkline input{accent-color:var(--green);margin-top:7px}
+    pre{position:relative;margin:16px 0;background:var(--code);color:var(--code-ink);border-radius:14px;padding:42px 18px 18px;overflow:auto;font:13px/1.65 Consolas,"Cascadia Code",monospace;border:1px solid #274536}code{font-family:Consolas,"Cascadia Code",monospace}.lang{position:absolute;left:15px;top:11px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#7fb79a}.copy{position:absolute;right:9px;top:8px;border:1px solid #426653;background:#183427;color:#dff6e7;border-radius:7px;padding:4px 8px;cursor:pointer;font-size:11px}.copy:hover{background:#25533d}.inline{background:var(--paper-2);padding:.12em .38em;border-radius:5px;font-size:.92em}
+    table{width:100%;border-collapse:collapse;margin:22px 0;background:var(--card);font-size:14px}th,td{padding:13px 14px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--paper-2);font-weight:800}
+    .steps{counter-reset:step;list-style:none;padding:0}.steps>li{counter-increment:step;margin:20px 0;padding-left:54px;position:relative}.steps>li:before{content:counter(step);position:absolute;left:0;top:0;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--green);color:var(--paper);font:800 16px Georgia,serif}
+    details{border:1px solid var(--line);background:var(--card);border-radius:12px;margin:10px 0;padding:0 16px}summary{cursor:pointer;font-weight:800;padding:14px 0}details>div{padding:0 0 16px;color:var(--muted)}
+    .metric{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}.metric div{padding:16px;background:var(--paper-2);border-radius:12px}.metric b{display:block;font:800 24px Georgia,serif;color:var(--green)}
+    .source-list{font-size:13px;color:var(--muted)}.source-list li{margin:7px 0}.source-list a{overflow-wrap:anywhere}.footer{padding:40px clamp(24px,7vw,110px);background:var(--ink);color:var(--paper);display:flex;justify-content:space-between;gap:20px;align-items:end}.footer b{font:800 28px Georgia,serif}.footer small{color:#b6c2ba}
+    .mobile-bar{display:none}.hidden-by-search{display:none!important}.search-result{background:color-mix(in srgb,var(--lime) 35%,transparent);outline:2px solid var(--lime)}
+    @media(max-width:980px){.layout{display:block}aside{position:fixed;left:0;top:0;transform:translateX(-105%);transition:.25s;width:min(88vw,330px);box-shadow:var(--shadow)}aside.open{transform:none}.mobile-bar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:30;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--ink);color:var(--paper);border-radius:14px;box-shadow:var(--shadow)}.mobile-bar button{background:transparent;color:inherit;border:0;padding:8px;font-weight:800}.hero{padding-top:62px}.workflow{grid-template-columns:1fr}.flow-step:not(:last-child):after{content:"↓";right:50%;top:auto;bottom:-23px}.grid.three{grid-template-columns:1fr 1fr}}
+    @media(max-width:680px){.content{width:min(100% - 28px,1020px)}.grid,.grid.three,.metric{grid-template-columns:1fr}.hero{padding-left:20px;padding-right:20px;min-height:auto;padding-bottom:70px}h1{font-size:52px}.section{padding:42px 0}.lab-body{padding:16px}.lab-head{align-items:flex-start;flex-direction:column}.footer{flex-direction:column;align-items:flex-start}table{display:block;overflow-x:auto}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+    @media print{aside,.mobile-bar,.progress,.copy,.hero-actions{display:none!important}.layout{display:block}.hero{min-height:auto}.content{width:100%}.section{break-inside:avoid}.lab{box-shadow:none}a{color:inherit;text-decoration:none}.hero:after{display:none}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a><div class="progress" id="progress"></div>
+  <div class="layout">
+    <aside id="sidebar" aria-label="教程目录">
+      <div class="brand"><div class="mark">O</div><div><b>Ollama Lab</b><small>Windows 实验手册</small></div></div>
+      <label class="search" aria-label="搜索教程"><span>⌕</span><input id="search" placeholder="搜索章节或命令…"><kbd>/</kbd></label>
+      <nav id="nav">
+        <a href="#start"><span>00</span>开始之前</a><a href="#scenes"><span>01</span>作用与适用场景</a><a href="#workflow"><span>02</span>工作流程</a><a href="#prepare"><span>03</span>硬件与模型选择</a><a href="#install"><span>04</span>Windows 安装</a><a href="#cli"><span>05</span>CLI 基本功</a><a href="#modelfile"><span>06</span>定制 AI 助手</a><a href="#api"><span>07</span>REST API</a><a href="#powershell"><span>08</span>PowerShell 实战</a><a href="#python"><span>09</span>Python 实战</a><a href="#structured"><span>10</span>结构化输出</a><a href="#tools"><span>11</span>工具调用</a><a href="#ops"><span>12</span>性能、安全与排错</a><a href="#cheatsheet"><span>13</span>速查与下一步</a>
+      </nav>
+      <div class="side-actions"><button class="icon-btn" id="theme" title="切换主题">◐ 主题</button><button class="icon-btn" id="reset" title="清空实验进度">↺ 重置</button></div>
+    </aside>
+    <main id="main">
+      <header class="hero" id="top">
+        <div><span class="eyebrow"><i class="dot"></i> Offline-first · Windows</span><h1>把模型，<br><em>搬回你的电脑。</em></h1><p class="lead">一份从零开始、以“本地 AI 助手”为主线的 Ollama 实验手册。你会理解它的边界，完成安装、模型管理、定制、API 编程、结构化输出与工具调用。</p><div class="hero-meta"><span class="pill">单文件离线阅读</span><span class="pill">8 个动手实验</span><span class="pill">PowerShell + Python 标准库</span><span class="pill">资料核验：2026-08-01</span></div><div class="hero-actions"><a class="btn" href="#start">开始实验</a><a class="btn alt" href="#workflow">先看全貌</a></div></div>
+      </header>
+      <article class="content">
+        <section class="section" id="start" data-title="开始之前 学习路线">
+          <div class="chapter">Chapter 00</div><h2>先建立正确预期</h2><p class="lede">Ollama 不是一个“模型”，而是让你在本机下载、运行、管理模型，并通过统一 API 调用它们的运行时。</p>
+          <div class="grid three"><div class="card"><h3>你将得到</h3><p>一个可在终端使用、可被脚本调用、可按角色定制的本地 AI 助手。</p></div><div class="card"><h3>你不需要</h3><p>不需要先学机器学习，不需要 Docker；Python 实战不安装任何第三方包。</p></div><div class="card"><h3>预计用时</h3><p>基础路径约 60–90 分钟；完整 API 与工具调用约 2–3 小时。</p></div></div>
+          <div class="callout warn"><strong>“本地”不自动等于“永远离线”</strong>本地模型的推理发生在你的电脑上；若选择 Ollama 云端模型，提示词会发送到云端处理。本文默认只用本地模型，并给出禁用云功能的方法。</div>
+          <h3>完成标准</h3><div class="metric"><div><b>01</b>能运行模型</div><div><b>02</b>能定制角色</div><div><b>03</b>能调用 API</div><div><b>04</b>能安全接工具</div></div>
+        </section>
+
+        <section class="section" id="scenes" data-title="适用场景 不适用场景 本地隐私">
+          <div class="chapter">Chapter 01</div><h2>它适合什么，不适合什么</h2>
+          <div class="grid"><div class="card good"><h3>很适合</h3><ul><li>本地写作、总结、分类与信息抽取</li><li>私有代码或文档的辅助处理</li><li>低成本验证 AI 产品想法</li><li>给 PowerShell、Python、桌面工具提供统一 API</li><li>无稳定网络时运行已下载模型</li><li>比较模型、提示词和参数</li></ul></div><div class="card bad"><h3>不应硬用</h3><ul><li>弱硬件上强求超大模型的高速体验</li><li>需要 7×24 SLA 却没有运维体系</li><li>把模型输出直接当作可靠事实或专业结论</li><li>未经鉴权和 TLS 就暴露到公网</li><li>让模型直接执行付款、删除、群发等高风险动作</li><li>忽略模型许可证用于商业发布</li></ul></div></div>
+          <table><thead><tr><th>需求</th><th>Ollama 的价值</th><th>关键代价</th></tr></thead><tbody><tr><td>隐私与控制</td><td>本地模型可让输入、输出留在设备内</td><td>你负责设备、日志和访问控制</td></tr><tr><td>快速原型</td><td>同一套 CLI/API 切换多种模型</td><td>不同模型能力和提示格式仍有差异</td></tr><tr><td>成本可控</td><td>本地推理没有按 token 的远端调用费</td><td>硬件、电力、时间不是零成本</td></tr><tr><td>离线能力</td><td>模型下载完成后可断网推理</td><td>首次下载、更新及云模型仍需网络</td></tr></tbody></table>
+        </section>
+
+        <section class="section" id="workflow" data-title="工作流程 架构 数据流">
+          <div class="chapter">Chapter 02</div><h2>Ollama 的工作流程</h2><p class="lede">记住一条主线：客户端发请求，Ollama 负责模型生命周期，模型在本机完成推理，再把结果流式或一次性返回。</p>
+          <div class="workflow"><div class="flow-step"><b>1</b>选择模型<small>确认任务、标签、大小、许可证</small></div><div class="flow-step"><b>2</b>拉取模型<small>ollama pull / run</small></div><div class="flow-step"><b>3</b>加载运行<small>CPU/GPU 与内存参与推理</small></div><div class="flow-step"><b>4</b>发送请求<small>CLI 或 localhost API</small></div><div class="flow-step"><b>5</b>消费结果<small>文本、JSON、向量或工具请求</small></div></div>
+          <div class="grid"><div class="card"><h3>交互模式</h3><p><code class="inline">ollama run gemma4</code> 进入对话。适合人直接试模型、改提示词。</p></div><div class="card"><h3>服务模式</h3><p>应用访问 <code class="inline">http://localhost:11434/api</code>。适合脚本、工作流和产品原型。</p></div></div>
+          <div class="callout tip"><strong>判断问题在哪一层</strong>下载失败看网络；启动失败看服务和驱动；输出不好先看模型、提示词与上下文；API 失败看 HTTP 状态、JSON 和端点。</div>
+        </section>
+
+        <section class="section" id="prepare" data-title="硬件 显存 内存 模型选择 上下文">
+          <div class="chapter">Chapter 03</div><h2>不要从“最大模型”开始</h2><p class="lede">硬件与模型的关系不是一张万能显存表。量化、上下文、并发、GPU 后端都会改变占用；最可靠的方法是小步选择并实测。</p>
+          <ol class="steps"><li><strong>先定义任务。</strong>通用对话、代码、视觉、嵌入或工具调用，需要的能力不同。</li><li><strong>查看官方模型页。</strong>确认标签、下载大小、许可证及能力说明。</li><li><strong>选择能稳定运行的最小模型。</strong>先完成工作流，再逐步增大。</li><li><strong>用真实任务测试。</strong>记录首 token 等待、生成速度、质量和内存占用。</li></ol>
+          <table><thead><tr><th>观察项</th><th>命令/位置</th><th>如何解释</th></tr></thead><tbody><tr><td>本地模型</td><td><code>ollama ls</code></td><td>看名称、标签和磁盘大小</td></tr><tr><td>运行模型</td><td><code>ollama ps</code></td><td>看当前加载、处理器分配和上下文；字段以本机版本为准</td></tr><tr><td>模型详情</td><td><code>ollama show gemma4</code></td><td>看架构、参数、能力和模板</td></tr><tr><td>显卡状态</td><td><code>nvidia-smi</code>（NVIDIA）</td><td>看显存占用；没有该命令不代表 Ollama 不可用</td></tr></tbody></table>
+          <div class="callout warn"><strong>上下文越长，内存通常越高</strong>不要把模型宣称的最大上下文当成默认实际值。只在任务确实需要时提高 <code class="inline">num_ctx</code>，然后重新测内存和速度。</div>
+        </section>
+
+        <section class="section" id="install" data-title="Windows 安装 验证 环境变量 模型目录 卸载">
+          <div class="chapter">Chapter 04</div><h2>Windows 安装与验证</h2><p class="lede">官方要求 Windows 10 22H2 或更新版本。推荐使用官方图形安装器：可见、易更新、无需管理员权限。</p>
+          <div class="lab"><div class="lab-head"><b>实验 1｜安装并做三层验证</b><span>预计 10 分钟</span></div><div class="lab-body"><ol class="steps"><li>打开 <a href="https://ollama.com/download/windows" target="_blank" rel="noopener">Ollama 官方 Windows 下载页</a>，下载并运行 <code>OllamaSetup.exe</code>。</li><li>新开 PowerShell。旧终端可能尚未获得新的 PATH。</li><li>依次运行下面三组检查。</li></ol>
+          <pre><span class="lang">PowerShell · 客户端</span><button class="copy">复制</button><code>ollama --version
+Get-Command ollama | Select-Object Source</code></pre>
+          <pre><span class="lang">PowerShell · 服务</span><button class="copy">复制</button><code>Invoke-RestMethod http://localhost:11434/api/version</code></pre>
+          <pre><span class="lang">PowerShell · 真正推理</span><button class="copy">复制</button><code>ollama run gemma4 "请只回复：Ollama 已就绪"</code></pre>
+          <label class="checkline"><input type="checkbox" data-check="install"><span>我看到了版本号、API 版本响应，并完成了一次模型回复。</span></label></div></div>
+          <h3>可选：PowerShell 一行安装</h3><pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>irm https://ollama.com/install.ps1 | iex</code></pre><div class="callout danger"><strong>管道安装会执行远程脚本</strong>只有在确认域名、理解风险并信任脚本时才使用。新手优先选图形安装器。</div>
+          <h3>默认位置与迁移模型盘</h3><table><tbody><tr><th>程序</th><td><code>%LOCALAPPDATA%\Programs\Ollama</code></td></tr><tr><th>配置与模型</th><td><code>%USERPROFILE%\.ollama</code></td></tr><tr><th>模型文件</th><td><code>%USERPROFILE%\.ollama\models</code></td></tr></tbody></table>
+          <pre><span class="lang">PowerShell · 设置用户级模型目录</span><button class="copy">复制</button><code>[Environment]::SetEnvironmentVariable('OLLAMA_MODELS','D:\OllamaModels','User')</code></pre><p>设置后：退出系统托盘里的 Ollama，重新从开始菜单启动，再新开 PowerShell。不要直接搬动正在使用的模型文件。</p>
+          <details><summary>如何卸载？模型会一起删除吗？</summary><div>在 Windows“设置 → 应用 → 已安装的应用”卸载 Ollama。若你设置了自定义 <code>OLLAMA_MODELS</code>，官方说明卸载器不会删除该目录；删除模型是独立且可能不可逆的操作，先确认路径和备份需求。</div></details>
+        </section>
+
+        <section class="section" id="cli" data-title="CLI 命令 pull run ls ps stop rm show serve">
+          <div class="chapter">Chapter 05</div><h2>CLI 基本功</h2>
+          <table><thead><tr><th>动作</th><th>命令</th><th>注意</th></tr></thead><tbody><tr><td>下载/更新</td><td><code>ollama pull gemma4</code></td><td>需要网络和足够磁盘</td></tr><tr><td>运行/对话</td><td><code>ollama run gemma4</code></td><td>缺少时会先拉取</td></tr><tr><td>列出本地模型</td><td><code>ollama ls</code></td><td>确认名称和大小</td></tr><tr><td>列出已加载模型</td><td><code>ollama ps</code></td><td>用于观察运行状态</td></tr><tr><td>查看详情</td><td><code>ollama show gemma4</code></td><td>能力、模板、参数</td></tr><tr><td>停止模型</td><td><code>ollama stop gemma4</code></td><td>释放驻留资源</td></tr><tr><td>删除模型</td><td><code>ollama rm gemma4</code></td><td>会删除本地模型数据</td></tr><tr><td>启动服务</td><td><code>ollama serve</code></td><td>桌面应用通常已在后台启动</td></tr></tbody></table>
+          <div class="lab"><div class="lab-head"><b>实验 2｜完成一次可复现的模型巡检</b><span>预计 8 分钟</span></div><div class="lab-body"><pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>ollama pull gemma4
+ollama show gemma4
+ollama run gemma4 "用三点说明本地模型的优点，每点不超过 20 字"
+ollama ps
+ollama ls</code></pre><p>进入交互会话后可输入 <code>/bye</code> 退出。官方模型名称会演进；若 <code>gemma4</code> 不存在，请到 <a href="https://ollama.com/library" target="_blank" rel="noopener">官方模型库</a>选择当前可用的小型文本模型，并在全文替换名称。</p><label class="checkline"><input type="checkbox" data-check="cli"><span>我能解释 <code>ls</code> 与 <code>ps</code> 的区别，并成功完成一次推理。</span></label></div></div>
+          <div class="callout danger"><strong><code>ollama rm</code> 是删除操作</strong>它释放磁盘，但下次使用需要重新下载。先用 <code>ollama ls</code> 核对准确名称。</div>
+        </section>
+
+        <section class="section" id="modelfile" data-title="Modelfile SYSTEM PARAMETER temperature num_ctx 自定义模型">
+          <div class="chapter">Chapter 06</div><h2>定制你的 OPC 助手</h2><p class="lede">Modelfile 是模型运行配置的蓝图。我们只改角色和少量参数，不碰不理解的模板。</p>
+          <div class="lab"><div class="lab-head"><b>实验 3｜从基础模型创建专属助手</b><span>预计 12 分钟</span></div><div class="lab-body"><p>新建一个名为 <code>Modelfile</code>、没有扩展名的 UTF-8 文本文件：</p><pre><span class="lang">Modelfile</span><button class="copy">复制</button><code>FROM gemma4
+
+PARAMETER temperature 0.3
+PARAMETER num_ctx 8192
+
+SYSTEM """
+你是一个服务于 One-Person Company 的本地 AI 助手。
+回答使用简体中文，先给结论，再给可执行步骤。
+不确定时明确说“不确定”，不得编造来源。
+涉及删除、付款、发布或对外沟通时，必须先请求确认。
+"""</code></pre>
+          <pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>Set-Location 你的Modelfile所在目录
+ollama create opc-assistant -f .\Modelfile
+ollama run opc-assistant "帮我把今天的三项工作排优先级"</code></pre>
+          <label class="checkline"><input type="checkbox" data-check="model"><span>助手用中文回答，并体现了“先结论、再步骤”的约束。</span></label></div></div>
+          <table><thead><tr><th>指令</th><th>用途</th><th>新手建议</th></tr></thead><tbody><tr><td><code>FROM</code></td><td>基础模型或本地 GGUF/Safetensors</td><td>必填；先用官方库模型</td></tr><tr><td><code>SYSTEM</code></td><td>固定角色与行为边界</td><td>写清输出语言、目标和禁区</td></tr><tr><td><code>PARAMETER</code></td><td>温度、上下文等</td><td>一次只改一个并测试</td></tr><tr><td><code>MESSAGE</code></td><td>示例历史消息</td><td>用于稳定风格，避免堆太多</td></tr><tr><td><code>TEMPLATE</code></td><td>底层提示模板</td><td>不理解模型格式时不要改</td></tr><tr><td><code>ADAPTER</code></td><td>应用 (Q)LoRA 适配器</td><td>属于进阶导入场景</td></tr></tbody></table>
+        </section>
+
+        <section class="section" id="api" data-title="REST API generate chat embed streaming localhost 11434">
+          <div class="chapter">Chapter 07</div><h2>从对话框走向 API</h2><p class="lede">默认 API 基址是 <code>http://localhost:11434/api</code>。单轮生成用 <code>/generate</code>，多轮对话优先用 <code>/chat</code>，向量化用 <code>/embed</code>。</p>
+          <table><thead><tr><th>端点</th><th>输入核心</th><th>适用</th></tr></thead><tbody><tr><td><code>POST /api/generate</code></td><td><code>model</code> + <code>prompt</code></td><td>单轮补全、简单生成</td></tr><tr><td><code>POST /api/chat</code></td><td><code>model</code> + <code>messages</code></td><td>多轮对话、工具、结构化输出</td></tr><tr><td><code>POST /api/embed</code></td><td><code>model</code> + <code>input</code></td><td>语义检索、聚类、RAG</td></tr><tr><td><code>GET /api/tags</code></td><td>无</td><td>列出本地模型</td></tr><tr><td><code>GET /api/ps</code></td><td>无</td><td>列出运行模型</td></tr></tbody></table>
+          <div class="lab"><div class="lab-head"><b>实验 4｜在 PowerShell 发出第一条 API 请求</b><span>预计 6 分钟</span></div><div class="lab-body"><pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>$body = @{
+  model = 'opc-assistant'
+  messages = @(
+    @{ role = 'user'; content = '给我一个 15 分钟日计划模板' }
+  )
+  stream = $false
+} | ConvertTo-Json -Depth 6
+
+$result = Invoke-RestMethod `
+  -Uri 'http://localhost:11434/api/chat' `
+  -Method Post `
+  -ContentType 'application/json; charset=utf-8' `
+  -Body $body
+
+$result.message.content</code></pre><label class="checkline"><input type="checkbox" data-check="api"><span>请求返回 HTTP 200，并打印了 <code>message.content</code>。</span></label></div></div>
+          <h3>流式与非流式</h3><div class="grid"><div class="card"><h4><code>stream: false</code></h4><p>一次返回完整 JSON。最适合新手、自动化脚本和结构化输出。</p></div><div class="card"><h4><code>stream: true</code></h4><p>默认行为，以换行分隔 JSON 片段；更快看到首段内容，但客户端必须逐行解析和拼接。</p></div></div>
+          <div class="callout tip"><strong>指标单位</strong>响应中的 <code>total_duration</code>、<code>load_duration</code> 等时长以纳秒计；生成速度可近似用 <code>eval_count ÷ (eval_duration / 1e9)</code> 计算 tokens/s。</div>
+        </section>
+
+        <section class="section" id="powershell" data-title="PowerShell 多轮对话 历史 UTF8 JSON">
+          <div class="chapter">Chapter 08</div><h2>PowerShell 多轮助手</h2>
+          <div class="lab"><div class="lab-head"><b>实验 5｜保留上下文的终端助手</b><span>预计 15 分钟</span></div><div class="lab-body"><p>把下面内容保存为 <code>opc-chat.ps1</code>。它只使用 PowerShell 内置能力：</p><pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>$model = 'opc-assistant'
+$messages = [System.Collections.ArrayList]::new()
+
+Write-Host 'OPC 助手已启动。输入 /bye 退出。' -ForegroundColor Green
+while ($true) {
+  $inputText = Read-Host '你'
+  if ($inputText -eq '/bye') { break }
+  if ([string]::IsNullOrWhiteSpace($inputText)) { continue }
+
+  [void]$messages.Add(@{ role = 'user'; content = $inputText })
+  $payload = @{
+    model = $model
+    messages = $messages
+    stream = $false
+  } | ConvertTo-Json -Depth 10
+
+  try {
+    $response = Invoke-RestMethod `
+      -Uri 'http://localhost:11434/api/chat' `
+      -Method Post -ContentType 'application/json; charset=utf-8' `
+      -Body $payload -TimeoutSec 300
+    $answer = $response.message.content
+    Write-Host "助手：$answer" -ForegroundColor Cyan
+    [void]$messages.Add(@{ role = 'assistant'; content = $answer })
+  } catch {
+    Write-Warning "请求失败：$($_.Exception.Message)"
+    [void]$messages.RemoveAt($messages.Count - 1)
+  }
+}</code></pre><pre><span class="lang">PowerShell · 运行</span><button class="copy">复制</button><code>powershell -ExecutionPolicy Bypass -File .\opc-chat.ps1</code></pre><label class="checkline"><input type="checkbox" data-check="ps"><span>连续追问时，助手能够引用上一轮的信息。</span></label></div></div>
+          <div class="callout warn"><strong>历史不会凭空保留</strong><code>/api/chat</code> 是由客户端把 <code>messages</code> 再次发送。对话越长，输入 token、延迟和内存压力通常越高；生产应用要做截断、摘要或检索。</div>
+        </section>
+
+        <section class="section" id="python" data-title="Python 标准库 urllib 多轮助手 无依赖">
+          <div class="chapter">Chapter 09</div><h2>零依赖 Python 助手</h2><p class="lede">官方有 Python 包，但这个实验刻意只用标准库，让你看清 HTTP 与 JSON 的本质，也满足离线单文件教程“不依赖外部模块”的目标。</p>
+          <div class="lab"><div class="lab-head"><b>实验 6｜构建可复用的 API 客户端</b><span>预计 15 分钟</span></div><div class="lab-body"><pre><span class="lang">Python 3</span><button class="copy">复制</button><code>import json
+import urllib.error
+import urllib.request
+
+API = "http://localhost:11434/api/chat"
+MODEL = "opc-assistant"
+
+def chat(messages):
+    payload = json.dumps({
+        "model": MODEL,
+        "messages": messages,
+        "stream": False,
+        "keep_alive": "5m",
+    }, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(
+        API,
+        data=payload,
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=300) as response:
+        return json.load(response)
+
+messages = []
+print("OPC 助手已启动。输入 /bye 退出。")
+while True:
+    text = input("你：").strip()
+    if text == "/bye":
+        break
+    if not text:
+        continue
+    messages.append({"role": "user", "content": text})
+    try:
+        result = chat(messages)
+        answer = result["message"]["content"]
+        print("助手：", answer)
+        messages.append({"role": "assistant", "content": answer})
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        print(f"HTTP {exc.code}: {detail}")
+        messages.pop()
+    except urllib.error.URLError as exc:
+        print("无法连接 Ollama：", exc.reason)
+        messages.pop()</code></pre><label class="checkline"><input type="checkbox" data-check="python"><span>脚本不安装任何包即可运行，并能区分 HTTP 错误和连接错误。</span></label></div></div>
+          <div class="callout tip"><strong>如果你愿意安装官方 SDK</strong>可使用官方 <code>ollama-python</code>，它能简化流式、工具与类型处理。但理解上面的标准库版本，会让排错更容易。</div>
+        </section>
+
+        <section class="section" id="structured" data-title="结构化输出 JSON Schema format 稳定数据">
+          <div class="chapter">Chapter 10</div><h2>让输出成为可用数据</h2><p class="lede">自由文本适合人读，JSON Schema 适合程序接。结构化输出用于分类、抽取、表单生成和自动化衔接。</p>
+          <div class="lab"><div class="lab-head"><b>实验 7｜把自然语言任务变成 JSON</b><span>预计 10 分钟</span></div><div class="lab-body"><pre><span class="lang">PowerShell</span><button class="copy">复制</button><code>$schema = @{
+  type = 'object'
+  properties = @{
+    goal = @{ type = 'string' }
+    priority = @{ type = 'string'; enum = @('高','中','低') }
+    next_actions = @{ type = 'array'; items = @{ type = 'string' } }
+  }
+  required = @('goal','priority','next_actions')
+}
+
+$body = @{
+  model = 'opc-assistant'
+  messages = @(@{
+    role = 'user'
+    content = '分析任务：周五前发布产品落地页。严格按给定 schema 输出。'
+  })
+  format = $schema
+  stream = $false
+} | ConvertTo-Json -Depth 12
+
+$response = Invoke-RestMethod `
+  -Uri 'http://localhost:11434/api/chat' `
+  -Method Post -ContentType 'application/json; charset=utf-8' -Body $body
+
+$data = $response.message.content | ConvertFrom-Json
+$data | Format-List</code></pre><label class="checkline"><input type="checkbox" data-check="json"><span>输出能被 <code>ConvertFrom-Json</code> 解析，并包含三个必填字段。</span></label></div></div>
+          <div class="callout warn"><strong>Schema 约束不等于业务正确</strong>它提高格式可靠性，但模型仍可能填入错误事实。程序还要验证枚举、长度、日期、ID 和业务规则。</div>
+        </section>
+
+        <section class="section" id="tools" data-title="工具调用 function calling 白名单 参数验证">
+          <div class="chapter">Chapter 11</div><h2>让模型请求工具，而不是直接掌权</h2><p class="lede">工具调用的核心是一个受控循环。模型只能提出“想调用什么”，真正执行权始终在你的程序。</p>
+          <div class="workflow"><div class="flow-step"><b>1</b>声明工具<small>名称、描述、JSON 参数</small></div><div class="flow-step"><b>2</b>模型选择<small>返回 tool_calls</small></div><div class="flow-step"><b>3</b>程序验证<small>白名单、类型、范围、权限</small></div><div class="flow-step"><b>4</b>执行工具<small>你的代码真正运行</small></div><div class="flow-step"><b>5</b>回传结果<small>role: tool 后再次请求</small></div></div>
+          <div class="lab"><div class="lab-head"><b>实验 8｜安全的本地时间工具</b><span>预计 20 分钟</span></div><div class="lab-body"><p>这是关键请求骨架；完整应用应再加入工具名白名单、参数 schema 校验、超时与审计日志。</p><pre><span class="lang">JSON · POST /api/chat</span><button class="copy">复制</button><code>{
+  "model": "opc-assistant",
+  "messages": [
+    {"role": "user", "content": "现在几点？"}
+  ],
+  "stream": false,
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "get_local_time",
+      "description": "读取本机当前时间，不接受参数",
+      "parameters": {"type": "object", "properties": {}}
+    }
+  }]
+}</code></pre>
+          <ol class="steps"><li>检查响应中的 <code>message.tool_calls</code>，只接受精确名称 <code>get_local_time</code>。</li><li>由程序执行 <code>Get-Date -Format o</code> 或 Python <code>datetime.now().isoformat()</code>。</li><li>把结果追加为 <code>{"role":"tool","tool_name":"get_local_time","content":"..."}</code>。</li><li>连同完整消息历史再次请求 <code>/api/chat</code>，获得自然语言回答。</li></ol><label class="checkline"><input type="checkbox" data-check="tools"><span>我能解释：模型没有执行 PowerShell，是我的程序执行了白名单函数。</span></label></div></div>
+          <div class="card bad"><h3>绝不能直接照做</h3><p>不要把模型返回的字符串拼进 <code>Invoke-Expression</code>、Shell、SQL 或文件路径；不要让模型绕过确认执行删除、付款、发布和对外通信。把模型输出视为不可信输入。</p></div>
+        </section>
+
+        <section class="section" id="ops" data-title="性能 并发 安全 隐私 排错 日志 代理 OLLAMA_HOST OLLAMA_NO_CLOUD">
+          <div class="chapter">Chapter 12</div><h2>性能、安全与排错</h2>
+          <h3>先测，再优化</h3><table><thead><tr><th>现象</th><th>可能方向</th><th>优先动作</th></tr></thead><tbody><tr><td>第一次很慢，随后变快</td><td>首次加载模型</td><td>查看 <code>load_duration</code>；按需使用 <code>keep_alive</code></td></tr><tr><td>生成一直慢</td><td>模型过大、CPU 卸载、上下文过长</td><td><code>ollama ps</code>，换小模型，缩短上下文</td></tr><tr><td>内存不足</td><td>模型/上下文/并发超预算</td><td>停掉其他模型，降低尺寸和 <code>num_ctx</code></td></tr><tr><td>长对话变差</td><td>历史噪声或上下文截断</td><td>摘要旧历史，保留关键事实，必要时用检索</td></tr></tbody></table>
+          <h3>安全底线</h3><div class="grid"><div class="card good"><h4>默认保持本机绑定</h4><p>默认 <code>127.0.0.1:11434</code> 只允许本机访问，最适合个人使用。</p></div><div class="card bad"><h4>不要裸露公网</h4><p><code>OLLAMA_HOST=0.0.0.0:11434</code> 会扩大攻击面。需要网络访问时应加认证、TLS、防火墙和反向代理。</p></div></div>
+          <pre><span class="lang">PowerShell · 强制关闭云功能</span><button class="copy">复制</button><code>[Environment]::SetEnvironmentVariable('OLLAMA_NO_CLOUD','1','User')</code></pre><p>设置后退出托盘中的 Ollama，再从开始菜单重启。此设置会停用云端模型和依赖云能力的功能。</p>
+          <h3>六步诊断法</h3><ol class="steps"><li><strong>客户端：</strong><code>ollama --version</code> 是否可用？</li><li><strong>服务：</strong><code>Invoke-RestMethod http://localhost:11434/api/version</code> 是否响应？</li><li><strong>模型：</strong><code>ollama ls</code> 是否包含请求的准确标签？</li><li><strong>状态：</strong><code>ollama ps</code> 是否显示模型和处理器分配？</li><li><strong>资源：</strong>磁盘、内存、显存、驱动是否足够？</li><li><strong>日志：</strong>查看 <code>%LOCALAPPDATA%\Ollama</code>，再对照官方排错页。</li></ol>
+          <details><summary>“ollama 不是内部或外部命令”</summary><div>关闭并重新打开终端；检查 <code>Get-Command ollama</code>。默认程序目录是 <code>%LOCALAPPDATA%\Programs\Ollama</code>。若文件存在但 PATH 未更新，退出登录或重启 Ollama/终端后再试。</div></details>
+          <details><summary>API 报连接被拒绝</summary><div>桌面应用可能未启动。先从开始菜单启动 Ollama；确认托盘图标，再调用 <code>/api/version</code>。若你手动运行服务，检查是否已有进程占用 11434。</div></details>
+          <details><summary>模型下载慢或失败</summary><div>检查磁盘、网络、证书和代理。官方建议模型拉取使用 <code>HTTPS_PROXY</code>；避免设置 <code>HTTP_PROXY</code>，它可能干扰客户端与本地服务通信。</div></details>
+          <details><summary>模型回答乱码或 JSON 解析失败</summary><div>PowerShell 请求设置 <code>application/json; charset=utf-8</code>；文件保存为 UTF-8。结构化输出应设置 <code>stream:false</code> 并使用 JSON Schema，随后仍做业务校验。</div></details>
+          <details><summary>GPU 没有被使用</summary><div>先查看 <code>ollama ps</code>，再核对官方硬件支持页与显卡驱动。不要仅凭任务管理器某一个图表下结论；不同后端和共享显存的表现不同。</div></details>
+        </section>
+
+        <section class="section" id="cheatsheet" data-title="速查表 下一步 官方来源">
+          <div class="chapter">Chapter 13</div><h2>把这张速查表留下</h2>
+          <pre><span class="lang">PowerShell · 日常命令</span><button class="copy">复制</button><code># 安装后验证
+ollama --version
+Invoke-RestMethod http://localhost:11434/api/version
+
+# 模型生命周期
+ollama pull gemma4
+ollama run gemma4
+ollama show gemma4
+ollama ls
+ollama ps
+ollama stop gemma4
+# ollama rm gemma4  # 删除前先确认
+
+# 自定义模型
+ollama create opc-assistant -f .\Modelfile
+ollama run opc-assistant
+
+# 服务与帮助
+ollama serve --help
+ollama --help</code></pre>
+          <h3>下一步学习顺序</h3><ol class="steps"><li>用 10 条真实任务比较两个小模型，不凭榜单选型。</li><li>为提示词和结构化 schema 建立固定测试样本。</li><li>学习 Embeddings：索引和查询始终使用同一个嵌入模型。</li><li>需要 RAG 时，再引入切块、向量库、召回评估；不要把 RAG 当成“上传文件”的魔法按钮。</li><li>准备对外服务前，补齐认证、TLS、限流、日志脱敏、备份和资源隔离。</li></ol>
+          <h3>官方来源</h3><ul class="source-list"><li><a href="https://github.com/ollama/ollama" target="_blank" rel="noopener">Ollama 官方 GitHub 仓库</a></li><li><a href="https://docs.ollama.com/windows" target="_blank" rel="noopener">Windows 安装与文件位置</a></li><li><a href="https://docs.ollama.com/cli" target="_blank" rel="noopener">CLI Reference</a></li><li><a href="https://docs.ollama.com/modelfile" target="_blank" rel="noopener">Modelfile Reference</a></li><li><a href="https://docs.ollama.com/api/introduction" target="_blank" rel="noopener">REST API Introduction</a></li><li><a href="https://docs.ollama.com/capabilities/structured-outputs" target="_blank" rel="noopener">Structured Outputs</a></li><li><a href="https://docs.ollama.com/capabilities/tool-calling" target="_blank" rel="noopener">Tool calling</a></li><li><a href="https://docs.ollama.com/faq" target="_blank" rel="noopener">FAQ：隐私、环境变量、网络与模型目录</a></li><li><a href="https://docs.ollama.com/troubleshooting" target="_blank" rel="noopener">Troubleshooting</a></li></ul>
+          <div class="callout tip"><strong>版本说明</strong>本文依据 2026-08-01 可访问的官方资料核验。Ollama 和模型库更新很快；遇到命令、标签或字段差异时，以本机 <code>--help</code>、当前官方文档和 API 响应为准。</div>
+        </section>
+      </article>
+      <footer class="footer"><div><b>Ollama 本地 AI 实验手册</b><br><small>Windows 主线 · 零基础到独立实战</small></div><small>单文件制作 · 无 CDN · 无外部模块 · 可离线阅读</small></footer>
+    </main>
+  </div>
+  <div class="mobile-bar"><button id="menu">☰ 目录</button><span id="mobileChapter">00 / 开始之前</span><button id="mobileTheme">◐</button></div>
+  <script>
+    (()=>{
+      const root=document.documentElement,sidebar=document.getElementById('sidebar'),search=document.getElementById('search'),sections=[...document.querySelectorAll('.section')],links=[...document.querySelectorAll('#nav a')];
+      const savedTheme=localStorage.getItem('ollama-guide-theme');if(savedTheme)root.dataset.theme=savedTheme;
+      function toggleTheme(){root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('ollama-guide-theme',root.dataset.theme)}
+      document.getElementById('theme').onclick=toggleTheme;document.getElementById('mobileTheme').onclick=toggleTheme;
+      document.getElementById('menu').onclick=()=>sidebar.classList.toggle('open');links.forEach(a=>a.addEventListener('click',()=>sidebar.classList.remove('open')));
+      document.querySelectorAll('.copy').forEach(btn=>btn.addEventListener('click',async()=>{const text=btn.parentElement.querySelector('code').innerText;try{await navigator.clipboard.writeText(text);btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1400)}catch{btn.textContent='请选择复制'}}));
+      document.querySelectorAll('[data-check]').forEach(box=>{const key='ollama-check-'+box.dataset.check;box.checked=localStorage.getItem(key)==='1';box.addEventListener('change',()=>localStorage.setItem(key,box.checked?'1':'0'))});
+      document.getElementById('reset').onclick=()=>{if(confirm('清空这份教程的实验勾选进度？')){document.querySelectorAll('[data-check]').forEach(b=>{b.checked=false;localStorage.removeItem('ollama-check-'+b.dataset.check)})}};
+      function update(){const max=document.documentElement.scrollHeight-innerHeight;document.getElementById('progress').style.width=(max?scrollY/max*100:0)+'%';let current=sections[0];for(const s of sections)if(s.getBoundingClientRect().top<innerHeight*.38)current=s;links.forEach(a=>a.classList.toggle('active',a.hash==='#'+current.id));const active=links.find(a=>a.classList.contains('active'));if(active)document.getElementById('mobileChapter').textContent=active.textContent.trim()}
+      addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();
+      function runSearch(){const q=search.value.trim().toLowerCase();sections.forEach(s=>{s.classList.remove('search-result','hidden-by-search');if(q){const hit=(s.dataset.title+' '+s.innerText).toLowerCase().includes(q);s.classList.toggle('hidden-by-search',!hit);s.classList.toggle('search-result',hit)}});if(q){const first=sections.find(s=>!s.classList.contains('hidden-by-search'));first?.scrollIntoView({behavior:'smooth',block:'start'})}}
+      search.addEventListener('input',runSearch);document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==search){e.preventDefault();search.focus()}if(e.key==='Escape'){search.value='';runSearch();search.blur();sidebar.classList.remove('open')}});
+    })();
+  </script>
+</body>
+</html>

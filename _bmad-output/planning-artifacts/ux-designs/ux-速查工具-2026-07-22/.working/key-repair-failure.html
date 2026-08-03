@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>速查工具 · 失败修复关键屏幕</title>
+  <style>
+    /*
+      Governed by DESIGN.md:
+      Brand & Style; Colors; Typography; Layout & Spacing; Elevation & Depth; Shapes;
+      Components: app-shell, category-nav, category-item, view-header, global-search,
+      toolbar-button, file-card, file-type-mark, category-tag, error-dialog,
+      duplicate-dialog, confirmation-dialog.
+      Governed by EXPERIENCE.md:
+      Information Architecture S01/S16/S18 and X01; Voice and Tone; Component Patterns;
+      State Patterns S16/S18; Cross-surface rules; Interaction Primitives;
+      Accessibility Floor; Responsive & Platform; Key Flow UJ-4 steps 1-6 and failure paths.
+    */
+    :root {
+      --canvas: #F4F3EC;
+      --surface: #FFFDF7;
+      --surface-subtle: #E8E9E1;
+      --text: #1B211D;
+      --muted: #566158;
+      --disabled: #747D76;
+      --border: #253229;
+      --border-muted: #A9AFA9;
+      --action: #1F6248;
+      --action-hover: #154532;
+      --focus: #6D43B5;
+      --warning: #895400;
+      --danger: #A52A2A;
+      --sidebar: 208px;
+      --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: #DDDFDA;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .page { min-width: 1120px; padding: 28px 40px 48px; }
+    .page-head { width: 1024px; margin: 0 auto 20px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.3; }
+    .page-head p { margin: 0; color: var(--muted); }
+    .specimen { width: 1024px; margin: 0 auto 38px; }
+    .caption { display: flex; align-items: baseline; gap: 12px; margin: 0 0 10px; }
+    .caption strong { font-size: 16px; }
+    .caption span { color: var(--muted); font-size: 13px; }
+    .app {
+      position: relative;
+      width: 1024px;
+      height: 720px;
+      overflow: hidden;
+      background: var(--canvas);
+      border: 2px solid var(--border);
+      box-shadow: 0 12px 32px rgba(27, 33, 29, .12);
+    }
+    .window-bar {
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 12px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font: 12px/1 var(--mono);
+    }
+    .window-title { grid-column: 2; font-weight: 700; }
+    .window-controls { grid-column: 3; justify-self: end; display: flex; gap: 14px; color: var(--muted); }
+    .shell { height: calc(100% - 36px); display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); }
+    .sidebar { min-width: 0; display: flex; flex-direction: column; background: var(--surface); border-right: 2px solid var(--border); }
+    .brand { height: 68px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border-bottom: 1px solid var(--border); font-weight: 800; }
+    .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; color: #FFF; background: var(--border); font: 700 13px/1 var(--mono); }
+    .nav-head { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 16px; border-bottom: 1px solid var(--border); }
+    .nav-head strong { font-size: 13px; }
+    .nav-actions { display: flex; gap: 5px; }
+    .icon-button, .more { display: inline-grid; place-items: center; min-width: 32px; height: 32px; padding: 0 7px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; }
+    .category-list { padding-top: 8px; }
+    .category { min-height: 44px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; padding: 0 12px 0 16px; border-bottom: 1px solid var(--border-muted); }
+    .category:first-child { border-top: 1px solid var(--border-muted); }
+    .category.active { color: #FFF; background: var(--action); border-color: var(--action); font-weight: 700; }
+    .category-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .category-count { font: 12px/1 var(--mono); }
+    .category-bottom { margin-top: auto; border-top: 1px solid var(--border-muted); }
+    .main { min-width: 0; display: flex; flex-direction: column; padding: 22px 24px 26px; }
+    .view-head { display: grid; grid-template-columns: 1fr 284px; align-items: end; gap: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
+    .view-head h2 { margin: 0; font-size: 22px; line-height: 1.3; }
+    .view-meta { margin: 4px 0 0; color: var(--muted); font: 12px/1.4 var(--mono); }
+    .search { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 12px; color: var(--muted); background: var(--surface); border: 2px solid var(--border); border-radius: 2px; }
+    .toolbar { display: flex; gap: 8px; padding: 14px 0 12px; }
+    .button { min-height: 36px; padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; font-weight: 650; }
+    .button.primary { margin-left: auto; color: #FFF; background: var(--action); border-color: var(--action); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .card { position: relative; min-height: 144px; padding: 13px 42px 12px 13px; background: var(--surface); border: 1px solid var(--border); border-radius: 2px; }
+    .card h3 { margin: 0; padding-bottom: 9px; border-bottom: 1px solid var(--border-muted); font-size: 15px; line-height: 1.4; }
+    .file-meta { display: flex; align-items: center; gap: 7px; margin-top: 9px; color: var(--muted); font: 11px/1.3 var(--mono); }
+    .file-icon { width: 22px; height: 24px; display: grid; place-items: center; border: 1px solid var(--border-muted); border-radius: 2px; font: 700 9px/1 var(--mono); }
+    .card p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .more { position: absolute; top: 7px; right: 7px; width: 30px; min-width: 30px; height: 30px; }
+    .tags { display: flex; gap: 5px; margin-top: 9px; }
+    .tag { padding: 2px 6px; color: var(--action); background: var(--canvas); border: 1px solid var(--action); border-radius: 2px; font: 10px/1.4 var(--mono); }
+    .scrim { position: absolute; inset: 36px 0 0; display: grid; place-items: center; padding-left: var(--sidebar); background: rgba(27, 33, 29, .46); }
+    .dialog { width: 506px; background: var(--surface); border: 2px solid var(--border); border-radius: 4px; box-shadow: 0 16px 38px rgba(27, 33, 29, .24); }
+    .dialog-head { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
+    .warning-mark { width: 38px; height: 38px; display: grid; place-items: center; color: #FFF; background: var(--warning); font-size: 22px; font-weight: 800; }
+    .dialog h2 { margin: 0; font-size: 19px; line-height: 1.35; }
+    .dialog-lead { margin: 5px 0 0; color: var(--muted); }
+    .dialog-body { padding: 18px 22px; }
+    .dialog-body p { margin: 0 0 12px; }
+    .fact-box { padding: 12px 14px; background: var(--canvas); border: 1px solid var(--border); }
+    .fact-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; }
+    .fact-value { display: block; font-weight: 750; }
+    .fact-path { display: block; margin-top: 5px; overflow-wrap: anywhere; color: var(--muted); font: 11px/1.5 var(--mono); }
+    .boundary { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; color: var(--muted); font-size: 13px; }
+    .boundary-mark { flex: 0 0 auto; width: 18px; height: 18px; display: grid; place-items: center; color: var(--warning); border: 1px solid var(--warning); font: 700 11px/1 var(--mono); }
+    .dialog-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 22px 18px; border-top: 1px solid var(--border); }
+    .dialog-actions .button { min-height: 40px; }
+    .dialog-actions .repair, .dialog-actions .inspect { color: #FFF; background: var(--action); border-color: var(--action); }
+    .dialog-actions .delete { color: var(--danger); border-color: var(--danger); }
+    .focus-demo { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .dialog-note { margin-right: auto; color: var(--muted); font-size: 11px; }
+    @media (max-width: 1120px) { .page { padding-left: 24px; padding-right: 24px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-head">
+      <h1>失败修复关键屏幕</h1>
+      <p>两个状态均保留原首页上下文；系统文件选择器不在产品内仿制。</p>
+    </header>
+
+    <section class="specimen" aria-labelledby="caption-s16">
+      <p class="caption" id="caption-s16"><strong>S16 · 无法打开文件</strong><span>卡片保留；修复、删除与关闭是三个明确分支</span></p>
+      <div class="app">
+        <div class="window-bar"><span class="window-title">速查工具</span><span class="window-controls" aria-hidden="true">—　□　×</span></div>
+        <div class="shell">
+          <aside class="sidebar" aria-label="类别导航">
+            <div class="brand"><span class="brand-mark">速</span><span>速查工具</span></div>
+            <div class="nav-head"><strong>类别</strong><div class="nav-actions"><button class="icon-button" aria-label="整理类别">↕</button><button class="icon-button" aria-label="新建类别">＋</button></div></div>
+            <div class="category-list">
+              <div class="category active"><span class="category-name">全部卡片</span><span class="category-count">6</span></div>
+              <div class="category"><span class="category-name">当前项目</span><span class="category-count">3</span></div>
+              <div class="category"><span class="category-name">常用模板</span><span class="category-count">2</span></div>
+              <div class="category"><span class="category-name">会议资料</span><span class="category-count">1</span></div>
+            </div>
+            <div class="category category-bottom"><span class="category-name">未分类</span><span class="category-count">1</span></div>
+          </aside>
+          <section class="main" aria-label="全部卡片">
+            <header class="view-head"><div><h2>全部卡片</h2><p class="view-meta">6 个文件 · 手动顺序</p></div><div class="search" aria-label="搜索全部卡片">⌕　搜索全部卡片</div></header>
+            <div class="toolbar"><button class="button">整理排序</button><button class="button primary">＋ 选择文件</button></div>
+            <div class="grid">
+              <article class="card"><button class="more" aria-label="更多操作：产品需求文档">⋮</button><h3>产品需求文档</h3><div class="file-meta"><span class="file-icon">MD</span><span>.md</span></div><p>速查工具 V1 的最终产品规则与验收边界。</p><div class="tags"><span class="tag">当前项目</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：项目预算表">⋮</button><h3>项目预算表</h3><div class="file-meta"><span class="file-icon">XLS</span><span>.xlsx</span></div><p>研发与设计资源投入测算。</p><div class="tags"><span class="tag">当前项目</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：周会记录">⋮</button><h3>周会记录</h3><div class="file-meta"><span class="file-icon">DOC</span><span>.docx</span></div><p>本周交付、风险与待确认事项。</p><div class="tags"><span class="tag">会议资料</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：交付清单">⋮</button><h3>交付清单</h3><div class="file-meta"><span class="file-icon">XLS</span><span>.xlsx</span></div><p>版本文件、演示路径与验收证据。</p><div class="tags"><span class="tag">当前项目</span></div></article>
+            </div>
+          </section>
+        </div>
+        <div class="scrim">
+          <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="s16-title" aria-describedby="s16-desc">
+            <header class="dialog-head"><span class="warning-mark" aria-hidden="true">!</span><div><h2 id="s16-title">无法打开文件</h2><p class="dialog-lead" id="s16-desc">操作系统未能打开“项目预算表”。卡片仍被保留。</p></div></header>
+            <div class="dialog-body">
+              <div class="fact-box"><span class="fact-label">保留的卡片</span><span class="fact-value">项目预算表</span><span class="fact-path">E:\项目资料\2026\项目预算表.xlsx</span></div>
+              <p class="boundary"><span class="boundary-mark" aria-hidden="true">✓</span><span>名称、备注、类别和各视图顺序均未改变。重新选择文件后不会自动重试打开。</span></p>
+            </div>
+            <footer class="dialog-actions"><span class="dialog-note">初始焦点</span><button class="button repair focus-demo">重新选择文件</button><button class="button delete">删除卡片</button><button class="button">关闭</button></footer>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="caption-s18">
+      <p class="caption" id="caption-s18"><strong>S18 · 重复源文件冲突</strong><span>显示原卡片名；不创建第二张卡片，也不覆盖当前关联</span></p>
+      <div class="app">
+        <div class="window-bar"><span class="window-title">速查工具</span><span class="window-controls" aria-hidden="true">—　□　×</span></div>
+        <div class="shell">
+          <aside class="sidebar" aria-label="类别导航">
+            <div class="brand"><span class="brand-mark">速</span><span>速查工具</span></div>
+            <div class="nav-head"><strong>类别</strong><div class="nav-actions"><button class="icon-button" aria-label="整理类别">↕</button><button class="icon-button" aria-label="新建类别">＋</button></div></div>
+            <div class="category-list">
+              <div class="category active"><span class="category-name">全部卡片</span><span class="category-count">6</span></div>
+              <div class="category"><span class="category-name">当前项目</span><span class="category-count">3</span></div>
+              <div class="category"><span class="category-name">常用模板</span><span class="category-count">2</span></div>
+              <div class="category"><span class="category-name">会议资料</span><span class="category-count">1</span></div>
+            </div>
+            <div class="category category-bottom"><span class="category-name">未分类</span><span class="category-count">1</span></div>
+          </aside>
+          <section class="main" aria-label="全部卡片">
+            <header class="view-head"><div><h2>全部卡片</h2><p class="view-meta">6 个文件 · 手动顺序</p></div><div class="search" aria-label="搜索全部卡片">⌕　搜索全部卡片</div></header>
+            <div class="toolbar"><button class="button">整理排序</button><button class="button primary">＋ 选择文件</button></div>
+            <div class="grid">
+              <article class="card"><button class="more" aria-label="更多操作：产品需求文档">⋮</button><h3>产品需求文档</h3><div class="file-meta"><span class="file-icon">MD</span><span>.md</span></div><p>速查工具 V1 的最终产品规则与验收边界。</p><div class="tags"><span class="tag">当前项目</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：项目预算表">⋮</button><h3>项目预算表</h3><div class="file-meta"><span class="file-icon">XLS</span><span>.xlsx</span></div><p>研发与设计资源投入测算。</p><div class="tags"><span class="tag">当前项目</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：周会记录">⋮</button><h3>周会记录</h3><div class="file-meta"><span class="file-icon">DOC</span><span>.docx</span></div><p>本周交付、风险与待确认事项。</p><div class="tags"><span class="tag">会议资料</span></div></article>
+              <article class="card"><button class="more" aria-label="更多操作：路演模板">⋮</button><h3>路演模板</h3><div class="file-meta"><span class="file-icon">PPT</span><span>.pptx</span></div><p>首次沟通使用的演示文稿母版。</p><div class="tags"><span class="tag">常用模板</span></div></article>
+            </div>
+          </section>
+        </div>
+        <div class="scrim">
+          <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="s18-title" aria-describedby="s18-desc">
+            <header class="dialog-head"><span class="warning-mark" aria-hidden="true">!</span><div><h2 id="s18-title">该文件已收录</h2><p class="dialog-lead" id="s18-desc">所选文件已经关联到另一张卡片。</p></div></header>
+            <div class="dialog-body">
+              <div class="fact-box"><span class="fact-label">原卡片</span><span class="fact-value">产品需求文档</span><span class="fact-path">E:\元梦工作空间\速查工具\产品需求文档.md</span></div>
+              <p class="boundary"><span class="boundary-mark" aria-hidden="true">✓</span><span>“项目预算表”继续关联原文件，不会覆盖当前关联，也不会创建第二张卡片。</span></p>
+            </div>
+            <footer class="dialog-actions"><button class="button inspect focus-demo">查看原卡片</button><button class="button">重新选择</button><button class="button">取消</button></footer>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

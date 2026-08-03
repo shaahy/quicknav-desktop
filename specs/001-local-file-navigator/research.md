@@ -9,15 +9,15 @@
 **Decision**: Electron 33+
 
 **Rationale**:
-- **System tray**: Electron `Tray` API 成熟稳定，直接满足 spec FR-036b（关闭→托盘）需求。Tauri 的 tray 支持在 v2 中仍标记为 experimental。
+- **单实例与退出生命周期**: Electron `app.requestSingleInstanceLock()`、`second-instance` 和窗口生命周期事件直接满足修订后的 FR-036b（关闭即退出、重复启动聚焦已有窗口）。
 - **文件系统集成**: `shell.openPath()` 和 `shell.showItemInFolder()` 直接映射 FR-026（系统默认方式打开）和 FR-028（在文件管理器中显示），无需 Rust 原生层桥接。
 - **无障碍**: Electron + React 可复用 Web 无障碍生态（ARIA live region、focus management），直接支持 constitution Principle V 的 WCAG 2.2 AA 基线。Tauri 的 WebView 对辅助技术暴露有限。
 - **开发速度**: 单开发者（怡哥），TypeScript 全栈，无需学习 Rust。20 个 UI 组件 + 复杂状态管理的项目，Web 生态的 UI 库和调试工具链显著加速。
 - **跨平台构建**: electron-builder 对 Windows (NSIS/portable) 和 macOS (DMG) 的开箱支持最好。
 
 **Alternatives considered**:
-- **Tauri v2**: 包体小（~5MB vs ~150MB）、内存低（~20MB vs ~200MB），但系统托盘为 experimental、无障碍支持弱、需 Rust 知识。V1 个人工具不优先优化包体和内存，可评估为 V2 迁移目标。
-- **PWA (Web-only)**: 无系统文件选择器原生集成、无系统托盘、无法调用 `shell.openPath()` 等关键 API。不满足桌面应用的核心需求。
+- **Tauri v2**: 包体小（~5MB vs ~150MB）、内存低（~20MB vs ~200MB），但无障碍支持弱、需 Rust 知识。V1 个人工具不优先优化包体和内存，可评估为 V2 迁移目标。
+- **PWA (Web-only)**: 无完整的系统文件选择器原生集成，且无法可靠调用 `shell.openPath()` 等关键 API。不满足桌面应用的核心需求。
 
 ## Decision 2: UI 框架 — React 18 + TypeScript
 
@@ -47,7 +47,7 @@
 
 **Save timing**:
 - 正常关闭/退出: 全量写回（FR-036）
-- 托盘最小化: 保持在内存，不写盘（功率和 I/O 优化）
+- 不提供托盘最小化或后台驻留路径
 - 排序操作: 立即写盘（spec US2 场景 9 "立即生效"）—— 实际可采用 500ms debounce
 - 新增/编辑删除: 确认保存后立即写盘
 

@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Matt Pocock Skills 在 Codex 中的新项目 0-1 与已有项目增量开发双场景工程实战教程。">
+  <title>Matt Pocock Skills · Codex 双场景工程实战教程</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper:#f4f1e9; --surface:#fffef9; --ink:#16222c; --muted:#64717b;
+      --line:#d6d4cc; --line-strong:#aeb4b7; --navy:#0f2940;
+      --new:#246b9e; --new-soft:#e5f0f7; --inc:#287a5b; --inc-soft:#e5f2eb;
+      --warn:#a84b2d; --warn-soft:#f9e9e2; --gold:#956516; --gold-soft:#faefd7;
+      --radius:8px; --page:1180px; --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      --mono:"Cascadia Code","SFMono-Regular",Consolas,monospace;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth;scroll-padding-top:78px} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7}
+    a{color:var(--new);text-underline-offset:3px} button,input,select{font:inherit} button,a,summary,input,select{-webkit-tap-highlight-color:transparent}
+    :focus-visible{outline:3px solid #79b9e3;outline-offset:3px} code{font-family:var(--mono);font-size:.91em;background:#ebeae4;padding:.12em .35em;border-radius:4px;overflow-wrap:anywhere}
+    .wrap{width:min(var(--page),calc(100% - 40px));margin-inline:auto}.skip{position:fixed;left:12px;top:-100px;z-index:99;padding:10px 14px;background:var(--navy);color:#fff}.skip:focus{top:12px}
+    .topbar{position:sticky;top:0;z-index:30;border-bottom:1px solid var(--line);background:rgba(244,241,233,.96);backdrop-filter:blur(9px)}
+    .nav{min-height:64px;display:flex;align-items:center;gap:20px}.brand{color:var(--ink);font-weight:780;text-decoration:none;letter-spacing:-.02em}.brand small{display:block;color:var(--muted);font:500 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+    .navlinks{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}.navlinks::-webkit-scrollbar{display:none}.navlinks a{flex:0 0 auto;padding:8px 9px;border-radius:5px;color:var(--muted);text-decoration:none;font-size:13px}.navlinks a:hover{background:var(--surface);color:var(--ink)}
+    .hero{padding:72px 0 46px;border-bottom:1px solid var(--line)}.eyebrow{margin:0 0 12px;color:var(--new);font:700 12px/1.3 var(--mono);letter-spacing:.11em;text-transform:uppercase}
+    h1{max-width:980px;margin:0;font-size:clamp(38px,6.2vw,74px);line-height:1.04;letter-spacing:-.055em}.lede{max-width:850px;margin:24px 0 0;color:#3e4b55;font-size:clamp(18px,2.1vw,23px);line-height:1.62}
+    .hero-rule{display:grid;grid-template-columns:8px 1fr;max-width:960px;margin-top:30px;border:1px solid var(--line-strong);background:var(--surface)}.hero-rule:before{content:"";background:var(--warn)}.hero-rule div{padding:17px 20px}.hero-rule strong{display:block;font-size:18px}
+    .route-summary{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:28px;border:1px solid var(--line-strong);background:var(--line-strong)}.route-summary article{padding:20px;background:var(--surface)}.route-summary article:first-child{border-top:5px solid var(--new)}.route-summary article:last-child{border-top:5px solid var(--inc)}.route-summary p{margin-bottom:0;color:var(--muted)}
+    main{padding-bottom:70px}section{padding:64px 0;border-bottom:1px solid var(--line)}.section-head{display:grid;grid-template-columns:170px minmax(0,1fr);gap:28px;margin-bottom:30px}.section-no{color:var(--muted);font:600 12px/1.5 var(--mono);letter-spacing:.08em}h2{margin:0;font-size:clamp(28px,4vw,46px);line-height:1.15;letter-spacing:-.035em}h3{margin:0 0 9px;font-size:21px;line-height:1.3}h4{margin:0 0 7px;font-size:15px}p{margin:0 0 14px}.intro{max-width:790px;margin:10px 0 0;color:var(--muted);font-size:17px}ul,ol{margin:8px 0;padding-left:21px}
+    .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;border:1px solid var(--line-strong);background:var(--line-strong)}.principle{min-height:178px;padding:22px;background:var(--surface)}.principle b{display:block;margin-bottom:13px;color:var(--new);font:700 12px/1.3 var(--mono)}.principle p{color:#46535e}
+    .invoke-note{margin-top:18px;padding:15px 17px;border-left:4px solid var(--gold);background:var(--gold-soft)}
+    .route-tabs{display:flex;gap:10px;margin-bottom:20px}.route-tab{min-height:48px;padding:10px 16px;border:1px solid var(--line-strong);border-radius:6px;background:transparent;color:var(--ink);font-weight:750;cursor:pointer}.route-tab[aria-selected="true"][data-route="route-new"]{background:var(--new);border-color:var(--new);color:#fff}.route-tab[aria-selected="true"][data-route="route-increment"]{background:var(--inc);border-color:var(--inc);color:#fff}
+    .route-case{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:20px}.case-card{padding:20px;background:var(--navy);color:#fff}.case-card small{color:#b9c9d6;font:600 11px/1.3 var(--mono);letter-spacing:.08em}.case-card p{margin-bottom:0;color:#d7e0e7}.route-goal{padding:20px;border:1px solid var(--line-strong);background:var(--surface)}.route-goal p{margin-bottom:0;color:var(--muted)}
+    .timeline{display:flex;width:100%;max-width:100%;min-width:0;contain:inline-size;gap:0;overflow-x:auto;padding:0 0 10px;scrollbar-color:var(--line-strong) transparent}.timeline a{position:relative;flex:0 0 155px;min-height:94px;padding:12px 12px 12px 18px;border:1px solid var(--line);border-right:0;background:var(--surface);color:var(--ink);text-decoration:none}.timeline a:last-child{border-right:1px solid var(--line)}.timeline a:after{content:"→";position:absolute;right:-7px;top:33px;z-index:2;color:var(--muted);background:var(--paper);line-height:20px}.timeline a:last-child:after{display:none}.timeline b{display:block;color:var(--muted);font:700 11px/1.3 var(--mono)}.timeline span{display:block;margin-top:7px;font-weight:720;line-height:1.35}.timeline code{display:block;margin-top:5px;color:var(--muted);background:transparent;padding:0;font-size:10px}
+    .branch-hint{margin-top:13px;color:var(--muted);font-size:13px}.branch-hint strong{color:var(--warn)}
+    .teaching-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:16px}.route-marker{font:700 12px/1.3 var(--mono);letter-spacing:.06em}.route-marker.new{color:var(--new)}.route-marker.increment{color:var(--inc)}
+    .stages{display:grid;gap:12px}.stage{border:1px solid var(--line);background:var(--surface)}.stage[open]{border-color:var(--line-strong)}.stage summary{position:relative;display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:15px;align-items:center;min-height:116px;padding:17px 48px 17px 17px;cursor:pointer;list-style:none}.stage summary::-webkit-details-marker{display:none}.stage summary:after{content:"+";position:absolute;right:18px;top:22px;font:25px/1 var(--mono)}.stage[open] summary:after{content:"−"}.stage-index{display:grid;place-items:center;width:54px;height:54px;border:1px solid currentColor;border-radius:50%;font:750 14px/1 var(--mono)}.stage.new .stage-index{color:var(--new);background:var(--new-soft)}.stage.increment .stage-index{color:var(--inc);background:var(--inc-soft)}.stage-title strong{display:block;font-size:21px;line-height:1.25}.stage-title p{margin:5px 0 0;color:var(--muted);font-size:14px}.chips{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}.chip{padding:3px 7px;border:1px solid var(--line-strong);border-radius:999px;background:#f1f0ea;font:650 11px/1.5 var(--mono)}
+    .stage-body{padding:0 20px 22px;border-top:1px solid var(--line)}.context-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.context-box{padding:16px;border:1px solid var(--line);background:#f8f7f2}.context-box p:last-child{margin-bottom:0}.why{margin-top:14px;padding:13px 15px;border-left:4px solid var(--new);background:var(--new-soft)}.stage.increment .why{border-color:var(--inc);background:var(--inc-soft)}
+    .io{display:grid;grid-template-columns:1fr 54px 1fr;gap:10px;align-items:stretch;margin-top:16px}.io-box{padding:15px;border:1px solid var(--line);background:#f8f7f2}.io-arrow{display:grid;place-items:center;color:var(--muted);font-size:24px}.io ul{font-size:14px}.prompt-wrap{margin-top:16px}.prompt{position:relative;min-height:100px;padding:17px 104px 17px 17px;border-radius:6px;background:#1c2934;color:#f4f7f9;font:13px/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere}.copy{position:absolute;right:10px;top:10px;min-height:36px;padding:6px 10px;border:1px solid #667786;border-radius:4px;background:#2d3c49;color:#fff;cursor:pointer}.copy:hover{background:#3b4c5a}
+    .execution{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:16px}.actions,.gate{padding:16px;border:1px solid var(--line)}.gate{border-color:#d1a58f;background:var(--warn-soft)}.gate strong{color:var(--warn)}.finish-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.done,.misuse{padding:15px;border:1px solid var(--line)}.done{background:#edf5ef;border-color:#a9c7b4}.misuse{background:var(--warn-soft);border-color:#d8ad9b}.next-step{margin-top:14px;padding:13px 15px;background:var(--navy);color:#fff}.next-step strong{color:#a9d3f0}
+    .branches{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.branch{padding:19px;border:1px solid var(--line);background:var(--surface)}.branch:last-child{grid-column:1/-1}.branch-top{display:flex;gap:9px;align-items:center;margin-bottom:8px}.branch-id{color:var(--warn);font:700 12px/1 var(--mono)}.branch p{color:#46535e}.branch .path{margin:12px 0;padding:9px 11px;background:#efeee8;font:12px/1.6 var(--mono);overflow-wrap:anywhere}
+    .dialogue-tabs{display:flex;gap:8px;margin-bottom:14px}.dialogue-tab{min-height:44px;padding:8px 13px;border:1px solid var(--line-strong);background:transparent;border-radius:5px;cursor:pointer}.dialogue-tab.active{background:var(--navy);color:#fff}.dialogue{display:grid;gap:10px}.message{max-width:82%;padding:14px 16px;border:1px solid var(--line);background:var(--surface)}.message.user{margin-left:auto;border-color:#93b9d4;background:var(--new-soft)}.message.codex{margin-right:auto}.message .who{display:block;margin-bottom:5px;color:var(--muted);font:700 11px/1.3 var(--mono)}.message p:last-child{margin-bottom:0}.artifact-note{margin:4px auto;width:min(94%,850px);padding:10px 13px;border:1px dashed var(--line-strong);color:var(--muted);text-align:center;font-size:13px}
+    .helper{display:grid;grid-template-columns:.85fr 1.15fr;gap:18px}.helper-form,.recommendation{padding:20px;border:1px solid var(--line-strong);background:var(--surface)}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field label{color:var(--muted);font-size:12px;font-weight:700}.field select{width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--line-strong);border-radius:5px;background:#fff;color:var(--ink)}.recommendation{border-top:5px solid var(--gold)}.recommendation .skill-answer{display:inline-block;margin:5px 0 12px;padding:5px 9px;background:var(--gold-soft);color:#6a470b;font:750 15px/1.4 var(--mono)}.mini-prompt{position:relative;margin-top:13px;padding:13px 95px 13px 13px;background:#1c2934;color:white;font:12px/1.65 var(--mono);white-space:pre-wrap}.mini-prompt .copy{min-height:32px;font-size:12px}
+    .comparison{width:100%;border-collapse:collapse;border:1px solid var(--line-strong);background:var(--surface)}.comparison th,.comparison td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.comparison th{background:#e9e8e2;font-size:13px}.comparison tr:last-child td{border-bottom:0}.comparison td:nth-child(2){border-left:4px solid var(--new)}.comparison td:nth-child(3){border-left:4px solid var(--inc)}
+    .checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.check{display:flex;gap:11px;align-items:flex-start;padding:14px;border:1px solid var(--line);background:var(--surface)}.check:before{content:"";flex:0 0 18px;height:18px;margin-top:3px;border:2px solid var(--line-strong);border-radius:3px}.check strong{display:block}.check span{color:var(--muted);font-size:14px}.outside{margin-top:18px;padding:17px;border-left:4px solid var(--line-strong);background:#ecebe5}.outside p:last-child{margin-bottom:0}
+    footer{padding:38px 0 62px;color:var(--muted);font-size:14px}.footer-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}.toast{position:fixed;right:20px;bottom:20px;z-index:50;padding:10px 14px;border-radius:5px;background:var(--navy);color:#fff;opacity:0;transform:translateY(9px);pointer-events:none;transition:.16s}.toast.show{opacity:1;transform:none}
+    @media(max-width:900px){.section-head{grid-template-columns:105px minmax(0,1fr)}.route-case,.helper{grid-template-columns:1fr}.stage summary{grid-template-columns:64px minmax(0,1fr)}.chips{grid-column:2;justify-content:flex-start}.execution{grid-template-columns:1fr}.timeline a{flex-basis:145px}}
+    @media(max-width:700px){.wrap{width:calc(100% - 24px)}.topbar{position:static}.nav{display:block;padding:12px 0}.brand{display:block;margin-bottom:9px}.navlinks{margin:0}.hero{padding:44px 0 34px}.route-summary,.principles,.context-grid,.finish-grid,.branches,.checklist,.footer-grid{grid-template-columns:1fr}.branch:last-child{grid-column:auto}section{padding:48px 0}.section-head{display:block}.section-no{display:block;margin-bottom:8px}.stage summary{grid-template-columns:54px minmax(0,1fr);padding-right:42px}.stage-title strong{font-size:18px}.io{grid-template-columns:1fr}.io-arrow{transform:rotate(90deg);height:28px}.fields{grid-template-columns:1fr}.comparison,.comparison tbody,.comparison tr,.comparison td{display:block;width:100%}.comparison thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.comparison tr{padding:12px;border-bottom:1px solid var(--line-strong)}.comparison td{display:grid;grid-template-columns:90px 1fr;gap:8px;padding:6px 0;border:0!important}.comparison td:before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:700}.message{max-width:95%}}
+    @media(max-width:375px){.wrap{width:calc(100% - 20px)}h1{font-size:36px}.route-tabs{display:grid;grid-template-columns:1fr}.stage summary{grid-template-columns:44px minmax(0,1fr);gap:10px}.stage-index{width:42px;height:42px}.prompt{padding:58px 14px 15px}.mini-prompt{padding:52px 12px 12px}.teaching-head{display:block}.route-marker{display:block;margin-top:8px}}
+    @media(prefers-color-scheme:dark){:root{color-scheme:dark;--paper:#171c20;--surface:#20272d;--ink:#edf1f3;--muted:#a8b2ba;--line:#39434b;--line-strong:#56636d;--navy:#101a22;--new:#79b9e7;--new-soft:#21384a;--inc:#76c59e;--inc-soft:#203c30;--warn:#ef9677;--warn-soft:#472b23;--gold:#e0b35f;--gold-soft:#41351e}.principle,.context-box,.io-box,.chip,.comparison th,.branch .path{background:#283038}.field select{background:#171c20;color:var(--ink)}code{background:#2b333a}.done{background:#20362b;border-color:#476f59}.hero-rule,.route-summary article,.stage,.helper-form,.recommendation,.branch,.message,.check{background:var(--surface)}.topbar{background:rgba(23,28,32,.96)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+    @media print{.topbar,.route-tabs,.dialogue-tabs,.helper,.copy,.toast{display:none!important}.wrap{width:100%}body{background:white;color:black}.stage{break-inside:avoid}.stage>*{display:block!important}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">跳到正文</a>
+  <div class="topbar"><nav class="nav wrap" aria-label="教程目录"><a class="brand" href="#top">Matt Pocock Skills<small>Codex 双场景工程实战</small></a><div class="navlinks"><a href="#mental-model">认知</a><a href="#route-map">路线</a><a href="#stage-teaching">阶段</a><a href="#branches">支线</a><a href="#dialogues">对话</a><a href="#decision-helper">决策器</a><a href="#checklist">检查表</a></div></nav></div>
+
+  <header class="hero" id="top"><div class="wrap">
+    <p class="eyebrow">From idea to reviewed change</p>
+    <h1>在 Codex 里，<br>走对一条工程路线。</h1>
+    <p class="lede">同一套 Matt Pocock Skills，在新项目 0→1和已有项目增量开发中，起点、判断依据和支线完全不同。这份教程用两个连续案例，教你何时调用、给什么输入、期待什么输出。</p>
+    <div class="hero-rule"><div><strong>先记住这一条</strong>Skill 是条件路由，不是打卡清单。每个阶段只调用能消除当前不确定性的技能；如果产物已经存在，就直接把它交给下一阶段。</div></div>
+    <div class="route-summary"><article><h3>路线 A · 新项目 0→1</h3><p>AI 客户访谈洞察平台：从模糊产品想法走到第一个通过审查的纵向切片。</p></article><article><h3>路线 B · 已有项目增量</h3><p>给已上线平台增加团队邀请与角色权限：先尊重现有事实，再完成小而完整的变更。</p></article></div>
+  </div></header>
+
+  <main id="content">
+    <section id="mental-model"><div class="wrap">
+      <div class="section-head"><span class="section-no">01 / MENTAL MODEL</span><div><h2>使用前先把四件事分开</h2><p class="intro">很多误用不是 Skill 不好，而是把路由器、编排器、底层纪律和产物当成一回事。</p></div></div>
+      <div class="principles">
+        <article class="principle"><b>USER-INVOKED</b><h3>用户调用型是流程入口</h3><p><code>grill-with-docs</code>、<code>to-spec</code>、<code>implement</code> 等需要你明确启动。它们负责组织一段流程。</p></article>
+        <article class="principle"><b>MODEL-INVOKED</b><h3>模型调用型是底层纪律</h3><p><code>tdd</code>、<code>domain-modeling</code>、<code>codebase-design</code> 可能被任务描述或其他 Skill 拉起。不要在编排器已经包含它们时重复启动。</p></article>
+        <article class="principle"><b>ARTIFACTS</b><h3>产物是阶段之间的接口</h3><p><code>CONTEXT.md</code>、ADR、Spec、Tickets、测试和 Review Report 承接上下文。下一阶段读产物，不重新发明需求。</p></article>
+        <article class="principle"><b>HUMAN GATES</b><h3>用户负责不可逆决策</h3><p>范围、测试 seam、Ticket 粒度、Issue 状态、Commit 和冲突取舍需要人工确认。Skill 负责准备证据，不替你拥有决策。</p></article>
+      </div>
+      <div class="invoke-note"><strong>Codex 调用写法：</strong>官方仓库用 <code>/skill-name</code> 表示用户调用。实际界面取决于安装方式；最稳妥的写法是同时明确点名技能和任务，例如：“使用 <code>grill-with-docs</code>，围绕以下想法逐项访谈……”</div>
+    </div></section>
+
+    <section id="route-map"><div class="wrap">
+      <div class="section-head"><span class="section-no">02 / ROUTE MAP</span><div><h2>先选项目状态，再看当前问题</h2><p class="intro">切换路线查看完整阶段。节点不是每次必走，斜杠后的技能是条件分支。</p></div></div>
+      <div class="route-tabs" role="tablist" aria-label="选择工程路线"><button class="route-tab" type="button" role="tab" aria-selected="true" data-route="route-new">新项目 0→1</button><button class="route-tab" type="button" role="tab" aria-selected="false" data-route="route-increment">已有项目增量</button></div>
+      <div class="route-case"><article class="case-card" id="case-card"></article><article class="route-goal" id="route-goal"></article></div>
+      <div class="timeline" id="timeline" aria-label="当前路线阶段"></div>
+      <p class="branch-hint"><strong>分支提示：</strong><span id="branch-hint"></span></p>
+    </div></section>
+
+    <section id="stage-teaching"><div class="wrap">
+      <div class="section-head"><span class="section-no">03 / STAGE PLAYBOOK</span><div><h2>逐阶段看场景、输入与输出</h2><p class="intro">展开任一阶段，照着“进入条件 → 提示词 → 人工确认 → 完成标准”走。提示词是教学模板，应替换为你项目的真实信息。</p></div></div>
+      <div class="teaching-head"><div><h3 id="teaching-title">新项目 0→1阶段教学</h3><p id="teaching-subtitle" class="intro"></p></div><span id="route-marker" class="route-marker new">ROUTE A · GREENFIELD</span></div>
+      <div class="stages" id="stages"></div>
+      <noscript><div class="invoke-note">浏览器禁用了 JavaScript。核心路线仍显示在上方；启用 JavaScript 后可查看全部阶段教学与提示词。</div></noscript>
+    </div></section>
+
+    <section id="branches"><div class="wrap">
+      <div class="section-head"><span class="section-no">04 / BRANCHES</span><div><h2>五个信号出现时，离开主线</h2><p class="intro">支线用于解决主流程无法回答的问题。问题解决后带着产物返回，而不是把支线无限延长。</p></div></div>
+      <div class="branches" id="branch-grid"></div>
+    </div></section>
+
+    <section id="dialogues"><div class="wrap">
+      <div class="section-head"><span class="section-no">05 / CODEX DIALOGUE</span><div><h2>在 Codex 中，一轮正确的协作长什么样</h2><p class="intro">以下是教学对话，不是假装真实执行结果。注意用户何时提供输入、Codex 何时停下等待、产物如何传给下一阶段。</p></div></div>
+      <div class="dialogue-tabs"><button type="button" class="dialogue-tab active" data-dialogue="new">0→1：从访谈到 Spec</button><button type="button" class="dialogue-tab" data-dialogue="increment">增量：从既有事实到实现</button></div>
+      <div class="dialogue" id="dialogue"></div>
+    </div></section>
+
+    <section id="decision-helper"><div class="wrap">
+      <div class="section-head"><span class="section-no">06 / DECISION HELPER</span><div><h2>你现在应该调用哪个 Skill？</h2><p class="intro">选择当前事实，不要选择你希望使用的技能。决策器只给建议，不运行任何操作。</p></div></div>
+      <div class="helper">
+        <form class="helper-form" id="helper-form"><div class="fields">
+          <div class="field"><label for="project-state">项目状态</label><select id="project-state"><option value="new">新项目</option><option value="existing">已有项目</option></select></div>
+          <div class="field"><label for="task-type">当前任务</label><select id="task-type"><option value="idea">模糊想法</option><option value="feature">明确增量需求</option><option value="issue">外部 Issue / PR</option><option value="bug">故障或性能问题</option><option value="architecture">架构与测试 seam 问题</option></select></div>
+          <div class="field"><label for="task-scale">规模</label><select id="task-scale"><option value="scoped">一轮会话可看清</option><option value="huge">跨多个会话仍有迷雾</option></select></div>
+          <div class="field"><label for="runnable-question">是否需要运行起来才能决定</label><select id="runnable-question"><option value="no">不需要</option><option value="yes">需要逻辑或 UI 原型</option></select></div>
+        </div></form>
+        <article class="recommendation" id="recommendation"></article>
+      </div>
+    </div></section>
+
+    <section id="comparison"><div class="wrap">
+      <div class="section-head"><span class="section-no">07 / COMPARISON</span><div><h2>两条路线最容易混淆的地方</h2><p class="intro">增量开发不是缩短版 0→1。它多了既有约束、回归风险和变更基线。</p></div></div>
+      <table class="comparison"><thead><tr><th>比较点</th><th>新项目 0→1</th><th>已有项目增量</th></tr></thead><tbody>
+        <tr><td data-label="比较点">起点</td><td data-label="0→1">目标与未知，事实源尚未建立</td><td data-label="增量">现有代码、CONTEXT、ADR、Issue 与用户行为</td></tr>
+        <tr><td data-label="比较点">首要风险</td><td data-label="0→1">方向没想清就开始写代码</td><td data-label="忽略既有决策，破坏兼容性或重复已有能力</td></tr>
+        <tr><td data-label="比较点">澄清入口</td><td data-label="0→1"><code>wayfinder</code> 或 <code>grill-with-docs</code></td><td data-label="内部需求用 <code>grill-with-docs</code>；外部请求用 <code>triage</code></td></tr>
+        <tr><td data-label="比较点">领域模型</td><td data-label="0→1">第一次建立 canonical terms</td><td data-label="增量修改必须先与现有词汇对照</td></tr>
+        <tr><td data-label="比较点">原型目的</td><td data-label="0→1">验证核心状态模型或产品交互</td><td data-label="验证新行为如何嵌入既有模块与 UI</td></tr>
+        <tr><td data-label="比较点">Spec 重点</td><td data-label="0→1">V1 能力、范围、测试 seams</td><td data-label="行为变化、兼容性、迁移、回归和明确不修改项</td></tr>
+        <tr><td data-label="比较点">审查基线</td><td data-label="0→1">Spec 与项目初始标准</td><td data-label="固定 merge-base、原始 Issue/Spec 与现有标准</td></tr>
+        <tr><td data-label="比较点">常见误用</td><td data-label="0→1">把所有未知都塞进第一版</td><td data-label="把增量需求当成新系统重做，产生 scope creep</td></tr>
+      </tbody></table>
+    </div></section>
+
+    <section id="checklist"><div class="wrap">
+      <div class="section-head"><span class="section-no">08 / PRACTICE CHECKLIST</span><div><h2>在自己的工程中照着检查</h2><p class="intro">当每一项都有明确答案，你已经从“会调用 Skill”进入“会组织工程流程”。</p></div></div>
+      <div class="checklist">
+        <div class="check"><div><strong>我知道当前是新项目还是增量任务</strong><span>两者的输入、风险和起始 Skill 不同。</span></div></div>
+        <div class="check"><div><strong>我只选了一个主流程入口</strong><span>没有同时启动多个访谈或规划编排器。</span></div></div>
+        <div class="check"><div><strong>事实和决策有唯一落点</strong><span>CONTEXT 存词汇，ADR 存难逆权衡，Spec 存本次需求。</span></div></div>
+        <div class="check"><div><strong>我知道哪些问题必须用原型回答</strong><span>只有纸面无法决定的状态或 UI 才进入 prototype。</span></div></div>
+        <div class="check"><div><strong>测试 seam 已经得到确认</strong><span>测试观察公共行为，不跟内部实现绑定。</span></div></div>
+        <div class="check"><div><strong>Tickets 是纵向且可单独验证的</strong><span>不是数据库、后端、前端各一张水平 Ticket。</span></div></div>
+        <div class="check"><div><strong>实现阶段只有一个编排器</strong><span>implement 已含 tdd 和 code-review，不重复启动另一套流程。</span></div></div>
+        <div class="check"><div><strong>审查有固定基线与 Spec 来源</strong><span>Standards 和 Spec 两轴分开，不互相掩盖。</span></div></div>
+        <div class="check"><div><strong>上下文过长时先 handoff</strong><span>新会话引用既有产物，不在衰退上下文里硬撑。</span></div></div>
+        <div class="check"><div><strong>任何外部写入都经过人工确认</strong><span>Issue、标签、Commit、Merge 与关闭请求都不是默认授权。</span></div></div>
+      </div>
+      <div class="outside"><h3>流程外独立工具</h3><p><code>teach</code> 用于多会话教学空间，<code>writing-great-skills</code> 用于 Skill 设计与评审。它们有价值，但不是本教程两条工程交付路线的一环；不要为了“用全 22 个”而硬插进项目流程。</p></div>
+    </div></section>
+  </main>
+
+  <footer id="sources"><div class="wrap footer-grid"><div><h3>事实来源</h3><p>流程行为依据 <a href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">mattpocock/skills 官方仓库</a>及其公开 SKILL.md，核验日期 2026-07-20。页面中的案例、提示词和人工门槛是教学编排。</p></div><div><h3>边界</h3><p>本页不会安装或调用 Skill，不连接 Tracker，不创建代码库。实际执行前，请先检查技能版本、项目 AGENTS.md/CLAUDE.md 和写权限。</p><p><a href="#top">返回顶部 ↑</a></p></div></div></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite">已复制提示词</div>
+
+  <script>
+    // Offline-first: no CDN scripts, fonts, or runtime network calls.
+    const routes = [
+      { id: "route-new", kind: "new", label: "新项目 0→1", marker: "ROUTE A · GREENFIELD", title: "AI 客户访谈洞察平台", scene: "从模糊产品想法出发，逐步确定领域语言、V1 范围、测试 seam 和首批纵向 Tickets。", goal: "走到一个通过双轴审查的可验证 V1 切片，而不是一次设计完整平台。", hint: "路线看不清且跨多个会话时用 wayfinder；一轮持续讨论可以澄清时直接 grill-with-docs。" },
+      { id: "route-increment", kind: "increment", label: "已有项目增量", marker: "ROUTE B · EXISTING CODEBASE", title: "团队邀请与角色权限", scene: "在已上线平台加入邀请有效期、撤销、重复接受保护、角色权限和审计记录。", goal: "尊重现有领域模型与 ADR，以最小完整变更交付功能，并控制回归风险。", hint: "外部 Issue/PR 先 triage，内部需求先 grill-with-docs；若本质是故障，切换 diagnosing-bugs。" }
+    ];
+
+    const stages = [
+      { stageId:"new-01",route:"route-new",stageNumber:"01",title:"项目级准备",scene:"你已经在 Codex 中打开一个新仓库，技能本体可能已安装，但仓库还没有 Tracker、领域文档与标签约定。",entryCondition:"第一次在该仓库使用 Matt 工程技能。",purpose:"建立后续技能共同依赖的项目级约定，避免每个 Skill 猜测 Issue、CONTEXT 和 ADR 放在哪里。",primarySkills:["setup-matt-pocock-skills"],whyTheseSkills:"setup 是官方工程主流程的前置条件。它先探索，再展示拟写入内容，最后在用户确认后配置，而不是盲目生成模板。",inputs:["仓库根目录","现有 AGENTS.md 或 CLAUDE.md","git remote 与 Tracker 偏好","是否安装 triage","是否为大型 monorepo"],codexPrompt:"使用 setup-matt-pocock-skills 配置当前仓库。先只读扫描现有 AGENTS.md/CLAUDE.md、git remote、CONTEXT、ADR 和 docs/agents；展示发现与拟写入文件，等我逐项确认后再修改。",codexActions:["检测 Git 与现有 Agent 指令","判断 GitHub/GitLab/本地/其他 Tracker","决定单一或多上下文领域文档布局","展示 Agent skills 配置块和 docs/agents 草稿","等待确认后写入"],outputs:["docs/agents/issue-tracker.md","docs/agents/domain.md","可选 docs/agents/triage-labels.md","AGENTS.md 或 CLAUDE.md 中的 Agent skills 区块"],humanGate:"确认 Tracker、标签、文档布局和即将修改的 Agent 指令。",doneWhen:["其他工程 Skill 能明确读取 Tracker 与领域文档约定","没有重复的 Agent skills 区块","现有用户规则未被覆盖"],misuses:["每次任务都重新运行 setup","未审阅就允许覆盖 AGENTS.md/CLAUDE.md","同时维护两套领域文档位置"],next:"进入 ask-matt，判断这个新项目需要短主线还是 Wayfinder。" },
+      { stageId:"new-02",route:"route-new",stageNumber:"02",title:"选择主路线",scene:"你知道要做“AI 客户访谈洞察平台”，但不知道应该直接访谈、先研究、先原型，还是建立多会话决策地图。",entryCondition:"项目级约定已经建立，当前仍处于路线选择。",purpose:"用路由器判断主流程与必要支线，避免靠记忆从 22 个技能中盲选。",primarySkills:["ask-matt"],whyTheseSkills:"ask-matt 不产生 Spec 或代码，它只根据任务规模、代码库状态与未知类型推荐正确入口。",inputs:["一句话项目目标","是否已有代码库","预计能否在一个会话内看清关键决策","哪些问题必须运行起来才能决定"],codexPrompt:"/ask-matt 我正在从 0 到 1 设计“AI 客户访谈洞察平台”。目标是先交付可验证 V1。目前还没确定数据边界、AI 输出审核方式和核心工作流。请判断该走 wayfinder 还是 grill-with-docs，并指出需要的 research/prototype 支线。",codexActions:["判断任务是否超出单会话 smart zone","区分主流程、on-ramp 与 standalone 技能","给出路线顺序与分支进入条件","提醒 setup 前置条件"],outputs:["一条推荐主流程","支线技能及触发条件","上下文管理建议"],humanGate:"接受或调整路线；路由建议不是自动授权执行。",doneWhen:["能说清下一步只调用哪一个技能","知道何时进入 research/prototype","没有并行启动两个主编排器"],misuses:["把 ask-matt 当成项目规划器","安装少量技能却期待路由器推荐不存在的流程","得到路线后仍一次调用所有技能"],next:"如果路线仍跨多会话不可见，进入 wayfinder；否则直接 grill-with-docs。" },
+      { stageId:"new-03",route:"route-new",stageNumber:"03",title:"判断是否需要决策地图",scene:"项目可能包含导入、AI 提炼、人工审核、标签协作、报告与权限，尚不清楚哪些决策先后依赖。",entryCondition:"路线判断认为任务超出一个会话，且你连完整问题清单都无法稳定列出。",purpose:"把巨大目标转为可共享的决策地图，逐步清除 fog of war，而不是提前拆开发 Tickets。",primarySkills:["wayfinder（仅大型项目）"],whyTheseSkills:"wayfinder 产出决策而非代码。它适合路线不可见的大型努力；如果关键问题已经能一次说清，使用它会制造不必要的 Tracker 开销。",inputs:["Destination：本轮要找到什么路线","已知决策","当前可明确的问题","尚不能精确描述的迷雾区域","Tracker 配置"],codexPrompt:"使用 wayfinder 为“AI 客户访谈洞察平台 V1”建立决策地图。Destination 是形成一份可进入 to-spec 的 V1 路线。先通过 grilling 明确 destination，再只创建当前能准确表述的决策 Tickets；不要实现功能。",codexActions:["确认 destination 与范围","广度优先发现首批决策","创建 Map 与 research/prototype/grilling/task Tickets","建立阻塞边与 frontier","把不够明确的问题保留在 Not yet specified"],outputs:["Wayfinder Map","首批决策 Tickets","Decisions-so-far 索引","Not yet specified 与 Out of scope"],humanGate:"确认 destination、首批 Ticket 和阻塞关系；外部 Tracker 写入前确认。",doneWhen:["路线已清晰到可以进入 to-spec","地图中没有仍阻塞 Spec 的未解决决策","决策细节只存在对应 Ticket，不在 Map 重复"],misuses:["把 wayfinder 当开发 Backlog","在一个会话里解决多个 HITL Ticket","地图没收敛就直接 implement"],next:"地图收敛后进入 to-spec；如果一开始就不需要地图，跳到 grill-with-docs。" },
+      { stageId:"new-04",route:"route-new",stageNumber:"04",title:"需求访谈与领域建模",scene:"“访谈”“洞察”“机会”“标签”等词看似清楚，但不同人理解不同，V1 还缺关键业务分支。",entryCondition:"项目范围能在当前上下文中持续澄清，或 Wayfinder 已把待讨论问题收敛。",purpose:"沿决策树一次解决一个问题，同时建立统一领域语言和真正需要的 ADR。",primarySkills:["grill-with-docs","domain-modeling"],whyTheseSkills:"grill-with-docs 负责访谈节奏；domain-modeling 负责挑战术语、检查代码/场景一致性并即时更新 CONTEXT。",inputs:["产品目标与目标用户","Wayfinder 决策（若有）","已有研究资料","约束、明确不做事项","用户可实时回答"],codexPrompt:"使用 grill-with-docs 访谈“AI 客户访谈洞察平台 V1”。一次只问一个问题，每题给推荐答案。使用 domain-modeling 区分 Transcript、Evidence、Insight、Opportunity；术语确认后即时更新 CONTEXT.md，只有难逆且意外的真实权衡才提议 ADR。",codexActions:["逐分支提出一个问题","事实可查时先查而不是问用户","用边界场景压力测试领域关系","即时维护 glossary","把难逆权衡提议为 ADR"],outputs:["已解决的决策树","CONTEXT.md 中的 canonical terms","少量满足条件的 ADR","明确范围与开放问题"],humanGate:"每个业务决策由用户确认；直到双方明确说已形成共同理解。",doneWhen:["关键业务分支都有答案","术语没有重载与冲突","开放问题被分派给 research/prototype 或明确出范围"],misuses:["一次问五个问题","把实现细节写进 CONTEXT.md","为每个普通选择都创建 ADR","访谈未完成就急着 to-spec"],next:"把事实未知交给 research，把纸面无法决定的问题交给 prototype。" },
+      { stageId:"new-05",route:"route-new",stageNumber:"05",title:"研究与原型验证",scene:"团队不知道转录 API 的真实限制，也无法仅靠讨论判断“AI 提炼→人工审核→发布”的状态模型是否顺手。",entryCondition:"存在可独立查证的外部事实，或一个需要运行/看到才能回答的设计问题。",purpose:"用一手来源消除事实未知，用可丢弃原型提高讨论保真度；只保留结论，不把实验代码当产品代码。",primarySkills:["research","prototype","handoff（跨会话时）"],whyTheseSkills:"research 解决“事实是什么”，prototype 解决“这样设计是否可行/顺手”。两者都为主流程提供证据，不替代需求决策。",inputs:["具体研究问题或原型问题","官方来源范围","项目运行约定","逻辑原型或 UI 原型分支"],codexPrompt:"使用 research 调研主流转录 API 对长音频、说话人分离和数据保留的官方限制，输出带逐项引用的 Markdown。另使用 prototype 做一个可丢弃的终端状态机，只回答“Insight 从 AI 草稿到人工批准再到发布的状态是否足够”。",codexActions:["research 使用官方文档/标准/源码","prototype 选择逻辑或 UI 分支","提供一条运行命令并显式展示状态","跳过生产级抽象和非必要错误处理","记录问题、结论与证据指针"],outputs:["带引用研究文档","可丢弃原型与运行说明","被验证或否定的设计结论","回到主线程的 handoff 指针"],humanGate:"确认原型回答了原问题；确认哪些结论进入正式 Spec。",doneWhen:["每个支线只回答一个明确问题","研究结论可追溯一手来源","原型没有混入生产主分支","验证结论已带回主流程"],misuses:["把 research 当二手文章汇总","原型开始补测试、容错和架构","没有明确问题就做多个 UI 变体","忘记把结论写回主线程"],next:"用 domain-modeling 把新证据反映到词汇和必要 ADR，再进入 to-spec。" },
+      { stageId:"new-06",route:"route-new",stageNumber:"06",title:"固化领域语言",scene:"研究和原型验证了 Evidence、Insight Draft、Approved Insight 的边界，需要让后续代码、测试和 Tickets 使用同一种语言。",entryCondition:"关键外部事实和原型结论已经明确，领域词汇需要最终对齐。",purpose:"更新项目统一语言，使 Spec、接口、测试名和代码名能够压缩表达而不丢失含义。",primarySkills:["domain-modeling"],whyTheseSkills:"这里不是再次访谈，而是把已经得到的证据与决策对照 glossary，解决矛盾并记录高价值概念。",inputs:["现有 CONTEXT.md","研究报告","原型结论","最新业务决策"],codexPrompt:"使用 domain-modeling 对照研究与原型结论，审查 CONTEXT.md 中 Transcript、Evidence、Insight Draft、Approved Insight、Opportunity 的定义。只修改有新证据支撑的术语；发现代码/决策矛盾时先报告并等我选择。",codexActions:["挑战重载或模糊术语","用具体边界场景检查关系","更新 glossary 而非实现说明","只在三条件满足时提议 ADR"],outputs:["最终 glossary","必要 ADR","供 Spec 使用的统一术语"],humanGate:"任何改变业务概念含义的修改都由用户确认。",doneWhen:["后续 Spec 可只用 canonical terms 表达","CONTEXT 不含实现细节","研究结论与领域定义无冲突"],misuses:["把 CONTEXT 当 PRD","批量写入尚未确认词汇","为了显得完整创造无用术语"],next:"进入 to-spec，把已有对话和证据综合为可交付规格。" },
+      { stageId:"new-07",route:"route-new",stageNumber:"07",title:"生成 V1 Spec",scene:"关键问题已经讨论清楚，需要把对话、领域语言、研究和原型结论变成一个工程团队可执行的规格。",entryCondition:"共同理解已形成，不再需要继续访谈；测试 seam 可以被明确讨论。",purpose:"综合已有上下文形成 Spec/PRD，锁定用户行为、实现决策、测试决策与范围。",primarySkills:["to-spec"],whyTheseSkills:"to-spec 不重新访谈，只综合已经讨论过的内容；唯一需要额外确认的是测试 seam 是否符合预期。",inputs:["当前完整对话","CONTEXT 与 ADR","研究和原型结论","代码库探索（若已有）","Tracker 配置"],codexPrompt:"使用 to-spec 把当前对话综合为“AI 客户访谈洞察平台 V1”Spec。不要重新访谈。先提出最高层可测试 seam 并让我确认，然后写问题、方案、完整用户故事、实现决策、测试决策、Out of Scope 和 Further Notes。",codexActions:["探索现有仓库状态（若有）","优先使用已有高层 seam","请求用户确认测试 seam","用项目领域词汇写完整用户故事","发布到已配置 Tracker 并标记 ready-for-agent"],outputs:["单一 V1 Spec/PRD","确认后的测试 seams","ready-for-agent Spec Issue"],humanGate:"确认测试 seam、范围与 Spec 草稿；发布 Tracker 属于外部写入。",doneWhen:["用户故事覆盖已确认行为与失败路径","没有具体易过期文件路径","Out of Scope 清晰","Spec 成为本轮唯一需求事实源"],misuses:["讨论未完成就调用 to-spec","让 to-spec 再做需求访谈","在 Spec 中放大量代码路径和实现片段","保留另一份平行 PRD"],next:"若工作无法在一个上下文完成，进入 to-tickets；很小的任务可直接 implement。" },
+      { stageId:"new-08",route:"route-new",stageNumber:"08",title:"拆成纵向 Tickets",scene:"V1 包含导入、分析、审核和报告，单个实现会话装不下，需要拆解但仍保持每片可演示。",entryCondition:"Spec 已确认，工作量超过一个新上下文窗口。",purpose:"生成 tracer-bullet 纵向切片和真实阻塞边，让每个 Ticket 独立穿过必要层并可验证。",primarySkills:["to-tickets"],whyTheseSkills:"to-tickets 按端到端行为拆分，而不是按数据库、后端、前端水平分工；每张 Ticket 适合一个新会话。",inputs:["已确认 Spec","领域词汇","代码库现状","Tracker 配置","原型中承载关键决策的片段"],codexPrompt:"使用 to-tickets 将 V1 Spec 拆成纵向 tracer-bullet Tickets。每张 Ticket 必须交付可演示的端到端行为、适合一个新上下文，并明确 Blocked by。先给编号草案和依赖图，等我确认粒度后再发布。",codexActions:["识别可单独验证的用户行为","优先安排必要 prefactoring","为每片定义验收标准","建立阻塞边与可并行 frontier","确认粒度后逐 Ticket 发布"],outputs:["每 Ticket 一份 Issue/文件","端到端 What to build","验收标准","阻塞关系与执行前沿"],humanGate:"确认粒度、依赖、是否合并或再拆；发布前确认外部写入。",doneWhen:["每片完成后都能演示或验证","每片可装入一个新会话","没有按技术层水平拆分","阻塞关系只表达真实门槛"],misuses:["数据库一张、API 一张、UI 一张","把所有 Ticket 合成一个文件","对 to-tickets 生成的 Ticket 再 triage","在 Ticket 写死易过期文件路径"],next:"为每个 frontier Ticket 开新上下文，使用 implement。" },
+      { stageId:"new-09",route:"route-new",stageNumber:"09",title:"Implement + TDD",scene:"首张 Ticket 是“上传一份访谈并看到可审核的 Insight Draft”，需要从公共接口开始实现一个完整切片。",entryCondition:"存在 ready-for-agent Spec/Ticket，测试 seam 已在 Spec 阶段确认。",purpose:"按一个失败行为测试、一个最小实现的红绿循环逐片交付，持续类型检查，最后做完整测试。",primarySkills:["implement","tdd","codebase-design（设计 seam 时）"],whyTheseSkills:"implement 是本阶段编排器，会在已约定 seam 使用 tdd，并在结束时调用 code-review。codebase-design 只在接口形状需要判断时提供深模块词汇。",inputs:["单张 Ticket","Spec 与验收标准","已确认测试 seams","项目运行/测试命令","CONTEXT 与 ADR"],codexPrompt:"使用 implement 完成“上传访谈并生成可审核 Insight Draft”Ticket。只处理本 Ticket 的验收标准。在已确认的 ingestion seam 使用 tdd：先运行失败测试，再写最小实现。定期运行类型检查和单测试文件，结束时运行全量测试并调用 code-review。",codexActions:["读取 Ticket、Spec、CONTEXT、ADR","确认或复述测试 seam","一个测试→运行变红→最小实现→运行变绿","避免 speculative generality","定期 typecheck，最后全量测试","结束时进入双轴 review 并提交当前分支"],outputs:["行为测试与最小实现","类型检查/测试证据","双轴审查结果","当前分支 Commit"],humanGate:"测试 seam 若与实际架构不符必须暂停确认；Commit 前确认授权。",doneWhen:["验收行为可从公共接口观察","测试确实先红后绿","全量检查通过","没有实现 Ticket 外功能","审查问题已处理或明确记录"],misuses:["手动再启动第二套实现编排器","一次写完所有测试再实现","测试内部私有方法","未看到红色失败就宣称 TDD","顺手实现下一张 Ticket"],next:"如果 implement 未自动完成审查，显式进入 code-review；否则根据审查结果修正。" },
+      { stageId:"new-10",route:"route-new",stageNumber:"10",title:"双轴代码审查",scene:"功能测试通过，但还需要分别回答“代码写得对不对”和“做的是不是 Spec 要的东西”。",entryCondition:"HEAD 相对固定基线有非空 diff，Spec 来源可定位。",purpose:"让 Standards 与 Spec 两个独立视角审查同一 diff，避免代码质量掩盖需求偏差，或反过来。",primarySkills:["code-review"],whyTheseSkills:"code-review 固定三点基线并用两个并行子代理保持视角隔离；没有子代理能力时应顺序执行但仍保持两份报告分离。",inputs:["固定点：commit/branch/tag/merge-base","非空 diff 与 commit 列表","Spec/Issue 来源","项目代码标准与 smell baseline"],codexPrompt:"使用 code-review 审查 main...HEAD。Spec 来源是已确认的 V1 Ticket。先确认 fixed point 可解析且 diff 非空；Standards 与 Spec 两轴分开报告，不合并优先级。若当前平台不能并行子代理，顺序执行但保持上下文和输出分离。",codexActions:["验证 fixed point 与非空 diff","定位 Spec 来源","收集仓库标准","独立执行 Standards 与 Spec 审查","并列呈现并统计每轴发现"],outputs:["Standards Review","Spec Review","各轴发现数量与最严重问题","明确的修正清单"],humanGate:"决定哪些判断型 smell 要修、哪些 Spec 偏差必须回到需求确认。",doneWhen:["两个轴都完成或明确说明缺失来源","每条硬违反有标准引用","每条 Spec 发现有需求引用","修正后重新验证"],misuses:["不指定基线就审查全部仓库","把两轴混成一个严重度榜","没有 Spec 却假装判断符合度","让工具检查已经覆盖的格式问题占满报告"],next:"审查通过后提交/保留分支；若需跨会话继续，进入 handoff。" },
+      { stageId:"new-11",route:"route-new",stageNumber:"11",title:"交接与下一会话",scene:"首个切片已经提交，后续还有 Tickets；当前上下文包含大量访谈、规格和实现细节，继续使用会降低推理质量。",entryCondition:"阶段自然结束、上下文接近 smart zone，或需要把工作交给另一 Agent/会话。",purpose:"压缩当前会话，只保留下一会话所需状态，并通过路径引用已有事实源。",primarySkills:["handoff"],whyTheseSkills:"handoff 用于开启新会话，而不是在原会话压缩继续；它引用 Spec、ADR、Tickets 和 Commit，不重复复制内容。",inputs:["下一会话目标","当前完成状态","已有产物路径/URL","未决问题","敏感信息清单"],codexPrompt:"/handoff 下一会话负责实现下一个无阻塞 Ticket。引用现有 Spec、CONTEXT、ADR、Ticket 与本次 Commit，不复制它们的正文。写明已完成、下一步、验证命令和建议调用的 Skill；脱敏所有凭据和个人信息。",codexActions:["确定下一会话焦点","汇总当前状态","引用已有产物","列出建议技能与验证命令","写入操作系统临时目录并报告路径"],outputs:["脱敏 Handoff Markdown","产物指针","下一会话第一步"],humanGate:"确认交接内容没有秘密、个人信息或错误完成状态。",doneWhen:["新会话仅靠 handoff 与引用产物即可开始","没有重复制造第二份 Spec","未完成事项和风险明确"],misuses:["把 handoff 当长期事实源","复制全部文档导致漂移","含 API Key 或个人信息","在原会话继续工作却又创建 handoff"],next:"新会话引用 Handoff，从下一个 frontier Ticket 的 implement 开始。" },
+
+      { stageId:"increment-01",route:"route-increment",stageNumber:"01",title:"读取现有事实",scene:"平台已经上线。你收到“增加团队邀请与角色权限”的内部需求，但还不了解现有 Account、User、Membership 模型和权限实现。",entryCondition:"任何已有代码库增量任务开始时。",purpose:"先建立当前系统事实模型，找到现有能力、约束、测试 seam 与历史决策，避免重建已有功能或推翻 ADR。",primarySkills:["Codex 常规探索","ask-matt（路线不确定时）"],whyTheseSkills:"读取资料本身不是 domain-modeling；只有需要改变术语时才调用它。先探索能减少后续向用户询问可查事实。",inputs:["AGENTS.md/CLAUDE.md","CONTEXT.md/CONTEXT-MAP","相关 ADR","Issue/PR/需求说明","代码与测试","近期相关提交"],codexPrompt:"先只读探索当前仓库中与 User、Account、Membership、Role、邀请邮件和审计日志相关的实现。读取 AGENTS.md/CLAUDE.md、CONTEXT 和相关 ADR，列出现有公共接口、测试 seam、已实现能力、冲突约束与未知项。暂不修改代码。",codexActions:["读取项目指令与领域文档","按领域概念搜索代码而非只搜需求措辞","定位公共接口与类似测试","检查既有实现与历史决策","把事实、推断和未知分开报告"],outputs:["现有系统事实摘要","相关模块与 seam","已有能力与重复风险","ADR 约束","需要用户决策的真实未知"],humanGate:"确认探索范围是否覆盖真实系统边界；纠正错误推断。",doneWhen:["能说清增量功能将触碰哪些现有行为","区分已实现、缺失与未知","没有开始写代码","已找到可复用测试模式"],misuses:["没读 CONTEXT/ADR 就访谈","把读 glossary 误称为 domain-modeling","只按“邀请”关键词搜索，漏掉 Membership 等领域概念","探索过程中顺手重构"],next:"判断需求来自内部想法、外部 Issue/PR，还是实际 Bug。" },
+      { stageId:"increment-02",route:"route-increment",stageNumber:"02",title:"判断需求来源",scene:"同一句“团队邀请有问题”可能是内部新功能、外部请求、已有故障或架构债务，入口选错会让流程失真。",entryCondition:"现有事实摘要已建立，需求来源与性质需要分类。",purpose:"决定使用 grill-with-docs、triage、diagnosing-bugs 或架构支线，避免用规格流程处理故障。",primarySkills:["ask-matt","triage / grill-with-docs / diagnosing-bugs"],whyTheseSkills:"入口由问题来源决定：你自己提出的增量无需 triage；外部请求需要验证和状态机；Bug 必须先建立反馈回路。",inputs:["需求来源","当前症状或目标","Issue/PR 内容","现有行为与期望行为","任务规模"],codexPrompt:"使用 ask-matt 判断这项工作入口：这是内部提出的团队邀请增量，不是外部 Issue，也不是当前故障。基于现有代码事实，说明应从 grill-with-docs 开始还是直接 to-spec，并列出触发 prototype 的条件。",codexActions:["区分内部想法、外部请求、Bug、架构问题","判断是否已有足够共同理解","推荐唯一入口与条件支线","不自动更改 Tracker 状态"],outputs:["需求类型","主流程入口","支线触发条件","不适用技能说明"],humanGate:"确认分类正确；尤其不要把 Bug 伪装成 enhancement。",doneWhen:["下一步只有一个主入口","清楚说明为何不用其他入口","外部写入仍未发生"],misuses:["对自己生成的 Ticket 再 triage","用 grill-with-docs 调查可复现 Bug","需求已清楚仍重复访谈","把架构优化混进功能范围"],next:"内部需求进入 grill-with-docs；外部 Issue/PR 进入 triage；Bug 进入 diagnosing-bugs。" },
+      { stageId:"increment-03",route:"route-increment",stageNumber:"03",title:"内部澄清或外部分诊",scene:"本案例是内部增量，需要定义邀请生命周期、角色变化、撤销、过期和重复接受；若来源是外部 Issue，则先验证其主张。",entryCondition:"入口已经分类。",purpose:"内部需求形成共同理解；外部请求通过验证、补充信息和状态机变成 agent-ready brief。",primarySkills:["grill-with-docs（内部）","triage（外部）","domain-modeling"],whyTheseSkills:"grill-with-docs 处理你能代表决策的内部想法；triage 处理到达项目的原始请求，并保存报告者与验证上下文。",inputs:["现有事实摘要","需求或 Issue/PR 全文","CONTEXT 与 ADR","权限和安全约束","用户可做的决策"],codexPrompt:"使用 grill-with-docs 澄清团队邀请与角色权限增量。一次一个问题，优先压力测试：邀请过期、撤销后接受、同邮箱重复邀请、现有成员再次接受、角色降级与审计。使用 domain-modeling 对照现有 User、Membership、Role 词汇，发现冲突先指出。",codexActions:["内部：逐分支访谈并维护领域语言","外部：读取完整 Issue/PR、检查重复实现与 prior rejection","外部：复现或验证主张","形成 ready-for-agent / needs-info / wontfix 等建议","任何标签或评论前等待确认"],outputs:["内部：已确认的行为矩阵与术语更新","外部：验证结论、状态建议和 Agent Brief","明确 Out of Scope"],humanGate:"确认业务分支；对 Issue 标签、评论、关闭等外部写入单独授权。",doneWhen:["所有影响现有用户的边界行为已明确","领域词汇与现有模型一致或已正式修订","外部请求有可行动状态","没有未经确认关闭 Issue"],misuses:["一次问多个安全决策","跳过现有成员与重复接受边界","外部请求未验证就 ready-for-agent","把暂不做的 enhancement 误记为已实现"],next:"若状态或接口还需运行验证，进入 prototype/codebase-design；否则进入增量 to-spec。" },
+      { stageId:"increment-04",route:"route-increment",stageNumber:"04",title:"验证状态与模块接口",scene:"现有 Membership 模块接口可能无法自然表达 Pending Invitation；需要判断新增实体、状态迁移与测试 seam。",entryCondition:"关键设计问题靠文字难以判断，或现有模块过浅、测试必须跨内部细节。",purpose:"用原型验证状态行为，用 codebase-design 选择深模块接口；若缺少正确 seam，单独进入架构改进支线。",primarySkills:["prototype","codebase-design","improve-codebase-architecture（条件）"],whyTheseSkills:"prototype 回答一个运行问题；codebase-design 比较接口深度、locality 与 leverage；架构扫描只有在真实摩擦阻塞变更时才启动。",inputs:["现有 Membership/Role 接口","邀请状态决策","类似测试","要回答的单一原型问题","近期修改热点"],codexPrompt:"使用 prototype 做一个可丢弃的邀请状态机，只回答：Pending、Accepted、Revoked、Expired 是否足以覆盖确认场景。随后使用 codebase-design 比较“Invitation 独立深模块”和“扩展 Membership 接口”两个方案，按 interface、seam、locality、leverage 和 deletion test 评估。",codexActions:["限定一个可运行问题","展示每次动作后的完整状态","提出至少两个接口方向","检查是否真的存在两个 adapter/变化源","识别正确测试 seam","原型结论写回需求，原型代码保持可丢弃"],outputs:["验证后的状态机","候选模块接口与 seam","选择理由","是否需要架构改进的结论"],humanGate:"确认状态模型与接口方向；架构改动若扩大范围必须另行批准。",doneWhen:["纸面未知被运行结果替代","选定接口能隐藏足够行为","测试可通过公共 seam 观察","原型没有变生产实现"],misuses:["没有明确问题就原型整个页面","一个 adapter 就提前抽象 seam","为了本需求顺手重构全仓库","直接测试数据库而绕过公共接口"],next:"把验证结论与不改动项写入增量 Spec。" },
+      { stageId:"increment-05",route:"route-increment",stageNumber:"05",title:"生成增量 Spec",scene:"需求和接口方向已确认，需要形成一份明确描述“改变什么、不改变什么、如何回归验证”的规格。",entryCondition:"现有事实、边界行为和设计验证已经完成。",purpose:"把增量需求综合为唯一 Spec，特别记录兼容性、迁移、审计、安全和 Out of Scope。",primarySkills:["to-spec"],whyTheseSkills:"to-spec 从现有对话合成，不重复访谈；它把增量行为与测试决定发布为 agent-ready 输入。",inputs:["现有系统事实摘要","澄清后的行为矩阵","CONTEXT/ADR","原型与接口结论","测试 seam","明确不修改项"],codexPrompt:"使用 to-spec 生成“团队邀请与角色权限”增量 Spec，不重新访谈。使用现有领域词汇，重点写清邀请生命周期、幂等与重复接受、安全权限、审计、邮件失败、兼容性、迁移、回归测试和明确不修改项。先让我确认最高层测试 seam。",codexActions:["验证现有 seam 是否可复用","定义用户可见行为与错误路径","记录实现决策但不写易过期文件路径","把兼容性与回归纳入测试决策","发布并标记 ready-for-agent"],outputs:["单一增量 Spec","测试 seams","兼容性与回归要求","Out of Scope"],humanGate:"确认现有行为不会被无意改变；确认权限和审计属于安全边界。",doneWhen:["每项行为变化都有用户故事或验收含义","迁移与回滚风险已描述","不修改项清晰","没有范围外架构重写"],misuses:["把现有平台当绿地重新设计","遗漏旧邀请/旧成员兼容性","Spec 只写成功路径","在多个文档维护不同版本需求"],next:"工作超过一个会话时进入 to-tickets；否则直接 implement。" },
+      { stageId:"increment-06",route:"route-increment",stageNumber:"06",title:"拆成纵向 Tickets",scene:"增量涉及邀请创建、接受、撤销、邮件和权限，但每一片都应保持 CI 绿色并可独立验证。",entryCondition:"增量 Spec 已批准，工作量需要多个新上下文。",purpose:"用最小端到端行为切片控制回归面，并把必要 prefactoring 放在真正阻塞的位置。",primarySkills:["to-tickets"],whyTheseSkills:"纵向 Ticket 让每个提交都可观察真实行为；如果是宽重构，则使用 expand–migrate–contract，而不是强行纵向切。",inputs:["增量 Spec","现有模块与测试","迁移约束","依赖与可并行点"],codexPrompt:"使用 to-tickets 拆分团队邀请增量。优先形成可独立验证的纵向切片，例如“管理员创建邀请并查询状态”“受邀人幂等接受”“管理员撤销并留下审计”。如果 schema 变更属于宽重构，使用 expand–migrate–contract 并明确阻塞边。",codexActions:["识别最小完整行为","区分纵向切片与宽重构","写验收标准与 Blocked by","保持每片可独立变绿","让用户确认粒度后发布"],outputs:["增量 Tickets","验收标准","迁移 Ticket 序列","可执行 frontier"],humanGate:"确认每片的用户价值、回归面和依赖关系。",doneWhen:["每 Ticket 能单独验证","迁移期间旧行为仍工作","没有按技术层分票","所有阻塞边都可解释"],misuses:["先改完整数据库再做所有 UI","把机械迁移与行为切片混成一票","每票都依赖所有其他票","忽略旧数据迁移"],next:"从无阻塞 Ticket 开新上下文运行 implement。" },
+      { stageId:"increment-07",route:"route-increment",stageNumber:"07",title:"增量 Implement + TDD",scene:"首张 Ticket 要让管理员创建邀请并看到 Pending 状态，同时不能破坏现有 Membership 创建流程。",entryCondition:"Ticket 已 ready-for-agent，基线测试可运行，seam 已确认。",purpose:"先锁定现有行为，再用红绿循环加入最小增量；每个切片保持类型、测试和兼容性证据。",primarySkills:["implement","tdd"],whyTheseSkills:"implement 负责编排完整实现；tdd 在公共 seam 逐行为前进。增量任务特别需要先确认基线绿色，才能区分旧故障与新回归。",inputs:["单张 Ticket","增量 Spec","固定基线与现有测试","公共测试 seam","迁移策略","项目检查命令"],codexPrompt:"使用 implement 完成“管理员创建邀请并查询 Pending 状态”Ticket。开始前运行相关基线测试并确认绿色；在 Invitation 公共 seam 使用 tdd，每次只做一个行为。保持现有 Membership 行为不变，定期 typecheck，结束时全量测试并 code-review。",codexActions:["先运行基线测试","写一个能因缺失增量而失败的测试","实现最小行为并变绿","运行受影响区域回归测试","检查 schema 兼容性与审计","全量检查与 review"],outputs:["增量实现","新行为测试","旧行为回归证据","迁移/审计结果","Review 与 Commit"],humanGate:"如果基线已红、seam 不正确或迁移不可逆，立即暂停并由用户决定。",doneWhen:["新验收行为通过","原有 Membership 行为通过","测试不是实现耦合","没有 Ticket 外变更","全量检查通过"],misuses:["基线测试红仍继续实现","用 mock 绕过真实公共 seam","一次实现所有 Tickets","为了测试暴露内部方法","未确认就执行不可逆迁移"],next:"对固定基线执行 code-review，分别检查 Standards 与 Spec。" },
+      { stageId:"increment-08",route:"route-increment",stageNumber:"08",title:"按固定基线双轴审查",scene:"增量功能工作正常，但必须确认 diff 没有破坏项目标准，也没有偷偷扩展角色系统范围。",entryCondition:"Ticket 实现结束，HEAD 与 merge-base 之间有非空 diff。",purpose:"分别审查代码标准与增量 Spec，重点发现 scope creep、遗漏回归路径和现有约定违反。",primarySkills:["code-review"],whyTheseSkills:"双轴隔离能抓住“代码漂亮但做错需求”和“需求正确但破坏仓库规范”两种问题。",inputs:["merge-base 或明确 commit","增量 Spec/Issue","commit 列表与 diff","CONTRIBUTING/编码标准","现有 smell baseline"],codexPrompt:"使用 code-review 审查 main...HEAD。Spec 来源为“团队邀请与角色权限”增量 Issue。Standards 轴检查仓库标准和 smell；Spec 轴检查遗漏、scope creep、错误实现与兼容性。两份报告分开展示并分别统计。",codexActions:["验证 fixed point 与非空 diff","定位原始 Spec","读取仓库标准","执行两轴审查","修正后重跑受影响与全量测试"],outputs:["Standards 报告","Spec 报告","修正记录","最终测试证据"],humanGate:"对判断型重构建议与超出 Spec 的改动做取舍。",doneWhen:["每轴问题都有依据","scope creep 已删除或回到需求确认","所有修正后验证通过","没有用代码质量掩盖需求偏差"],misuses:["用工作区当前状态替代固定基线","把整个历史遗留问题都算本次缺陷","没有 Spec 仍宣称 Spec pass","合并两轴导致严重需求遗漏被稀释"],next:"如果 merge/rebase 出现冲突，进入 resolving-merge-conflicts；否则进入交接收尾。" },
+      { stageId:"increment-09",route:"route-increment",stageNumber:"09",title:"条件式处理合并冲突",scene:"目标分支同时修改了 Membership 角色逻辑，rebase 出现冲突，简单选择 ours/theirs 会丢失一方业务意图。",entryCondition:"Git 已处于 merge 或 rebase 冲突状态；没有冲突则跳过本阶段。",purpose:"追溯双方一手意图，逐 hunk 保留兼容目标，验证并完成合并过程。",primarySkills:["resolving-merge-conflicts"],whyTheseSkills:"该技能要求先理解 commit、PR、Issue 的原始目的，再解冲突，不把文本合并等同于行为合并。",inputs:["当前冲突状态","双方 commit/PR/Issue","冲突文件","合并目标","项目类型/测试/格式命令"],codexPrompt:"使用 resolving-merge-conflicts 处理当前 rebase。先展示冲突状态、双方 commit 与原始 Issue 意图；逐 hunk 说明保留方案和取舍，不引入两边都未要求的新行为。运行类型检查、相关测试和全量测试。继续 rebase 前等我确认。",codexActions:["确认 merge/rebase 状态","寻找双方 primary sources","逐 hunk 按意图解决","执行自动检查","报告取舍并继续完成 Git 操作"],outputs:["解决后的冲突","意图取舍记录","验证结果","完成的 merge/rebase"],humanGate:"官方技能主张始终解决而非 abort；教程要求涉及不可逆取舍和继续 rebase 前明确确认。",doneWhen:["所有冲突 hunk 有意图依据","没有发明新行为","检查通过","Git 操作完成且历史符合目标"],misuses:["只选 ours/theirs 不看 Issue","冲突期间顺手重构","未验证就继续 rebase","用户未确认就处理不可逆取舍"],next:"进入 handoff 或由项目既定交付工具完成 PR/发布。" },
+      { stageId:"increment-10",route:"route-increment",stageNumber:"10",title:"交接与收尾",scene:"增量分支已经通过审查和测试，需要让下一会话处理剩余 Ticket、PR 反馈或发布准备。",entryCondition:"当前 Ticket 已完成，或上下文需要切换。",purpose:"把完成证据、剩余风险和下一步浓缩为新会话入口，同时引用而不复制事实源。",primarySkills:["handoff"],whyTheseSkills:"handoff 负责跨会话连续性；Matt 技能集没有完整部署编排器，后续交付遵循项目自身流程。",inputs:["完成的 Ticket/Commit","Spec 与 Review","验证命令和结果","剩余 Tickets","下一会话目标"],codexPrompt:"/handoff 下一会话处理团队邀请功能的下一张 frontier Ticket或 PR 反馈。引用增量 Spec、CONTEXT、ADR、Review 和 Commit；写明已完成行为、回归证据、剩余风险、第一条验证命令和建议 Skill，不复制文档正文。",codexActions:["聚焦下一会话用途","引用现有产物","记录完成状态与风险","脱敏内容","保存临时 Handoff 并报告路径"],outputs:["Handoff 文档","验证与风险摘要","下一会话入口"],humanGate:"确认完成状态真实、敏感信息已移除、未把发布描述成已完成。",doneWhen:["新会话可直接开始","事实源仍唯一","剩余风险与外部动作清楚","没有擅自声称 PR/部署完成"],misuses:["把 Handoff 当 Release Note","复制整个 Spec","遗漏失败测试或未解决 Review","把尚未授权的发布写成已完成"],next:"在新会话继续 frontier Ticket，或进入项目既定 PR/发布流程。" }
+    ];
+
+    const branches = [
+      {branchId:"bug",signal:"出现故障、失败或性能回退",skill:"diagnosing-bugs",path:"tight red-capable loop → reproduce → minimise → hypotheses → instrument → fix → regression",output:"一条能捕捉精确症状的命令、最小复现、回归测试和根因复盘",warning:"没有红色反馈回路时不要先猜原因。"},
+      {branchId:"no-seam",signal:"找不到能锁定真实行为的测试 seam",skill:"improve-codebase-architecture + codebase-design",path:"scan friction → HTML candidates → pick one → grill → design deeper module",output:"架构摩擦报告、深模块候选、接口与 seam 决策",warning:"架构改进应作为独立范围，不偷渡进功能 Ticket。"},
+      {branchId:"huge-fog",signal:"目标巨大，跨多个会话仍无法列清问题",skill:"wayfinder",path:"destination → map → decision tickets → frontier → decisions → to-spec",output:"共享决策地图与收敛后的路线",warning:"产出决策，不默认产出功能。"},
+      {branchId:"merge-conflict",signal:"Git 已进入 merge/rebase 冲突",skill:"resolving-merge-conflicts",path:"state → primary sources → resolve hunk intent → checks → finish",output:"保留双方兼容意图的合并结果与验证证据",warning:"重要取舍和继续 rebase 前保持人工确认。"},
+      {branchId:"context-limit",signal:"会话接近 smart zone 或需要分支实验",skill:"handoff",path:"summarise → reference artifacts → redact → new session",output:"脱敏 Handoff 与下一会话入口",warning:"handoff 是换新会话；compact 是留在原会话。"}
+    ];
+
+    const dialogues = {
+      new:[
+        {role:"user",text:"使用 grill-with-docs 访谈 AI 客户访谈洞察平台 V1。一次只问一个问题；使用 domain-modeling 维护 Transcript、Evidence、Insight 和 Opportunity 的精确定义。"},
+        {role:"codex",text:"先锁定 V1 的核心用户结果。推荐答案：研究员上传一次访谈后，能看到每条 Insight 对应的原始 Evidence，并决定批准或驳回。你是否接受这个结果作为 V1 主路径？"},
+        {role:"user",text:"接受，但批准后的 Insight 还需要被团队归入 Opportunity。"},
+        {role:"artifact",text:"CONTEXT.md 更新：Evidence 是原始访谈中的可引用片段；Insight 是由一个或多个 Evidence 支撑、可人工审核的判断；Opportunity 是团队确认后组织 Insight 的问题空间。"},
+        {role:"codex",text:"下一个决策：Opportunity 是自动生成还是只能由人创建？推荐 V1 只允许人工创建，因为自动归类会同时扩大模型评估和纠错范围。"},
+        {role:"user",text:"同意。剩余问题继续逐项确认，结束后再 to-spec。"}
+      ],
+      increment:[
+        {role:"user",text:"先只读探索现有 User、Membership、Role 和审计实现，不改代码。然后使用 grill-with-docs 澄清团队邀请增量。"},
+        {role:"codex",text:"现有 Membership 只有 active 状态，ADR-0007 要求角色变更必须写审计。第一个决策：邀请是否应复用 Membership？推荐独立 Invitation，因为未接受邀请还不是成员。"},
+        {role:"user",text:"接受独立 Invitation。过期或撤销后，旧链接不能重新激活。"},
+        {role:"artifact",text:"决策进入增量 Spec：Invitation 独立于 Membership；Accepted 后创建 Membership；Revoked/Expired 为终止态；所有管理员动作写审计。"},
+        {role:"user",text:"使用 to-spec 综合当前对话，不重新访谈。先让我确认测试 seam。"},
+        {role:"codex",text:"推荐最高测试 seam 是 Invitation 应用接口：管理员创建/撤销，受邀人接受，查询状态。邮件适配器作为内部依赖；测试不直接查询数据库。这个 seam 是否符合预期？"}
+      ]
+    };
+
+    const routeById = id => routes.find(route => route.id === id);
+    const stagesFor = id => stages.filter(stage => stage.route === id);
+    let activeRoute = "route-new";
+
+    const escapeHtml = value => String(value).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c]);
+    const list = values => `<ul>${values.map(value => `<li>${escapeHtml(value)}</li>`).join("")}</ul>`;
+
+    function renderRouteMap(routeId){
+      const route=routeById(routeId); const routeStages=stagesFor(routeId);
+      document.getElementById("case-card").innerHTML=`<small>${escapeHtml(route.marker)}</small><h3>${escapeHtml(route.title)}</h3><p>${escapeHtml(route.scene)}</p>`;
+      document.getElementById("route-goal").innerHTML=`<h3>本路线终点</h3><p>${escapeHtml(route.goal)}</p>`;
+      document.getElementById("branch-hint").textContent=route.hint;
+      document.getElementById("timeline").innerHTML=routeStages.map(stage=>`<a href="#stage-${escapeHtml(stage.stageId)}"><b>${stage.stageNumber}</b><span>${escapeHtml(stage.title)}</span><code>${escapeHtml(stage.primarySkills[0])}</code></a>`).join("");
+    }
+
+    function renderStages(routeId){
+      const route=routeById(routeId); const routeStages=stagesFor(routeId);
+      document.getElementById("teaching-title").textContent=`${route.label}阶段教学`;
+      document.getElementById("teaching-subtitle").textContent=route.goal;
+      const marker=document.getElementById("route-marker"); marker.textContent=route.marker; marker.className=`route-marker ${route.kind}`;
+      document.getElementById("stages").innerHTML=routeStages.map((s,index)=>`
+        <details class="stage ${route.kind}" id="stage-${escapeHtml(s.stageId)}" ${index===0?"open":""}>
+          <summary><span class="stage-index">${s.stageNumber}</span><div class="stage-title"><strong>${escapeHtml(s.title)}</strong><p>${escapeHtml(s.scene)}</p></div><div class="chips">${s.primarySkills.map(skill=>`<span class="chip">${escapeHtml(skill)}</span>`).join("")}</div></summary>
+          <div class="stage-body">
+            <div class="context-grid"><div class="context-box"><h4>进入条件</h4><p>${escapeHtml(s.entryCondition)}</p></div><div class="context-box"><h4>本阶段作用</h4><p>${escapeHtml(s.purpose)}</p></div></div>
+            <div class="why"><strong>为什么调用这些 Skill：</strong>${escapeHtml(s.whyTheseSkills)}</div>
+            <div class="io"><div class="io-box"><h4>输入</h4>${list(s.inputs)}</div><div class="io-arrow" aria-hidden="true">→</div><div class="io-box"><h4>输出</h4>${list(s.outputs)}</div></div>
+            <div class="prompt-wrap"><h4>在 Codex 中这样说</h4><div class="prompt"><span>${escapeHtml(s.codexPrompt)}</span><button type="button" class="copy" data-copy="${escapeHtml(s.codexPrompt)}">复制提示词</button></div></div>
+            <div class="execution"><div class="actions"><h4>Codex 应执行</h4>${list(s.codexActions)}</div><div class="gate"><h4>人工确认点</h4><p><strong>必须停下来确认：</strong>${escapeHtml(s.humanGate)}</p></div></div>
+            <div class="finish-grid"><div class="done"><h4>完成标准</h4>${list(s.doneWhen)}</div><div class="misuse"><h4>常见误用</h4>${list(s.misuses)}</div></div>
+            <div class="next-step"><strong>下一阶段：</strong>${escapeHtml(s.next)}</div>
+          </div>
+        </details>`).join("");
+    }
+
+    function updateRouteButtons(routeId){ document.querySelectorAll(".route-tab").forEach(button=>button.setAttribute("aria-selected",String(button.dataset.route===routeId))); }
+    function selectRoute(routeId){ activeRoute=routeId; renderRouteMap(routeId); renderStages(routeId); updateRouteButtons(routeId); }
+
+    function renderBranches(){ document.getElementById("branch-grid").innerHTML=branches.map((b,i)=>`<article class="branch"><div class="branch-top"><span class="branch-id">B${i+1}</span><h3>${escapeHtml(b.signal)}</h3></div><p><strong>调用：</strong><code>${escapeHtml(b.skill)}</code></p><div class="path">${escapeHtml(b.path)}</div><p><strong>带回主线：</strong>${escapeHtml(b.output)}</p><p><strong>警戒线：</strong>${escapeHtml(b.warning)}</p></article>`).join(""); }
+
+    function renderDialogue(name){
+      document.querySelectorAll(".dialogue-tab").forEach(button=>button.classList.toggle("active",button.dataset.dialogue===name));
+      document.getElementById("dialogue").innerHTML=dialogues[name].map(item=>item.role==="artifact"?`<div class="artifact-note">产物更新 · ${escapeHtml(item.text)}</div>`:`<article class="message ${item.role}"><span class="who">${item.role==="user"?"YOU":"CODEX"}</span><p>${escapeHtml(item.text)}</p></article>`).join("");
+    }
+
+    const helperPrompts={
+      "wayfinder":"使用 wayfinder 为当前大型目标建立决策地图。先明确 Destination，只创建现在能准确描述的决策 Tickets，不开始实现。",
+      "grill-with-docs":"使用 grill-with-docs 澄清当前需求。一次只问一个问题，每题给推荐答案；使用 domain-modeling 对照项目术语。",
+      "triage":"使用 triage 读取并验证这个外部 Issue/PR。先报告分类、状态建议和代码库证据；任何评论、标签或关闭动作前等我确认。",
+      "diagnosing-bugs":"使用 diagnosing-bugs。先建立一条能捕捉用户精确症状、可重复运行且足够快的红色反馈命令；没有反馈回路前不要提出根因。",
+      "improve-codebase-architecture":"使用 improve-codebase-architecture 聚焦当前缺少测试 seam 的区域，读取 CONTEXT/ADR 与近期热点，先生成候选报告，不直接重构。",
+      "prototype":"使用 prototype 只回答这个必须运行才能决定的问题。先判断逻辑或 UI 分支，产物明确标记为可丢弃，并提供一条运行命令。"
+    };
+
+    function recommendSkill(){
+      const project=document.getElementById("project-state").value, type=document.getElementById("task-type").value, scale=document.getElementById("task-scale").value, runnable=document.getElementById("runnable-question").value;
+      let skill,reason;
+      if(type==="bug"){skill="diagnosing-bugs";reason="故障首先需要可变红的反馈回路，不能用需求访谈替代复现。"}
+      else if(type==="architecture"){skill="improve-codebase-architecture";reason="当前问题是模块与测试 seam 的摩擦，应先发现深模块机会并独立定范围。"}
+      else if(project==="existing"&&type==="issue"){skill="triage";reason="外部 Issue/PR 需要验证、补充上下文和状态机，而不是直接进入实现。"}
+      else if(scale==="huge"){skill="wayfinder";reason="路线跨多个会话仍不可见，需要先建立决策地图并逐步清除迷雾。"}
+      else if(runnable==="yes"){skill="prototype";reason="这个问题必须运行或看到才能决定，先用一个可丢弃原型提高讨论保真度。"}
+      else {skill="grill-with-docs";reason=project==="new"?"项目范围可在一轮持续访谈中澄清，并需要同步建立领域语言。":"内部增量需求需要结合现有 CONTEXT、ADR 和代码逐项澄清。"}
+      const prompt=helperPrompts[skill];
+      document.getElementById("recommendation").innerHTML=`<h3>推荐入口</h3><span class="skill-answer">${escapeHtml(skill)}</span><p>${escapeHtml(reason)}</p><div class="mini-prompt"><span>${escapeHtml(prompt)}</span><button type="button" class="copy" data-copy="${escapeHtml(prompt)}">复制</button></div>`;
+    }
+
+    async function copyPrompt(text,button){
+      try{await navigator.clipboard.writeText(text)}catch(error){const area=document.createElement("textarea");area.value=text;area.readOnly=true;area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();document.execCommand("copy");area.remove()}
+      const original=button.textContent;button.textContent="已复制";const toast=document.getElementById("toast");toast.classList.add("show");setTimeout(()=>{button.textContent=original;toast.classList.remove("show")},1200);
+    }
+
+    document.querySelectorAll(".route-tab").forEach(button=>button.addEventListener("click",()=>selectRoute(button.dataset.route)));
+    document.querySelectorAll(".dialogue-tab").forEach(button=>button.addEventListener("click",()=>renderDialogue(button.dataset.dialogue)));
+    document.getElementById("helper-form").addEventListener("input",recommendSkill);
+    document.addEventListener("click",event=>{const button=event.target.closest("[data-copy]");if(button)copyPrompt(button.dataset.copy,button)});
+
+    selectRoute(activeRoute); renderBranches(); renderDialogue("new"); recommendSkill();
+    new ResizeObserver(()=>document.documentElement.style.setProperty("--viewport",`${window.innerWidth}px`)).observe(document.body);
+  </script>
+</body>
+</html>

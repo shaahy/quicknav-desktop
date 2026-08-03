@@ -1,0 +1,269 @@
+<!doctype html>
+<!--
+OpenMontage 技能速查 + 工作流程图
+已选方向：A · 轨道控制台
+
+设计假设：
+- 读者已经在 Codex 中打开可用的 OpenMontage，不需要安装或环境说明。
+- 这是一张生产中的“第二屏”，目标是快速定位 skill、阶段、产物和审批要求。
+- 工具和 provider 可用性必须实时读取 registry，页面不把动态状态伪装成永久事实。
+
+信息结构：
+1. 20 秒路由：我现在该读什么？
+2. 三层技能体系：registry / pipeline director / Layer 3 provider。
+3. 12 条 pipeline 选择矩阵。
+4. preflight 到 final.mp4 的完整主轨与审批门。
+5. blocked / rework / resume 三条异常支线。
+6. 可复制的 Codex 控制提示词。
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+  <title>OpenMontage｜技能速查 + 工作流程图</title>
+  <style>
+    :root{
+      --bg:#070807;--panel:#10120e;--panel2:#151812;--line:#30352b;
+      --ink:#f2eee4;--muted:#989b8f;--acid:#c7ff36;--coral:#ff674c;
+      --cyan:#5ad8c9;--amber:#f2c85b;--danger:#ff7865;--max:1360px
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",sans-serif;line-height:1.65}
+    button{font:inherit}.wrap{width:min(var(--max),calc(100% - 64px));margin:auto}
+    .top{position:sticky;top:0;z-index:30;background:#070807ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .top .wrap{height:72px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}.brand img{width:44px;height:44px;object-fit:contain}.brand strong{display:block;font-size:14px;letter-spacing:.06em}.brand span,.mono{font:10px Consolas,"Courier New",monospace;letter-spacing:.12em;color:var(--muted)}
+    .top-actions{display:flex;align-items:center;gap:12px}.progress{font:11px Consolas,monospace;color:var(--muted)}.progress b{color:var(--acid)}.menu{display:none;border:1px solid var(--line);background:transparent;color:var(--ink);padding:7px 10px}
+    .mobile-nav{display:none}.hero{min-height:660px;display:grid;grid-template-columns:1.1fr .9fr;gap:70px;align-items:center;border-bottom:1px solid var(--line)}
+    .eyebrow{font:11px Consolas,monospace;letter-spacing:.14em;color:var(--acid)}h1{font:400 clamp(66px,7vw,104px)/.88 SimSun,"Songti SC",serif;letter-spacing:-.07em;margin:18px 0 28px}h1 em{color:var(--coral);font-style:normal}
+    .hero-copy{max-width:650px;color:#b5b7ad;font-size:16px;line-height:1.9}.hero-actions{display:flex;gap:10px;margin-top:28px}.btn{border:1px solid var(--line);padding:11px 15px;color:var(--ink);background:transparent;text-decoration:none;font:11px Consolas,monospace;letter-spacing:.05em}.btn.primary{background:var(--acid);border-color:var(--acid);color:#0c0d0a;font-weight:700}
+    .console{border:1px solid var(--line);background:#0b0d0a;box-shadow:18px 18px 0 #020302}.console-head{display:flex;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);font:10px Consolas;color:var(--muted)}
+    .console-body{padding:20px}.meter{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}.meter div{border-top:2px solid var(--line);padding-top:10px}.meter b{display:block;font:30px Consolas;color:var(--acid)}.meter small{color:var(--muted)}
+    .mini-track{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.mini-track i{height:52px;border:1px solid var(--line);position:relative}.mini-track i::after{content:attr(data-stage);position:absolute;left:5px;bottom:5px;font:7px Consolas;color:var(--muted)}.mini-track i.on{border-color:var(--acid);box-shadow:inset 0 -4px var(--acid)}.mini-track i.gate{background:repeating-linear-gradient(135deg,transparent 0 8px,#401c15 8px 12px)}
+    .quote{margin-top:20px;border-top:1px solid var(--line);padding-top:17px;color:#c7c9be;font:12px/1.7 Consolas,monospace}.quote b{color:var(--coral)}
+    .shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:56px;padding:0 0 100px}.side{position:sticky;top:98px;height:max-content;padding-top:72px}.side a{display:grid;grid-template-columns:30px 1fr;gap:8px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line);padding:11px 0;font-size:12px}.side a b{font:10px Consolas;color:#596052}.side a.active,.side a:hover{color:var(--ink)}.side a.active b{color:var(--acid)}
+    .section{padding:78px 0;border-bottom:1px solid var(--line);scroll-margin-top:70px}.section-head{display:grid;grid-template-columns:.72fr 1.28fr;gap:32px;margin-bottom:32px}.kicker{font:11px Consolas;color:var(--coral);letter-spacing:.12em}.section h2{font:400 clamp(36px,4vw,58px)/1.06 SimSun,serif;margin:10px 0}.lead{color:var(--muted);max-width:680px;margin:8px 0 0}.note{border:1px solid var(--line);background:var(--panel);padding:16px;color:#b9bbb1;font-size:13px}.note strong{color:var(--acid)}
+    .router-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}.choice{border:1px solid var(--line);background:var(--panel);color:var(--muted);padding:10px 13px;cursor:pointer;font-size:12px}.choice:hover,.choice.active{border-color:var(--acid);color:var(--ink);transform:translateY(-2px)}
+    .router-result{display:grid;grid-template-columns:180px 1fr 220px;border:1px solid var(--acid);background:var(--panel)}.router-result>div{padding:20px;border-right:1px solid var(--line)}.router-result>div:last-child{border:0}.router-result span{display:block;font:10px Consolas;color:var(--muted)}.router-result b{display:block;margin-top:7px;color:var(--acid);font-size:15px}.router-result p{margin:7px 0 0;color:#c2c4b9;font-size:13px}
+    .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.layer{border:1px solid var(--line);background:var(--panel);padding:23px;min-height:265px}.layer .level{font:11px Consolas;color:var(--acid)}.layer h3{font-size:20px;margin:16px 0 8px}.layer .question{font:24px SimSun,serif;color:var(--cyan);margin:15px 0}.layer p{color:var(--muted);font-size:13px}.layer code{display:block;padding:10px;background:#080a07;color:#c6c9bd;font:10px/1.55 Consolas;overflow:auto}.read-order{display:flex;align-items:center;gap:9px;margin-top:14px;color:var(--muted);font:11px Consolas}.read-order i{width:34px;height:1px;background:var(--line)}
+    .filterbar{display:flex;gap:8px;margin-bottom:14px}.filter{border:1px solid var(--line);background:transparent;color:var(--muted);padding:8px 12px;cursor:pointer;font:11px Consolas}.filter.active{color:#0b0c09;background:var(--acid);border-color:var(--acid)}
+    .pipelines{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pipeline{border:1px solid var(--line);padding:17px;background:var(--panel);min-height:145px}.pipeline header{display:flex;justify-content:space-between;gap:10px}.pipeline code{font:12px Consolas;color:var(--cyan)}.badge{font:9px Consolas;padding:3px 6px;border:1px solid var(--line);color:var(--muted)}.badge.prod{color:var(--acid);border-color:#577125}.badge.beta{color:var(--amber);border-color:#6d5e28}.pipeline h3{font-size:16px;margin:14px 0 6px}.pipeline p{font-size:12px;color:var(--muted);margin:0}.pipeline[hidden]{display:none}
+    .flow-shell{border:1px solid var(--line);background:#0a0c09;padding:20px;overflow:hidden}.flow-top{display:flex;justify-content:space-between;margin-bottom:19px}.flow{display:grid;grid-template-columns:repeat(8,minmax(105px,1fr));gap:7px;position:relative}.stage{border:1px solid var(--line);background:var(--panel);padding:13px 11px;min-height:105px;text-align:left;color:var(--ink);cursor:pointer;position:relative}.stage::after{content:"→";position:absolute;right:-8px;top:39px;color:#596052;z-index:2}.stage:last-child::after{display:none}.stage .n{font:9px Consolas;color:#5e6558}.stage b{display:block;margin:20px 0 4px;font:12px Consolas}.stage small{font-size:10px;color:var(--muted)}.stage.active{border-color:var(--acid);box-shadow:inset 0 -4px var(--acid)}.stage.approval{background:repeating-linear-gradient(135deg,var(--panel) 0 10px,#25130f 10px 14px)}.stage.approval b{color:var(--coral)}
+    .stage-detail{display:grid;grid-template-columns:1.1fr .9fr .9fr;margin-top:14px;border:1px solid var(--line)}.stage-detail>div{padding:18px;border-right:1px solid var(--line)}.stage-detail>div:last-child{border:0}.stage-detail span{font:10px Consolas;color:var(--muted)}.stage-detail b{display:block;color:var(--acid);font-size:14px;margin-top:7px}.stage-detail p{font-size:12px;color:#b7b9ae;margin:6px 0 0}.approval-track{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:8px}.approval-track i{height:9px;background:#20241d}.approval-track i.human{background:repeating-linear-gradient(90deg,var(--coral) 0 5px,transparent 5px 9px)}
+    .branch-map{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.branch{border:1px dashed var(--line);background:var(--panel);padding:22px}.branch .signal{font:10px Consolas;color:var(--coral)}.branch h3{margin:14px 0 8px;font-size:19px}.branch p{color:var(--muted);font-size:13px}.branch ol{padding-left:18px;color:#c4c6bc;font-size:12px}.branch code{font:10px Consolas;color:var(--cyan)}
+    .artifacts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.artifact{border:1px solid var(--line);background:var(--panel);padding:17px;min-height:130px;min-width:0;overflow-wrap:anywhere}.artifact code{font:11px Consolas;color:var(--acid)}.artifact b{display:block;margin:12px 0 5px}.artifact span{color:var(--muted);font-size:11px}.artifact.final{border-color:var(--acid);background:#141a0d}
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.prompt{border:1px solid var(--line);background:var(--panel);position:relative}.prompt header{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid var(--line)}.prompt header b{font:11px Consolas;color:var(--acid)}.copy{border:1px solid var(--line);background:transparent;color:var(--muted);padding:5px 9px;cursor:pointer;font:10px Consolas}.copy:hover,.copy.ok{color:#10110d;background:var(--acid);border-color:var(--acid)}.prompt pre{white-space:pre-wrap;margin:0;padding:16px;color:#d2d3cb;font:12px/1.7 Consolas,"Microsoft YaHei UI",monospace}
+    .redlines{display:grid;grid-template-columns:1fr 1fr;gap:10px}.redline{border:1px solid var(--line);padding:17px;background:var(--panel);display:grid;grid-template-columns:28px 1fr;gap:10px}.redline i{width:10px;height:10px;background:var(--coral);margin-top:7px}.redline b{font-size:14px}.redline p{font-size:12px;color:var(--muted);margin:4px 0 0}
+    .final-path{border:1px solid var(--acid);padding:22px;background:#11160c;display:flex;justify-content:space-between;align-items:center;gap:20px}.final-path code{color:var(--acid);font:16px Consolas}.final-path span{color:var(--muted);font-size:12px}
+    footer{padding:34px 0 60px;color:var(--muted);font-size:11px}.footer-inner{display:flex;justify-content:space-between;gap:24px}.marks{display:flex;gap:10px;align-items:center}.marks img{width:24px;height:24px;object-fit:contain}.disclaimer{max-width:760px}
+    @media(max-width:1050px){.hero{grid-template-columns:1fr;gap:20px;padding:80px 0}.console{max-width:700px}.shell{grid-template-columns:190px minmax(0,1fr);gap:30px}.pipelines{grid-template-columns:1fr 1fr}.flow{grid-template-columns:repeat(4,1fr)}.stage:nth-child(4)::after,.stage:last-child::after{display:none}.artifacts{grid-template-columns:1fr 1fr}}
+    @media(max-width:760px){.wrap{width:calc(100% - 36px)}.progress{display:none}.menu{display:block}.mobile-nav{position:fixed;display:none;top:72px;left:0;right:0;z-index:29;background:#090b08;border-bottom:1px solid var(--line);padding:12px 18px;max-height:70vh;overflow:auto}.mobile-nav.open{display:grid}.mobile-nav a{color:var(--muted);text-decoration:none;padding:9px;border-bottom:1px solid var(--line);font-size:12px}.hero{min-height:auto}.hero h1{font-size:61px}.shell{display:block}.side{display:none}.section{padding:62px 0}.section-head{grid-template-columns:1fr}.router-result{grid-template-columns:1fr}.router-result>div{border-right:0;border-bottom:1px solid var(--line)}.layers,.pipelines,.branch-map,.quick-grid,.redlines{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}.stage::after{display:none}.stage-detail{grid-template-columns:1fr}.stage-detail>div{border-right:0;border-bottom:1px solid var(--line)}.approval-track{grid-template-columns:repeat(4,1fr)}.artifacts{grid-template-columns:1fr 1fr}.final-path,.footer-inner{align-items:flex-start;flex-direction:column}.mini-track{grid-template-columns:repeat(4,1fr)}}
+    @media print{body{background:#fff;color:#111}.top,.side,.mobile-nav,.hero-actions,.copy,.filterbar{display:none!important}.hero{min-height:auto}.shell{display:block}.section{break-inside:avoid}.console,.layer,.pipeline,.flow-shell,.branch,.artifact,.prompt,.redline{background:#fff;color:#111}.prompt pre,.note,.lead,.layer p,.pipeline p,.branch p,.redline p{color:#333}}
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand"><img alt="OpenMontage Monty" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJNb250eSB0aGUgQ2xhcHBlciwgdGhlIE9wZW5Nb250YWdlIG1hc2NvdCI+CiAgPGRlZnM+CiAgICA8cGF0dGVybiBpZD0ibXN0ciIgd2lkdGg9IjIyIiBoZWlnaHQ9IjIyIiBwYXR0ZXJuVHJhbnNmb3JtPSJyb3RhdGUoNDUpIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgICAgPHJlY3Qgd2lkdGg9IjExIiBoZWlnaHQ9IjIyIiBmaWxsPSIjMjQxZDE1Ii8+CiAgICA8L3BhdHRlcm4+CiAgPC9kZWZzPgoKICA8IS0tIGlkbGUgZmxvYXQgLS0+CiAgPGc+CiAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIKICAgICAgdmFsdWVzPSIwIDA7IDAgLTc7IDAgMCIga2V5VGltZXM9IjA7MC41OzEiCiAgICAgIGNhbGNNb2RlPSJzcGxpbmUiIGtleVNwbGluZXM9IjAuNDIgMCAwLjU4IDE7MC40MiAwIDAuNTggMSIKICAgICAgZHVyPSI0LjVzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgoKICAgIDwhLS0gbGVncyAtLT4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxNTYiIHdpZHRoPSIxNiIgaGVpZ2h0PSIyNiIgcng9IjgiIGZpbGw9IiMzYTJmMjYiIHN0cm9rZT0iI2YyZWNkZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgICA8cmVjdCB4PSIxMTIiIHk9IjE1NiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjI2IiByeD0iOCIgZmlsbD0iIzNhMmYyNiIgc3Ryb2tlPSIjZjJlY2RmIiBzdHJva2Utd2lkdGg9IjMiLz4KCiAgICA8IS0tIGNsYXBwZXIgamF3LCBoaW5nZWQgbGVmdCAtLT4KICAgIDxnPgogICAgICA8YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIHR5cGU9InJvdGF0ZSIKICAgICAgICB2YWx1ZXM9Ii0yMiA0NiA4ODsgLTIyIDQ2IDg4OyAtMiA0NiA4ODsgLTIgNDYgODg7IC0yNiA0NiA4ODsgLTIyIDQ2IDg4IgogICAgICAgIGtleVRpbWVzPSIwOzAuNjI7MC43MDswLjc4OzAuODY7MSIKICAgICAgICBkdXI9IjVzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgogICAgICA8cmVjdCB4PSI0MiIgeT0iNjQiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjQiIHJ4PSIxMCIgZmlsbD0iI2YyZWNkZiIvPgogICAgICA8cmVjdCB4PSI0MiIgeT0iNjQiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjQiIHJ4PSIxMCIgZmlsbD0idXJsKCNtc3RyKSIvPgogICAgPC9nPgoKICAgIDwhLS0gc2xhdGUgYm9keSAtLT4KICAgIDxyZWN0IHg9IjQyIiB5PSI4OCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSI3NiIgcng9IjE0IiBmaWxsPSIjMjQxZDE1IiBzdHJva2U9IiNmMmVjZGYiIHN0cm9rZS13aWR0aD0iMy41Ii8+CiAgICA8cmVjdCB4PSI0MiIgeT0iODgiIHdpZHRoPSIxMjAiIGhlaWdodD0iMjAiIHJ4PSIxMCIgZmlsbD0iI2YyZWNkZiIvPgogICAgPHJlY3QgeD0iNDIiIHk9Ijg4IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjIwIiByeD0iMTAiIGZpbGw9InVybCgjbXN0cikiLz4KCiAgICA8IS0tIGFybXMgLS0+CiAgICA8cmVjdCB4PSIyNCIgeT0iMTE2IiB3aWR0aD0iMjQiIGhlaWdodD0iMTQiIHJ4PSI3IiBmaWxsPSIjM2EyZjI2IiBzdHJva2U9IiNmMmVjZGYiIHN0cm9rZS13aWR0aD0iMyIgdHJhbnNmb3JtPSJyb3RhdGUoMjQgMzYgMTIzKSIvPgogICAgPHJlY3QgeD0iMTU2IiB5PSIxMTYiIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNCIgcng9IjciIGZpbGw9IiMzYTJmMjYiIHN0cm9rZT0iI2YyZWNkZiIgc3Ryb2tlLXdpZHRoPSIzIiB0cmFuc2Zvcm09InJvdGF0ZSgtMjQgMTY4IDEyMykiLz4KCiAgICA8IS0tIGZhY2UgLS0+CiAgICA8Y2lyY2xlIGN4PSI3OSIgY3k9IjEzMiIgcj0iMTMiIGZpbGw9IiNmMmVjZGYiLz4KICAgIDxjaXJjbGUgY3g9IjEyMyIgY3k9IjEzMiIgcj0iMTMiIGZpbGw9IiNmMmVjZGYiLz4KICAgIDxjaXJjbGUgY3g9IjgxIiBjeT0iMTMzIiByPSI1LjUiIGZpbGw9IiMyNDFkMTUiLz4KICAgIDxjaXJjbGUgY3g9IjEyMSIgY3k9IjEzMyIgcj0iNS41IiBmaWxsPSIjMjQxZDE1Ii8+CiAgICA8Y2lyY2xlIGN4PSI2MSIgY3k9IjE0NiIgcj0iNSIgZmlsbD0iI2UwNzA0ZiIgb3BhY2l0eT0iLjg1Ii8+CiAgICA8Y2lyY2xlIGN4PSIxNDEiIGN5PSIxNDYiIHI9IjUiIGZpbGw9IiNlMDcwNGYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHBhdGggZD0iTTkzIDE0OCBRMTAxIDE1NSAxMDkgMTQ4IiBzdHJva2U9IiNmMmVjZGYiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBmaWxsPSJub25lIi8+CiAgPC9nPgo8L3N2Zz4K"><div><strong>OPENMONTAGE × CODEX</strong><span>SKILL QUICKLOOK / PRODUCTION TRACK</span></div></div>
+      <div class="top-actions"><span class="progress">READING <b id="readPercent">0%</b></span><button class="menu" id="menuButton" type="button">目录</button></div>
+    </div>
+  </header>
+  <nav class="mobile-nav" id="mobileNav" aria-label="移动端目录"></nav>
+
+  <section class="hero wrap" id="top">
+    <div>
+      <span class="eyebrow">DON'T MEMORIZE 500+ SKILLS</span>
+      <h1>技能速查<br><em>就是制片轨道</em></h1>
+      <p class="hero-copy">在 Codex 里使用 OpenMontage，不需要背完整技能库。先确定任务入口和 pipeline，再按当前阶段读取 director skill；真正调用工具前，读取它声明的 Layer 3 provider skill。</p>
+      <div class="hero-actions"><a class="btn primary" href="#router">20 秒定位 skill</a><a class="btn" href="#workflow">查看完整流程</a></div>
+    </div>
+    <aside class="console" aria-label="制作轨道摘要">
+      <div class="console-head"><span>PRODUCTION / STATUS</span><span>HOLD FOR APPROVAL</span></div>
+      <div class="console-body">
+        <div class="meter"><div><small>PIPELINES</small><b>12</b></div><div><small>CORE STAGES</small><b>07</b></div><div><small>RULE ZERO</small><b>PIPE</b></div></div>
+        <div class="mini-track"><i class="on" data-stage="PRE"></i><i data-stage="RES"></i><i class="gate" data-stage="PROP"></i><i class="gate" data-stage="SCRIPT"></i><i class="gate" data-stage="PLAN"></i><i data-stage="ASSET"></i><i data-stage="FINAL"></i></div>
+        <div class="quote"><b>CONTROL CONTRACT</b><br>READ → ACT → REVIEW → CHECKPOINT → APPROVE</div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="wrap shell">
+    <nav class="side" id="sideNav" aria-label="页面目录">
+      <a href="#router"><b>01</b><span>20 秒技能路由</span></a>
+      <a href="#layers"><b>02</b><span>三层技能体系</span></a>
+      <a href="#pipelines"><b>03</b><span>Pipeline 速查</span></a>
+      <a href="#workflow"><b>04</b><span>完整工作流程</span></a>
+      <a href="#branches"><b>05</b><span>异常与恢复支线</span></a>
+      <a href="#artifacts"><b>06</b><span>阶段产物</span></a>
+      <a href="#prompts"><b>07</b><span>Codex 控制提示词</span></a>
+      <a href="#redlines"><b>08</b><span>生产红线</span></a>
+    </nav>
+
+    <main>
+      <section class="section" id="router">
+        <div class="section-head"><div><span class="kicker">01 · ROUTE</span><h2>我现在该读什么？</h2></div><p class="lead">先点选你手上的任务状态。这里定位的是技能入口，不替代 OpenMontage 的实时 preflight。</p></div>
+        <div class="router-controls" id="routerControls">
+          <button class="choice active" data-route="brief">已有明确主题</button>
+          <button class="choice" data-route="vague">只说“帮我做视频”</button>
+          <button class="choice" data-route="reference">给了参考视频</button>
+          <button class="choice" data-route="footage">要剪已有素材</button>
+          <button class="choice" data-route="resume">继续未完成项目</button>
+        </div>
+        <div class="router-result">
+          <div><span>NEXT ACTION</span><b id="routeAction">直接进入 Rule Zero</b></div>
+          <div><span>READ FIRST</span><b id="routeSkill">pipeline manifest → 当前 stage director</b><p id="routeWhy">先匹配 pipeline，运行 preflight，再逐阶段执行；不要补做 onboarding。</p></div>
+          <div><span>STOP CONDITION</span><b id="routeStop">在 proposal 审批门停下</b></div>
+        </div>
+      </section>
+
+      <section class="section" id="layers">
+        <div class="section-head"><div><span class="kicker">02 · SKILL STACK</span><h2>三层读取，顺序不能反。</h2></div><p class="lead">OpenMontage 的关键不是“找到一个万能 skill”，而是用不同层分别回答工具、阶段和 provider 三种问题。</p></div>
+        <div class="layers">
+          <article class="layer"><span class="level">L1 · REGISTRY / TOOL CONTRACT</span><h3>先发现真实能力</h3><div class="question">“现在有什么？”</div><p>查询 capability、provider、可用状态、运行方式、fallback、费用线索和相关 skills。动态信息以本机 registry 为准。</p><code>registry.capability_catalog()<br>registry.provider_catalog()</code></article>
+          <article class="layer"><span class="level">L2 · PIPELINE DIRECTOR</span><h3>再读取阶段规则</h3><div class="question">“本阶段怎么做？”</div><p>当前 pipeline 的每个 stage 都有 director skill，规定输入、canonical artifact、可用工具、review focus、成功标准和审批门。</p><code>skills/pipelines/&lt;pipeline&gt;/<br>&lt;stage&gt;-director.md</code></article>
+          <article class="layer"><span class="level">L3 · PROVIDER KNOWLEDGE</span><h3>最后掌握具体工具</h3><div class="question">“这个模型怎样用好？”</div><p>生成工具通过 <code style="display:inline;padding:0">agent_skills</code> 指向 Layer 3。写提示词、选参数或调用模型前必须读，不能只凭通用经验。</p><code>.agents/skills/&lt;skill&gt;/<br>SKILL.md</code></article>
+        </div>
+        <div class="read-order"><b>读取顺序</b><i></i><span>REGISTRY</span><i></i><span>DIRECTOR</span><i></i><span>PROVIDER</span><i></i><span>EXECUTE</span></div>
+      </section>
+
+      <section class="section" id="pipelines">
+        <div class="section-head"><div><span class="kicker">03 · PIPELINE SELECTOR</span><h2>先选制片方法，再谈模型。</h2></div><p class="lead">pipeline 决定阶段、skill、产物和质量门。Beta 路线可以使用，但应预期更多粗糙边缘，并在执行前说明。</p></div>
+        <div class="filterbar"><button class="filter active" data-filter="all">全部 12</button><button class="filter" data-filter="prod">Production</button><button class="filter" data-filter="beta">Beta</button></div>
+        <div class="pipelines" id="pipelineGrid">
+          <article class="pipeline" data-status="prod"><header><code>animated-explainer</code><span class="badge prod">PRODUCTION</span></header><h3>主题 → 完整动画解说</h3><p>知识解释、教育内容、数据驱动叙事。</p></article>
+          <article class="pipeline" data-status="prod"><header><code>screen-demo</code><span class="badge prod">PRODUCTION</span></header><h3>软件操作与 walkthrough</h3><p>真实录屏、合成终端或产品操作路径。</p></article>
+          <article class="pipeline" data-status="prod"><header><code>cinematic</code><span class="badge prod">PRODUCTION</span></header><h3>预告、teaser、情绪片</h3><p>气氛、镜头质感和节奏优先。</p></article>
+          <article class="pipeline" data-status="prod"><header><code>animation</code><span class="badge prod">PRODUCTION</span></header><h3>Motion graphics 优先</h3><p>动态图形、排版动画和抽象视觉。</p></article>
+          <article class="pipeline" data-status="prod"><header><code>hybrid</code><span class="badge prod">PRODUCTION</span></header><h3>已有素材 + 支撑画面</h3><p>真实素材作为主体，生成视觉补充叙事。</p></article>
+          <article class="pipeline" data-status="prod"><header><code>avatar-spokesperson</code><span class="badge prod">PRODUCTION</span></header><h3>数字人 / 口型同步</h3><p>主持人式呈现、avatar 与 lip-sync。</p></article>
+          <article class="pipeline" data-status="beta"><header><code>talking-head</code><span class="badge beta">BETA</span></header><h3>真人口播素材剪辑</h3><p>以讲话者 footage 为核心的包装与编辑。</p></article>
+          <article class="pipeline" data-status="beta"><header><code>clip-factory</code><span class="badge beta">BETA</span></header><h3>长视频批量切短</h3><p>从课程、采访或直播提取多条传播片段。</p></article>
+          <article class="pipeline" data-status="beta"><header><code>podcast-repurpose</code><span class="badge beta">BETA</span></header><h3>播客内容再利用</h3><p>高光、短片和衍生内容。</p></article>
+          <article class="pipeline" data-status="beta"><header><code>localization-dub</code><span class="badge beta">BETA</span></header><h3>字幕、翻译与配音</h3><p>把现有视频扩展成多语言版本。</p></article>
+          <article class="pipeline" data-status="beta"><header><code>character-animation</code><span class="badge beta">BETA</span></header><h3>可复用角色表演</h3><p>本地 SVG rig、姿势库和角色动画。</p></article>
+          <article class="pipeline" data-status="test"><header><code>framework-smoke</code><span class="badge">TEST</span></header><h3>最小框架冒烟测试</h3><p>用于验证框架，不是正常内容生产路线。</p></article>
+        </div>
+      </section>
+
+      <section class="section" id="workflow">
+        <div class="section-head"><div><span class="kicker">04 · MASTER FLOW</span><h2>一条主轨，四次必须看人的地方。</h2></div><p class="lead">点击阶段查看应读内容、canonical artifact 和停止条件。不同 pipeline 的审批设置以 manifest 为准；创意阶段通常需要人工批准。</p></div>
+        <div class="flow-shell">
+          <div class="flow-top"><span class="eyebrow">PRODUCTION TRACK / CLICK A STAGE</span><span class="mono">READ → ACT → REVIEW → CHECKPOINT</span></div>
+          <div class="flow" id="flow">
+            <button class="stage active" data-stage="preflight"><span class="n">00</span><b>PREFLIGHT</b><small>能力审计 / pipeline</small></button>
+            <button class="stage" data-stage="research"><span class="n">01</span><b>RESEARCH</b><small>事实 / 素材边界</small></button>
+            <button class="stage approval" data-stage="proposal"><span class="n">02</span><b>PROPOSAL</b><small>方案 / 工具 / 成本</small></button>
+            <button class="stage approval" data-stage="script"><span class="n">03</span><b>SCRIPT</b><small>旁白 / 节奏</small></button>
+            <button class="stage approval" data-stage="scene_plan"><span class="n">04</span><b>SCENE PLAN</b><small>逐镜生产合同</small></button>
+            <button class="stage" data-stage="assets"><span class="n">05</span><b>ASSETS</b><small>先样本后批量</small></button>
+            <button class="stage" data-stage="edit"><span class="n">06</span><b>EDIT</b><small>画面 / 音频 / 字幕</small></button>
+            <button class="stage" data-stage="compose"><span class="n">07</span><b>COMPOSE</b><small>渲染 / QA / final</small></button>
+          </div>
+          <div class="approval-track" aria-label="审批轨"><i></i><i></i><i class="human"></i><i class="human"></i><i class="human"></i><i></i><i></i><i class="human"></i></div>
+          <div class="stage-detail">
+            <div><span>READ / ACTION</span><b id="stageRead">pipeline manifest + registry</b><p id="stageAction">确认 pipeline，发现真实工具能力，展示 provider 与 compose runtime 选项。</p></div>
+            <div><span>CANONICAL OUTPUT</span><b id="stageOutput">能力菜单 + 生产路线</b><p id="stageReview">不要凭旧文档或记忆判断本机能力。</p></div>
+            <div><span>GATE</span><b id="stageGate">等待路线与关键选择确认</b><p id="stageNext">批准后进入 research；不批准则修改计划。</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="branches">
+        <div class="section-head"><div><span class="kicker">05 · BRANCHES</span><h2>阻塞不是授权你悄悄换路。</h2></div><p class="lead">异常处理的核心是保持决策可见：说清失败、给出选项、推荐一条，然后停下来。</p></div>
+        <div class="branch-map">
+          <article class="branch"><span class="signal">BLOCKED / HOLD</span><h3>工具、权限或质量失败</h3><ol><li>说明尝试了什么</li><li>判断 auth / provider / tool bug / 质量问题</li><li>列出选项、取舍和推荐</li><li>等待批准，不自动替换</li></ol><code>provider/model/runtime 不静默变更</code></article>
+          <article class="branch"><span class="signal">REWORK / RETURN</span><h3>只回到指定节点</h3><ol><li>锁定返工 scene 或 artifact</li><li>保留其他已批准内容</li><li>先说明下游影响</li><li>重新 review 与 checkpoint</li></ol><code>只返工 scene 04，不重做整片</code></article>
+          <article class="branch"><span class="signal">RESUME / CHECKPOINT</span><h3>从断点继续，不从头再来</h3><ol><li>读取 checkpoint 状态</li><li>确认 completed / awaiting_human</li><li>定位 get_next_stage</li><li>汇报恢复点后继续</li></ol><code>checkpoint 是恢复协议，不只是日志</code></article>
+        </div>
+      </section>
+
+      <section class="section" id="artifacts">
+        <div class="section-head"><div><span class="kicker">06 · ARTIFACT CONTRACT</span><h2>每阶段只交付一个权威合同。</h2></div><p class="lead">canonical artifact 是下一阶段的输入。随口聊天不能替代正式产物，修改上游时也要检查下游是否失效。</p></div>
+        <div class="artifacts">
+          <article class="artifact"><code>research</code><b>研究与事实边界</b><span>主题范围、来源、素材约束。</span></article>
+          <article class="artifact"><code>proposal</code><b>生产方案</b><span>delivery promise、工具路线、成本和 runtime。</span></article>
+          <article class="artifact"><code>script</code><b>正式脚本</b><span>旁白、节奏、字幕与时长意图。</span></article>
+          <article class="artifact"><code>scene_plan</code><b>逐镜合同</b><span>镜头顺序、时长、资产需求与画面目标。</span></article>
+          <article class="artifact"><code>asset_manifest</code><b>素材清单</b><span>来源、文件、model/tool 元数据和镜头关联。</span></article>
+          <article class="artifact"><code>edit</code><b>编辑结果</b><span>已批准资产的画面、音频和字幕组合。</span></article>
+          <article class="artifact"><code>checkpoint_*.json</code><b>阶段状态</b><span>completed、failed、awaiting_human 或 in_progress。</span></article>
+          <article class="artifact final"><code>final</code><b>标准成片</b><span>projects/&lt;project&gt;/renders/final.mp4</span></article>
+        </div>
+      </section>
+
+      <section class="section" id="prompts">
+        <div class="section-head"><div><span class="kicker">07 · COPY DECK</span><h2>六条 Codex 控制提示词。</h2></div><p class="lead">这些提示词控制“怎样生产”，不是替你写创意内容。点击即可复制。</p></div>
+        <div class="quick-grid">
+          <article class="prompt"><header><b>定位当前阶段</b><button class="copy" data-copy="pLocate">复制</button></header><pre id="pLocate">先读取当前项目 checkpoint，报告：pipeline、已完成阶段、下一阶段、对应 director skill、预期 canonical artifact、review focus 和是否需要人工批准。报告后停下。</pre></article>
+          <article class="prompt"><header><b>完整能力审计</b><button class="copy" data-copy="pAudit">复制</button></header><pre id="pAudit">运行 mandatory preflight。不要依赖旧文档或记忆：从 registry 报告各 capability 的可用 provider、状态、runtime、fallback、相关 skills 和已知成本；再给出与你推荐 pipeline 相符的生产路线。</pre></article>
+          <article class="prompt"><header><b>批准当前阶段</b><button class="copy" data-copy="pApprove">复制</button></header><pre id="pApprove">我批准当前 canonical artifact。记录 checkpoint，然后只进入下一阶段；开始前先读取该阶段 director skill，并告诉我本阶段产物、工具范围、质量门和下一个停止点。</pre></article>
+          <article class="prompt"><header><b>先样本后批量</b><button class="copy" data-copy="pSample">复制</button></header><pre id="pSample">先制作能代表最终质量的最小样本，覆盖最难镜头和正式声音路线。提交样本、实际工具/provider/model、成本与 review 结果后 HOLD，不进入批量生成。</pre></article>
+          <article class="prompt"><header><b>只返工指定内容</b><button class="copy" data-copy="pRework">复制</button></header><pre id="pRework">只返工我指定的 scene 或 artifact，保留其他已批准内容。执行前先列出受影响的下游文件、预算变化和需要重新通过的 review/checkpoint。</pre></article>
+          <article class="prompt"><header><b>阻止静默替换</b><button class="copy" data-copy="pNoSwap">复制</button></header><pre id="pNoSwap">不要静默更换 provider、model、render runtime、旁白、音乐或视频路线。遇到阻塞时说明尝试、失败类型、所有可选方案、取舍与推荐，然后等待我批准。</pre></article>
+        </div>
+      </section>
+
+      <section class="section" id="redlines">
+        <div class="section-head"><div><span class="kicker">08 · RED LINES</span><h2>六条最容易被跳过的生产纪律。</h2></div><p class="lead">如果 Codex 的行动违背这些规则，先停下来纠正流程，再继续生产。</p></div>
+        <div class="redlines">
+          <article class="redline"><i></i><div><b>不绕过 pipeline</b><p>不要临时写脚本直调 API，也不要跳过 preflight、review 或 checkpoint。</p></div></article>
+          <article class="redline"><i></i><div><b>不跳过 director skill</b><p>每个 stage 动手前都要读取相应 director；不同阶段的成功标准不同。</p></div></article>
+          <article class="redline"><i></i><div><b>不跳过 Layer 3</b><p>生成工具声明的 provider skill 是必读项，不能用通用提示词替代。</p></div></article>
+          <article class="redline"><i></i><div><b>不隐藏降级路线</b><p>still-led、provider 替换、移除音乐或旁白都属于需要告知的重大变化。</p></div></article>
+          <article class="redline"><i></i><div><b>不在批准前批量生成</b><p>先提交方案、成本和代表性样本，确认之后才扩大调用。</p></div></article>
+          <article class="redline"><i></i><div><b>不把 Beta 当成成熟路线</b><p>Beta pipeline 可以选，但必须如实说明粗糙边缘和额外验证成本。</p></div></article>
+        </div>
+        <div class="final-path"><div><span>STANDARD DELIVERY PATH</span><br><code>projects/&lt;project-name&gt;/renders/final.mp4</code></div><span>成片前仍需验证可播放、分辨率、时长、音轨、字幕、首尾画面与 delivery promise。</span></div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div class="disclaimer">本页是独立制作的教学速查资料。OpenAI 与 OpenMontage 标识仅用于说明相关服务，不代表合作、赞助或官方背书。事实核验日期为 2026-07-30；pipeline、provider 和工具状态以当前仓库 manifest 与本机 registry 为准。</div>
+      <div class="marks"><img alt="OpenAI" src="data:image/png;base64,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"><span>CODEX BY OPENAI<br>OPENMONTAGE AGENT FLOW</span></div>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const routes={
+        brief:{action:"直接进入 Rule Zero",skill:"pipeline manifest → 当前 stage director",why:"先匹配 pipeline，运行 preflight，再逐阶段执行；不要补做 onboarding。",stop:"在 proposal 审批门停下"},
+        vague:{action:"先做发现式 onboarding",skill:"skills/meta/onboarding.md",why:"把模糊愿望收敛为平台、时长、受众、内容来源和交付目标。",stop:"得到明确 brief 后再选 pipeline"},
+        reference:{action:"先分析参考视频",skill:"skills/meta/video-reference-analyst.md",why:"提取内容、节奏、结构和风格，再提出原创概念；不要把它当普通搜索。",stop:"提交分析和 2–3 个原创方向"},
+        footage:{action:"先做 source media review",skill:"对应 footage-led pipeline director",why:"检查已有素材，再在 talking-head、clip-factory、hybrid 等路线中选择。",stop:"确认素材范围与剪辑路线"},
+        resume:{action:"读取 checkpoint 恢复",skill:"checkpoint-protocol + 下一 stage director",why:"确认已完成产物、awaiting_human 状态和 get_next_stage，不从头再做。",stop:"汇报恢复点后等待确认"}
+      };
+      const controls=[...document.querySelectorAll(".choice")],action=document.getElementById("routeAction"),skill=document.getElementById("routeSkill"),why=document.getElementById("routeWhy"),stop=document.getElementById("routeStop");
+      controls.forEach(button=>button.addEventListener("click",()=>{controls.forEach(x=>x.classList.remove("active"));button.classList.add("active");const r=routes[button.dataset.route];action.textContent=r.action;skill.textContent=r.skill;why.textContent=r.why;stop.textContent=r.stop}));
+
+      const filters=[...document.querySelectorAll(".filter")],pipelines=[...document.querySelectorAll(".pipeline")];
+      filters.forEach(button=>button.addEventListener("click",()=>{filters.forEach(x=>x.classList.remove("active"));button.classList.add("active");const value=button.dataset.filter;pipelines.forEach(card=>card.hidden=value!=="all"&&card.dataset.status!==value)}));
+
+      const stages={
+        preflight:{read:"pipeline manifest + registry",action:"确认 pipeline，发现真实工具能力，展示 provider 与 compose runtime 选项。",output:"能力菜单 + 生产路线",review:"不要凭旧文档或记忆判断本机能力。",gate:"等待路线与关键选择确认",next:"批准后进入 research；不批准则修改计划。"},
+        research:{read:"research director skill",action:"界定问题、事实来源、素材范围、版权与可验证边界。",output:"research canonical artifact",review:"事实、来源和范围必须足以支撑 proposal。",gate:"通常进入自检与 checkpoint",next:"将研究合同交给 proposal，不要让下游重新猜。"},
+        proposal:{read:"proposal director skill",action:"提交概念、delivery promise、工具/provider、成本、音乐和 render runtime 方案。",output:"proposal canonical artifact",review:"选择必须与真实 preflight 和用户目标一致。",gate:"HUMAN APPROVAL",next:"明确批准之前，不生成生产资产。"},
+        script:{read:"script director skill",action:"完成旁白、hook、节奏、字幕意图和时长控制。",output:"script canonical artifact",review:"内容准确、结构清晰、时长合理。",gate:"HUMAN APPROVAL",next:"批准后脚本成为 scene plan 的上游合同。"},
+        scene_plan:{read:"scene-plan director skill",action:"逐镜规定时长、画面、资产、声音、转场和验收目标。",output:"scene_plan canonical artifact",review:"每一镜必须可制作、可核验、与脚本对齐。",gate:"HUMAN APPROVAL",next:"批准后才进入资产样本与批量生产。"},
+        assets:{read:"assets director + tool agent_skills",action:"先生成代表性样本，再按已批准 provider/model 批量生产并记录 provenance。",output:"asset_manifest",review:"质量、来源、镜头关联、成本和降级项。",gate:"样本确认 / manifest checkpoint",next:"禁止用未批准替代品悄悄填满资产位。"},
+        edit:{read:"edit director skill",action:"依据 scene plan 组织画面、旁白、音乐、音效和字幕，只使用已批准资产。",output:"edit artifact / timeline",review:"节奏、同步、连续性和已批准承诺。",gate:"review + checkpoint",next:"局部问题只回到对应 scene 或 asset。"},
+        compose:{read:"compose director + runtime skill",action:"使用已批准 runtime 渲染，执行媒体硬校验、关键帧检查和最终 review。",output:"renders/final.mp4",review:"可播放、时长、分辨率、音轨、字幕、安全区与承诺兑现。",gate:"FINAL ACCEPTANCE",next:"提交实际工具、成本、失败重试、降级项与残余风险。"}
+      };
+      const stageButtons=[...document.querySelectorAll(".stage")],stageRead=document.getElementById("stageRead"),stageAction=document.getElementById("stageAction"),stageOutput=document.getElementById("stageOutput"),stageReview=document.getElementById("stageReview"),stageGate=document.getElementById("stageGate"),stageNext=document.getElementById("stageNext");
+      stageButtons.forEach(button=>button.addEventListener("click",()=>{stageButtons.forEach(x=>x.classList.remove("active"));button.classList.add("active");const s=stages[button.dataset.stage];stageRead.textContent=s.read;stageAction.textContent=s.action;stageOutput.textContent=s.output;stageReview.textContent=s.review;stageGate.textContent=s.gate;stageNext.textContent=s.next}));
+
+      document.querySelectorAll("[data-copy]").forEach(button=>button.addEventListener("click",async()=>{const source=document.getElementById(button.dataset.copy),text=source.innerText;try{await navigator.clipboard.writeText(text)}catch(error){const area=document.createElement("textarea");area.value=text;document.body.append(area);area.select();document.execCommand("copy");area.remove()}const old=button.textContent;button.textContent="已复制";button.classList.add("ok");setTimeout(()=>{button.textContent=old;button.classList.remove("ok")},1200)}));
+
+      const side=document.getElementById("sideNav"),mobile=document.getElementById("mobileNav"),menu=document.getElementById("menuButton");
+      mobile.innerHTML=[...side.querySelectorAll("a")].map(link=>`<a href="${link.getAttribute("href")}">${link.textContent.trim()}</a>`).join("");
+      menu.addEventListener("click",()=>mobile.classList.toggle("open"));mobile.addEventListener("click",event=>{if(event.target.tagName==="A")mobile.classList.remove("open")});
+      const navLinks=[...side.querySelectorAll("a")],sections=navLinks.map(link=>document.querySelector(link.getAttribute("href")));
+      const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)navLinks.forEach(link=>link.classList.toggle("active",link.getAttribute("href")==="#"+entry.target.id))}),{rootMargin:"-18% 0px -70% 0px"});
+      sections.forEach(section=>observer.observe(section));
+      const read=document.getElementById("readPercent"),progress=()=>{const max=document.documentElement.scrollHeight-innerHeight;read.textContent=(max?Math.round(scrollY/max*100):0)+"%"};addEventListener("scroll",progress,{passive:true});progress();
+    })();
+  </script>
+</body>
+</html>

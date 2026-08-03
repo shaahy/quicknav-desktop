@@ -10,6 +10,7 @@ interface FileCardProps {
   viewType: ViewType
   onOpenFile: (cardId: string) => void
   onShowMenu: (cardId: string, anchorRect: DOMRect) => void
+  onSetFavorite: (cardId: string, isFavorite: boolean) => void
   isReorderMode: boolean
 }
 
@@ -19,6 +20,7 @@ export function FileCard({
   total,
   onOpenFile,
   onShowMenu,
+  onSetFavorite,
   isReorderMode,
 }: FileCardProps) {
   const handleOpen = () => {
@@ -39,9 +41,15 @@ export function FileCard({
     onShowMenu(card.id, rect)
   }
 
+  const handleFavorite = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    onSetFavorite(card.id, !card.isFavorite)
+  }
+
   return (
     <article
       className="qc-file-card"
+      data-card-id={card.id}
       role="article"
       aria-posinset={index}
       aria-setsize={total}
@@ -81,6 +89,17 @@ export function FileCard({
           />
         </footer>
       </div>
+
+      <button
+        className="qc-file-card__favorite-btn"
+        type="button"
+        aria-label={`${card.isFavorite ? '取消收藏' : '收藏'}：${card.name}`}
+        aria-pressed={card.isFavorite}
+        disabled={isReorderMode}
+        onClick={handleFavorite}
+      >
+        <span aria-hidden="true">{card.isFavorite ? '♥' : '♡'}</span>
+      </button>
     </article>
   )
 }

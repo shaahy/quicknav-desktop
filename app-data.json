@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "cards": [
     {
       "id": "9d8dd7fa-7845-406a-9b07-18411732f569",
@@ -10,13 +10,15 @@
         "extension": "html",
         "fileSize": 75441,
         "mtimeMs": 1784541137897.4766,
-        "relativePath": "../A 教程集合/AI工程化全流程框架调研/index.html"
+        "relativePath": "A 教程集合/AI工程化全流程框架调研/index.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
       ],
       "createdAt": "2026-07-24T03:04:02.679Z",
-      "updatedAt": "2026-07-24T03:05:00.673Z"
+      "updatedAt": "2026-07-28T08:37:21.032Z",
+      "isFavorite": false
     },
     {
       "id": "60f3844d-762f-427a-8324-3d1a9d17cab5",
@@ -27,13 +29,14 @@
         "extension": "html",
         "fileSize": 59171,
         "mtimeMs": 1784181958156.5647,
-        "relativePath": "../A 教程集合/BMAD-METHOD技能速查/BMAD-METHOD-v6.10.0-全技能速查.html"
+        "relativePath": "A 教程集合/BMAD-METHOD技能速查/BMAD-METHOD-v6.10.0-全技能速查.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:05:22.927Z",
-      "updatedAt": "2026-07-24T03:06:54.146Z"
+      "updatedAt": "2026-07-27T10:32:17.695Z",
+      "isFavorite": false
     },
     {
       "id": "42dffc58-5da3-4f25-898d-41950ee3771a",
@@ -44,13 +47,14 @@
         "extension": "html",
         "fileSize": 47314,
         "mtimeMs": 1784603813824.219,
-        "relativePath": "../A 教程集合/gstack技能速查/gstack-skills-cheatsheet.html"
+        "relativePath": "A 教程集合/gstack技能速查/gstack-skills-cheatsheet.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:05:37.560Z",
-      "updatedAt": "2026-07-24T03:06:59.072Z"
+      "updatedAt": "2026-07-24T03:06:59.072Z",
+      "isFavorite": false
     },
     {
       "id": "d5b8e80b-aa43-4ab9-b6af-fa2c33942041",
@@ -61,13 +65,14 @@
         "extension": "html",
         "fileSize": 48068,
         "mtimeMs": 1784603870602.898,
-        "relativePath": "../A 教程集合/Matt Pocock Skills 技能速查/mattpocock-skills-cheatsheet.html"
+        "relativePath": "A 教程集合/Matt Pocock Skills 技能速查/mattpocock-skills-cheatsheet.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:06:15.143Z",
-      "updatedAt": "2026-07-24T03:06:38.504Z"
+      "updatedAt": "2026-07-24T03:06:38.504Z",
+      "isFavorite": false
     },
     {
       "id": "66b4da5d-0535-4814-a79c-dc89943bbc02",
@@ -78,13 +83,14 @@
         "extension": "html",
         "fileSize": 81437,
         "mtimeMs": 1784522403179.639,
-        "relativePath": "../A 教程集合/Matt Pocock Skill双场景工程实战教程/Matt-Pocock-Skills-Codex双场景工程实战教程.html"
+        "relativePath": "A 教程集合/Matt Pocock Skill双场景工程实战教程/Matt-Pocock-Skills-Codex双场景工程实战教程.html"
       },
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
       "createdAt": "2026-07-24T03:07:23.064Z",
-      "updatedAt": "2026-07-24T03:07:23.064Z"
+      "updatedAt": "2026-07-24T03:07:23.064Z",
+      "isFavorite": false
     },
     {
       "id": "9c800c56-cc36-479d-9075-7709ae76357c",
@@ -95,13 +101,14 @@
         "extension": "html",
         "fileSize": 92603,
         "mtimeMs": 1784604037707.826,
-        "relativePath": "../A 教程集合/obra-superpowers技能速查/obra-superpowers-v6.1.1-14技能速查.html"
+        "relativePath": "A 教程集合/obra-superpowers技能速查/obra-superpowers-v6.1.1-14技能速查.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:07:37.032Z",
-      "updatedAt": "2026-07-24T03:07:37.032Z"
+      "updatedAt": "2026-07-24T03:07:37.032Z",
+      "isFavorite": false
     },
     {
       "id": "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
@@ -112,13 +119,14 @@
         "extension": "html",
         "fileSize": 44336,
         "mtimeMs": 1784604344070.2896,
-        "relativePath": "../A 教程集合/OpenSpec技能速查/OpenSpec-OPSX-技能速查.html"
+        "relativePath": "A 教程集合/OpenSpec技能速查/OpenSpec-OPSX-技能速查.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:07:49.920Z",
-      "updatedAt": "2026-07-24T03:07:49.920Z"
+      "updatedAt": "2026-07-24T03:07:49.920Z",
+      "isFavorite": false
     },
     {
       "id": "5c670b11-26c3-483b-a413-f81e0edd25cd",
@@ -129,13 +137,14 @@
         "extension": "html",
         "fileSize": 107292,
         "mtimeMs": 1784603686633.454,
-        "relativePath": "../A 教程集合/PM Skills技能速查/phuryn-pm-skills-v2.1.0-中文速查.html"
+        "relativePath": "A 教程集合/PM Skills技能速查/phuryn-pm-skills-v2.1.0-中文速查.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:08:06.480Z",
-      "updatedAt": "2026-07-24T03:08:06.480Z"
+      "updatedAt": "2026-07-24T03:08:06.480Z",
+      "isFavorite": false
     },
     {
       "id": "27f72c0a-0654-49c0-a872-966b0688c4d4",
@@ -146,13 +155,14 @@
         "extension": "html",
         "fileSize": 34359,
         "mtimeMs": 1784603658521.2642,
-        "relativePath": "../A 教程集合/Spec-Kit技能速查/Spec-Kit-v0.8.15-技能速查.html"
+        "relativePath": "A 教程集合/Spec-Kit技能速查/Spec-Kit-v0.8.15-技能速查.html"
       },
       "categoryIds": [
         "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
       ],
       "createdAt": "2026-07-24T03:08:19.208Z",
-      "updatedAt": "2026-07-24T03:08:19.208Z"
+      "updatedAt": "2026-07-24T03:08:19.208Z",
+      "isFavorite": false
     },
     {
       "id": "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
@@ -163,13 +173,14 @@
         "extension": "html",
         "fileSize": 54036,
         "mtimeMs": 1783769241597.9482,
-        "relativePath": "../A 教程集合/BMAD-产物地图-流程教程.html"
+        "relativePath": "A 教程集合/BMAD-产物地图-流程教程.html"
       },
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
       "createdAt": "2026-07-24T03:09:01.913Z",
-      "updatedAt": "2026-07-24T03:09:01.913Z"
+      "updatedAt": "2026-07-24T03:09:01.913Z",
+      "isFavorite": false
     },
     {
       "id": "27c9b342-0fc1-4306-a748-a432afb16aa4",
@@ -180,13 +191,15 @@
         "extension": "html",
         "fileSize": 41594,
         "mtimeMs": 1784691797500.5413,
-        "relativePath": "../A 教程集合/BMAD Bug与功能Fix教程/index.html"
+        "relativePath": "A 教程集合/BMAD Bug与功能Fix教程/index.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "381d7232-65a8-4a56-9033-585d4b220ca2"
       ],
       "createdAt": "2026-07-24T03:10:42.761Z",
-      "updatedAt": "2026-07-24T03:10:42.761Z"
+      "updatedAt": "2026-07-28T08:37:34.080Z",
+      "isFavorite": false
     },
     {
       "id": "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
@@ -197,13 +210,15 @@
         "extension": "html",
         "fileSize": 47879,
         "mtimeMs": 1784691337518.5652,
-        "relativePath": "../A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html"
+        "relativePath": "A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
       ],
       "createdAt": "2026-07-24T03:11:08.664Z",
-      "updatedAt": "2026-07-24T03:12:07.392Z"
+      "updatedAt": "2026-07-28T08:37:40.401Z",
+      "isFavorite": false
     },
     {
       "id": "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
@@ -214,13 +229,15 @@
         "extension": "html",
         "fileSize": 55966,
         "mtimeMs": 1784695466353.7896,
-        "relativePath": "../A 教程集合/BMAD新产品0-1完整流程教程/index.html"
+        "relativePath": "A 教程集合/BMAD新产品0-1完整流程教程/index.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
       ],
       "createdAt": "2026-07-24T03:11:24.720Z",
-      "updatedAt": "2026-07-24T03:11:24.720Z"
+      "updatedAt": "2026-07-28T08:37:46.539Z",
+      "isFavorite": false
     },
     {
       "id": "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
@@ -231,13 +248,15 @@
         "extension": "html",
         "fileSize": 59626,
         "mtimeMs": 1784690702440.8152,
-        "relativePath": "../A 教程集合/BMAD已上线V1增量开发教程/index.html"
+        "relativePath": "A 教程集合/BMAD已上线V1增量开发教程/index.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
       ],
       "createdAt": "2026-07-24T03:11:43.376Z",
-      "updatedAt": "2026-07-24T03:11:43.376Z"
+      "updatedAt": "2026-07-28T08:37:52.459Z",
+      "isFavorite": false
     },
     {
       "id": "238f1926-f7f5-4dd5-9fa0-196d4b570546",
@@ -248,13 +267,15 @@
         "extension": "html",
         "fileSize": 156735,
         "mtimeMs": 1784859671892.7832,
-        "relativePath": "../A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html"
+        "relativePath": "A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
       ],
       "createdAt": "2026-07-24T03:29:46.336Z",
-      "updatedAt": "2026-07-24T03:29:46.336Z"
+      "updatedAt": "2026-07-28T08:37:03.665Z",
+      "isFavorite": true
     },
     {
       "id": "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
@@ -265,13 +286,14 @@
         "extension": "html",
         "fileSize": 82249,
         "mtimeMs": 1784863870749.0557,
-        "relativePath": "../A 教程集合/OpenSpec使用场景与实战教程/OpenSpec使用场景与实战教程.html"
+        "relativePath": "A 教程集合/OpenSpec使用场景与实战教程/OpenSpec使用场景与实战教程.html"
       },
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
       "createdAt": "2026-07-24T03:43:46.145Z",
-      "updatedAt": "2026-07-24T03:43:46.145Z"
+      "updatedAt": "2026-07-24T03:43:46.145Z",
+      "isFavorite": false
     },
     {
       "id": "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
@@ -282,13 +304,15 @@
         "extension": "html",
         "fileSize": 78085,
         "mtimeMs": 1784864427114.746,
-        "relativePath": "../A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html"
+        "relativePath": "A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html"
       },
       "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
       ],
       "createdAt": "2026-07-24T03:44:03.794Z",
-      "updatedAt": "2026-07-24T03:44:03.794Z"
+      "updatedAt": "2026-07-28T08:38:00.002Z",
+      "isFavorite": false
     },
     {
       "id": "162fe64a-f260-49f7-b507-4bd4bc213cea",
@@ -299,30 +323,14 @@
         "extension": "html",
         "fileSize": 71665,
         "mtimeMs": 1784863888324.072,
-        "relativePath": "../A 教程集合/Spec-Kit使用场景与实战教程/Spec-Kit使用场景与实战教程.html"
+        "relativePath": "A 教程集合/Spec-Kit使用场景与实战教程/Spec-Kit使用场景与实战教程.html"
       },
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
       "createdAt": "2026-07-24T03:44:21.329Z",
-      "updatedAt": "2026-07-24T03:44:21.329Z"
-    },
-    {
-      "id": "c6007c68-cd77-488f-beb9-995506dcf953",
-      "name": "四种组合开发流程精简对比矩阵",
-      "note": null,
-      "fileReference": {
-        "fileName": "四种组合开发流程对比",
-        "extension": "html",
-        "fileSize": 21790,
-        "mtimeMs": 1784873295796.2385,
-        "relativePath": "../A 教程集合/四种组合开发流程对比/四种组合开发流程对比.html"
-      },
-      "categoryIds": [
-        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
-      ],
-      "createdAt": "2026-07-24T06:11:42.485Z",
-      "updatedAt": "2026-07-24T06:11:42.485Z"
+      "updatedAt": "2026-07-24T03:44:21.329Z",
+      "isFavorite": false
     },
     {
       "id": "435af054-848e-428d-b5d8-954c45f8e9c6",
@@ -333,47 +341,50 @@
         "extension": "md",
         "fileSize": 2427,
         "mtimeMs": 1784861965756.111,
-        "relativePath": "../A 教程集合/工作记录.md"
+        "relativePath": "A 教程集合/工作记录.md"
       },
       "categoryIds": [
         "572e876b-8996-46da-b618-8d5380a94045"
       ],
       "createdAt": "2026-07-24T06:20:03.628Z",
-      "updatedAt": "2026-07-24T06:20:03.628Z"
+      "updatedAt": "2026-07-24T06:20:03.628Z",
+      "isFavorite": false
     },
     {
       "id": "5601f873-81f3-4a4f-8801-900e118d48e2",
-      "name": "AGENTS",
+      "name": "AGENTS-日常工作",
       "note": null,
       "fileReference": {
-        "fileName": "AGENTS",
+        "relativePath": "A 教程集合/AGENTS-日常工作用.md",
+        "fileName": "AGENTS-日常工作用",
         "extension": "md",
-        "fileSize": 1663,
-        "mtimeMs": 1783564698791.4272,
-        "relativePath": "../A 教程集合/AGENTS.md"
+        "fileSize": 1573,
+        "mtimeMs": 1785461737588.3098
       },
       "categoryIds": [
         "572e876b-8996-46da-b618-8d5380a94045"
       ],
       "createdAt": "2026-07-27T07:15:36.144Z",
-      "updatedAt": "2026-07-27T07:15:36.144Z"
+      "updatedAt": "2026-07-31T03:13:01.784Z",
+      "isFavorite": false
     },
     {
       "id": "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
       "name": "内网资源总览",
       "note": null,
       "fileReference": {
+        "relativePath": "C:/Users/MSI/Desktop/内网资源总览.md",
         "fileName": "内网资源总览",
         "extension": "md",
-        "fileSize": 1811,
-        "mtimeMs": 1783653967892.3474,
-        "relativePath": "../A 教程集合/内网资源总览.md"
+        "fileSize": 4009,
+        "mtimeMs": 1785210249449.5981
       },
       "categoryIds": [
         "572e876b-8996-46da-b618-8d5380a94045"
       ],
       "createdAt": "2026-07-27T07:15:47.224Z",
-      "updatedAt": "2026-07-27T07:15:47.224Z"
+      "updatedAt": "2026-08-03T03:05:09.113Z",
+      "isFavorite": true
     },
     {
       "id": "2f6e1a04-e1d8-4c6e-9125-a40bcf613696",
@@ -384,13 +395,14 @@
         "extension": "txt",
         "fileSize": 1998,
         "mtimeMs": 1784284947769.4612,
-        "relativePath": "../A 教程集合/原型提示词.txt"
+        "relativePath": "A 教程集合/原型提示词.txt"
       },
       "categoryIds": [
         "572e876b-8996-46da-b618-8d5380a94045"
       ],
       "createdAt": "2026-07-27T07:15:57.514Z",
-      "updatedAt": "2026-07-27T07:15:57.514Z"
+      "updatedAt": "2026-07-27T07:15:57.514Z",
+      "isFavorite": false
     },
     {
       "id": "da13ec12-a8bb-4865-98da-dae738586c7e",
@@ -407,14 +419,15 @@
         "572e876b-8996-46da-b618-8d5380a94045"
       ],
       "createdAt": "2026-07-27T07:28:32.233Z",
-      "updatedAt": "2026-07-27T07:28:32.233Z"
+      "updatedAt": "2026-07-27T07:28:32.233Z",
+      "isFavorite": false
     },
     {
       "id": "efd5a52e-06bc-455d-b3cb-6032399ff0bf",
       "name": "Matt Pocock Skills 实战教程",
       "note": null,
       "fileReference": {
-        "relativePath": "../A 教程集合/Matt Pocock Skills实战教程/Matt-Pocock-Skills实战教程.html",
+        "relativePath": "A 教程集合/Matt Pocock Skills实战教程/Matt-Pocock-Skills实战教程.html",
         "fileName": "Matt-Pocock-Skills实战教程",
         "extension": "html",
         "fileSize": 57860,
@@ -424,7 +437,337 @@
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
       ],
       "createdAt": "2026-07-27T09:45:20.736Z",
-      "updatedAt": "2026-07-27T09:45:20.736Z"
+      "updatedAt": "2026-07-27T09:45:20.736Z",
+      "isFavorite": false
+    },
+    {
+      "id": "74aac9a5-278c-4641-990c-995a0b96c28a",
+      "name": "Bug 修复：三种 AI 开发方式怎么选",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/MVP-Bug与功能修复三种方式对比/MVP-Bug与功能修复方式全面对比.html",
+        "fileName": "MVP-Bug与功能修复方式全面对比",
+        "extension": "html",
+        "fileSize": 81133,
+        "mtimeMs": 1785222724794.396
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "381d7232-65a8-4a56-9033-585d4b220ca2"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-28T08:34:19.281Z",
+      "updatedAt": "2026-07-28T08:38:14.546Z"
+    },
+    {
+      "id": "18853bb6-cf67-4830-aea6-58cbb2a23cfa",
+      "name": "增量迭代：五种开发方式怎么选",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/MVP-V1.0增量迭代方式对比教程/index.html",
+        "fileName": "index",
+        "extension": "html",
+        "fileSize": 80130,
+        "mtimeMs": 1785222974684.819
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-28T08:34:19.281Z",
+      "updatedAt": "2026-07-28T08:38:19.426Z"
+    },
+    {
+      "id": "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
+      "name": "OpenSpec 增量开发实战",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/OpenSpec已上线MVP-V1增量开发实战教程/OpenSpec已上线MVP-V1增量开发实战教程.html",
+        "fileName": "OpenSpec已上线MVP-V1增量开发实战教程",
+        "extension": "html",
+        "fileSize": 60626,
+        "mtimeMs": 1785222205591.0576
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-28T08:34:19.281Z",
+      "updatedAt": "2026-07-31T01:40:45.124Z"
+    },
+    {
+      "id": "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd",
+      "name": "Superpowers 增量开发实战",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Superpowers上线MVP增量开发教程/superpowers-mvp-incremental-development.html",
+        "fileName": "superpowers-mvp-incremental-development",
+        "extension": "html",
+        "fileSize": 73598,
+        "mtimeMs": 1785222278513.2263
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-28T08:34:19.281Z",
+      "updatedAt": "2026-07-31T01:40:46.535Z"
+    },
+    {
+      "id": "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
+      "name": "两种 BMAD 产品设计交付",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/两种BMAD产品设计交付.html",
+        "fileName": "两种BMAD产品设计交付",
+        "extension": "html",
+        "fileSize": 61148,
+        "mtimeMs": 1785294409390.341
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-29T05:40:01.793Z",
+      "updatedAt": "2026-07-29T05:40:01.793Z"
+    },
+    {
+      "id": "6998360c-0e2c-49be-841e-3030ee5c15b7",
+      "name": "16个场景内容",
+      "note": null,
+      "fileReference": {
+        "relativePath": "../超级智能体/16个场景内容.md",
+        "fileName": "16个场景内容",
+        "extension": "md",
+        "fileSize": 27693,
+        "mtimeMs": 1785296842698.1409
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-30T09:19:33.338Z",
+      "updatedAt": "2026-07-30T09:19:33.338Z"
+    },
+    {
+      "id": "4bc520d6-e3bc-48e3-b70f-237d4c1b90de",
+      "name": "四个阶段规划",
+      "note": null,
+      "fileReference": {
+        "relativePath": "../超级智能体/四个阶段规划.md",
+        "fileName": "四个阶段规划",
+        "extension": "md",
+        "fileSize": 12627,
+        "mtimeMs": 1785296842177.149
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-30T09:19:41.584Z",
+      "updatedAt": "2026-07-30T09:19:41.584Z"
+    },
+    {
+      "id": "4d78bfd0-6d59-458f-8f29-dfecd9bd81b4",
+      "name": "OpenMontage｜技能速查 + 工作流程图",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/openmontage-skill-quicklook.html",
+        "fileName": "openmontage-skill-quicklook",
+        "extension": "html",
+        "fileSize": 46754,
+        "mtimeMs": 1785461443268.9265
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-31T01:31:27.057Z",
+      "updatedAt": "2026-07-31T01:31:27.057Z"
+    },
+    {
+      "id": "4404d657-8177-4bec-9578-52ee48c62e3a",
+      "name": "AGENTS-卡帕西-开发用",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/AGENTS-卡帕西版本-开发用.md",
+        "fileName": "AGENTS-卡帕西版本-开发用",
+        "extension": "md",
+        "fileSize": 2339,
+        "mtimeMs": 1785466789042.6963
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-07-31T03:13:16.621Z",
+      "updatedAt": "2026-07-31T03:13:16.621Z"
+    },
+    {
+      "id": "afe283b7-7a2b-4312-8a03-55aa8fa5fed4",
+      "name": "四种组合开发流程对比",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/四种组合开发流程对比.html",
+        "fileName": "四种组合开发流程对比",
+        "extension": "html",
+        "fileSize": 21790,
+        "mtimeMs": 1784873295796.2385
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T01:44:22.026Z"
+    },
+    {
+      "id": "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
+      "name": "Github开源项目榜",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/github-top-repos-100k-stars.html",
+        "fileName": "github-top-repos-100k-stars",
+        "extension": "html",
+        "fileSize": 251776,
+        "mtimeMs": 1785719830737.2976
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": true,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T02:29:40.762Z"
+    },
+    {
+      "id": "c8230b6a-1452-4c83-81d2-cbab9d78cae1",
+      "name": "GitHub 项目管理实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/github-tutorial.html",
+        "fileName": "github-tutorial",
+        "extension": "html",
+        "fileSize": 24971,
+        "mtimeMs": 1785719817810.9966
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T02:29:59.627Z"
+    },
+    {
+      "id": "2b5b1804-5900-4767-8171-d18770af7213",
+      "name": "Langflow 教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/langflow-complete-tutorial.html",
+        "fileName": "langflow-complete-tutorial",
+        "extension": "html",
+        "fileSize": 56663,
+        "mtimeMs": 1785719806219.9138
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T01:44:22.026Z"
+    },
+    {
+      "id": "e28970b9-eaff-41ac-af51-850d3ac9a0a9",
+      "name": "n8n 自动化工程手册",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/n8n-complete-guide.html",
+        "fileName": "n8n-complete-guide",
+        "extension": "html",
+        "fileSize": 48813,
+        "mtimeMs": 1785719812560.198
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T01:44:22.026Z"
+    },
+    {
+      "id": "c302d701-4f34-447c-8bd6-02a402d5c06c",
+      "name": "Ollama 教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/ollama-guide.html",
+        "fileName": "ollama-guide",
+        "extension": "html",
+        "fileSize": 47785,
+        "mtimeMs": 1785719815531.431
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T01:44:22.026Z",
+      "updatedAt": "2026-08-03T01:44:22.026Z"
+    },
+    {
+      "id": "ce94ff41-1a17-4492-8629-71c130051b26",
+      "name": "常用提示词",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/常用提示词.md",
+        "fileName": "常用提示词",
+        "extension": "md",
+        "fileSize": 395,
+        "mtimeMs": 1785724686970.7793
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T02:38:29.937Z",
+      "updatedAt": "2026-08-03T02:38:29.937Z"
+    },
+    {
+      "id": "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
+      "name": "Agent Skill 实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Agent Skill实战教程/Agent Skill实战教程.html",
+        "fileName": "Agent Skill实战教程",
+        "extension": "html",
+        "fileSize": 67488,
+        "mtimeMs": 1785726082665.4402
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T03:17:40.130Z",
+      "updatedAt": "2026-08-03T03:17:40.130Z"
+    },
+    {
+      "id": "2ae7351f-76b0-4a3b-924c-42b48a19ac36",
+      "name": "Agent Skills 技能速查",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Agent Skills技能速查/Agent Skills 技能速查.html",
+        "fileName": "Agent Skills 技能速查",
+        "extension": "html",
+        "fileSize": 42767,
+        "mtimeMs": 1785725032077.1785
+      },
+      "categoryIds": [
+        "0a7f5a42-4e52-422c-9f4d-61e72e430ee8"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T03:17:40.130Z",
+      "updatedAt": "2026-08-03T03:17:40.130Z"
     }
   ],
   "categories": [
@@ -443,11 +786,39 @@
       "createdAt": "2026-07-24T03:06:24.991Z"
     },
     {
-      "id": "572e876b-8996-46da-b618-8d5380a94045",
-      "name": "工作文档",
+      "id": "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5",
+      "name": "新产品开发",
       "order": 2,
       "type": "user",
+      "createdAt": "2026-07-28T08:35:54.881Z"
+    },
+    {
+      "id": "58b460dc-76e8-49ec-960e-e412a7528992",
+      "name": "增量开发",
+      "order": 3,
+      "type": "user",
+      "createdAt": "2026-07-28T08:35:29.064Z"
+    },
+    {
+      "id": "381d7232-65a8-4a56-9033-585d4b220ca2",
+      "name": "bug修复",
+      "order": 4,
+      "type": "user",
+      "createdAt": "2026-07-28T08:35:37.737Z"
+    },
+    {
+      "id": "572e876b-8996-46da-b618-8d5380a94045",
+      "name": "工作文档",
+      "order": 5,
+      "type": "user",
       "createdAt": "2026-07-24T03:04:28.023Z"
+    },
+    {
+      "id": "6e6bad8d-0100-4f99-827c-06a47dc270d6",
+      "name": "其它",
+      "order": 6,
+      "type": "user",
+      "createdAt": "2026-08-03T02:29:24.578Z"
     }
   ],
   "viewOrders": [
@@ -455,7 +826,6 @@
       "viewType": "category:0e59029a-e4ec-41fa-981a-c2a69bb8485d",
       "cardIds": [
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
-        "c6007c68-cd77-488f-beb9-995506dcf953",
         "9d8dd7fa-7845-406a-9b07-18411732f569",
         "66b4da5d-0535-4814-a79c-dc89943bbc02",
         "9d23a039-3bc4-4064-8ad3-8e9fa075f104",
@@ -466,7 +836,17 @@
         "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
         "162fe64a-f260-49f7-b507-4bd4bc213cea",
-        "efd5a52e-06bc-455d-b3cb-6032399ff0bf"
+        "efd5a52e-06bc-455d-b3cb-6032399ff0bf",
+        "74aac9a5-278c-4641-990c-995a0b96c28a",
+        "18853bb6-cf67-4830-aea6-58cbb2a23cfa",
+        "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
+        "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd",
+        "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
+        "afe283b7-7a2b-4312-8a03-55aa8fa5fed4",
+        "2b5b1804-5900-4767-8171-d18770af7213",
+        "e28970b9-eaff-41ac-af51-850d3ac9a0a9",
+        "c302d701-4f34-447c-8bd6-02a402d5c06c",
+        "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af"
       ]
     },
     {
@@ -490,13 +870,30 @@
         "bdda4dc5-1d5b-4646-aab1-dd0fb2ec1e71",
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
         "162fe64a-f260-49f7-b507-4bd4bc213cea",
-        "c6007c68-cd77-488f-beb9-995506dcf953",
         "435af054-848e-428d-b5d8-954c45f8e9c6",
         "5601f873-81f3-4a4f-8801-900e118d48e2",
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
         "2f6e1a04-e1d8-4c6e-9125-a40bcf613696",
         "da13ec12-a8bb-4865-98da-dae738586c7e",
-        "efd5a52e-06bc-455d-b3cb-6032399ff0bf"
+        "efd5a52e-06bc-455d-b3cb-6032399ff0bf",
+        "74aac9a5-278c-4641-990c-995a0b96c28a",
+        "18853bb6-cf67-4830-aea6-58cbb2a23cfa",
+        "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
+        "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd",
+        "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
+        "6998360c-0e2c-49be-841e-3030ee5c15b7",
+        "4bc520d6-e3bc-48e3-b70f-237d4c1b90de",
+        "4d78bfd0-6d59-458f-8f29-dfecd9bd81b4",
+        "4404d657-8177-4bec-9578-52ee48c62e3a",
+        "afe283b7-7a2b-4312-8a03-55aa8fa5fed4",
+        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
+        "c8230b6a-1452-4c83-81d2-cbab9d78cae1",
+        "2b5b1804-5900-4767-8171-d18770af7213",
+        "e28970b9-eaff-41ac-af51-850d3ac9a0a9",
+        "c302d701-4f34-447c-8bd6-02a402d5c06c",
+        "ce94ff41-1a17-4492-8629-71c130051b26",
+        "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
+        "2ae7351f-76b0-4a3b-924c-42b48a19ac36"
       ]
     },
     {
@@ -507,10 +904,14 @@
       "viewType": "category:572e876b-8996-46da-b618-8d5380a94045",
       "cardIds": [
         "435af054-848e-428d-b5d8-954c45f8e9c6",
+        "4404d657-8177-4bec-9578-52ee48c62e3a",
         "5601f873-81f3-4a4f-8801-900e118d48e2",
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
         "2f6e1a04-e1d8-4c6e-9125-a40bcf613696",
-        "da13ec12-a8bb-4865-98da-dae738586c7e"
+        "da13ec12-a8bb-4865-98da-dae738586c7e",
+        "6998360c-0e2c-49be-841e-3030ee5c15b7",
+        "4bc520d6-e3bc-48e3-b70f-237d4c1b90de",
+        "ce94ff41-1a17-4492-8629-71c130051b26"
       ]
     },
     {
@@ -522,7 +923,51 @@
         "9c800c56-cc36-479d-9075-7709ae76357c",
         "00cb6936-df2a-40e6-8adf-4b9508ba23f5",
         "5c670b11-26c3-483b-a413-f81e0edd25cd",
-        "27f72c0a-0654-49c0-a872-966b0688c4d4"
+        "27f72c0a-0654-49c0-a872-966b0688c4d4",
+        "4d78bfd0-6d59-458f-8f29-dfecd9bd81b4",
+        "2ae7351f-76b0-4a3b-924c-42b48a19ac36"
+      ]
+    },
+    {
+      "viewType": "category:58b460dc-76e8-49ec-960e-e412a7528992",
+      "cardIds": [
+        "18853bb6-cf67-4830-aea6-58cbb2a23cfa",
+        "3e42a6fc-0cbf-450a-a531-d63dd6d0b029",
+        "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
+        "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
+        "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
+        "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd"
+      ]
+    },
+    {
+      "viewType": "category:381d7232-65a8-4a56-9033-585d4b220ca2",
+      "cardIds": [
+        "74aac9a5-278c-4641-990c-995a0b96c28a",
+        "27c9b342-0fc1-4306-a748-a432afb16aa4"
+      ]
+    },
+    {
+      "viewType": "category:d02b4519-bd86-4c2e-87cf-a258ccbfa3a5",
+      "cardIds": [
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "9d8dd7fa-7845-406a-9b07-18411732f569",
+        "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
+        "3d9b8764-178f-44ea-9ab0-7c7496d98d99"
+      ]
+    },
+    {
+      "viewType": "category:6e6bad8d-0100-4f99-827c-06a47dc270d6",
+      "cardIds": [
+        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
+        "c8230b6a-1452-4c83-81d2-cbab9d78cae1"
+      ]
+    },
+    {
+      "viewType": "favorites",
+      "cardIds": [
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
+        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35"
       ]
     }
   ]

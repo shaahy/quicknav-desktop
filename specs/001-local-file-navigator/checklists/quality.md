@@ -21,14 +21,14 @@
 - [ ] CHK007 — "5 秒、2 次核心操作"是否明确界定了计时起点（用户开始执行查找动作）和终点（文件成功交给操作系统），排除了系统"选择打开方式"等异常路径？[Clarity, Spec §SC-001]
 - [ ] CHK008 — "正常升级后保留全部应用数据"中的"正常升级"是否定义了具体含义（覆盖安装 vs 卸载重装 vs 大版本迁移）？[Clarity, Spec §FR-036]
 - [ ] CHK009 — ARIA live region 行为描述中"礼貌级播报""短暂输入停顿""可取消、可合并"是否有精确到毫秒或帧的量化定义？[Clarity, Spec §FR-023a]
-- [ ] CHK010 — "最小化到系统托盘"行为是否明确了数据保存策略（窗口关闭到托盘时是否实时写盘，还是只在退出时写）？[Clarity, Spec §FR-036b]
+- [ ] CHK010 — "关闭窗口即彻底退出"是否明确要求主进程及全部 Electron 子进程均结束，并排除隐藏到后台的实现？[Clarity, Spec §FR-036b]
 - [ ] CHK011 — "设计基线 1024×720，最小约 760×560"中的"约"是否足够精确？是否需要定义 ± 容差范围？[Clarity, Spec §SC-007]
 - [ ] CHK012 — HTML title 读取逻辑中"读取文件前 64KB 并解析"的实现细节出现在 research.md 中，spec.md 的需求文本本身是否对该行为有足够清晰的描述？[Clarity, Spec §FR-003]
 - [ ] CHK013 — "不设硬上限但也不承诺无限容量"中的容量承诺边界是否有可验证的标准（如"≤500 张卡片性能不退化"）？[Clarity, Spec §Assumptions]
 
 ## 3. 需求一致性 (Consistency)
 
-- [ ] CHK014 — FR-020 定义"冷启动进入全部卡片"与 FR-036b "托盘恢复保持关闭前状态"是否在措辞上互不矛盾？[Consistency, Spec §FR-020 vs FR-036b]
+- [ ] CHK014 — FR-020 定义"冷启动进入全部卡片"与 FR-036b "重复启动聚焦已有窗口并保持当前状态"是否在措辞上互不矛盾？[Consistency, Spec §FR-020 vs FR-036b]
 - [ ] CHK015 — FR-009 统一了 S11/S16/S17 三种修复场景，但 US4 Scenario 3 仅描述了 S16 的修复路径。US3 Scenario 7 定位失败后的修复行为是否与 FR-009 一致？[Consistency, Spec §FR-009 vs US3 vs US4]
 - [ ] CHK016 — FR-022 "排序移动结果立即生效"与 research.md "debounce 500ms 后写盘"之间是否存在 UI 即时反馈与数据持久化时机的不一致？[Consistency, Spec §FR-022 vs research.md]
 - [ ] CHK017 — S18 重复冲突对话框在新增（S10）、主动更换（S11）、打开修复（S16）、定位修复（S17）四种触发场景下的行为是否完全一致？[Consistency, Spec §外部系统交互契约]
@@ -54,7 +54,7 @@
 
 - [ ] CHK029 — 是否定义了 JSON 数据文件写入失败（磁盘满、权限不足、文件被锁定）时的用户反馈和恢复路径？[Gap, Exception Flow]
 - [ ] CHK030 — 是否定义了用户在系统文件选择器中选择了无法访问的文件（如网络路径断开、权限拒绝）——在此时（非后续打开时）的行为？[Gap, Exception Flow, Spec §X01]
-- [ ] CHK031 — 是否定义了系统托盘不可用（某些 Linux 桌面环境或精简 Windows 版本）时的降级行为？[Gap, Exception Flow]
+- [ ] CHK031 — 是否定义了单实例锁获取失败或重复启动事件未能聚焦已有窗口时的降级行为？[Gap, Exception Flow]
 - [ ] CHK032 — 是否定义了同时快速点击两张卡片触发两次系统打开请求时的并发行为？[Gap, Exception Flow]
 - [ ] CHK033 — 是否定义了操作系统报告文件打开成功但用户实际看不到应用窗口（如最小化启动）时的反馈？[Gap, Exception Flow, Spec §FR-026]
 - [ ] CHK034 — 是否定义了用户在"选择打开方式"（X02）对话框中选择了一个无法处理该文件类型的应用后的行为？[Gap, Exception Flow, Spec §FR-027]
@@ -71,8 +71,8 @@
 - [ ] CHK039 — 是否所有 18 个 Surface 都定义了加载中、正常、空、错误四种基础状态的需求覆盖？[Completeness, Experience States]
 - [ ] CHK040 — S01-S09 等主视图 Surface 的键盘焦点顺序是否在 spec 中明确定义，而不仅仅依赖 EXPERIENCE.md？[Gap, Experience States]
 - [ ] CHK041 — "模态不堆叠"原则——从 S16 进入 S14，从 S18 进入 S11 等跨 Surface 转换链，是否每个路径的状态变化都有需求覆盖？[Coverage, Experience States, Spec §Edge Cases]
-- [ ] CHK042 — 是否定义了系统托盘恢复窗口时，如果原来显示的卡片已被删除或原来所在的类别已被删除——界面的恢复行为？[Gap, Experience States, Spec §FR-036b]
-- [ ] CHK043 — 是否定义了应用在后台（最小化到托盘）期间，如果用户通过文件管理器手动删除了源文件——恢复窗口时的行为？[Gap, Experience States]
+- [ ] CHK042 — 是否定义了重复启动时已有窗口处于最小化、隐藏或失焦状态下的恢复、显示和聚焦行为？[Gap, Experience States, Spec §FR-036b]
+- [ ] CHK043 — 是否定义了用户关闭窗口退出后，外部文件发生变化并再次冷启动时的显示与错误处理行为？[Gap, Experience States]
 - [ ] CHK044 — status-bar 的"不遮挡操作、不推动布局"是否有精确的定位和尺寸需求？是否在所有 Surface 和窗口尺寸下一致？[Clarity, Experience States, Spec §Edge Cases]
 - [ ] CHK045 — 是否所有交互元素都定义了 disabled/active/focus/hover 四种交互状态的需求？[Completeness, Experience States]
 

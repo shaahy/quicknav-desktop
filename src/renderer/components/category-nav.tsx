@@ -1,6 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import type { MenuItem } from '@shared/types'
-import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
+import {
+  VIEW_ALL_CARDS,
+  VIEW_FAVORITES,
+  VIEW_UNCATEGORIZED,
+} from '@shared/constants'
 import { useAppState } from '../contexts/AppState'
 import { useCategories } from '../hooks/useCategories'
 import { CategoryItem } from './category-item'
@@ -58,7 +62,7 @@ function extractCategoryId(viewId: string): string {
 /**
  * Sidebar navigation for switching between card views.
  *
- * Renders system views ("全部卡片" at top, "未分类" at bottom) and
+ * Renders system views ("全部卡片" and "我的收藏" at top, "未分类" at bottom) and
  * user-created categories sorted by `order`. Each user category has a
  * "更多" button that opens an action menu with rename and delete options.
  *
@@ -99,6 +103,7 @@ export function CategoryNav({
 
   const renderedViews = useMemo<CategoryNavView[]>(() => {
     const allCardsView = views.find(v => v.id === VIEW_ALL_CARDS)
+    const favoritesView = views.find(v => v.id === VIEW_FAVORITES)
     const uncategorizedView = views.find(v => v.id === VIEW_UNCATEGORIZED)
 
     // Sort user categories by their order property
@@ -113,6 +118,7 @@ export function CategoryNav({
 
     const result: CategoryNavView[] = []
     if (allCardsView) result.push(allCardsView)
+    if (favoritesView) result.push(favoritesView)
     result.push(...userViews)
     if (uncategorizedView && hasUncategorized) result.push(uncategorizedView)
     return result
@@ -229,8 +235,9 @@ export function CategoryNav({
     const uncategorizedCount = state.data.cards.filter(
       c => c.categoryIds.length === 0
     ).length
+    const favoriteCount = state.data.cards.filter(c => c.isFavorite).length
 
-    return { totalCards, perCategory, uncategorizedCount }
+    return { totalCards, favoriteCount, perCategory, uncategorizedCount }
   }, [state.data.cards])
 
   // ── Check if we should show inline rename (only when no callback provided) ──
@@ -305,6 +312,8 @@ export function CategoryNav({
               cardCount={
                 view.id === VIEW_ALL_CARDS
                   ? cardCounts.totalCards
+                  : view.id === VIEW_FAVORITES
+                    ? cardCounts.favoriteCount
                   : view.id === VIEW_UNCATEGORIZED
                     ? cardCounts.uncategorizedCount
                     : cardCounts.perCategory.get(extractCategoryId(view.id)) ?? 0

@@ -380,7 +380,7 @@ describe('useFileRepair', () => {
       mocks.state.data.cards = [makeCard({ id: 'card-1', name: 'My Card' })]
       mocks.electronAPI.selectFile.mockResolvedValue({
         canceled: false,
-        error: '所选文件与工具不在同一磁盘，无法创建相对路径',
+        error: '无法访问所选文件',
       })
 
       const { result } = renderHook(() => useFileRepair())
@@ -388,7 +388,7 @@ describe('useFileRepair', () => {
 
       expect(repairResult).toEqual({
         result: 'error',
-        errorMessage: '所选文件与工具不在同一磁盘，无法创建相对路径',
+        errorMessage: '无法访问所选文件',
       })
       expect(mocks.dispatch).not.toHaveBeenCalled()
     })

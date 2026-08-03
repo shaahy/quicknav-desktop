@@ -1,0 +1,1313 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="两种 BMAD 产品设计交付方式教程">
+  <title>两种 BMAD 产品设计交付</title>
+  <style>
+    :root {
+      --bg: #f5f3ee;
+      --surface: #fffdf8;
+      --surface-2: #ece9e1;
+      --ink: #17201c;
+      --muted: #5d6963;
+      --line: #d6d2c8;
+      --green: #176b51;
+      --green-soft: #dcebe4;
+      --amber: #a45718;
+      --amber-soft: #f4e5d4;
+      --red: #9c3d37;
+      --red-soft: #f4dedb;
+      --blue: #315c79;
+      --blue-soft: #dfe8ee;
+      --code: #222b27;
+      --code-ink: #edf3ef;
+      --shadow: 0 16px 40px rgba(31, 40, 35, .08);
+      --radius: 14px;
+      --max: 1420px;
+      --sidebar: 284px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23,107,81,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23,107,81,.025) 1px, transparent 1px),
+        var(--bg);
+      background-size: 24px 24px;
+      font-family: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+      line-height: 1.68;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--green); }
+    code, pre {
+      font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+    :focus-visible {
+      outline: 3px solid #cf7e2e;
+      outline-offset: 3px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: 64px;
+      padding: 10px max(18px, calc((100vw - var(--max)) / 2));
+      color: #f6fbf8;
+      background: rgba(23, 32, 28, .96);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(14px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-size: 14px;
+      font-weight: 760;
+      letter-spacing: .02em;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,.24);
+      background: var(--green);
+    }
+    .topbar .search {
+      position: relative;
+      flex: 1;
+      max-width: 520px;
+      margin-left: auto;
+    }
+    .topbar input {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 42px 8px 14px;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+    }
+    .topbar input::placeholder { color: rgba(255,255,255,.58); }
+    .key {
+      position: absolute;
+      top: 8px;
+      right: 9px;
+      padding: 1px 7px;
+      color: rgba(255,255,255,.68);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 5px;
+      font-size: 12px;
+    }
+    .menu-toggle {
+      display: none;
+      min-width: 42px;
+      min-height: 40px;
+      color: #fff;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    aside {
+      position: sticky;
+      top: 64px;
+      align-self: start;
+      height: calc(100vh - 64px);
+      padding: 26px 18px 42px;
+      overflow-y: auto;
+      border-right: 1px solid var(--line);
+      background: rgba(245,243,238,.9);
+    }
+    .aside-label {
+      margin: 0 10px 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    nav { display: grid; gap: 3px; }
+    .nav-link {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      width: 100%;
+      padding: 9px 10px;
+      text-align: left;
+      background: transparent;
+      border: 0;
+      border-left: 3px solid transparent;
+      border-radius: 0 7px 7px 0;
+      cursor: pointer;
+    }
+    .nav-link:hover { background: var(--surface-2); }
+    .nav-link.active {
+      color: var(--green);
+      background: var(--green-soft);
+      border-left-color: var(--green);
+      font-weight: 760;
+    }
+    .nav-num {
+      color: var(--muted);
+      font: 700 11px/1 "Cascadia Code", Consolas, monospace;
+    }
+    .aside-note {
+      margin: 22px 8px 0;
+      padding: 14px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .aside-note strong { color: var(--ink); }
+
+    main {
+      min-width: 0;
+      padding: 54px clamp(24px, 5vw, 72px) 100px;
+    }
+    section {
+      max-width: 980px;
+      margin: 0 auto 84px;
+      scroll-margin-top: 90px;
+    }
+    section[hidden] { display: none; }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 820;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, h4 { line-height: 1.22; text-wrap: balance; }
+    h1 {
+      max-width: 920px;
+      margin: 0;
+      font-size: clamp(38px, 6.4vw, 78px);
+      letter-spacing: -.048em;
+    }
+    h2 {
+      margin: 0 0 18px;
+      font-size: clamp(29px, 4vw, 48px);
+      letter-spacing: -.032em;
+    }
+    h3 { margin: 34px 0 12px; font-size: 22px; }
+    h4 { margin: 26px 0 8px; font-size: 17px; }
+    .lead {
+      max-width: 810px;
+      margin: 24px 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 30px 0 44px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 720;
+    }
+    .hero-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .hero-map article {
+      min-height: 210px;
+      padding: 28px;
+      border-right: 1px solid var(--line);
+    }
+    .hero-map article:last-child { border-right: 0; }
+    .hero-map .step {
+      color: var(--green);
+      font: 800 12px/1 "Cascadia Code", Consolas, monospace;
+    }
+    .hero-map h3 { margin-top: 28px; }
+    .hero-map p { margin-bottom: 0; color: var(--muted); }
+
+    .thesis {
+      margin: 32px 0;
+      padding: 26px 28px;
+      background: var(--green);
+      color: #f5fbf8;
+      border-radius: var(--radius);
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .callout {
+      margin: 24px 0;
+      padding: 18px 20px;
+      border-left: 4px solid var(--blue);
+      background: var(--blue-soft);
+    }
+    .callout.warning {
+      border-left-color: var(--amber);
+      background: var(--amber-soft);
+    }
+    .callout.danger {
+      border-left-color: var(--red);
+      background: var(--red-soft);
+    }
+    .callout.success {
+      border-left-color: var(--green);
+      background: var(--green-soft);
+    }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    .route-picker {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 32px;
+    }
+    .route-card {
+      position: relative;
+      padding: 28px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--green);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .route-card.route-b { border-top-color: var(--amber); }
+    .route-letter {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font: 800 18px/1 "Cascadia Code", Consolas, monospace;
+    }
+    .route-b .route-letter { background: var(--amber); }
+    .route-card h3 { margin-top: 20px; }
+    .route-card p { color: var(--muted); }
+    .route-card button, .jump {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 14px;
+      color: #fff;
+      background: var(--ink);
+      border: 0;
+      border-radius: 7px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 28px 0;
+    }
+    .flow.step-5 { grid-template-columns: repeat(5, 1fr); }
+    .flow-item {
+      position: relative;
+      min-height: 132px;
+      padding: 18px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+    .flow-item::after {
+      position: absolute;
+      top: 50%;
+      right: -11px;
+      z-index: 2;
+      width: 10px;
+      height: 10px;
+      content: "";
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    .flow-item:last-child::after { display: none; }
+    .flow-phase {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--green);
+      font: 800 11px/1 "Cascadia Code", Consolas, monospace;
+    }
+    .flow-item b { display: block; line-height: 1.3; }
+    .flow-item small { display: block; margin-top: 8px; color: var(--muted); }
+    .flow-item.gate { color: #fff; background: var(--green); border-color: var(--green); }
+    .flow-item.gate .flow-phase, .flow-item.gate small { color: rgba(255,255,255,.78); }
+
+    .matrix-wrap {
+      margin: 24px 0 34px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: collapse;
+      background: var(--surface);
+      font-size: 14px;
+    }
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      color: var(--muted);
+      background: var(--surface-2);
+      font-size: 12px;
+      letter-spacing: .03em;
+    }
+    tr:last-child td { border-bottom: 0; }
+    td code {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 760;
+    }
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+    .required { color: var(--green); background: var(--green-soft); }
+    .optional { color: var(--blue); background: var(--blue-soft); }
+    .conditional { color: var(--amber); background: var(--amber-soft); }
+    .not-standard { color: var(--red); background: var(--red-soft); }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .file-card {
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .file-card header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .file-card h3 {
+      margin: 0;
+      font: 760 17px/1.4 "Cascadia Code", Consolas, monospace;
+    }
+    .file-card dl {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 8px 12px;
+      margin: 0;
+      font-size: 13px;
+    }
+    .file-card dt { color: var(--muted); font-weight: 760; }
+    .file-card dd { margin: 0; }
+    .file-card .attention {
+      margin: 15px 0 0;
+      padding-top: 14px;
+      color: var(--muted);
+      border-top: 1px dashed var(--line);
+      font-size: 13px;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      margin: 26px 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .compare > div {
+      padding: 15px 17px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .compare > div:nth-child(3n) { border-right: 0; }
+    .compare > div:nth-last-child(-n+3) { border-bottom: 0; }
+    .compare .head {
+      background: var(--surface-2);
+      font-weight: 800;
+    }
+    .compare .label { color: var(--muted); background: var(--surface); font-weight: 760; }
+
+    pre {
+      position: relative;
+      margin: 20px 0;
+      padding: 22px;
+      overflow: auto;
+      color: var(--code-ink);
+      background: var(--code);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      min-height: 32px;
+      padding: 3px 9px;
+      color: var(--code-ink);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn.done { color: #fff; background: var(--green); }
+
+    .checklist {
+      display: grid;
+      gap: 8px;
+      margin: 18px 0;
+      padding: 0;
+      list-style: none;
+    }
+    .checklist li {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 9px;
+      align-items: start;
+      padding: 12px 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .checklist li::before {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      content: "✓";
+      color: #fff;
+      background: var(--green);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .anti li::before { content: "!"; background: var(--red); }
+
+    .role-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin: 26px 0;
+      border: 1px solid var(--line);
+    }
+    .role {
+      min-height: 190px;
+      padding: 24px;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+    }
+    .role:last-child { border-right: 0; }
+    .role .role-id { color: var(--green); font: 800 12px/1 "Cascadia Code", Consolas, monospace; }
+    .role h3 { margin-top: 20px; }
+    .role p { color: var(--muted); }
+
+    .decision {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .decision .side {
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .decision .or {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font: 800 12px/1 "Cascadia Code", Consolas, monospace;
+    }
+    .decision h3 { margin-top: 0; }
+
+    .sources {
+      display: grid;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .source {
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+    .source b { display: block; }
+    .source code {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+      font-size: 11px;
+    }
+
+    .footer {
+      max-width: 980px;
+      margin: 0 auto;
+      padding-top: 28px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+    }
+    .search-empty {
+      display: none;
+      max-width: 760px;
+      margin: 80px auto;
+      padding: 30px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .searching section:not(.search-hit) { display: none; }
+    .searching .search-empty.show { display: block; }
+    mark { color: inherit; background: #f5d88e; }
+
+    @media (max-width: 1100px) {
+      .flow, .flow.step-5 { grid-template-columns: repeat(2, 1fr); }
+      .flow-item:nth-child(2n)::after { display: none; }
+      .hero-map { grid-template-columns: 1fr; }
+      .hero-map article { min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .hero-map article:last-child { border-bottom: 0; }
+    }
+    @media (max-width: 860px) {
+      .topbar { padding-inline: 14px; }
+      .menu-toggle { display: inline-grid; place-items: center; }
+      .layout { display: block; }
+      aside {
+        position: fixed;
+        inset: 64px auto 0 0;
+        z-index: 40;
+        width: min(86vw, 320px);
+        height: calc(100vh - 64px);
+        background: var(--bg);
+        transform: translateX(-105%);
+        transition: transform .2s ease;
+        box-shadow: 12px 0 30px rgba(0,0,0,.16);
+      }
+      body.nav-open aside { transform: translateX(0); }
+      main { padding: 42px 20px 80px; }
+      .route-picker, .file-grid, .role-strip { grid-template-columns: 1fr; }
+      .role { min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .role:last-child { border-bottom: 0; }
+      .compare { grid-template-columns: 140px 1fr; }
+      .compare > div:nth-child(3n) { border-right: 1px solid var(--line); }
+      .compare > div:nth-child(2n) { border-right: 0; }
+      .compare .route-b-head { display: none; }
+      .decision { grid-template-columns: 1fr; }
+      .decision .or { min-height: 30px; }
+    }
+    @media (max-width: 560px) {
+      .brand span { display: none; }
+      .key { display: none; }
+      .topbar .search { max-width: none; }
+      main { padding-inline: 16px; }
+      section { margin-bottom: 64px; }
+      .flow, .flow.step-5 { grid-template-columns: 1fr; }
+      .flow-item::after { display: none; }
+      .compare { display: block; }
+      .compare > div { border-right: 0; }
+      .compare .head { position: sticky; top: 64px; }
+      .compare .route-b-head { display: block; }
+      .file-card dl { grid-template-columns: 1fr; }
+      .file-card dd { margin-bottom: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+    @media print {
+      .topbar, aside, .copy-btn, .route-card button { display: none !important; }
+      body { background: #fff; color: #111; }
+      .layout { display: block; max-width: none; }
+      main { padding: 0; }
+      section { max-width: none; margin: 0 0 36px; break-inside: avoid; }
+      .file-card, .flow-item, .callout, .route-card { break-inside: avoid; box-shadow: none; }
+      .matrix-wrap { overflow: visible; }
+      table { min-width: 0; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle" aria-label="打开教程导航" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 4h5v5H3zM12 4h5v5h-5zM7.5 13h5v4h-5zM8 6.5h4M10 8.5V13" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </span>
+      <span>两种 BMAD 产品设计交付</span>
+    </div>
+    <div class="search">
+      <label class="sr-only" for="searchInput" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">搜索教程</label>
+      <input id="searchInput" type="search" placeholder="搜索文件、技能、Gate 或注意事项" autocomplete="off">
+      <span class="key">/</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside id="sidebar">
+      <p class="aside-label">教程目录</p>
+      <nav id="nav" aria-label="教程章节"></nav>
+      <div class="aside-note">
+        <strong>离线交付</strong>
+        本页不引用任何在线脚本、字体、图片或图标库。打印时会自动展开为文档版式。
+      </div>
+    </aside>
+
+    <main id="content">
+      <section id="overview" data-title="总览与核心结论">
+        <p class="eyebrow">BMAD → Spec Kit 双路径教程 · 2026-07-29</p>
+        <h1>两种 BMAD 产品设计交付方式</h1>
+        <p class="lead">这份教程只回答一个问题：BMAD 应该做到什么程度，再把哪些文件交给 Spec Kit。答案有两种，区别在于产品级架构、Feature 拆分和 Readiness 风险由谁提前收敛。</p>
+        <div class="hero-meta">
+          <span class="chip">单文件离线教程</span>
+          <span class="chip">两条交付路线</span>
+          <span class="chip">文件级责任说明</span>
+          <span class="chip">Gate 驱动</span>
+        </div>
+        <div class="hero-map" aria-label="两种 BMAD 产品设计交付路线">
+          <article>
+            <span class="step">ROUTE A / RECOMMENDED</span>
+            <h3>Phase 3 完整交付</h3>
+            <p>完成 PRD、UX、Architecture、Epics/Stories，并通过 Implementation Readiness 后交接。适合中大型和长期产品。</p>
+          </article>
+          <article>
+            <span class="step">ROUTE B / LEAN</span>
+            <h3>UX &amp; Design 后交付</h3>
+            <p>交付 <code>prd.md</code>、<code>DESIGN.md</code>、<code>EXPERIENCE.md</code>，由 Spec Kit 补 Feature roadmap 和技术规划。适合小型 MVP。</p>
+          </article>
+          <article>
+            <span class="step">SHARED RULE</span>
+            <h3>只保留一个拆分真相</h3>
+            <p>Feature 拆分只能由 BMAD Epics/Stories 或 Spec Kit roadmap 中的一方负责，不能长期并行维护两套范围。</p>
+          </article>
+        </div>
+        <div class="thesis">默认推荐路线 A：先在 BMAD 中完成 Phase 3 Solutioning，并通过 Implementation Readiness Check，再按一个 Epic 或 Feature 交给 Spec Kit。只有范围小、架构简单、速度优先的 MVP，才建议采用路线 B。</div>
+        <div class="callout warning">
+          <strong>本教程对前述讨论的正式修正</strong>
+          “Feature 包”和独立的 <code>traceability.md</code> 都不是 BMAD 当前标准工作流的固定原生产物。它们只能被标记为自定义适配层，不能冒充 BMAD 官方输出。
+        </div>
+      </section>
+
+      <section id="decision" data-title="如何选择两条路线">
+        <p class="eyebrow">Route Decision</p>
+        <h2>先选交接深度，再选 Feature 拆分负责人</h2>
+        <p>两条路线都能成立。区别不是“正确与错误”，而是有多少产品级风险在 BMAD 中提前收敛，以及有多少责任被转移给 Spec Kit。</p>
+        <div class="route-picker">
+          <article class="route-card">
+            <span class="route-letter">A</span>
+            <h3>Phase 3 完整治理路线</h3>
+            <p>适合中大型产品、多个 Feature、长期演进、多成员/多智能体协作，以及有复杂权限、集成、安全或部署要求的项目。</p>
+            <ul>
+              <li>产品级架构先冻结</li>
+              <li>Epics/Stories 在 BMAD 中形成</li>
+              <li>Readiness 作为正式交接 Gate</li>
+            </ul>
+            <button type="button" data-jump="route-a">查看路线 A</button>
+          </article>
+          <article class="route-card route-b">
+            <span class="route-letter">B</span>
+            <h3>UX &amp; Design 轻量路线</h3>
+            <p>适合小型 MVP、单体应用、技术边界简单、迭代速度优先，以及允许 Spec Kit 承担更多分解和规划责任的项目。</p>
+            <ul>
+              <li>只交付 PRD 与两个 UX Spine</li>
+              <li>Spec Kit 负责 Feature roadmap</li>
+              <li>技术一致性需额外补偿</li>
+            </ul>
+            <button type="button" data-jump="route-b">查看路线 B</button>
+          </article>
+        </div>
+        <div class="callout">
+          <strong>先做一个不可重复的决定</strong>
+          Feature 拆分只指定一个负责人：要么使用 BMAD 的 Epics/Stories，要么使用 Spec Kit 的 Spec-of-Specs roadmap。不要让两边各自产出一套并长期并行维护。
+        </div>
+      </section>
+
+      <section id="route-a" data-title="路线 A">
+        <p class="eyebrow">Route A · Recommended</p>
+        <h2>BMAD 完成 Solutioning 和 Readiness 后交付</h2>
+        <p class="lead">这条路线把产品级不确定性留在 BMAD 中解决。Spec Kit 接手时，不再重新发明产品目标、体验和整体架构，而是把一个已批准的交付切片编译成可执行规格。</p>
+        <div class="flow step-5" aria-label="路线 A 流程">
+          <div class="flow-item">
+            <span class="flow-phase">PHASE 1</span>
+            <b>Analysis</b>
+            <small>研究、Product Brief，按需执行</small>
+          </div>
+          <div class="flow-item">
+            <span class="flow-phase">PHASE 2</span>
+            <b>PRD + UX</b>
+            <small>产品需求、设计系统与体验行为</small>
+          </div>
+          <div class="flow-item">
+            <span class="flow-phase">PHASE 3</span>
+            <b>Architecture + Epics</b>
+            <small>整体技术决策和产品交付切片</small>
+          </div>
+          <div class="flow-item gate">
+            <span class="flow-phase">GATE</span>
+            <b>Implementation Readiness</b>
+            <small>只有 PASS/READY 才正式交接</small>
+          </div>
+          <div class="flow-item">
+            <span class="flow-phase">HANDOFF</span>
+            <b>Spec Kit per Feature</b>
+            <small>Specify → Plan → Tasks → Analyze</small>
+          </div>
+        </div>
+        <div class="callout success">
+          <strong>BMAD 的停止点</strong>
+          Readiness 通过后停止 BMAD 实施循环。不再运行 BMAD 的 Sprint Planning、Create Story、Dev Story 作为主开发链，否则会与 Spec Kit 形成重复任务系统。
+        </div>
+
+        <h3>路线 A 交付文件总表</h3>
+        <div class="matrix-wrap">
+          <table>
+            <thead><tr><th>文件</th><th>必要性</th><th>产生技能/阶段</th><th>作用</th><th>交给 Spec Kit 的方式</th></tr></thead>
+            <tbody>
+              <tr><td><code>product-brief.md</code></td><td><span class="status optional">推荐</span></td><td><code>bmad-product-brief</code> / Phase 1</td><td>记录用户、问题、价值主张和商业背景。</td><td>作为背景源，不直接变成 Feature Spec。</td></tr>
+              <tr><td><code>prd.md</code></td><td><span class="status required">必须</span></td><td><code>bmad-prd</code> / Phase 2</td><td>产品范围、业务规则、FR/NFR、成功指标的产品事实源。</td><td>Spec Kit 的需求来源；保留稳定需求 ID。</td></tr>
+              <tr><td><code>DESIGN.md</code></td><td><span class="status required">UI 必须</span></td><td><code>bmad-ux</code> / Phase 2</td><td>视觉 Token、组件规范、布局和表达规则。</td><td>作为 Feature UI 约束，不得扩张业务范围。</td></tr>
+              <tr><td><code>EXPERIENCE.md</code></td><td><span class="status required">UI 必须</span></td><td><code>bmad-ux</code> / Phase 2</td><td>信息架构、用户流程、行为、状态、异常和无障碍。</td><td>转入 <code>spec.md</code> 的场景与验收行为。</td></tr>
+              <tr><td><code>ARCHITECTURE-SPINE.md</code></td><td><span class="status required">必须</span></td><td><code>bmad-architecture</code> / Phase 3</td><td>技术栈、系统边界、模块、数据、集成、安全和验证原则。</td><td>是 <code>plan.md</code> 的上位约束，Feature 不得默默推翻。</td></tr>
+              <tr><td><code>SPEC.md</code> + companions</td><td><span class="status conditional">条件性</span></td><td><code>bmad-spec</code> / 所用版本的规格流程</td><td>机器可读意图核心，以及术语、来源保存与追踪辅助。</td><td>若实际工作流产出，则优先作为规格化输入；不能凭空要求。</td></tr>
+              <tr><td><code>epics.md</code> / Epic files</td><td><span class="status required">推荐必备</span></td><td><code>bmad-create-epics-and-stories</code> / Phase 3</td><td>MVP 切片、优先级、依赖及验收意图。</td><td>选择一个 Epic 或垂直 Story 集合启动一次 <code>/speckit.specify</code>。</td></tr>
+              <tr><td>Readiness 报告</td><td><span class="status required">必须</span></td><td><code>bmad-check-implementation-readiness</code> / Phase 3 Gate</td><td>验证规划文件之间的内聚性，给出 PASS/CONCERNS/FAIL 或 READY 结论。</td><td>记录交接资格、已接受风险和剩余问题。</td></tr>
+              <tr><td><code>project-context.md</code></td><td><span class="status optional">推荐</span></td><td>手工或 <code>bmad-generate-project-context</code> / Architecture 后</td><td>编码、工程、测试和实现约束。</td><td>用于形成 Spec Kit Constitution，但两者不应机械复制。</td></tr>
+              <tr><td><code>traceability.md</code></td><td><span class="status not-standard">非标准</span></td><td>无固定 BMAD 标准技能</td><td>只有高治理项目才单独维护的自定义追踪矩阵。</td><td>默认用需求 ID + Epic/roadmap + Spec Source References 代替。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="route-a-files">
+        <p class="eyebrow">Route A · Deliverables</p>
+        <h2>每个文件只拥有一种权威</h2>
+        <p>文件越多，越需要明确“谁有权定义什么”。否则 Spec Kit 会遇到相互冲突的上游事实，并在无意中选择一个版本。</p>
+        <div class="file-grid">
+          <article class="file-card">
+            <header><h3>prd.md</h3><span class="status required">必须</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-prd</code>，Phase 2 Planning</dd><dt>拥有</dt><dd>业务范围、业务规则、FR/NFR、成功指标</dd><dt>消费</dt><dd><code>/speckit.specify</code>、checklist、验收测试</dd></dl>
+            <p class="attention"><b>注意：</b>需求必须有稳定 ID。UX、Architecture 或 Feature Spec 都不能反向改写产品事实；发现冲突先回到 PRD 处理。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>DESIGN.md</h3><span class="status required">UI 必须</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-ux</code>，Phase 2 Planning</dd><dt>拥有</dt><dd>视觉 Token、组件、布局、视觉状态</dd><dt>消费</dt><dd>Feature UI 规格、前端实现与视觉验收</dd></dl>
+            <p class="attention"><b>注意：</b>它定义“怎样表达”，不定义新的业务能力。Mock 与 DESIGN 冲突时，应以已批准的 Design Spine 为准。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>EXPERIENCE.md</h3><span class="status required">UI 必须</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-ux</code>，Phase 2 Planning</dd><dt>拥有</dt><dd>IA、用户旅程、交互行为、状态、错误恢复、无障碍</dd><dt>消费</dt><dd><code>spec.md</code> 的 User Scenarios 与 Acceptance</dd></dl>
+            <p class="attention"><b>注意：</b>必须覆盖异常和恢复路径，不能只有 Happy Path。它不应冻结 Electron/Tauri、数据库或部署等 Architecture 决策。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>ARCHITECTURE-SPINE.md</h3><span class="status required">必须</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-architecture</code>，Phase 3 Solutioning</dd><dt>拥有</dt><dd>系统边界、核心模式、技术栈、数据与集成、安全和验证 Gate</dd><dt>消费</dt><dd><code>/speckit.plan</code> 与全部 Feature 技术方案</dd></dl>
+            <p class="attention"><b>注意：</b>Feature Plan 可以细化，但不能私自替换产品级架构。确需改变时先修改并批准上游 Architecture。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>epics.md / Epic files</h3><span class="status required">推荐必备</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-create-epics-and-stories</code>，Phase 3</dd><dt>拥有</dt><dd>价值切片、依赖、优先级、Story 验收意图</dd><dt>消费</dt><dd>选择下一次 <code>/speckit.specify</code> 的范围</dd></dl>
+            <p class="attention"><b>注意：</b>Story 不要写成文件路径级开发任务。任务实现细节交给 Spec Kit 的 <code>plan.md</code> 与 <code>tasks.md</code>。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>Readiness report</h3><span class="status required">交接 Gate</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-check-implementation-readiness</code></dd><dt>拥有</dt><dd>规划一致性结论、阻断问题、已接受风险</dd><dt>消费</dt><dd>项目负责人和 Spec Kit Handoff</dd></dl>
+            <p class="attention"><b>注意：</b>内部检查通过不等于发布批准。FAIL 不得交接；CONCERNS 必须有明确处理人、期限和豁免理由。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>SPEC.md + companions</h3><span class="status conditional">按版本</span></header>
+            <dl><dt>产生</dt><dd><code>bmad-spec</code>，仅在实际安装版本存在并采用时</dd><dt>拥有</dt><dd>Why、Capabilities、Constraints、Non-goals、Success 等意图合同</dd><dt>消费</dt><dd>Spec Kit 的高密度上游输入</dd></dl>
+            <p class="attention"><b>注意：</b>不要因为教程列出它就人工伪造。若没有运行对应技能，直接使用 PRD、UX、Architecture 和 Epic 即可。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>project-context.md</h3><span class="status optional">推荐</span></header>
+            <dl><dt>产生</dt><dd>Architecture 后生成或手工维护</dd><dt>拥有</dt><dd>长期工程偏好、编码规范、测试与依赖规则</dd><dt>消费</dt><dd>Spec Kit Constitution 与后续实施约束</dd></dl>
+            <p class="attention"><b>注意：</b>它是工程上下文，不是第二份 Architecture，也不是第二份 PRD。只保存跨 Feature 长期稳定的规则。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="route-a-handoff">
+        <p class="eyebrow">Route A · Handoff Gate</p>
+        <h2>不是“把一堆文件扔进去”，而是带着范围和权威关系交接</h2>
+        <h3>交接前检查</h3>
+        <ul class="checklist">
+          <li>PRD 的 FR/NFR 有稳定且连续的 ID，没有未处理的关键开放问题。</li>
+          <li>DESIGN 与 EXPERIENCE 已批准，职责边界清楚，关键流程包含失败与恢复路径。</li>
+          <li>Architecture 已冻结产品级技术决定，并说明 Feature 允许自行决定的空间。</li>
+          <li>Epics/Stories 覆盖 MVP，依赖清楚；Story 是产品切片，不是重复的代码任务。</li>
+          <li>Implementation Readiness 为 PASS/READY；所有 CONCERNS 均有明确处置。</li>
+          <li>本次只选择一个 Epic 或垂直切片，不把整个产品放入一次 Feature Spec。</li>
+        </ul>
+        <h3>推荐交接提示词</h3>
+        <pre><button class="copy-btn" type="button">复制</button>你正在为本项目创建一个 Spec Kit Feature Specification。
+
+请读取并尊重以下权威源：
+- prd.md：业务范围、业务规则、FR/NFR、成功指标
+- DESIGN.md：视觉 Token、组件与表达规则
+- EXPERIENCE.md：用户流程、行为、状态、错误恢复与无障碍
+- ARCHITECTURE-SPINE.md：产品级技术决策和不可违反的约束
+- epics/epic-01.md：本次 Feature 的范围与验收意图
+- implementation-readiness.md：交接 Gate、剩余风险和豁免
+
+本次只规格化 Epic 01，不得引入其他 Epic 范围。
+保留所有上游需求 ID，并在 spec.md 中增加 Source References。
+如上游文件发生冲突，停止并报告冲突，不自行选择或改写源文件。
+先执行 /speckit.specify，再执行 /speckit.clarify；未经确认不要进入 plan。</pre>
+        <div class="callout danger">
+          <strong>不要进入 BMAD Phase 4 主循环</strong>
+          一旦选择 Spec Kit 负责 Feature 规格与任务，BMAD 的 <code>sprint-status.yaml</code>、Create Story 和 Dev Story 不应再成为另一套实施真相。项目管理工具可以追踪状态，但不能复制任务内容。
+        </div>
+      </section>
+
+      <section id="route-b" data-title="路线 B">
+        <p class="eyebrow">Route B · Lean Handoff</p>
+        <h2>PRD、DESIGN、EXPERIENCE 也能启动 Spec Kit</h2>
+        <p class="lead">这条路线可以使用，但它只完成了产品需求和体验层。Architecture、Feature 切片及跨 Feature 一致性尚未由 BMAD 收敛，因此必须明确转交给 Spec Kit 或人工治理。</p>
+        <div class="flow" aria-label="路线 B 流程">
+          <div class="flow-item">
+            <span class="flow-phase">BMAD</span>
+            <b>PRD</b>
+            <small>产品事实与验收目标</small>
+          </div>
+          <div class="flow-item">
+            <span class="flow-phase">BMAD UX</span>
+            <b>Design + Experience</b>
+            <small>视觉与行为体验基线</small>
+          </div>
+          <div class="flow-item">
+            <span class="flow-phase">SPEC KIT PROJECT</span>
+            <b>Constitution + Roadmap</b>
+            <small>补充原则与 Feature 分解</small>
+          </div>
+          <div class="flow-item gate">
+            <span class="flow-phase">PER FEATURE</span>
+            <b>Specify → Analyze</b>
+            <small>逐 Feature 规格、计划和任务</small>
+          </div>
+        </div>
+        <div class="callout warning">
+          <strong>这不是“少三个文件”这么简单</strong>
+          没有 Architecture 和 Readiness，意味着第一个 Feature Plan 可能无意中替整个产品做出架构决定；后续 Feature 又可能采用另一套模型。小型 MVP 可以接受这种速度优先策略，中大型产品必须补偿。
+        </div>
+
+        <h3>BMAD 实际交付给 Spec Kit 的三个文件</h3>
+        <div class="matrix-wrap">
+          <table>
+            <thead><tr><th>文件</th><th>产生技能/阶段</th><th>已有作用</th><th>尚未解决的问题</th><th>重点注意</th></tr></thead>
+            <tbody>
+              <tr><td><code>prd.md</code></td><td><code>bmad-prd</code> / Phase 2</td><td>产品目标、范围、业务规则、FR/NFR、成功指标。</td><td>未形成 Feature 路线图和技术方案。</td><td>保留需求 ID；Spec Kit 不得把技术偏好反写成产品需求。</td></tr>
+              <tr><td><code>DESIGN.md</code></td><td><code>bmad-ux</code> / Phase 2</td><td>视觉 Token、组件和布局表达。</td><td>不负责模块、数据、集成与部署。</td><td>只约束表达，不扩张业务范围。</td></tr>
+              <tr><td><code>EXPERIENCE.md</code></td><td><code>bmad-ux</code> / Phase 2</td><td>用户流程、IA、状态、交互、错误恢复和无障碍。</td><td>没有产品级技术一致性保证。</td><td>将相关切片写入 Feature Spec；不要一次灌入全部流程。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>进入 Spec Kit 后必须补出的文件</h3>
+        <div class="file-grid">
+          <article class="file-card">
+            <header><h3>constitution.md</h3><span class="status required">项目一次</span></header>
+            <dl><dt>产生</dt><dd><code>/speckit.constitution</code></dd><dt>作用</dt><dd>TDD、安全、依赖、质量、兼容性等长期原则</dd><dt>来源</dt><dd>PRD NFR、团队工程原则与已知硬约束</dd></dl>
+            <p class="attention"><b>注意：</b>Constitution 不是 Architecture。它规定不可违反的原则，不应塞入当前 Feature 的实现细节。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>feature-roadmap.md</h3><span class="status conditional">大产品需要</span></header>
+            <dl><dt>产生</dt><dd>Spec Kit Spec-of-Specs 的 roadmap pass</dd><dt>作用</dt><dd>Feature ID、范围、依赖、状态和对应 Spec 路径</dd><dt>来源</dt><dd>PRD + EXPERIENCE 的能力和旅程切片</dd></dl>
+            <p class="attention"><b>注意：</b>这不是 BMAD 原生产物。ID 一旦被子 Spec 引用就保持稳定；小项目可直接指定第一个 Feature 而不建 roadmap。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>spec.md</h3><span class="status required">每 Feature</span></header>
+            <dl><dt>产生</dt><dd><code>/speckit.specify</code> + <code>/speckit.clarify</code></dd><dt>作用</dt><dd>当前 Feature 的 What / Why、场景、需求、边界和成功标准</dd><dt>来源</dt><dd>三个 BMAD 文件中的相关切片</dd></dl>
+            <p class="attention"><b>注意：</b>加入 Source References；明确 In Scope / Out of Scope；不要把整个 PRD 原样改名为 <code>spec.md</code>。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>plan.md</h3><span class="status required">每 Feature</span></header>
+            <dl><dt>产生</dt><dd><code>/speckit.plan</code></dd><dt>作用</dt><dd>当前 Feature 的技术方案、数据、接口与验证策略</dd><dt>来源</dt><dd><code>spec.md</code>、Constitution 和代码库事实</dd></dl>
+            <p class="attention"><b>注意：</b>路线 B 最大风险集中在这里。第一份 Plan 需要显式标记哪些决定是“产品级基线”，避免后续 Feature 重复选择。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>tasks.md</h3><span class="status required">每 Feature</span></header>
+            <dl><dt>产生</dt><dd><code>/speckit.tasks</code></dd><dt>作用</dt><dd>依赖有序、可验证、可并行标记的唯一实施任务源</dd><dt>来源</dt><dd><code>spec.md</code> 与 <code>plan.md</code></dd></dl>
+            <p class="attention"><b>注意：</b><code>tasks.md</code> 是当前 Feature 的唯一实施任务源，不再生成另一份竞争计划。</p>
+          </article>
+          <article class="file-card">
+            <header><h3>analysis report</h3><span class="status required">实施 Gate</span></header>
+            <dl><dt>产生</dt><dd><code>/speckit.analyze</code>，只读检查</dd><dt>作用</dt><dd>发现 spec、plan、tasks 之间的冲突、遗漏和歧义</dd><dt>来源</dt><dd>当前 Feature 三件套</dd></dl>
+            <p class="attention"><b>注意：</b>原生 Analyze 不会自动证明上游 PRD 全量覆盖。需求追踪仍需 Source References 或自定义检查。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="route-b-risk">
+        <p class="eyebrow">Route B · Risk Control</p>
+        <h2>三文件方式可行，但要主动偿还四类缺口</h2>
+        <div class="compare">
+          <div class="head">缺口</div><div class="head">会发生什么</div><div class="head route-b-head">补偿动作</div>
+          <div class="label">产品级架构</div><div>每个 Feature 的 Plan 都可能选择不同的数据、身份、模块或错误模型。</div><div>小型 MVP 在首个 Plan 中建立 Architecture Baseline；中大型项目回到 BMAD 补做 Architecture。</div>
+          <div class="label">Feature 边界</div><div>一次 <code>/speckit.specify</code> 吞入整个产品，Spec、Plan 和 Tasks 过大。</div><div>先做 Spec-of-Specs roadmap，再逐 Feature 进入标准流程。</div>
+          <div class="label">跨文件冲突</div><div>PRD、Design、Experience 对范围、流程或状态描述不一致。</div><div>声明权威边界；遇到跨边界冲突停止并回写上游，不让模型自行裁决。</div>
+          <div class="label">上游追踪</div><div><code>/speckit.analyze</code> 只检查 Feature 内部三件套，不能天然证明 PRD 覆盖。</div><div>保留需求 ID，在 roadmap 和 <code>spec.md</code> 中加入 Source References。</div>
+        </div>
+        <h3>路线 B 的适用边界</h3>
+        <div class="decision">
+          <article class="side">
+            <h3>可以直接采用</h3>
+            <ul>
+              <li>小型或验证型 MVP</li>
+              <li>单体应用，外部集成很少</li>
+              <li>技术栈已有明确团队惯例</li>
+              <li>功能数量少，可逐个 Feature 校正</li>
+              <li>接受速度优先及后续架构补强</li>
+            </ul>
+          </article>
+          <div class="or">VS</div>
+          <article class="side">
+            <h3>建议回 BMAD 补 Architecture</h3>
+            <ul>
+              <li>多个端、服务或仓库</li>
+              <li>复杂权限、支付、合规或安全</li>
+              <li>跨 Feature 共享核心数据模型</li>
+              <li>多人或多智能体并行开发</li>
+              <li>需要长期维护、迁移和发布治理</li>
+            </ul>
+          </article>
+        </div>
+        <h3>路线 B 推荐交接提示词</h3>
+        <pre><button class="copy-btn" type="button">复制</button>请读取以下 BMAD 已批准文件：
+- prd.md：产品范围、业务规则、FR/NFR 与成功指标
+- DESIGN.md：视觉 Token、组件与布局表达
+- EXPERIENCE.md：用户流程、行为、状态、错误恢复与无障碍
+
+当前尚未完成 BMAD Architecture、Epics/Stories 和 Implementation Readiness。
+因此不要直接实现整个产品。
+
+第一步：从三个文件中提取 Feature roadmap，包含稳定 Feature ID、范围、
+PRD/UX 来源 ID、依赖、MVP/Deferred 标记和状态。
+第二步：等待我批准 roadmap。
+第三步：只为第一个获批 Feature 运行 /speckit.specify。
+
+任何技术决定先区分：
+- 仅当前 Feature 的局部决定；
+- 所有后续 Feature 必须遵守的产品级基线。
+
+遇到三个源文件冲突时停止并报告，不自行覆盖。</pre>
+      </section>
+
+      <section id="decomposition" data-title="Feature 拆分归属">
+        <p class="eyebrow">Single Decomposition Owner</p>
+        <h2>Feature 包不是必需品，清晰的拆分责任才是</h2>
+        <p>BMAD 没有名为“生成 Feature 包”的标准工作流。解决方式不是强造一个文件，而是选择下列一种拆分机制。</p>
+        <div class="decision">
+          <article class="side">
+            <h3>BMAD 负责拆分</h3>
+            <p><code>bmad-create-epics-and-stories</code> 使用 PRD 和 Architecture 产生技术知情的 Epics/Stories。</p>
+            <ul>
+              <li>一个 Epic 或垂直 Story 集合成为 Spec Kit 输入</li>
+              <li>不再额外生产 Feature 包</li>
+              <li>Spec Kit 的 <code>spec.md</code> 就是最终 Feature 合同</li>
+            </ul>
+          </article>
+          <div class="or">OR</div>
+          <article class="side">
+            <h3>Spec Kit 负责拆分</h3>
+            <p>使用 Spec-of-Specs roadmap，把产品拆成多个可独立规格化和验收的子 Feature。</p>
+            <ul>
+              <li>roadmap 保存稳定 ID、范围和依赖</li>
+              <li>每个 Feature 单独走 Spec → Plan → Tasks</li>
+              <li>不再生成 BMAD Epics/Stories 与它竞争</li>
+            </ul>
+          </article>
+        </div>
+        <div class="callout danger">
+          <strong>禁止双重拆分真相</strong>
+          如果 BMAD Epic、Spec Kit roadmap 和自定义 Feature 包同时存在，范围、编号、状态和依赖迟早漂移。选择一个主拆分源，其他形式只做引用，不复制内容。
+        </div>
+        <h3>最小 roadmap 示例</h3>
+        <pre><button class="copy-btn" type="button">复制</button>| ID    | Feature      | 范围     | 上游来源                  | 依赖  | 状态    | Sub-spec |
+|-------|--------------|----------|---------------------------|-------|---------|----------|
+| F-001 | 账号登录     | MVP      | PRD-FR-001, EXP-FLOW-01   | —     | planned | —        |
+| F-002 | 内容创建     | MVP      | PRD-FR-002, EXP-FLOW-02   | F-001 | planned | —        |
+| F-003 | 内容分享     | Deferred | PRD-FR-003, EXP-FLOW-03   | F-002 | planned | —        |</pre>
+      </section>
+
+      <section id="traceability" data-title="需求追踪怎么做">
+        <p class="eyebrow">Traceability</p>
+        <h2><code>traceability.md</code> 不是默认答案</h2>
+        <p class="lead">BMAD 的 Readiness 会检查规划文件的内聚性，但没有一个通用标准步骤保证输出名为 <code>traceability.md</code> 的独立矩阵。多数项目使用“稳定 ID + 引用链”即可。</p>
+        <div class="flow">
+          <div class="flow-item"><span class="flow-phase">SOURCE</span><b>PRD-FR-001</b><small>产品需求稳定 ID</small></div>
+          <div class="flow-item"><span class="flow-phase">SLICE</span><b>Epic 01 / F-001</b><small>产品或 roadmap 切片</small></div>
+          <div class="flow-item"><span class="flow-phase">CONTRACT</span><b>spec.md / FR-001</b><small>Feature 行为合同</small></div>
+          <div class="flow-item gate"><span class="flow-phase">DELIVERY</span><b>tasks + tests</b><small>实现与验证证据</small></div>
+        </div>
+        <h3>推荐的 Source References</h3>
+        <pre><button class="copy-btn" type="button">复制</button>## Source References
+
+- Product requirements: PRD-FR-001, PRD-FR-003, PRD-NFR-002
+- User journeys: EXP-FLOW-002, EXP-STATE-004
+- Design rules: DESIGN-COMP-004, DESIGN-TOKEN-007
+- Architecture constraints: ARCH-AUTH-001, ARCH-DATA-003
+- Delivery slice: EPIC-01 / STORY-01-02</pre>
+        <div class="callout">
+          <strong>什么时候才单独维护 traceability.md？</strong>
+          强监管、跨团队、多供应商、审计或合同性交付项目，需要集中查看需求覆盖时再建立。普通产品中，它往往是高维护成本的重复索引。
+        </div>
+      </section>
+
+      <section id="comparison" data-title="两条路线最终对比">
+        <p class="eyebrow">Side-by-Side</p>
+        <h2>两条路线的真实权衡</h2>
+        <div class="matrix-wrap">
+          <table>
+            <thead><tr><th>维度</th><th>路线 A：Phase 3 + Readiness</th><th>路线 B：UX &amp; Design 后交付</th></tr></thead>
+            <tbody>
+              <tr><td>BMAD 停止点</td><td>Solutioning 完成且 Readiness PASS/READY</td><td>PRD 与 UX Spines 完成</td></tr>
+              <tr><td>BMAD 交付</td><td>PRD、Design、Experience、Architecture、Epics、Readiness；SPEC 按版本</td><td>PRD、Design、Experience</td></tr>
+              <tr><td>Feature 拆分</td><td>默认由 BMAD Epics/Stories 提供</td><td>由 Spec Kit Spec-of-Specs roadmap 提供</td></tr>
+              <tr><td>产品级架构</td><td>实施前已批准</td><td>尚未形成，必须在 Spec Kit/人工侧补偿</td></tr>
+              <tr><td>交接 Gate</td><td>BMAD Implementation Readiness</td><td>自定义三文件一致性检查 + roadmap 批准</td></tr>
+              <tr><td>速度</td><td>前期较慢，后续一致性较高</td><td>前期快，后续可能产生架构返工</td></tr>
+              <tr><td>主要风险</td><td>文档和流程偏重、Story 与 Spec Kit 重复</td><td>跨 Feature 架构漂移、范围过大、追踪缺口</td></tr>
+              <tr><td>适用项目</td><td>中大型、复杂、长期、多团队/多智能体</td><td>小型 MVP、低风险、单体、验证优先</td></tr>
+              <tr><td>总体建议</td><td><b>默认推荐</b></td><td>作为经过风险接受的加速路线</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="mistakes" data-title="常见错误与纠偏">
+        <p class="eyebrow">Failure Modes</p>
+        <h2>最容易让三套方法互相打架的做法</h2>
+        <ul class="checklist anti">
+          <li><div><b>一次把整个产品交给 <code>/speckit.specify</code></b><br>纠偏：选择一个 Epic/Feature，或者先做 Spec-of-Specs roadmap。</div></li>
+          <li><div><b>把 PRD 直接改名为 <code>spec.md</code></b><br>纠偏：PRD 是产品级事实，Spec 是一个 Feature 的行为合同，粒度不同。</div></li>
+          <li><div><b>同时维护 BMAD Stories、Feature 包、Spec Kit roadmap 三套切片</b><br>纠偏：只保留一个 Feature 拆分真相，其他文件只引用稳定 ID。</div></li>
+          <li><div><b>把 <code>traceability.md</code> 当成 BMAD 官方必需产物</b><br>纠偏：默认使用稳定需求 ID、roadmap/Epic 和 Source References。</div></li>
+          <li><div><b>让 Feature Plan 默默推翻 Architecture</b><br>纠偏：产品级决策改变必须先回写并批准上游 Architecture。</div></li>
+          <li><div><b>把内部 Gate PASS 描述成发布批准</b><br>纠偏：规划就绪、实现验证、公开测试和正式发布是不同 Gate。</div></li>
+          <li><div><b>只验证 Happy Path</b><br>纠偏：Experience、Spec、测试和 Converge 都必须覆盖异常、恢复、并发和生命周期。</div></li>
+        </ul>
+      </section>
+
+      <section id="sources" data-title="术语、来源与最终结论">
+        <p class="eyebrow">Reference &amp; Closure</p>
+        <h2>最终建议</h2>
+        <div class="thesis">默认采用路线 A：BMAD 完成 Phase 3 Solutioning 并通过 Readiness，再把一个获批 Epic/Feature 交给 Spec Kit。路线 B 可以加速小型 MVP，但必须显式补偿 Architecture、Feature roadmap、追踪和一致性 Gate。</div>
+        <h3>本教程依据的官方资料</h3>
+        <p>以下地址以纯文本保存，仅供追溯；本 HTML 不会在运行时加载它们。</p>
+        <div class="sources">
+          <div class="source"><b>BMAD Method · Getting Started</b><code>https://docs.bmad-method.org/tutorials/getting-started/</code></div>
+          <div class="source"><b>BMAD Method · Workflow Map</b><code>https://docs.bmad-method.org/reference/workflow-map/</code></div>
+          <div class="source"><b>Spec Kit · Agentic SDD</b><code>https://github.github.io/spec-kit/reference/agentic-sdd.html</code></div>
+          <div class="source"><b>Spec Kit · Spec of Specs</b><code>https://github.github.io/spec-kit/concepts/spec-of-specs.html</code></div>
+        </div>
+        <div class="callout success">
+          <strong>一句话记忆</strong>
+          BMAD 管产品级事实与交付边界，Spec Kit 把一个边界明确的 Feature 转换成可执行规格。
+        </div>
+      </section>
+
+      <div class="search-empty" id="searchEmpty">
+        <h2>没有匹配章节</h2>
+        <p>请尝试搜索文件名、技能名、Phase、Gate、Feature 或“注意”。</p>
+      </div>
+
+      <footer class="footer">
+        <p>两种 BMAD 产品设计交付 · 结构化教程版 · 更新日期 2026-07-29</p>
+        <p>自包含状态：内嵌 CSS、JavaScript、SVG；无外部模块、在线字体、图片或运行时网络请求。</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var sections = Array.from(document.querySelectorAll("main section"));
+      var navSections = sections.filter(function (section) {
+        return Boolean(section.dataset.title);
+      });
+      var nav = document.getElementById("nav");
+      var menuToggle = document.getElementById("menuToggle");
+      var searchInput = document.getElementById("searchInput");
+      var content = document.getElementById("content");
+      var searchEmpty = document.getElementById("searchEmpty");
+
+      navSections.forEach(function (section, index) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.className = "nav-link";
+        button.dataset.target = section.id;
+        button.innerHTML = '<span class="nav-num">' +
+          String(index + 1).padStart(2, "0") +
+          '</span><span>' + section.dataset.title + '</span>';
+        button.addEventListener("click", function () {
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+          document.body.classList.remove("nav-open");
+          menuToggle.setAttribute("aria-expanded", "false");
+        });
+        nav.appendChild(button);
+      });
+
+      function setActive(id) {
+        document.querySelectorAll(".nav-link").forEach(function (button) {
+          button.classList.toggle("active", button.dataset.target === id);
+        });
+      }
+
+      var observer = new IntersectionObserver(function (entries) {
+        var visible = entries
+          .filter(function (entry) { return entry.isIntersecting; })
+          .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+        if (visible.length) setActive(visible[0].target.id);
+      }, { rootMargin: "-20% 0px -62% 0px", threshold: [0, .2, .5] });
+
+      navSections.forEach(function (section) { observer.observe(section); });
+      setActive(navSections[0].id);
+
+      menuToggle.addEventListener("click", function () {
+        var open = document.body.classList.toggle("nav-open");
+        menuToggle.setAttribute("aria-expanded", String(open));
+      });
+
+      document.addEventListener("click", function (event) {
+        if (window.innerWidth <= 860 &&
+            document.body.classList.contains("nav-open") &&
+            !event.target.closest("aside") &&
+            !event.target.closest("#menuToggle")) {
+          document.body.classList.remove("nav-open");
+          menuToggle.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      document.querySelectorAll("[data-jump]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          document.getElementById(button.dataset.jump).scrollIntoView({ behavior: "smooth" });
+        });
+      });
+
+      document.querySelectorAll("pre").forEach(function (pre) {
+        var button = pre.querySelector(".copy-btn");
+        if (!button) return;
+        button.addEventListener("click", function () {
+          var clone = pre.cloneNode(true);
+          var cloneButton = clone.querySelector(".copy-btn");
+          if (cloneButton) cloneButton.remove();
+          var text = clone.textContent.trim();
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function () {
+              button.textContent = "已复制";
+              button.classList.add("done");
+              setTimeout(function () {
+                button.textContent = "复制";
+                button.classList.remove("done");
+              }, 1600);
+            });
+          } else {
+            var area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+            button.textContent = "已复制";
+            button.classList.add("done");
+            setTimeout(function () {
+              button.textContent = "复制";
+              button.classList.remove("done");
+            }, 1600);
+          }
+        });
+      });
+
+      function normalize(value) {
+        return value.trim().toLocaleLowerCase("zh-CN");
+      }
+
+      function runSearch() {
+        var query = normalize(searchInput.value);
+        var hits = 0;
+        content.classList.toggle("searching", Boolean(query));
+        sections.forEach(function (section) {
+          var hit = !query || normalize(section.textContent).indexOf(query) !== -1;
+          section.classList.toggle("search-hit", Boolean(query && hit));
+          if (query && hit) hits += 1;
+        });
+        searchEmpty.classList.toggle("show", Boolean(query && hits === 0));
+      }
+
+      searchInput.addEventListener("input", runSearch);
+      searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          searchInput.value = "";
+          runSearch();
+          searchInput.blur();
+        }
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "/" && document.activeElement !== searchInput) {
+          event.preventDefault();
+          searchInput.focus();
+        }
+      });
+
+      window.addEventListener("beforeprint", function () {
+        searchInput.value = "";
+        runSearch();
+      });
+    })();
+  </script>
+</body>
+</html>

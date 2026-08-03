@@ -1,6 +1,10 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import type { AppData, Card, Category, ViewType } from '@shared/types'
-import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
+import {
+  VIEW_ALL_CARDS,
+  VIEW_FAVORITES,
+  VIEW_UNCATEGORIZED,
+} from '@shared/constants'
 
 // ── Action Types ──
 
@@ -9,6 +13,7 @@ type AppAction =
   | { type: 'ADD_CARD'; card: Card }
   | { type: 'ADD_CARDS_BATCH'; cards: Card[] }
   | { type: 'UPDATE_CARD'; cardId: string; updates: Partial<Pick<Card, 'name' | 'note' | 'fileReference' | 'categoryIds'>> }
+  | { type: 'SET_CARD_FAVORITE'; cardId: string; isFavorite: boolean }
   | { type: 'DELETE_CARD'; cardId: string }
   | { type: 'ADD_CATEGORY'; category: Category }
   | { type: 'UPDATE_CATEGORY'; categoryId: string; name: string }
@@ -37,11 +42,12 @@ interface AppState {
 }
 
 const INITIAL_APP_DATA: AppData = {
-  version: 2,
+  version: 3,
   cards: [],
   categories: [],
   viewOrders: [
     { viewType: VIEW_ALL_CARDS, cardIds: [] },
+    { viewType: VIEW_FAVORITES, cardIds: [] },
     { viewType: VIEW_UNCATEGORIZED, cardIds: [] },
   ],
 }
@@ -63,12 +69,19 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'LOAD': {
       const loadedData = action.data
 
-      // Ensure viewOrders always includes VIEW_ALL_CARDS and VIEW_UNCATEGORIZED
-      // (fix for legacy/stale data that may lack these entries).
+      // Ensure viewOrders always includes all system views.
       if (!loadedData.viewOrders.some(vo => vo.viewType === VIEW_ALL_CARDS)) {
         loadedData.viewOrders.push({
           viewType: VIEW_ALL_CARDS,
           cardIds: loadedData.cards.map(c => c.id),
+        })
+      }
+      if (!loadedData.viewOrders.some(vo => vo.viewType === VIEW_FAVORITES)) {
+        loadedData.viewOrders.push({
+          viewType: VIEW_FAVORITES,
+          cardIds: loadedData.cards
+            .filter(c => c.isFavorite)
+            .map(c => c.id),
         })
       }
       if (!loadedData.viewOrders.some(vo => vo.viewType === VIEW_UNCATEGORIZED)) {
@@ -123,6 +136,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         if (vo.viewType === VIEW_ALL_CARDS) {
           return { ...vo, cardIds: [...vo.cardIds, card.id] }
         }
+        if (vo.viewType === VIEW_FAVORITES && card.isFavorite) {
+          return { ...vo, cardIds: [...vo.cardIds, card.id] }
+        }
         // For each category the card belongs to, append to that category viewOrder
         if (card.categoryIds.some(catId => vo.viewType === `category:${catId}`)) {
           return { ...vo, cardIds: [...vo.cardIds, card.id] }
@@ -147,6 +163,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         const appendedIds = cards
           .filter(card => {
             if (vo.viewType === VIEW_ALL_CARDS) return true
+            if (vo.viewType === VIEW_FAVORITES) return card.isFavorite
             if (vo.viewType === VIEW_UNCATEGORIZED) return card.categoryIds.length === 0
             return card.categoryIds.some(categoryId => vo.viewType === `category:${categoryId}`)
           })
@@ -243,6 +260,41 @@ export function appReducer(state: AppState, action: AppAction): AppState {
             ...vo,
             cardIds: vo.cardIds.filter(id => id !== cardId),
           })),
+        },
+      }
+    }
+
+    case 'SET_CARD_FAVORITE': {
+      const { cardId, isFavorite } = action
+      const card = state.data.cards.find(candidate => candidate.id === cardId)
+      if (!card || card.isFavorite === isFavorite) return state
+
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          cards: state.data.cards.map(candidate =>
+            candidate.id === cardId
+              ? {
+                  ...candidate,
+                  isFavorite,
+                  updatedAt: new Date().toISOString(),
+                }
+              : candidate
+          ),
+          viewOrders: state.data.viewOrders.map(viewOrder => {
+            if (viewOrder.viewType !== VIEW_FAVORITES) return viewOrder
+            if (isFavorite && !viewOrder.cardIds.includes(cardId)) {
+              return { ...viewOrder, cardIds: [...viewOrder.cardIds, cardId] }
+            }
+            if (!isFavorite) {
+              return {
+                ...viewOrder,
+                cardIds: viewOrder.cardIds.filter(id => id !== cardId),
+              }
+            }
+            return viewOrder
+          }),
         },
       }
     }

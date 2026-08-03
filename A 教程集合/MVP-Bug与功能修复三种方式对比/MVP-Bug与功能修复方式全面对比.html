@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="已完成 MVP 的 Bug 修复与功能增量：直接对话、Superpowers、OpenSpec 三种方式的离线决策对比。">
+  <title>MVP Bug 与功能修复｜三种 AI 开发方式全面对比</title>
+  <style>
+    :root {
+      --ink: #17222d;
+      --ink-soft: #485664;
+      --paper: #f4f0e8;
+      --surface: #fffdf8;
+      --surface-2: #ebe6dc;
+      --line: #d3cdc1;
+      --line-strong: #9c968b;
+      --navy: #18384b;
+      --navy-2: #24546d;
+      --direct: #bd5b36;
+      --direct-soft: #f7e5dc;
+      --super: #b27a13;
+      --super-soft: #f8edcf;
+      --spec: #27755d;
+      --spec-soft: #dff0e9;
+      --danger: #a13a35;
+      --danger-soft: #f7dfdc;
+      --good: #286b4f;
+      --good-soft: #dff0e8;
+      --neutral-soft: #e9edf0;
+      --shadow: 0 12px 34px rgba(31, 42, 51, .08);
+      --radius: 14px;
+      --page: 1480px;
+      --sans: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Microsoft YaHei UI", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 98px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(24, 56, 75, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 56, 75, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    button, select, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+    code, pre { font-family: var(--mono); }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 1000;
+      padding: 10px 14px;
+      color: #fff;
+      background: var(--navy);
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: none; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      color: #fff;
+      background: rgba(19, 42, 56, .97);
+      border-bottom: 1px solid rgba(255, 255, 255, .16);
+      backdrop-filter: blur(12px);
+    }
+    .topbar-inner {
+      width: min(calc(100% - 32px), var(--page));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: max-content;
+      font-weight: 750;
+      letter-spacing: .02em;
+    }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 50%;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .topnav::-webkit-scrollbar { display: none; }
+    .topnav a {
+      min-height: 44px;
+      padding: 11px 10px;
+      display: inline-flex;
+      align-items: center;
+      color: rgba(255,255,255,.78);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      font-size: 13px;
+    }
+    .topnav a:hover,
+    .topnav a:focus-visible {
+      color: #fff;
+      border-color: #e6b552;
+      outline: none;
+    }
+
+    .hero {
+      color: #fff;
+      background:
+        radial-gradient(circle at 83% 22%, rgba(226, 176, 78, .18), transparent 23%),
+        linear-gradient(125deg, #173447 0%, #204d61 62%, #18384b 100%);
+      border-bottom: 6px solid #d5a33f;
+    }
+    .hero-inner {
+      width: min(calc(100% - 32px), var(--page));
+      margin: 0 auto;
+      padding: 70px 0 54px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr);
+      gap: 56px;
+      align-items: end;
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: #e7bb65;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { margin-top: 0; line-height: 1.22; }
+    h1 {
+      max-width: 850px;
+      margin-bottom: 20px;
+      font-size: clamp(34px, 5vw, 68px);
+      letter-spacing: -.045em;
+    }
+    .hero-lead {
+      max-width: 830px;
+      margin: 0;
+      color: rgba(255,255,255,.82);
+      font-size: clamp(17px, 2vw, 21px);
+    }
+    .hero-ledger {
+      border-top: 1px solid rgba(255,255,255,.28);
+      border-bottom: 1px solid rgba(255,255,255,.28);
+    }
+    .hero-ledger-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 16px;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+    }
+    .hero-ledger-row:last-child { border-bottom: 0; }
+    .hero-ledger dt {
+      color: #e7bb65;
+      font-family: var(--mono);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .hero-ledger dd {
+      margin: 0;
+      color: rgba(255,255,255,.9);
+      font-size: 14px;
+    }
+
+    .workspace {
+      width: min(calc(100% - 32px), var(--page));
+      margin: 0 auto;
+      padding: 30px 0 84px;
+    }
+    .control-panel {
+      position: relative;
+      z-index: 10;
+      margin: -2px 0 34px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 18px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .control-title {
+      margin: 0 0 3px;
+      color: var(--navy);
+      font-weight: 800;
+    }
+    .control-note {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+    .scenario-switch,
+    .method-switch {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .switch-label {
+      margin-right: 3px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .seg-btn,
+    .method-btn {
+      min-height: 42px;
+      padding: 8px 12px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .seg-btn[aria-pressed="true"] {
+      color: #fff;
+      background: var(--navy);
+      border-color: var(--navy);
+    }
+    .method-btn[aria-pressed="false"] {
+      color: var(--ink-soft);
+      background: var(--surface-2);
+      text-decoration: line-through;
+      opacity: .72;
+    }
+    .method-btn[data-method="direct"] { border-bottom: 3px solid var(--direct); }
+    .method-btn[data-method="super"] { border-bottom: 3px solid var(--super); }
+    .method-btn[data-method="spec"] { border-bottom: 3px solid var(--spec); }
+
+    .section {
+      margin-top: 58px;
+    }
+    .section-head {
+      margin-bottom: 18px;
+      display: grid;
+      grid-template-columns: 66px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .section-no {
+      padding-top: 4px;
+      color: var(--navy-2);
+      border-top: 3px solid var(--navy);
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 800;
+    }
+    h2 {
+      margin-bottom: 7px;
+      color: var(--navy);
+      font-size: clamp(25px, 3vw, 38px);
+      letter-spacing: -.025em;
+    }
+    .section-intro {
+      max-width: 900px;
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+
+    .table-shell {
+      position: relative;
+      overflow: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 7px 26px rgba(30, 43, 52, .06);
+      scrollbar-color: var(--line-strong) var(--surface-2);
+    }
+    .table-shell + .table-shell { margin-top: 18px; }
+    .scroll-cue {
+      display: none;
+      margin: 0 0 8px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      text-align: right;
+    }
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--surface);
+    }
+    caption {
+      padding: 13px 16px;
+      color: var(--ink-soft);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      text-align: left;
+    }
+    th, td {
+      padding: 16px 17px;
+      vertical-align: top;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+    tr:last-child > * { border-bottom: 0; }
+    tr > *:last-child { border-right: 0; }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      color: #fff;
+      background: var(--navy);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    thead th:first-child {
+      left: 0;
+      z-index: 7;
+      min-width: 180px;
+    }
+    tbody th {
+      position: sticky;
+      left: 0;
+      z-index: 4;
+      width: 210px;
+      min-width: 180px;
+      color: var(--navy);
+      background: #f0ece3;
+      font-size: 14px;
+    }
+    tbody tr:hover td,
+    tbody tr:hover th { background-color: #fff9eb; }
+    td { min-width: 245px; }
+    td p:first-child { margin-top: 0; }
+    td p:last-child { margin-bottom: 0; }
+    td ul, td ol { margin: 0; padding-left: 20px; }
+    td li + li { margin-top: 4px; }
+    .compact th, .compact td { padding: 12px 14px; }
+    .compact td { min-width: 220px; }
+    .narrow td { min-width: 170px; }
+    .wide-first tbody th { min-width: 250px; }
+
+    .method-head {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .method-dot {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.15);
+    }
+    .head-direct { background: #7f3822 !important; }
+    .head-super { background: #705013 !important; }
+    .head-spec { background: #1d5c49 !important; }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      margin: 0 5px 5px 0;
+      padding: 3px 8px;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .tag.direct { color: #913f25; background: var(--direct-soft); }
+    .tag.super { color: #79510b; background: var(--super-soft); }
+    .tag.spec { color: #1e654e; background: var(--spec-soft); }
+    .tag.good { color: var(--good); background: var(--good-soft); }
+    .tag.risk { color: var(--danger); background: var(--danger-soft); }
+    .tag.neutral { color: var(--ink-soft); background: var(--neutral-soft); }
+    .tag.dark { color: #fff; background: var(--navy); border-color: var(--navy); }
+
+    .verdict {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .cell-note {
+      display: block;
+      margin-top: 7px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .rating {
+      display: inline-flex;
+      gap: 3px;
+      min-width: 86px;
+      margin-bottom: 5px;
+      color: var(--line-strong);
+      letter-spacing: 1px;
+    }
+    .rating .on { color: #b1780f; }
+    .score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 48px;
+      min-height: 30px;
+      padding: 3px 8px;
+      color: #fff;
+      background: var(--navy);
+      border-radius: 7px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .score.high { background: var(--good); }
+    .score.mid { background: #a06d11; }
+    .score.low { background: var(--danger); }
+    .callout-row td {
+      color: #fff;
+      background: var(--navy);
+      font-weight: 700;
+    }
+    .callout-row th {
+      color: #fff;
+      background: #102c3c;
+    }
+
+    .formula {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .formula span {
+      padding: 5px 8px;
+      color: var(--navy);
+      background: var(--surface-2);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .formula b { color: var(--ink-soft); }
+
+    .prompt {
+      position: relative;
+      min-width: 340px;
+      padding: 14px 14px 52px;
+      color: #e7edf1;
+      background: #162b37;
+      border-radius: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+    .copy-btn {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      min-height: 34px;
+      padding: 6px 10px;
+      color: #fff;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.45);
+      border-radius: 7px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .copy-btn:hover,
+    .copy-btn:focus-visible {
+      background: rgba(255,255,255,.12);
+      outline: 2px solid #e6b552;
+      outline-offset: 2px;
+    }
+
+    .decision-banner {
+      margin: 22px 0 0;
+      padding: 18px 20px;
+      color: #fff;
+      background: var(--navy);
+      border-left: 6px solid #d4a23e;
+      border-radius: 9px;
+    }
+    .decision-banner strong { color: #f2c76f; }
+
+    .source-code {
+      display: block;
+      margin: 4px 0;
+      color: var(--navy);
+      font-family: var(--mono);
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .footer {
+      color: rgba(255,255,255,.83);
+      background: #112b3a;
+      border-top: 6px solid #d5a33f;
+    }
+    .footer-inner {
+      width: min(calc(100% - 32px), var(--page));
+      margin: 0 auto;
+      padding: 32px 0 42px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+    }
+    .footer p { margin: 0; }
+    .footer small { color: rgba(255,255,255,.58); }
+
+    [data-hidden-method="true"] { display: none; }
+    [data-hidden-scenario="true"] { display: none; }
+
+    :focus-visible {
+      outline: 3px solid #d9a33a;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 32px; }
+      .control-panel { grid-template-columns: 1fr; }
+      .scroll-cue { display: block; }
+      .topbar-inner { align-items: flex-start; padding: 8px 0; }
+      .brand { min-height: 44px; }
+      .footer-inner { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      body { font-size: 14px; }
+      .topbar-inner, .workspace, .hero-inner, .footer-inner { width: min(calc(100% - 20px), var(--page)); }
+      .topbar-inner { display: block; }
+      .brand { margin-bottom: 3px; }
+      .hero-inner { padding: 46px 0 38px; }
+      .hero-ledger-row { grid-template-columns: 72px 1fr; }
+      .workspace { padding-top: 18px; }
+      .control-panel { padding: 15px; }
+      .section { margin-top: 46px; }
+      .section-head { grid-template-columns: 44px 1fr; gap: 11px; }
+      table { min-width: 900px; }
+      th, td { padding: 13px 14px; }
+      tbody th { min-width: 160px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 12mm; }
+      body { background: #fff; color: #111; font-size: 9pt; }
+      .topbar, .control-panel, .scroll-cue, .copy-btn { display: none !important; }
+      .hero { color: #111; background: #fff; border-bottom: 2px solid #111; }
+      .hero-inner { width: 100%; padding: 0 0 12mm; display: block; }
+      .hero-lead, .hero-ledger dd { color: #333; }
+      .hero-ledger { margin-top: 8mm; border-color: #777; }
+      .hero-ledger-row { border-color: #bbb; }
+      .workspace { width: 100%; padding: 0; }
+      .section { margin-top: 10mm; break-before: page; }
+      .section:first-of-type { break-before: auto; }
+      .table-shell { overflow: visible; border: 1px solid #777; box-shadow: none; }
+      table { min-width: 0; font-size: 7.4pt; }
+      thead th, tbody th { position: static; color: #111; background: #e9e9e9 !important; }
+      thead th { background: #d7d7d7 !important; }
+      th, td { padding: 5px 6px; border-color: #aaa; }
+      td { min-width: 0; }
+      tbody th { min-width: 0; }
+      .prompt { color: #111; background: #eee; }
+      .footer { color: #111; background: #fff; border-top: 2px solid #111; }
+      .footer-inner { width: 100%; }
+      [data-hidden-method="true"], [data-hidden-scenario="true"] { display: table-cell; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark">MVP</span><span>修复方式决策表</span></div>
+      <nav class="topnav" aria-label="页面章节">
+        <a href="#quick">快速结论</a>
+        <a href="#essence">本质差异</a>
+        <a href="#bug">Bug 流程</a>
+        <a href="#feature">功能流程</a>
+        <a href="#matrix">全面矩阵</a>
+        <a href="#selection">选型</a>
+        <a href="#prompts">提示词</a>
+        <a href="#dod">完成门槛</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="page-title">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Decision table · completed MVP · 2026-07-28</p>
+        <h1 id="page-title">Bug 与功能修复，三种 AI 开发方式怎么选</h1>
+        <p class="hero-lead">直接对话赢在启动速度，Superpowers 赢在实现纪律，OpenSpec 赢在变更契约。真正的选择，不是“哪个工具更强”，而是这次改变需要多少约束、证据与长期记忆。</p>
+      </div>
+      <dl class="hero-ledger">
+        <div class="hero-ledger-row"><dt>比较对象</dt><dd>直接对话式 / Superpowers / OpenSpec</dd></div>
+        <div class="hero-ledger-row"><dt>比较场景</dt><dd>已完成开发、具备可运行基线的 MVP</dd></div>
+        <div class="hero-ledger-row"><dt>核心边界</dt><dd>开发完成 ≠ 生产发布批准</dd></div>
+        <div class="hero-ledger-row"><dt>阅读方式</dt><dd>先看结论，再按风险与变更类型下钻</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <main id="main" class="workspace">
+    <section class="control-panel" aria-label="对比筛选器">
+      <div>
+        <p class="control-title">交互式对比筛选</p>
+        <p class="control-note">按钮只改变当前屏幕显示；打印时始终输出完整三种方式。</p>
+      </div>
+      <div class="scenario-switch" aria-label="场景筛选">
+        <span class="switch-label">场景</span>
+        <button class="seg-btn" type="button" data-scenario="all" aria-pressed="true">全部</button>
+        <button class="seg-btn" type="button" data-scenario="bug" aria-pressed="false">Bug</button>
+        <button class="seg-btn" type="button" data-scenario="feature" aria-pressed="false">功能</button>
+      </div>
+      <div class="method-switch" aria-label="方式显示开关">
+        <span class="switch-label">显示</span>
+        <button class="method-btn" type="button" data-method="direct" aria-pressed="true">直接对话</button>
+        <button class="method-btn" type="button" data-method="super" aria-pressed="true">Superpowers</button>
+        <button class="method-btn" type="button" data-method="spec" aria-pressed="true">OpenSpec</button>
+      </div>
+    </section>
+
+    <section class="section" id="quick" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">01</span>
+        <div>
+          <h2>30 秒结论</h2>
+          <p class="section-intro">先做方向判断。评分是相对比较，不代表任何方法天然保证质量。</p>
+        </div>
+      </div>
+      <p class="scroll-cue" aria-hidden="true">表格可左右滑动，首列固定</p>
+      <div class="table-shell">
+        <table>
+          <caption>三种方式的核心定位。低流程成本不等于低总成本，返工也属于成本。</caption>
+          <thead>
+            <tr>
+              <th scope="col">判断项</th>
+              <th scope="col" class="head-direct" data-method-col="direct"><span class="method-head"><i class="method-dot"></i>直接与大模型对话</span></th>
+              <th scope="col" class="head-super" data-method-col="super"><span class="method-head"><i class="method-dot"></i>基于 Superpowers</span></th>
+              <th scope="col" class="head-spec" data-method-col="spec"><span class="method-head"><i class="method-dot"></i>基于 OpenSpec</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">一句话定位</th>
+              <td data-method-col="direct"><span class="verdict">自由对话，临场约束</span>你在 Prompt 和追问中临时定义目标、过程与验收。</td>
+              <td data-method-col="super"><span class="verdict">工程技能，强过程纪律</span>用系统化调试、TDD、计划、审查和验证约束智能体怎样开发。</td>
+              <td data-method-col="spec"><span class="verdict">变更契约，强事实治理</span>用 Change 与 Delta Spec 约束这次到底改变什么，并将结果折叠回当前事实。</td>
+            </tr>
+            <tr>
+              <th scope="row">最强项</th>
+              <td data-method-col="direct"><span class="tag direct">启动速度</span><span class="tag direct">灵活性</span></td>
+              <td data-method-col="super"><span class="tag super">根因调试</span><span class="tag super">TDD</span><span class="tag super">审查</span></td>
+              <td data-method-col="spec"><span class="tag spec">范围边界</span><span class="tag spec">追溯</span><span class="tag spec">团队共识</span></td>
+            </tr>
+            <tr>
+              <th scope="row">最大短板</th>
+              <td data-method-col="direct"><span class="tag risk">过程靠人记</span>容易边聊边改、漏回归、结论强于证据。</td>
+              <td data-method-col="super"><span class="tag risk">长期产品事实较弱</span>设计与计划存在，但不是 OpenSpec 式持续规格账本。</td>
+              <td data-method-col="spec"><span class="tag risk">实现纪律不等于内置</span>规格清晰不自动等于根因正确、TDD 严格或代码质量合格。</td>
+            </tr>
+            <tr>
+              <th scope="row">最适合</th>
+              <td data-method-col="direct">低风险、局部、可快速验证、失败可轻易回退的修改。</td>
+              <td data-method-col="super">根因不清的 Bug、高回归风险修复、需要可靠实现与独立审查的功能。</td>
+              <td data-method-col="spec">用户行为、接口、数据、权限或跨团队契约发生变化的增量。</td>
+            </tr>
+            <tr>
+              <th scope="row">不宜单独使用</th>
+              <td data-method-col="direct">跨模块、高风险、需求仍模糊、多人协作或需要长期审计的变更。</td>
+              <td data-method-col="super">多个版本持续演进且必须维护统一产品规格时，不宜只依赖计划文档。</td>
+              <td data-method-col="spec">高难根因调试或高可靠实现时，不宜把“有规格”误当“实现正确”。</td>
+            </tr>
+            <tr class="callout-row">
+              <th scope="row">默认推荐</th>
+              <td data-method-col="direct">仅作为低风险快车道</td>
+              <td data-method-col="super">Bug 修复默认主线</td>
+              <td data-method-col="spec">行为变更与团队协作默认主线</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="essence" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">02</span>
+        <div>
+          <h2>本质差异：三种方式在管什么</h2>
+          <p class="section-intro">公平比较的前提是承认：直接对话是一种交互方式；Superpowers 是工程方法与技能集；OpenSpec 是规格驱动的变更生命周期。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>事实边界：三者可以叠加，并非天然互斥；本页先按单独采用时的默认能力比较。</caption>
+          <thead>
+            <tr>
+              <th scope="col">维度</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">核心问题</th><td data-method-col="direct">“我现在怎么让模型把这件事做完？”</td><td data-method-col="super">“怎样用可验证的工程纪律把它做对？”</td><td data-method-col="spec">“这次到底改变什么，怎样形成可持续的事实？”</td></tr>
+            <tr><th scope="row">约束载体</th><td data-method-col="direct">当前对话、Prompt、临时检查清单。</td><td data-method-col="super">技能规则、设计文档、实施计划、测试、审查与验证记录。</td><td data-method-col="spec">Proposal、Delta Spec、Design、Tasks、Verify、主规格与 Archive。</td></tr>
+            <tr><th scope="row">默认工作单元</th><td data-method-col="direct">一轮或一串对话。</td><td data-method-col="super">设计批准后的工程任务或 Bug 调试闭环。</td><td data-method-col="spec">一个可独立提议、实施、验证、同步、归档的 Change。</td></tr>
+            <tr><th scope="row">主要事实源</th><td data-method-col="direct">人脑 + 当前聊天上下文 + 仓库现状。</td><td data-method-col="super">批准的设计/计划 + 代码与测试证据。</td><td data-method-col="spec"><code>openspec/specs/</code> 当前事实 + <code>openspec/changes/</code> 拟议变化。</td></tr>
+            <tr><th scope="row">对 Bug 的核心机制</th><td data-method-col="direct">取决于你是否明确要求复现、根因、失败测试和回归。</td><td data-method-col="super"><code>systematic-debugging</code> 四阶段 + TDD + 完成前验证。</td><td data-method-col="spec">用 Change 固化预期行为、影响范围和修复任务；根因方法需另补。</td></tr>
+            <tr><th scope="row">对功能的核心机制</th><td data-method-col="direct">对话澄清后直接实现，或边实现边校正。</td><td data-method-col="super">Brainstorming → 隔离 → Plan → TDD → 双阶段审查 → 完成分支。</td><td data-method-col="spec">Explore → Propose → Review → Apply → Verify → Sync/Archive。</td></tr>
+            <tr><th scope="row">长期记忆</th><td data-method-col="direct"><span class="tag risk">弱</span>除非主动沉淀到仓库。</td><td data-method-col="super"><span class="tag neutral">中</span>设计、计划、Git 与测试可保留实现上下文。</td><td data-method-col="spec"><span class="tag good">强</span>主规格和归档 Change 形成演进记录。</td></tr>
+            <tr><th scope="row">它不是什么</th><td data-method-col="direct">不是自动存在的工程流程。</td><td data-method-col="super">不是产品规格数据库，也不是部署平台。</td><td data-method-col="spec">不是测试框架、调试器、代码审查器或生产发布系统。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="bug" data-scenario-section="bug">
+      <div class="section-head">
+        <span class="section-no">03</span>
+        <div>
+          <h2>Bug 修复完整流程对比</h2>
+          <p class="section-intro">以“用户保存后偶发丢失数据”为例。高质量 Bug 修复必须证明：症状被复现、根因被确认、修复能让失败测试变绿、旧行为未被破坏。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table>
+          <caption>Bug 路线按工程阶段逐步比较。直接对话列展示“合格 Prompt 下的最佳实践”，不是默认自动行为。</caption>
+          <thead>
+            <tr>
+              <th scope="col">阶段 / Gate</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">0. 基线与止血</th>
+              <td data-method-col="direct">必须主动要求先看 Git 状态、测试基线、发布版本和回滚点；否则模型可能直接改。</td>
+              <td data-method-col="super">先验证隔离环境与绿色基线。线上 P0 仍应先走事故止血，技能流程不能延误恢复。</td>
+              <td data-method-col="spec">严重事故先止血。较大永久修复再建立紧凑 Change，记录既有红灯与风险。</td>
+            </tr>
+            <tr>
+              <th scope="row">1. 稳定复现</th>
+              <td data-method-col="direct">提供错误文本、输入、频率、环境；要求只读调查并输出最小复现。</td>
+              <td data-method-col="super"><b>Phase 1</b>：完整读取错误、稳定复现、检查近期变更与组件边界证据。</td>
+              <td data-method-col="spec"><code>/opsx:explore</code> 调查真实代码与行为；无承诺，不急于生成 Change。</td>
+            </tr>
+            <tr>
+              <th scope="row">2. 根因追踪</th>
+              <td data-method-col="direct">必须规定“没有根因证据，不准提出修复”；否则容易症状修补。</td>
+              <td data-method-col="super"><b>Phase 1–3</b>：坏值逆向追踪 → 比较工作模式 → 单一可证伪假设。</td>
+              <td data-method-col="spec">Design 可记录根因与方案，但 OpenSpec 本身不强制采用特定根因方法。</td>
+            </tr>
+            <tr>
+              <th scope="row">3. 预期行为</th>
+              <td data-method-col="direct">在对话中写清 Given / When / Then 与不改变的旧行为。</td>
+              <td data-method-col="super">将已确认预期变成失败测试和计划约束。</td>
+              <td data-method-col="spec">用 MODIFIED/ADDED Requirement + Scenario 固化外部可观察行为。</td>
+            </tr>
+            <tr>
+              <th scope="row">4. 失败测试</th>
+              <td data-method-col="direct">主动要求先写、运行、看到正确失败，再允许改生产代码。</td>
+              <td data-method-col="super"><b>强制 RED</b>：测试必须因缺失行为失败，不是因环境、拼写或测试自身错误。</td>
+              <td data-method-col="spec">Tasks 可要求失败测试，但是否严格 RED–GREEN 取决于团队规则或组合 Superpowers。</td>
+            </tr>
+            <tr>
+              <th scope="row">5. 最小修复</th>
+              <td data-method-col="direct">限定一次只改一个假设；避免顺手重构和多个补丁混在一起。</td>
+              <td data-method-col="super"><b>GREEN</b>：只修根因，让当前测试通过；之后才重构。</td>
+              <td data-method-col="spec"><code>/opsx:apply</code> 按 Tasks 实施；新事实出现时先更新 Change。</td>
+            </tr>
+            <tr>
+              <th scope="row">6. 回归与兼容</th>
+              <td data-method-col="direct">必须显式列出新测试、相关模块、全量测试和真实运行验证命令。</td>
+              <td data-method-col="super"><code>verification-before-completion</code> 要求在当前状态重新运行证据命令并读取退出码。</td>
+              <td data-method-col="spec">项目测试 + 兼容/迁移验证 + <code>/opsx:verify</code> + 人工产品验收。</td>
+            </tr>
+            <tr>
+              <th scope="row">7. 审查</th>
+              <td data-method-col="direct">需要主动开独立审查上下文，避免实现者自审代替评审。</td>
+              <td data-method-col="super">规格符合度审查后，再做代码质量审查；严重问题阻断。</td>
+              <td data-method-col="spec">审查代码、测试、Change 和 Delta 是否一致；规格审查不替代代码审查。</td>
+            </tr>
+            <tr>
+              <th scope="row">8. 闭环</th>
+              <td data-method-col="direct">人工记录原因、修改、验证、残余风险和回滚方式。</td>
+              <td data-method-col="super">选择合并/PR/保留/丢弃分支；分支完成仍不是生产上线批准。</td>
+              <td data-method-col="spec">验证后 Sync/Archive，将已证实变化合并进当前规格并保留归档。</td>
+            </tr>
+            <tr class="callout-row">
+              <th scope="row">Bug 路线结论</th>
+              <td data-method-col="direct">小而清楚时快；质量高度依赖操作者纪律。</td>
+              <td data-method-col="super">默认首选：对“找对根因并证明修复”约束最强。</td>
+              <td data-method-col="spec">适合行为契约变化或需审计的 Bug；复杂根因应补调试方法。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="feature" data-scenario-section="feature">
+      <div class="section-head">
+        <span class="section-no">04</span>
+        <div>
+          <h2>功能增量完整流程对比</h2>
+          <p class="section-intro">以“给已完成的任务管理 MVP 增加标签”为例。真正风险不是把按钮写出来，而是范围、兼容、数据迁移、验收和长期事实是否一致。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table>
+          <caption>功能路线从问题澄清到事实归档。生产发布所需灰度、监控和回滚是三种方式都要另行完成的外层闭环。</caption>
+          <thead>
+            <tr>
+              <th scope="col">阶段 / Gate</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">1. 澄清问题</th>
+              <td data-method-col="direct">通过多轮问答确认用户、痛点、成功标准、范围外与约束。</td>
+              <td data-method-col="super"><code>brainstorming</code> 一次问一个问题，先理解现状，再给 2–3 个方案。</td>
+              <td data-method-col="spec"><code>/opsx:explore</code> 调查问题和代码，不建立实施承诺。</td>
+            </tr>
+            <tr>
+              <th scope="row">2. 设计方案</th>
+              <td data-method-col="direct">方案可能只存在对话里；需主动要求保存设计与决策理由。</td>
+              <td data-method-col="super">分段展示设计并获得批准，形成设计文档；YAGNI 控制未证实范围。</td>
+              <td data-method-col="spec">Proposal 说明 Why/What/Impact，Design 说明实现方向、迁移、风险和回滚。</td>
+            </tr>
+            <tr>
+              <th scope="row">3. 行为规格</th>
+              <td data-method-col="direct">手工编写验收标准，容易漏掉修改和移除的既有行为。</td>
+              <td data-method-col="super">设计和计划可以写行为，但不维护独立的主规格/Delta 生命周期。</td>
+              <td data-method-col="spec">ADDED / MODIFIED / REMOVED Delta 精确表达与当前规格的差异。</td>
+            </tr>
+            <tr>
+              <th scope="row">4. 人工批准</th>
+              <td data-method-col="direct">完全取决于 Prompt 是否设置“未经批准不写代码”。</td>
+              <td data-method-col="super">设计批准后才写实施计划；计划批准后才执行。</td>
+              <td data-method-col="spec">四类产物互相一致、未知项解决、成功标准可验证后才 Apply。</td>
+            </tr>
+            <tr>
+              <th scope="row">5. 任务拆分</th>
+              <td data-method-col="direct">临时 Todo，颗粒度与证据要求依操作者能力。</td>
+              <td data-method-col="super"><code>writing-plans</code> 拆成短任务，包含文件、代码方向与验证命令。</td>
+              <td data-method-col="spec">Tasks 绑定规格、实施顺序与完成证据；可在实现中持续更新。</td>
+            </tr>
+            <tr>
+              <th scope="row">6. 实现纪律</th>
+              <td data-method-col="direct">可要求 TDD，但模型容易在长对话中弱化约束。</td>
+              <td data-method-col="super">RED–GREEN–REFACTOR；可按任务使用新上下文并做两阶段审查。</td>
+              <td data-method-col="spec">Apply 约束按计划实施，但 TDD、独立审查强度由工程制度决定。</td>
+            </tr>
+            <tr>
+              <th scope="row">7. 处理新事实</th>
+              <td data-method-col="direct">在聊天里改方向，若未同步文档，容易出现对话、代码、验收不一致。</td>
+              <td data-method-col="super">重大偏差回到设计/计划 Gate；小偏差按计划更新。</td>
+              <td data-method-col="spec">先更新 Proposal/Spec/Design/Tasks，再继续 Apply，保留同一 Change 的一致性。</td>
+            </tr>
+            <tr>
+              <th scope="row">8. 验证与验收</th>
+              <td data-method-col="direct">需要主动建立规格映射表与全量验证清单。</td>
+              <td data-method-col="super">任务测试、全量测试、代码审查和新鲜验证；外层补真实用户验收。</td>
+              <td data-method-col="spec">项目质量命令、兼容/迁移、规格一致性、人工产品验收四层证据。</td>
+            </tr>
+            <tr>
+              <th scope="row">9. 长期收口</th>
+              <td data-method-col="direct">人工更新 README、PRD、ADR 或 Issue，否则事实散落。</td>
+              <td data-method-col="super">Git、设计、计划和测试留下实现历史，但产品事实需额外维护。</td>
+              <td data-method-col="spec">Sync 将 Delta 合入主规格，Archive 保留完整 Change 历史。</td>
+            </tr>
+            <tr class="callout-row">
+              <th scope="row">功能路线结论</th>
+              <td data-method-col="direct">只适合边界已明确的小功能；否则最容易边做边变。</td>
+              <td data-method-col="super">工程质量强，适合设计已明确且需要可靠实现的增量。</td>
+              <td data-method-col="spec">行为变化、多人评审与长期演进的默认首选。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="matrix" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">05</span>
+        <div>
+          <h2>30 项全面对比矩阵</h2>
+          <p class="section-intro">“强”表示该能力被原生流程显式要求；“可补”表示可以通过 Prompt、团队规则或组合方法实现，但不是默认保证。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact wide-first">
+          <caption>能力矩阵不评价模型本身的编码水平，只评价流程是否系统性降低遗漏、漂移和伪完成。</caption>
+          <thead>
+            <tr>
+              <th scope="col">对比维度</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">01 启动速度</th><td data-method-col="direct"><span class="score high">5/5</span> 几乎零准备。</td><td data-method-col="super"><span class="score mid">3/5</span> 需加载技能、核查环境。</td><td data-method-col="spec"><span class="score mid">3/5</span> 需初始化并建立 Change。</td></tr>
+            <tr><th scope="row">02 学习门槛</th><td data-method-col="direct"><span class="score high">5/5</span> 会描述问题即可开始。</td><td data-method-col="super"><span class="score mid">3/5</span> 需理解技能触发与 Gate。</td><td data-method-col="spec"><span class="score mid">3/5</span> 需理解 Spec/Change/Delta/Archive。</td></tr>
+            <tr><th scope="row">03 流程灵活性</th><td data-method-col="direct"><span class="score high">5/5</span> 随时改方向。</td><td data-method-col="super"><span class="score mid">4/5</span> 可选 Bug/功能路线，但纪律严格。</td><td data-method-col="spec"><span class="score mid">4/5</span> 产物可迭代，但变化必须同步。</td></tr>
+            <tr><th scope="row">04 需求澄清</th><td data-method-col="direct"><span class="tag neutral">可补</span> 取决于提问质量。</td><td data-method-col="super"><span class="tag good">强</span> Brainstorming 显式要求。</td><td data-method-col="spec"><span class="tag good">强</span> Explore/Proposal/Review。</td></tr>
+            <tr><th scope="row">05 范围边界</th><td data-method-col="direct"><span class="tag risk">弱</span> 容易在长对话中漂移。</td><td data-method-col="super"><span class="tag good">强</span> 批准设计、计划与 YAGNI。</td><td data-method-col="spec"><span class="tag good">最强</span> Change 与 Delta 明确差异。</td></tr>
+            <tr><th scope="row">06 根因调查</th><td data-method-col="direct"><span class="tag neutral">可补</span> 需明确禁止猜修。</td><td data-method-col="super"><span class="tag good">最强</span> 四阶段系统化调试。</td><td data-method-col="spec"><span class="tag neutral">中</span> 可记录，不强制方法。</td></tr>
+            <tr><th scope="row">07 TDD 强制力</th><td data-method-col="direct"><span class="tag neutral">可补</span> 容易先实现后补测。</td><td data-method-col="super"><span class="tag good">最强</span> 必须看到正确 RED。</td><td data-method-col="spec"><span class="tag neutral">可补</span> Tasks 可要求，但非核心机制。</td></tr>
+            <tr><th scope="row">08 回归保护</th><td data-method-col="direct"><span class="tag risk">中弱</span> 依赖人工列全范围。</td><td data-method-col="super"><span class="tag good">强</span> 测试与完成前验证。</td><td data-method-col="spec"><span class="tag good">强</span> 规格场景与 Verify 可映射回归。</td></tr>
+            <tr><th scope="row">09 代码审查</th><td data-method-col="direct"><span class="tag neutral">可补</span> 需另开独立审查。</td><td data-method-col="super"><span class="tag good">强</span> 规格符合度 + 代码质量。</td><td data-method-col="spec"><span class="tag neutral">可补</span> Change 审查不等于代码审查。</td></tr>
+            <tr><th scope="row">10 验证纪律</th><td data-method-col="direct"><span class="tag risk">中弱</span> 易接受模型口头结论。</td><td data-method-col="super"><span class="tag good">最强</span> 新鲜命令、退出码、失败数量。</td><td data-method-col="spec"><span class="tag good">强</span> 多层 Verify，但项目证据需配置。</td></tr>
+            <tr><th scope="row">11 行为规格</th><td data-method-col="direct"><span class="tag risk">弱</span> 多为聊天文本。</td><td data-method-col="super"><span class="tag neutral">中</span> 设计/计划承载。</td><td data-method-col="spec"><span class="tag good">最强</span> Requirement + Scenario + Delta。</td></tr>
+            <tr><th scope="row">12 需求到代码追溯</th><td data-method-col="direct"><span class="tag risk">弱</span> 需人工建表。</td><td data-method-col="super"><span class="tag good">强</span> 计划任务 → 提交 → 审查。</td><td data-method-col="spec"><span class="tag good">强</span> Change → Tasks → Verify → Archive。</td></tr>
+            <tr><th scope="row">13 长期产品事实</th><td data-method-col="direct"><span class="tag risk">弱</span> 对话易失效。</td><td data-method-col="super"><span class="tag neutral">中</span> 实现事实强，产品规格需另管。</td><td data-method-col="spec"><span class="tag good">最强</span> 主规格持续更新。</td></tr>
+            <tr><th scope="row">14 上下文恢复</th><td data-method-col="direct"><span class="tag risk">弱</span> 依赖聊天历史与人工摘要。</td><td data-method-col="super"><span class="tag good">强</span> 计划、Git、测试及进度记录。</td><td data-method-col="spec"><span class="tag good">强</span> Change 目录即工作上下文。</td></tr>
+            <tr><th scope="row">15 多人协作</th><td data-method-col="direct"><span class="tag risk">弱</span> 难共享隐含决策。</td><td data-method-col="super"><span class="tag neutral">中强</span> 任务和审查清晰。</td><td data-method-col="spec"><span class="tag good">最强</span> 共享计划先于代码。</td></tr>
+            <tr><th scope="row">16 多 Agent 协作</th><td data-method-col="direct"><span class="tag risk">中弱</span> 易上下文碎片化。</td><td data-method-col="super"><span class="tag good">强</span> 任务隔离与阶段审查。</td><td data-method-col="spec"><span class="tag neutral">中强</span> 共享规格强，执行编排需宿主能力。</td></tr>
+            <tr><th scope="row">17 并行安全性</th><td data-method-col="direct"><span class="tag risk">低</span> 接口和范围易冲突。</td><td data-method-col="super"><span class="tag neutral">中强</span> 依赖拆分正确时可并行。</td><td data-method-col="spec"><span class="tag neutral">中强</span> Change 边界清楚，但并行 Change 仍需冲突治理。</td></tr>
+            <tr><th scope="row">18 方案决策留痕</th><td data-method-col="direct"><span class="tag risk">弱</span> 除非主动沉淀。</td><td data-method-col="super"><span class="tag good">强</span> 设计文档包含方案与理由。</td><td data-method-col="spec"><span class="tag good">强</span> Proposal/Design/Archive 保留。</td></tr>
+            <tr><th scope="row">19 变更中途校正</th><td data-method-col="direct"><span class="tag neutral">快但易漂</span> 改口即可。</td><td data-method-col="super"><span class="tag good">强</span> 回到设计或计划 Gate。</td><td data-method-col="spec"><span class="tag good">最强</span> 先更新产物再继续 Apply。</td></tr>
+            <tr><th scope="row">20 文档维护成本</th><td data-method-col="direct"><span class="score high">5/5</span> 最低，但债务后移。</td><td data-method-col="super"><span class="score mid">3/5</span> 设计与计划有成本。</td><td data-method-col="spec"><span class="score low">2/5</span> 产物最多，需持续维护。</td></tr>
+            <tr><th scope="row">21 小改吞吐</th><td data-method-col="direct"><span class="score high">5/5</span> 快。</td><td data-method-col="super"><span class="score mid">3/5</span> 有固定纪律。</td><td data-method-col="spec"><span class="score mid">3/5</span> 紧凑 Change 仍有启动成本。</td></tr>
+            <tr><th scope="row">22 中高风险返工控制</th><td data-method-col="direct"><span class="score low">2/5</span> 易晚发现误解。</td><td data-method-col="super"><span class="score high">4/5</span> 设计、测试和审查前移。</td><td data-method-col="spec"><span class="score high">5/5</span> 先对齐变化，再实现。</td></tr>
+            <tr><th scope="row">23 数据迁移表达</th><td data-method-col="direct"><span class="tag neutral">可补</span> 全靠 Prompt。</td><td data-method-col="super"><span class="tag good">强</span> 可纳入设计与任务验证。</td><td data-method-col="spec"><span class="tag good">强</span> Design/Tasks/Scenario 可系统表达。</td></tr>
+            <tr><th scope="row">24 接口兼容表达</th><td data-method-col="direct"><span class="tag risk">易漏</span></td><td data-method-col="super"><span class="tag neutral">中强</span> 需加入设计附录。</td><td data-method-col="spec"><span class="tag good">最强</span> 修改行为与兼容场景可直接规格化。</td></tr>
+            <tr><th scope="row">25 审计与合规</th><td data-method-col="direct"><span class="tag risk">弱</span></td><td data-method-col="super"><span class="tag neutral">中</span> Git/测试/审查有证据。</td><td data-method-col="spec"><span class="tag good">强</span> 提议、批准、变更、归档链清晰。</td></tr>
+            <tr><th scope="row">26 紧急热修适配</th><td data-method-col="direct"><span class="tag good">强</span> 但要最小护栏。</td><td data-method-col="super"><span class="tag good">强</span> 系统调试可压缩，不应省略根因。</td><td data-method-col="spec"><span class="tag neutral">中</span> 不应阻塞止血，事后补齐事实。</td></tr>
+            <tr><th scope="row">27 生产发布能力</th><td data-method-col="direct"><span class="tag risk">无内置</span></td><td data-method-col="super"><span class="tag risk">无内置</span> 分支完成不是上线批准。</td><td data-method-col="spec"><span class="tag risk">无内置</span> Archive 不是生产发布。</td></tr>
+            <tr><th scope="row">28 监控与灰度</th><td data-method-col="direct"><span class="tag neutral">需另补</span></td><td data-method-col="super"><span class="tag neutral">需生产附录</span></td><td data-method-col="spec"><span class="tag neutral">可写入 Design/Tasks，但需外部系统执行</span></td></tr>
+            <tr><th scope="row">29 回滚可逆性</th><td data-method-col="direct"><span class="tag neutral">可补</span></td><td data-method-col="super"><span class="tag good">工程分支可控</span> 生产回滚另管。</td><td data-method-col="spec"><span class="tag good">变更与影响清晰</span> 生产回滚另管。</td></tr>
+            <tr><th scope="row">30 最依赖的人类能力</th><td data-method-col="direct">技术负责人持续掌控范围、测试和证据。</td><td data-method-col="super">批准设计/计划，并判断审查结论与生产风险。</td><td data-method-col="spec">写对可观察行为、控制 Change 粒度并维护当前规格。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="artifacts" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">06</span>
+        <div>
+          <h2>产物、仓库与维护成本</h2>
+          <p class="section-intro">工件不是越多越好。关键是每份工件是否减少了误解、返工或交接成本。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>“默认”指遵循各自标准流程时通常会产生；项目可按需要调整路径与模板。</caption>
+          <thead>
+            <tr>
+              <th scope="col">产物 / 影响</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">问题与方案</th><td data-method-col="direct">聊天记录；是否落盘不确定。</td><td data-method-col="super">批准的设计文档。</td><td data-method-col="spec"><code>proposal.md</code> + <code>design.md</code>。</td></tr>
+            <tr><th scope="row">行为规格</th><td data-method-col="direct">Prompt、Issue 或手写 AC。</td><td data-method-col="super">设计/计划中的行为描述。</td><td data-method-col="spec">Delta Spec 与主 Spec。</td></tr>
+            <tr><th scope="row">任务计划</th><td data-method-col="direct">临时 Todo。</td><td data-method-col="super">细粒度实施计划。</td><td data-method-col="spec"><code>tasks.md</code>。</td></tr>
+            <tr><th scope="row">实现证据</th><td data-method-col="direct">Diff、命令输出，需主动保留。</td><td data-method-col="super">RED/GREEN、提交、双阶段审查、最终验证。</td><td data-method-col="spec">项目测试、Verify、任务勾选、人工验收。</td></tr>
+            <tr><th scope="row">长期事实</th><td data-method-col="direct">依赖团队自己更新文档。</td><td data-method-col="super">代码、测试、Git、设计与计划。</td><td data-method-col="spec">同步后的主规格。</td></tr>
+            <tr><th scope="row">历史记录</th><td data-method-col="direct">聊天和 Git，查询分散。</td><td data-method-col="super">Git + 设计/计划。</td><td data-method-col="spec">带日期 Archive + Git。</td></tr>
+            <tr><th scope="row">仓库噪音</th><td data-method-col="direct"><span class="tag good">低</span></td><td data-method-col="super"><span class="tag neutral">中</span></td><td data-method-col="spec"><span class="tag risk">中高</span> 需控制 Change 粒度和归档。</td></tr>
+            <tr><th scope="row">维护责任</th><td data-method-col="direct">人必须记得把对话决策同步出去。</td><td data-method-col="super">计划变化要同步，避免代码偏离批准设计。</td><td data-method-col="spec">实现新事实必须回写 Change，完成后同步与归档。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="risks" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">07</span>
+        <div>
+          <h2>常见失败模式与修正动作</h2>
+          <p class="section-intro">选型不是看宣传语，而是看团队最可能犯什么错，以及流程能否在错误发生前拦住它。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>每种方式列出高频失败、用户后果和最低修正动作。</caption>
+          <thead>
+            <tr>
+              <th scope="col">方式</th>
+              <th scope="col">典型失败</th>
+              <th scope="col">真实后果</th>
+              <th scope="col">最低修正动作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-method-row="direct">
+              <th scope="row"><span class="tag direct">直接对话</span></th>
+              <td><ul><li>一看到错误就改代码</li><li>多个修复一起试</li><li>测试写在实现之后</li><li>只跑新增测试</li><li>相信模型“已完成”</li></ul></td>
+              <td>根因未修、复发、旧功能被破坏、问题无法解释、下次从头调查。</td>
+              <td>固定五步护栏：只读复现 → 根因证据 → 失败测试 → 单一最小修复 → 新鲜全量验证。</td>
+            </tr>
+            <tr data-method-row="super">
+              <th scope="row"><span class="tag super">Superpowers</span></th>
+              <td><ul><li>小改跳过设计或调试</li><li>机械执行过重计划</li><li>Reviewer 只看最后提交</li><li>把分支完成当上线</li><li>产品事实未同步</li></ul></td>
+              <td>流程看似完整，但规格边界或生产风险仍失控；长期文档与代码分离。</td>
+              <td>按风险压缩篇幅，不删除 Gate；审查完整 Diff；明确开发 Gate 与生产 Gate；必要时补 OpenSpec。</td>
+            </tr>
+            <tr data-method-row="spec">
+              <th scope="row"><span class="tag spec">OpenSpec</span></th>
+              <td><ul><li>Proposal 代替真实调查</li><li>Change 过大</li><li>规格写得清楚但实现无 TDD</li><li>代码变化后不更新 Delta</li><li>未验证就 Archive</li></ul></td>
+              <td>产生“文档正确、代码错误”或“文档与现实双轨”的伪确定性。</td>
+              <td>未知先 Explore；一 Change 一闭环；Tasks 强绑定证据；高风险实现叠加系统调试、TDD 与独立审查。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="selection" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">08</span>
+        <div>
+          <h2>按风险与场景选型</h2>
+          <p class="section-intro">推荐不是二元开关。方式可以分层：OpenSpec 管“改什么”，Superpowers 管“怎样可靠实现”，直接对话只作为受控快车道。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact narrow">
+          <caption>默认推荐基于“已完成 MVP、需要保护既有行为”的前提。团队制度更成熟时，可调整权重。</caption>
+          <thead>
+            <tr>
+              <th scope="col">场景</th>
+              <th scope="col">风险特征</th>
+              <th scope="col">首选方式</th>
+              <th scope="col">为什么</th>
+              <th scope="col">必须补充</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-scenario-row="bug"><th scope="row">文案、样式、明显拼写错误</th><td>无数据/接口/权限影响；人工易验证。</td><td><span class="tag direct">直接对话</span></td><td>流程成本低，回退容易。</td><td>Diff 检查 + 相关测试/构建。</td></tr>
+            <tr data-scenario-row="bug"><th scope="row">单模块、稳定复现的 Bug</th><td>影响有限，但需要防复发。</td><td><span class="tag super">Superpowers</span></td><td>失败测试与最小根因修复更可靠。</td><td>产品验收与回归范围。</td></tr>
+            <tr data-scenario-row="bug"><th scope="row">偶发、跨组件、根因不清</th><td>猜修概率高，复现成本高。</td><td><span class="tag super">Superpowers</span></td><td>四阶段系统调试优先解决证据链。</td><td>若行为契约变化，再补 OpenSpec Change。</td></tr>
+            <tr data-scenario-row="bug"><th scope="row">线上 P0 故障</th><td>恢复时间优先，错误成本极高。</td><td><span class="tag direct">事故止血</span> → <span class="tag super">系统调试</span></td><td>先恢复服务，再完成永久根因闭环。</td><td>回滚、监控、事故记录；较大永久修复补紧凑 Change。</td></tr>
+            <tr data-scenario-row="feature"><th scope="row">纯局部小功能</th><td>边界清晰，不改外部行为契约。</td><td><span class="tag super">Superpowers</span></td><td>设计可短，但 TDD 与验证能保护基线。</td><td>明确范围外与旧行为回归。</td></tr>
+            <tr data-scenario-row="feature"><th scope="row">用户可见行为变化</th><td>验收、帮助文档或流程发生变化。</td><td><span class="tag spec">OpenSpec</span></td><td>Delta 能精确说明增加、修改与移除。</td><td>实现阶段补 TDD 与代码审查。</td></tr>
+            <tr data-scenario-row="feature"><th scope="row">接口、数据、权限变化</th><td>兼容、迁移、回滚和审计风险高。</td><td><span class="tag spec">OpenSpec</span> + <span class="tag super">Superpowers</span></td><td>同时需要契约治理和可靠实现。</td><td>Expand/contract、功能开关、灰度、监控。</td></tr>
+            <tr data-scenario-row="feature"><th scope="row">多人或多 Agent 并行</th><td>共享理解与集成冲突是主要风险。</td><td><span class="tag spec">OpenSpec</span> + 任务级审查</td><td>先共享 Change 边界，再隔离执行。</td><td>依赖图、接口冻结、跨任务集成测试。</td></tr>
+            <tr data-scenario-row="feature"><th scope="row">一次性内部原型</th><td>允许丢弃，不承诺长期维护。</td><td><span class="tag direct">直接对话</span></td><td>治理收益可能低于启动成本。</td><td>明确“原型非生产”、合成数据和销毁边界。</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-shell">
+        <table class="compact">
+          <caption>五问决策规则：任一高风险答案为“是”，就向更强约束升级。</caption>
+          <thead><tr><th scope="col">决策问题</th><th scope="col">如果“否”</th><th scope="col">如果“是”</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">根因是否不清楚？</th><td>可继续评估直接对话。</td><td>至少使用 Superpowers 系统化调试。</td></tr>
+            <tr><th scope="row">是否改变用户可观察行为？</th><td>可能是纯内部修复。</td><td>建立 OpenSpec Change 或等价行为契约。</td></tr>
+            <tr><th scope="row">是否涉及接口、数据、权限、迁移？</th><td>保持当前等级。</td><td>OpenSpec + Superpowers，并增加回滚设计。</td></tr>
+            <tr><th scope="row">是否需要多人、多 Agent 或跨版本协作？</th><td>单一上下文可能足够。</td><td>使用可共享、可评审、可归档的规格。</td></tr>
+            <tr><th scope="row">修错后果是否难以恢复？</th><td>可采用轻流程。</td><td>完整根因、TDD、独立审查、真实环境验证和发布 Gate。</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="decision-banner"><strong>专业建议：</strong>把“直接对话”限定为低风险快车道；把 Superpowers 设为 Bug 与实现质量的默认主线；当行为契约、数据、接口、权限或团队协作发生变化时，再引入 OpenSpec。高风险变化不是二选一，而是 OpenSpec 与 Superpowers 分层组合。</p>
+    </section>
+
+    <section class="section" id="cost" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">09</span>
+        <div>
+          <h2>成本模型：别只看“开始写代码有多快”</h2>
+          <p class="section-intro">总成本由启动、执行、返工、交接和长期维护共同组成。直接对话常把成本从前期治理转移到后期返工。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>定性成本比较。具体时间取决于仓库规模、测试基础、变更风险和团队熟练度。</caption>
+          <thead>
+            <tr>
+              <th scope="col">成本项</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">首次接入</th><td data-method-col="direct">极低：直接聊天。</td><td data-method-col="super">中：安装技能、理解工作流、测试与 Git 规范。</td><td data-method-col="spec">中：安装初始化、建立配置、理解产物生命周期。</td></tr>
+            <tr><th scope="row">单次小改</th><td data-method-col="direct">最低。</td><td data-method-col="super">中；短设计与验证仍有固定成本。</td><td data-method-col="spec">中高；即使紧凑 Change 也需评审与归档。</td></tr>
+            <tr><th scope="row">中风险变更</th><td data-method-col="direct">表面低，误解或回归会抬高总成本。</td><td data-method-col="super">中，测试和审查前置换取较少返工。</td><td data-method-col="spec">中高，规格前置换取更低范围漂移。</td></tr>
+            <tr><th scope="row">高风险变更</th><td data-method-col="direct">不可预测；返工和事故成本可能最高。</td><td data-method-col="super">可控，但需补行为契约与生产闭环。</td><td data-method-col="spec">规格成本高，但与 Superpowers 组合后总体风险最低。</td></tr>
+            <tr><th scope="row">交接成本</th><td data-method-col="direct">高：接手人需还原聊天和隐含判断。</td><td data-method-col="super">中低：计划、提交、测试与审查可读。</td><td data-method-col="spec">低：当前事实和每次 Change 均可追溯。</td></tr>
+            <tr><th scope="row">长期治理</th><td data-method-col="direct">前期低，文档债务随版本累积。</td><td data-method-col="super">中，工程事实持续积累。</td><td data-method-col="spec">持续投入最高，但最适合多版本演进。</td></tr>
+            <tr><th scope="row">总成本公式</th><td colspan="3"><div class="formula"><span>总成本</span><b>=</b><span>启动</span><b>+</b><span>实施</span><b>+</b><span>返工概率 × 返工损失</span><b>+</b><span>交接</span><b>+</b><span>长期维护</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="prompts" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">10</span>
+        <div>
+          <h2>可复制提示词骨架</h2>
+          <p class="section-intro">Prompt 表达目标、边界与 Gate；不能把方法名当魔法咒语。占位符需替换为项目真实信息。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table>
+          <caption>点击“复制”可复制当前单元格。若浏览器禁止本地文件访问剪贴板，可直接选择文本。</caption>
+          <thead>
+            <tr>
+              <th scope="col">场景</th>
+              <th scope="col" class="head-direct" data-method-col="direct">直接对话</th>
+              <th scope="col" class="head-super" data-method-col="super">Superpowers</th>
+              <th scope="col" class="head-spec" data-method-col="spec">OpenSpec</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-scenario-row="bug">
+              <th scope="row">调查 Bug<br><span class="cell-note">先调查，不修改</span></th>
+              <td data-method-col="direct"><div class="prompt">调查 [Bug 症状]。现在不要修改代码。
+先只读检查 Git 状态、错误日志、复现步骤、近期变更、相邻正常实现和测试基线。
+输出：已确认事实、未知项、最小复现、证据链、单一根因假设、影响范围。
+没有根因证据前，不提出修复。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="super"><div class="prompt">请严格使用 Superpowers systematic-debugging 调查 [Bug 症状]。
+现在不修改代码。
+依次完成根因调查、工作模式比较和单一假设验证。
+输出原始症状复现、坏值来源、影响面、证据与下一步。
+未经我确认根因，不进入修复。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="spec"><div class="prompt">使用 /opsx:explore 调查 [Bug 症状]，当前不建立实施承诺。
+读取真实代码、测试、现有规格和近期变更。
+确认当前行为、预期行为、影响组件、兼容风险、复现方式及两种处理方案。
+未知项未解决前，不执行 /opsx:propose。<button class="copy-btn" type="button">复制</button></div></td>
+            </tr>
+            <tr data-scenario-row="bug">
+              <th scope="row">修复 Bug<br><span class="cell-note">根因已确认</span></th>
+              <td data-method-col="direct"><div class="prompt">根因已确认：[根因与证据]。
+先写最小失败测试并运行，确认它因该缺陷正确失败。
+然后只做修复根因所需的最小改动；不要顺手重构。
+最后运行新增测试、相关回归、全量质量命令和真实运行验证。
+报告文件、命令、退出码、失败数、残余风险和回滚方式。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="super"><div class="prompt">基于已确认根因 [根因]，继续使用 Superpowers 完成 Phase 4。
+严格执行 test-driven-development：RED → GREEN → REFACTOR。
+完成后请求规格符合度与代码质量审查，并使用 verification-before-completion 运行新鲜验证。
+任何失败都如实保留，不得把测试通过描述成上线批准。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="spec"><div class="prompt">为已确认的 [Bug] 执行 /opsx:propose，建立紧凑 Change。
+Delta Spec 必须写清预期行为、回归场景和不改变的旧行为。
+Design 记录根因、最小方案、兼容与回滚。
+Tasks 必须包含失败测试、修复、回归和验证证据。
+四类产物经我批准后才 /opsx:apply。<button class="copy-btn" type="button">复制</button></div></td>
+            </tr>
+            <tr data-scenario-row="feature">
+              <th scope="row">新增小功能<br><span class="cell-note">保护 MVP 基线</span></th>
+              <td data-method-col="direct"><div class="prompt">在已完成的 [MVP] 上增加 [功能]。
+先只读检查现有实现和测试，不写代码。
+输出：用户问题、成功标准、范围内/外、既有行为、依赖、兼容、数据迁移、回滚，以及 2–3 个方案与推荐。
+等我批准后再给实施计划；计划再次批准后才修改。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="super"><div class="prompt">请使用 Superpowers brainstorming 设计 [功能]。
+先读取 MVP 当前事实，一次只问一个问题。
+设计必须包含：用户行为、范围外、兼容、迁移、测试、功能开关、监控和回滚。
+给出 2–3 个方案与推荐。
+未经我批准设计，不进入 writing-plans 或实现。<button class="copy-btn" type="button">复制</button></div></td>
+              <td data-method-col="spec"><div class="prompt">使用 /opsx:explore 调查 [功能] 的用户问题、现有插入点和兼容风险。
+未知项解决后执行 /opsx:propose：
+Proposal 写 Why/What/Impact；
+Delta Spec 写 ADDED/MODIFIED/REMOVED 行为；
+Design 写迁移、观测、灰度与回滚；
+Tasks 写实施顺序和逐项证据。
+未经批准，不 /opsx:apply。<button class="copy-btn" type="button">复制</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="dod" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">11</span>
+        <div>
+          <h2>统一完成门槛</h2>
+          <p class="section-intro">无论选哪种方式，都不能跳过这些结果条件。方法可以轻，证据不能虚。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>Definition of Done：满足开发完成的最低证据；是否上线还需独立生产 Gate。</caption>
+          <thead>
+            <tr>
+              <th scope="col">完成项</th>
+              <th scope="col">必须回答的问题</th>
+              <th scope="col">合格证据</th>
+              <th scope="col">禁止结论</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-scenario-row="bug"><th scope="row">Bug 根因</th><td>为什么发生，而不只是哪里报错？</td><td>稳定复现、数据流/调用链证据、被验证的单一假设。</td><td>“看起来像”“可能是”之后直接改代码。</td></tr>
+            <tr><th scope="row">范围</th><td>改什么、不改什么、影响谁？</td><td>批准的范围、受影响组件和旧行为清单。</td><td>边做边扩大且未重新批准。</td></tr>
+            <tr><th scope="row">测试</th><td>测试是否能捕获缺失行为？</td><td>正确 RED、修复后 GREEN、相关回归与全量测试。</td><td>测试补写后直接通过就声称已覆盖。</td></tr>
+            <tr><th scope="row">代码审查</th><td>实现是否符合意图，代码本身是否可靠？</td><td>完整 Diff、规格符合度和代码质量两类结论。</td><td>实现者一句“自查无误”。</td></tr>
+            <tr><th scope="row">新鲜验证</th><td>当前最终状态真的通过吗？</td><td>最终状态上的命令、退出码、通过/失败数量和时间。</td><td>引用修改前或中间状态的旧绿灯。</td></tr>
+            <tr><th scope="row">兼容与迁移</th><td>旧数据、旧客户端、旧配置会怎样？</td><td>兼容矩阵、真实旧数据验证、迁移前后检查。</td><td>只在空库和新用户路径测试。</td></tr>
+            <tr><th scope="row">人工验收</th><td>用户目标是否达成，异常状态是否可恢复？</td><td>按场景执行的产品验收记录。</td><td>自动化测试通过即代表产品正确。</td></tr>
+            <tr><th scope="row">文档与规格</th><td>当前事实是否与代码一致？</td><td>需要时更新规格、帮助、运行手册、ADR 或 Change。</td><td>留下旧文档让下次 Agent 读取错误事实。</td></tr>
+            <tr><th scope="row">回滚</th><td>失败时如何恢复，数据是否可逆？</td><td>明确回滚步骤、功能开关、迁移策略和恢复验证。</td><td>“Git 可以回退”但数据库或外部副作用不可逆。</td></tr>
+            <tr><th scope="row">生产发布</th><td>上线风险是否被独立批准？</td><td>灰度计划、监控指标、阈值、告警、回滚演练与负责人。</td><td>“测试绿了”“PR 合并了”“Change 归档了”所以可以上线。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="sources" data-scenario-section="all">
+      <div class="section-head">
+        <span class="section-no">12</span>
+        <div>
+          <h2>来源、版本与适用边界</h2>
+          <p class="section-intro">页面离线运行，不会主动请求下列地址。工具更新较快，实际执行时应读取当前安装版本的官方文档和技能文件。</p>
+        </div>
+      </div>
+      <div class="table-shell">
+        <table class="compact">
+          <caption>校准日期：2026-07-28。来源地址以纯文本保留，页面不加载任何在线资源。</caption>
+          <thead><tr><th scope="col">来源</th><th scope="col">本页采用的边界</th><th scope="col">地址 / 备注</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Superpowers 官方仓库</th><td>工程技能与方法：Brainstorming、计划、TDD、系统调试、审查、验证和分支收口。</td><td><span class="source-code">https://github.com/obra/superpowers</span></td></tr>
+            <tr><th scope="row">Superpowers 版本边界</th><td>本地既有教程校准 Superpowers 6.2.0；未来版本可能调整技能名、触发条件或进度机制。</td><td>实际执行以当前安装的 <code>SKILL.md</code> 为准。</td></tr>
+            <tr><th scope="row">OpenSpec 官方文档</th><td>Spec、Change、Delta、Explore、Propose、Apply、Verify、Sync、Archive 生命周期。</td><td><span class="source-code">https://openspec.dev/docs</span><span class="source-code">https://openspec.dev/docs/overview</span></td></tr>
+            <tr><th scope="row">OpenSpec CLI 参考</th><td>Archive 会验证 Change，并将 Delta 合入主规格后移动到带日期的归档目录；具体行为以当前版本为准。</td><td><span class="source-code">https://openspec.dev/docs/reference/cli</span></td></tr>
+            <tr><th scope="row">直接对话式</th><td>不是标准产品名。本页定义为：不依赖固定工程框架，主要靠当前对话、Prompt 和人工检查清单约束开发。</td><td>因此能力取决于模型、Prompt、操作者与项目已有制度。</td></tr>
+            <tr><th scope="row">生产边界</th><td>三种方式都不能自动替代发布审批、真实流量灰度、监控、告警、回滚演练与风险负责人。</td><td>“开发完成”与“可上线”必须保持不同状态。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <p><strong>MVP Bug 与功能修复方式全面对比</strong><br><small>单文件离线版 · 无在线字体、图片、脚本或模块依赖</small></p>
+      <p><small>生成日期：2026-07-28 · 适用于已完成开发并具备可运行基线的 MVP</small></p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const methodButtons = Array.from(document.querySelectorAll(".method-btn"));
+      const scenarioButtons = Array.from(document.querySelectorAll(".seg-btn"));
+      const enabledMethods = new Set(["direct", "super", "spec"]);
+      let activeScenario = "all";
+
+      function updateMethods() {
+        document.querySelectorAll("[data-method-col]").forEach(function (cell) {
+          const method = cell.getAttribute("data-method-col");
+          cell.dataset.hiddenMethod = enabledMethods.has(method) ? "false" : "true";
+        });
+        document.querySelectorAll("[data-method-row]").forEach(function (row) {
+          const method = row.getAttribute("data-method-row");
+          row.dataset.hiddenMethod = enabledMethods.has(method) ? "false" : "true";
+        });
+      }
+
+      function updateScenario() {
+        document.querySelectorAll("[data-scenario-section]").forEach(function (section) {
+          const type = section.getAttribute("data-scenario-section");
+          section.dataset.hiddenScenario =
+            activeScenario === "all" || type === "all" || type === activeScenario ? "false" : "true";
+        });
+        document.querySelectorAll("[data-scenario-row]").forEach(function (row) {
+          const type = row.getAttribute("data-scenario-row");
+          row.dataset.hiddenScenario =
+            activeScenario === "all" || type === activeScenario ? "false" : "true";
+        });
+      }
+
+      methodButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          const method = button.dataset.method;
+          if (enabledMethods.has(method)) {
+            if (enabledMethods.size === 1) return;
+            enabledMethods.delete(method);
+            button.setAttribute("aria-pressed", "false");
+          } else {
+            enabledMethods.add(method);
+            button.setAttribute("aria-pressed", "true");
+          }
+          updateMethods();
+        });
+      });
+
+      scenarioButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          activeScenario = button.dataset.scenario;
+          scenarioButtons.forEach(function (item) {
+            item.setAttribute("aria-pressed", item === button ? "true" : "false");
+          });
+          updateScenario();
+        });
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(function (button) {
+        button.addEventListener("click", async function () {
+          const prompt = button.closest(".prompt");
+          const clone = prompt.cloneNode(true);
+          const cloneButton = clone.querySelector(".copy-btn");
+          if (cloneButton) cloneButton.remove();
+          const text = clone.textContent.trim();
+          try {
+            await navigator.clipboard.writeText(text);
+            button.textContent = "已复制";
+          } catch (error) {
+            const range = document.createRange();
+            range.selectNodeContents(prompt);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            button.textContent = "已选中文本";
+          }
+          window.setTimeout(function () { button.textContent = "复制"; }, 1600);
+        });
+      });
+
+      updateMethods();
+      updateScenario();
+    }());
+  </script>
+</body>
+</html>

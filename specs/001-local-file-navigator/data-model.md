@@ -29,6 +29,7 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 | `note` | string | ❌ | ≤500 chars (含换行), 去除首尾空格后纯空白→null | null |
 | `fileReference` | FileReference | ✅ | 一对一 | — |
 | `categoryIds` | string[] | ✅ | 至少 1 个用户类别 ID，不含未分类 ID | — |
+| `isFavorite` | boolean | ✅ | 是否属于"我的收藏"系统视图 | false |
 | `createdAt` | ISO 8601 | ✅ | auto | now |
 | `updatedAt` | ISO 8601 | ✅ | auto | now |
 
@@ -39,6 +40,7 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 [正常] ──删除确认──▶ [已删除]
 [正常] ──文件打开失败──▶ [正常] (卡片不变，仅触发 S16)
 [正常] ──重新关联──▶ [正常] (fileReference 更新)
+[正常] ──收藏/取消收藏──▶ [正常] (isFavorite 与 favorites ViewOrder 同步更新)
 ```
 
 **Validation rules** (from spec FR-006, FR-002a, FR-032):
@@ -51,7 +53,7 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 | Field | Type | Required | Constraints | Default |
 |-------|------|----------|-------------|---------|
 | `id` | string (UUID v4) | ✅ | 唯一 | auto |
-| `name` | string | ✅ | 1-30 chars, single-line, 去除首尾空格后非空, 不与已有 category name 完全相同（去除首尾空格后）, 不可为"全部卡片"或"未分类" | — |
+| `name` | string | ✅ | 1-30 chars, single-line, 去除首尾空格后非空, 不与已有 category name 完全相同（去除首尾空格后）, 不可为"全部卡片"、"我的收藏"或"未分类" | — |
 | `order` | number | ✅ | 用户类别之间的独立顺序 | 末尾 |
 | `type` | enum | ✅ | `'user'` | `'user'` |
 | `createdAt` | ISO 8601 | ✅ | auto | now |
@@ -64,15 +66,16 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 [正常] ──排序调整──▶ [正常] (order 更新)
 ```
 
-**Note**: 系统视图（"全部卡片"、"未分类"）不存储为 Category 实体，由应用逻辑动态生成：
+**Note**: 系统视图（"全部卡片"、"我的收藏"、"未分类"）不存储为 Category 实体，由应用逻辑动态生成：
 - "全部卡片": 聚合所有 Card，按 allCardsOrder 排序
+- "我的收藏": 聚合 `isFavorite === true` 的 Card，按 favorites ViewOrder 排序并始终显示
 - "未分类": 聚合 `categoryIds.length === 0` 的 Card，按 uncategorizedOrder 排序，仅在结果非空时显示
 
 ### FileReference
 
 | Field | Type | Required | Constraints |
 |-------|------|----------|-------------|
-| `relativePath` | string | ✅ | 相对于 `app-data.json` 所在工具目录的路径，分隔符归一化为正斜杠并使用 Unicode NFC；允许 `../` 指向工具目录外的同盘文件，Windows 跨盘文件不允许创建卡片 |
+| `relativePath` | string | ✅ | 持久化路径：同盘文件保存为相对于 `app-data.json` 所在工具目录的路径，允许 `../` 指向目录外；Windows 跨盘文件保存为绝对路径；统一使用正斜杠和 Unicode NFC |
 | `fileName` | string | ✅ | 不含扩展名的文件名（用于默认卡片名回退） |
 | `extension` | string | ❌ | 扩展名（不含点），用于 file-type-mark |
 | `fileSize` | number | ❌ | 字节数，辅助唯一性校验 |
@@ -80,20 +83,21 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 | `platformId` | string | ❌ | 平台特定标识符，V1 不强制使用 |
 
 **Identity rule** (from research Decision 4):
-- 主键 = `normalizePath(relativePath)` — 相对路径归一化 + Unicode NFC
+- 主键 = `normalizePath(relativePath)` — 持久化路径归一化 + Unicode NFC
 - 唯一性辅助校验 = `{fileSize, mtimeMs}` 组合（快速交叉验证，不做文件哈希）
 
 ### ViewOrder
 
 | Field | Type | Required | Constraints |
 |-------|------|----------|-------------|
-| `viewType` | enum | ✅ | `'allCards' | 'category:{categoryId}' | 'uncategorized'` |
+| `viewType` | enum | ✅ | `'allCards' | 'favorites' | 'category:{categoryId}' | 'uncategorized'` |
 | `cardIds` | string[] | ✅ | 有序列表，只含该视图下的卡片 ID |
 
 **Order semantics**:
 - 每个视图独立维护顺序数组
 - 新增卡片追加到每个所属视图末尾
 - 从类别移出卡片时从该视图移除（但其他视图保持不变）
+- 收藏时追加到 favorites 末尾，取消收藏时从 favorites 移除
 - 删除卡片时从所有视图移除
 - 空视图的 cardIds 为 `[]`
 
@@ -101,15 +105,21 @@ Category (1) ──< (N) CardCategory (N) >── (1) Card
 
 ```typescript
 interface AppData {
-  version: 1;
+  version: 3;
   cards: Card[];
   categories: Category[];
   viewOrders: ViewOrder[];
   // 衍生视图由应用逻辑计算:
   // - allCards: cards 按 viewOrders[allCards] 排序
+  // - favorites: cards.filter(c => c.isFavorite) 按 viewOrders[favorites] 排序
   // - uncategorized: cards.filter(c => c.categoryIds.length === 0)
 }
 ```
+
+**Migration**:
+- V1 同盘绝对路径迁移为相对路径，跨盘绝对路径保持绝对形式，再补 `isFavorite: false` 与空 favorites ViewOrder。
+- V2 保留所有既有关系和顺序，补 `isFavorite: false` 与空 favorites ViewOrder。
+- V3 加载时校验 favorites ViewOrder，只保留 `isFavorite === true` 的卡片并将遗漏成员追加到末尾。
 
 ## Data File
 

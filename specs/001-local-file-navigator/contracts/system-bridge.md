@@ -42,7 +42,7 @@ interface FileSelectionResult {
   success: boolean;
   canceled: boolean;
   file?: {
-    relativePath: string;     // 相对于 app-data.json 所在目录的归一化路径
+    relativePath: string;     // 同盘为相对路径，Windows 跨盘为绝对路径
     fileName: string;          // 不含扩展名
     extension: string;         // 扩展名（不含点）
     fileSize: number;          // 字节
@@ -58,8 +58,8 @@ interface FileSelectionResult {
 - 取消: `{ success: false, canceled: true }`
 - 失败: `{ success: false, error: "..." }`
 - 成功后自动读取文件元信息（fs.statSync）
-- Main 进程以 `app-data.json` 所在目录为基准，把选择结果转换成相对路径
-- Windows 所选文件与工具目录不在同一盘符时，返回明确错误且不创建卡片
+- Main 进程以 `app-data.json` 所在目录为基准：同盘选择结果转换成相对路径，Windows 跨盘结果保存为规范化绝对路径
+- 路径统一使用正斜杠和 Unicode NFC；跨盘选择不再因无法生成相对路径而失败
 - 不在此阶段读取 HTML title（留给 `readHtmlTitle`）
 
 ## X02: openFile — 系统默认方式打开
@@ -99,7 +99,7 @@ interface LocateResult {
 ```
 
 **Behavior**:
-- Main 进程先解析相对路径，再调用 `shell.showItemInFolder(resolvedPath)`
+- Main 进程统一解析持久化路径：相对路径以 `app-data.json` 所在目录为基准，绝对路径保持原目标；随后调用 `shell.showItemInFolder(resolvedPath)`
 - Windows: 资源管理器中定位
 - macOS: Finder 中定位
 - 不预检查文件存在
@@ -122,7 +122,7 @@ Main → Renderer: string | null
 
 **Behavior**:
 - 仅在 `selectFile` 返回 `isHtml: true` 时调用
-- Main 进程先以 `app-data.json` 所在目录解析相对路径
+- Main 进程统一解析持久化路径：相对路径以 `app-data.json` 所在目录为基准，绝对路径保持原目标
 - 读取文件前 64KB 并解析 `<title>...</title>`
 - 返回去除首尾空格后的内容
 - 无法读取、缺少 `<title>`、标题为空或仅含空白 → `null`
@@ -163,8 +163,8 @@ interface SaveResult {
 
 **Save behavior**（spec FR-036）:
 - `JSON.stringify(data, null, 2)` → `fs.writeFileSync`
-- 退出时调用（FR-036b）
-- 托盘最小化不调用（数据保持内存）
+- 数据变更时调用；关闭窗口和应用内退出均结束进程（FR-036b）
+- 不提供托盘最小化或后台驻留路径
 - 排序操作 debounce 500ms 后调用
 
 ## Error Handling Convention

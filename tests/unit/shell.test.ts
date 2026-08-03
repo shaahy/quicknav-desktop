@@ -69,7 +69,8 @@ describe('shell', () => {
       electronMocks.shell.openPath.mockResolvedValue('')
 
       const relativePath = '../A 教程集合/工作记录.md'
-      const result = await openFile(relativePath, dataDir)
+      const appDataPath = path.join(dataDir, 'app-data.json')
+      const result = await openFile(relativePath, appDataPath)
 
       expect(result).toEqual({})
       expect(electronMocks.shell.openPath).toHaveBeenCalledWith(
@@ -82,8 +83,8 @@ describe('shell', () => {
       const firstDataDir = path.resolve('clone-a')
       const secondDataDir = path.resolve('clone-b')
 
-      await openFile('tutorials/guide.html', firstDataDir)
-      await openFile('tutorials/guide.html', secondDataDir)
+      await openFile('tutorials/guide.html', path.join(firstDataDir, 'app-data.json'))
+      await openFile('tutorials/guide.html', path.join(secondDataDir, 'app-data.json'))
 
       expect(electronMocks.shell.openPath).toHaveBeenNthCalledWith(
         1,
@@ -94,6 +95,19 @@ describe('shell', () => {
         path.resolve(secondDataDir, 'tutorials/guide.html'),
       )
     })
+
+    it.runIf(process.platform === 'win32')(
+      'opens a stored cross-drive absolute path without prefixing the tool directory',
+      async () => {
+        electronMocks.shell.openPath.mockResolvedValue('')
+
+        await openFile('C:/Users/MSI/Desktop/notes.md', 'E:\\quick-nav\\app-data.json')
+
+        expect(electronMocks.shell.openPath).toHaveBeenCalledWith(
+          'C:\\Users\\MSI\\Desktop\\notes.md',
+        )
+      },
+    )
 
     it('does not leak the Electron dev renderer URL into the default application', async () => {
       const originalRendererUrl = process.env.ELECTRON_RENDERER_URL
@@ -109,7 +123,10 @@ describe('shell', () => {
       })
 
       try {
-        const result = await openFile('../A 教程集合/工作记录.md', dataDir)
+        const result = await openFile(
+          '../A 教程集合/工作记录.md',
+          path.join(dataDir, 'app-data.json'),
+        )
 
         expect(result).toEqual({})
         expect(inheritedRendererUrl).toBeUndefined()
@@ -135,7 +152,7 @@ describe('shell', () => {
         'No application is associated with the specified file for this operation.',
       )
 
-      const result = await openFile('../notes/work.md', dataDir)
+      const result = await openFile('../notes/work.md', path.join(dataDir, 'app-data.json'))
 
       expect(result).toEqual({ error: 'no-default-app' })
     })
@@ -143,7 +160,7 @@ describe('shell', () => {
     it('maps other system launch failures to unknown', async () => {
       electronMocks.shell.openPath.mockResolvedValue('Access denied')
 
-      const result = await openFile('../notes/work.md', dataDir)
+      const result = await openFile('../notes/work.md', path.join(dataDir, 'app-data.json'))
 
       expect(result).toEqual({ error: 'unknown' })
     })
@@ -151,7 +168,7 @@ describe('shell', () => {
     it('maps an unexpected shell exception to unknown', async () => {
       electronMocks.shell.openPath.mockRejectedValue(new Error('shell unavailable'))
 
-      const result = await openFile('../notes/work.md', dataDir)
+      const result = await openFile('../notes/work.md', path.join(dataDir, 'app-data.json'))
 
       expect(result).toEqual({ error: 'unknown' })
     })
@@ -159,7 +176,7 @@ describe('shell', () => {
     it('does NOT call fs.existsSync/fs.access/fs.stat before opening (CHK019)', async () => {
       electronMocks.shell.openPath.mockResolvedValue('')
 
-      await openFile('../some/file.txt', dataDir)
+      await openFile('../some/file.txt', path.join(dataDir, 'app-data.json'))
 
       expect(fsMocks.existsSync).not.toHaveBeenCalled()
       expect(fsMocks.access).not.toHaveBeenCalled()
@@ -178,6 +195,17 @@ describe('shell', () => {
         path.resolve(dataDir, 'tutorials/file.txt'),
       )
     })
+
+    it.runIf(process.platform === 'win32')(
+      'locates a stored cross-drive absolute path without prefixing the tool directory',
+      async () => {
+        await showItemInFolder('C:/Users/MSI/Desktop/notes.md', 'E:\\quick-nav')
+
+        expect(electronMocks.shell.showItemInFolder).toHaveBeenCalledWith(
+          'C:\\Users\\MSI\\Desktop\\notes.md',
+        )
+      },
+    )
   })
 
   // ── readHtmlTitle ──
@@ -196,6 +224,30 @@ describe('shell', () => {
 
       expect(result).toBe('My Page Title')
     })
+
+    it.runIf(process.platform === 'win32')(
+      'reads an HTML title from a stored cross-drive absolute path',
+      async () => {
+        fsMocks.readSync.mockImplementation(
+          (_fd: number, buffer: Buffer) => {
+            const content = '<title>桌面文档</title>'
+            buffer.write(content, 'utf-8')
+            return Buffer.byteLength(content, 'utf-8')
+          },
+        )
+
+        const result = await readHtmlTitle(
+          'C:/Users/MSI/Desktop/page.html',
+          'E:\\quick-nav',
+        )
+
+        expect(result).toBe('桌面文档')
+        expect(fsMocks.openSync).toHaveBeenCalledWith(
+          'C:\\Users\\MSI\\Desktop\\page.html',
+          'r',
+        )
+      },
+    )
 
     it('returns null when no title tag', async () => {
       fsMocks.readSync.mockImplementation(
@@ -280,7 +332,7 @@ describe('shell', () => {
     })
 
     it.runIf(process.platform === 'win32')(
-      'rejects a file on a different Windows drive',
+      'stores an absolute path when a file is on a different Windows drive',
       async () => {
         const mockWindow = {} as any
         electronMocks.dialog.showOpenDialog.mockResolvedValue({
@@ -291,8 +343,8 @@ describe('shell', () => {
 
         const result = await selectFile(mockWindow, 'E:\\quick-nav')
 
-        expect(result.file).toBeUndefined()
-        expect(result.error).toBe('所选文件与工具不在同一磁盘，无法创建相对路径')
+        expect(result.error).toBeUndefined()
+        expect(result.file?.relativePath).toBe('C:/personal/notes.md')
       },
     )
   })
@@ -321,9 +373,60 @@ describe('shell', () => {
       )
     })
 
-    it('recursively scans selected file types and skips symbolic links', async () => {
+    it.runIf(process.platform === 'win32')(
+      'stores an absolute folder path when the scan folder is on another drive',
+      async () => {
+        const mockWindow = {} as any
+        electronMocks.dialog.showOpenDialog.mockResolvedValue({
+          canceled: false,
+          filePaths: ['C:\\documents'],
+        })
+
+        const result = await selectScanFolder(mockWindow, 'E:\\quick-nav')
+
+        expect(result).toEqual({
+          canceled: false,
+          folder: {
+            relativePath: 'C:/documents',
+            displayPath: 'C:\\documents',
+          },
+        })
+      },
+    )
+
+    it.runIf(process.platform === 'win32')(
+      'returns absolute file paths when scanning a folder on another drive',
+      async () => {
+        fsMocks.promises.stat.mockImplementation(async (targetPath: string) => ({
+          isDirectory: () => targetPath === 'C:\\documents',
+          size: 100,
+          mtimeMs: 123,
+        }))
+        fsMocks.promises.readdir.mockResolvedValue([
+          {
+            name: 'readme.md',
+            isFile: () => true,
+            isDirectory: () => false,
+            isSymbolicLink: () => false,
+          },
+        ])
+
+        const result = await scanFolder(
+          'C:/documents',
+          ['markdown'],
+          'E:\\quick-nav',
+        )
+
+        expect(result.error).toBeUndefined()
+        expect(result.files).toHaveLength(1)
+        expect(result.files[0].relativePath).toBe('C:/documents/readme.md')
+      },
+    )
+
+    it('scans the root and first-level folders without entering deeper folders', async () => {
       const rootPath = path.resolve(dataDir, 'documents')
       const nestedPath = path.join(rootPath, 'nested')
+      const deepPath = path.join(nestedPath, 'deep')
       const dirent = (
         name: string,
         kind: 'file' | 'directory' | 'symlink',
@@ -350,7 +453,13 @@ describe('shell', () => {
           ]
         }
         if (targetPath === nestedPath) {
-          return [dirent('note.md', 'file')]
+          return [
+            dirent('note.md', 'file'),
+            dirent('deep', 'directory'),
+          ]
+        }
+        if (targetPath === deepPath) {
+          return [dirent('should-not-be-scanned.md', 'file')]
         }
         throw new Error('unexpected directory')
       })
@@ -380,6 +489,11 @@ describe('shell', () => {
         .toBe('HTML 标题')
       expect(result.files.some(file => file.fileName === 'slides')).toBe(false)
       expect(result.files.some(file => file.fileName === 'note')).toBe(true)
+      expect(result.files.some(file => file.fileName === 'should-not-be-scanned')).toBe(false)
+      expect(fsMocks.promises.readdir).not.toHaveBeenCalledWith(
+        deepPath,
+        { withFileTypes: true },
+      )
     })
 
     it('rejects a scan when no file type is selected', async () => {

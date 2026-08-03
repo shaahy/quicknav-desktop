@@ -9,6 +9,7 @@ import {
   MAX_CARD_NAME,
   MAX_CARDS,
   VIEW_ALL_CARDS,
+  VIEW_FAVORITES,
   VIEW_UNCATEGORIZED,
 } from '@shared/constants'
 import { normalizePath, isHtmlFile } from '@shared/validation'
@@ -88,6 +89,7 @@ export function useCards() {
           mtimeMs: fileResult.file.mtimeMs,
         },
         categoryIds,
+        isFavorite: false,
         createdAt: now,
         updatedAt: now,
       }
@@ -177,6 +179,7 @@ export function useCards() {
           mtimeMs: input.file.mtimeMs,
         },
         categoryIds: [...input.categoryIds],
+        isFavorite: false,
         createdAt: now,
         updatedAt: now,
       }))
@@ -293,6 +296,65 @@ export function useCards() {
     [state.data, dispatch]
   )
 
+  const setFavorite = useCallback(
+    async (cardId: string, isFavorite: boolean): Promise<boolean> => {
+      const card = state.data.cards.find(candidate => candidate.id === cardId)
+      if (!card || card.isFavorite === isFavorite) return false
+
+      const favoriteViewExists = state.data.viewOrders.some(
+        viewOrder => viewOrder.viewType === VIEW_FAVORITES
+      )
+      const updatedViewOrders = state.data.viewOrders.map(viewOrder => {
+        if (viewOrder.viewType !== VIEW_FAVORITES) return viewOrder
+        if (isFavorite && !viewOrder.cardIds.includes(cardId)) {
+          return { ...viewOrder, cardIds: [...viewOrder.cardIds, cardId] }
+        }
+        if (!isFavorite) {
+          return {
+            ...viewOrder,
+            cardIds: viewOrder.cardIds.filter(id => id !== cardId),
+          }
+        }
+        return viewOrder
+      })
+      if (!favoriteViewExists) {
+        updatedViewOrders.push({
+          viewType: VIEW_FAVORITES,
+          cardIds: isFavorite ? [cardId] : [],
+        })
+      }
+
+      const updatedData = {
+        ...state.data,
+        cards: state.data.cards.map(candidate =>
+          candidate.id === cardId
+            ? {
+                ...candidate,
+                isFavorite,
+                updatedAt: new Date().toISOString(),
+              }
+            : candidate
+        ),
+        viewOrders: updatedViewOrders,
+      }
+
+      try {
+        const saveResult = await window.electronAPI.saveAppData(updatedData)
+        if (saveResult && saveResult.error) {
+          dispatch({ type: 'SET_SAVE_ERROR', error: saveResult.error })
+          return false
+        }
+      } catch {
+        dispatch({ type: 'SET_SAVE_ERROR', error: 'unknown' })
+        return false
+      }
+
+      dispatch({ type: 'SET_CARD_FAVORITE', cardId, isFavorite })
+      return true
+    },
+    [state.data, dispatch]
+  )
+
   const deleteCard = useCallback(
     async (cardId: string): Promise<void> => {
       dispatch({ type: 'DELETE_CARD', cardId })
@@ -343,6 +405,7 @@ export function useCards() {
     addCard,
     addCardsBatch,
     updateCard,
+    setFavorite,
     deleteCard,
     repairFile,
     findDuplicateByPath,

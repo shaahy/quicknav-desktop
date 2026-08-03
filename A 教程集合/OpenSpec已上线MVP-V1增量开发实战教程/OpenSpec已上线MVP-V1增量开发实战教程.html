@@ -1,0 +1,1436 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="面向已上线 MVP v1.0 项目的 OpenSpec OPSX 增量开发实战教程。纯离线、单文件 HTML。">
+  <title>OpenSpec 已上线 MVP v1.0 增量开发实战教程</title>
+  <style>
+    :root {
+      --paper: #f4f0e8;
+      --surface: #fffdf8;
+      --surface-2: #ede8dc;
+      --ink: #19211e;
+      --muted: #606a65;
+      --line: #d5cfc1;
+      --line-strong: #aaa293;
+      --green: #116149;
+      --green-dark: #0a4937;
+      --green-soft: #dcebe3;
+      --amber: #9b5919;
+      --amber-soft: #f4e4ce;
+      --red: #943b32;
+      --red-soft: #f2dfdc;
+      --blue: #315e7b;
+      --blue-soft: #e0eaf0;
+      --code: #17221e;
+      --code-ink: #e8f0ec;
+      --code-muted: #aabcb3;
+      --shadow: 0 18px 52px rgba(36, 42, 38, .08);
+      --radius-sm: 7px;
+      --radius-md: 13px;
+      --radius-lg: 22px;
+      --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sidebar: 272px;
+      --reading: 790px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 82px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--green-dark); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(17, 97, 73, .35); outline-offset: 3px; }
+    ::selection { color: var(--ink); background: #c9ded4; }
+
+    .progress {
+      position: fixed;
+      inset: 0 0 auto;
+      height: 4px;
+      z-index: 110;
+      background: transparent;
+    }
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--green);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      border-bottom: 1px solid rgba(170, 162, 147, .65);
+      background: rgba(244, 240, 232, .94);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      width: min(1480px, calc(100% - 36px));
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--green-dark);
+      border-radius: 50%;
+      color: var(--green-dark);
+      font: 800 11px/1 var(--mono);
+    }
+    .top-actions { display: flex; align-items: center; gap: 9px; }
+    .search-wrap { position: relative; }
+    #search {
+      width: min(310px, 32vw);
+      height: 38px;
+      padding: 0 38px 0 34px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: var(--surface);
+    }
+    .search-prefix {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font: 700 12px/1 var(--mono);
+      pointer-events: none;
+    }
+    #clearSearch {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      display: none;
+    }
+    #clearSearch:hover { background: var(--surface-2); }
+    .menu-button {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .hero {
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .hero-inner {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 78px 0 68px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(300px, .7fr);
+      gap: 72px;
+      align-items: end;
+    }
+    .eyebrow {
+      margin: 0 0 16px;
+      color: var(--green);
+      font: 760 12px/1.4 var(--mono);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 810px;
+      margin: 0;
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: 1.04;
+      letter-spacing: -.052em;
+    }
+    .hero-lead {
+      max-width: 780px;
+      margin: 26px 0 0;
+      color: #47524d;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.65;
+    }
+    .hero-note {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--green);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .hero-note small {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font: 720 11px/1.4 var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .hero-note p { margin: 0; }
+
+    .route-strip {
+      border-bottom: 1px solid var(--line);
+      background: var(--green-dark);
+      color: #f2f7f4;
+    }
+    .route {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 22px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+    }
+    .route-step {
+      min-width: max-content;
+      padding: 7px 11px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      border-radius: 999px;
+      font: 720 12px/1.3 var(--mono);
+    }
+    .route-arrow { color: #8fbaa8; font-family: var(--mono); }
+
+    .layout {
+      width: min(1480px, calc(100% - 36px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      gap: 58px;
+      align-items: start;
+    }
+    .sidebar {
+      position: sticky;
+      top: 84px;
+      height: calc(100vh - 104px);
+      padding: 30px 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .sidebar-title {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font: 760 11px/1.4 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .toc { margin: 0; padding: 0; list-style: none; }
+    .toc li { margin: 2px 0; }
+    .toc a {
+      display: block;
+      padding: 7px 10px;
+      border-left: 2px solid transparent;
+      color: #4b5550;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.38;
+    }
+    .toc a:hover { color: var(--ink); background: rgba(255, 253, 248, .65); }
+    .toc a.active {
+      border-left-color: var(--green);
+      color: var(--green-dark);
+      background: var(--green-soft);
+      font-weight: 720;
+    }
+    .toc .sub a { padding-left: 24px; color: var(--muted); }
+
+    main {
+      min-width: 0;
+      padding: 64px 0 100px;
+    }
+    .reading { width: min(var(--reading), 100%); min-width: 0; margin: 0 auto; }
+    section {
+      margin: 0 0 88px;
+      scroll-margin-top: 84px;
+    }
+    h2 {
+      margin: 0 0 22px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.16;
+      letter-spacing: -.035em;
+    }
+    h3 {
+      margin: 42px 0 14px;
+      font-size: 23px;
+      line-height: 1.3;
+      letter-spacing: -.015em;
+    }
+    h4 { margin: 30px 0 10px; font-size: 17px; }
+    p { margin: 0 0 18px; }
+    ul, ol { padding-left: 1.35em; }
+    li + li { margin-top: 8px; }
+    strong { font-weight: 760; }
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--green);
+      font: 760 11px/1.4 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .lead {
+      color: #4c5752;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+    .rule {
+      margin: 28px 0;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--green);
+      background: var(--surface);
+    }
+    .rule strong { display: block; margin-bottom: 5px; color: var(--green-dark); }
+    .callout {
+      margin: 24px 0;
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+    .callout.warning { border-color: #d9b98d; background: var(--amber-soft); }
+    .callout.danger { border-color: #d5aaa4; background: var(--red-soft); }
+    .callout.info { border-color: #b9cbd7; background: var(--blue-soft); }
+    .callout-title {
+      margin: 0 0 6px;
+      font: 780 12px/1.4 var(--mono);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .callout p:last-child, .rule p:last-child { margin-bottom: 0; }
+
+    .mental-model {
+      margin: 30px 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .mental-card { padding: 25px; }
+    .mental-card + .mental-card { border-left: 1px solid var(--line); }
+    .mental-card small {
+      color: var(--muted);
+      font: 760 11px/1.4 var(--mono);
+      letter-spacing: .09em;
+    }
+    .mental-card h3 { margin: 8px 0 10px; font-size: 21px; }
+    .mental-card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 26px 0;
+    }
+    .card {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+    .card-num {
+      display: inline-grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--green-dark);
+      background: var(--green-soft);
+      font: 780 11px/1 var(--mono);
+    }
+    .card h3 { margin: 12px 0 7px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .flow {
+      margin: 28px 0;
+      padding: 28px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .flow-row {
+      min-width: 680px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: stretch;
+      gap: 22px;
+    }
+    .flow-node {
+      position: relative;
+      padding: 17px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+    }
+    .flow-node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -19px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--green);
+      font: 800 18px/1 var(--mono);
+    }
+    .flow-node strong { display: block; font-family: var(--mono); font-size: 13px; }
+    .flow-node span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
+
+    .tree {
+      margin: 24px 0;
+      padding: 22px 24px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      overflow-x: auto;
+      white-space: pre;
+      color: #36423c;
+      font: 13px/1.7 var(--mono);
+    }
+
+    .codebox {
+      position: relative;
+      margin: 22px 0;
+      border: 1px solid #263b32;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--code);
+      box-shadow: 0 14px 34px rgba(20, 30, 26, .11);
+    }
+    .code-head {
+      min-height: 40px;
+      padding: 10px 92px 9px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      color: var(--code-muted);
+      font: 700 11px/1.5 var(--mono);
+      letter-spacing: .05em;
+    }
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow-x: auto;
+      color: var(--code-ink);
+      font: 13px/1.68 var(--mono);
+      tab-size: 2;
+    }
+    code { font-family: var(--mono); }
+    :not(pre) > code {
+      padding: .13em .36em;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      color: var(--green-dark);
+      background: var(--surface);
+      font-size: .9em;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .copy {
+      position: absolute;
+      right: 8px;
+      top: 7px;
+      min-width: 70px;
+      height: 27px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 6px;
+      color: #dbe7e1;
+      background: rgba(255,255,255,.06);
+      font: 720 11px/1 var(--mono);
+      cursor: pointer;
+    }
+    .copy:hover { background: rgba(255,255,255,.12); }
+
+    .review-grid {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      margin: 28px 0;
+      border-top: 1px solid var(--line);
+    }
+    .review-grid dt,
+    .review-grid dd {
+      margin: 0;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .review-grid dt {
+      padding-right: 20px;
+      color: var(--green-dark);
+      font: 760 12px/1.5 var(--mono);
+    }
+    .review-grid dd { color: #48534e; }
+
+    table {
+      width: 100%;
+      margin: 24px 0;
+      border-collapse: collapse;
+      background: var(--surface);
+      font-size: 14px;
+    }
+    th, td {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--green-dark); background: var(--green-soft); }
+
+    .gate-list {
+      margin: 24px 0;
+      padding: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+    .gate-list li {
+      position: relative;
+      margin: 0;
+      padding: 15px 16px 15px 44px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,253,248,.55);
+    }
+    .gate-list li::before {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: 20px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid var(--green);
+      border-radius: 3px;
+    }
+    .gate-list li::after {
+      content: "";
+      position: absolute;
+      left: 19px;
+      top: 23px;
+      width: 6px;
+      height: 3px;
+      border-left: 2px solid var(--green);
+      border-bottom: 2px solid var(--green);
+      transform: rotate(-45deg);
+    }
+
+    .search-hit {
+      border-radius: 2px;
+      color: var(--ink);
+      background: #f2cc77;
+    }
+    .no-results {
+      display: none;
+      margin: 28px auto;
+      padding: 22px;
+      border: 1px dashed var(--line-strong);
+      text-align: center;
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .footer-inner {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 38px 0 46px;
+      display: flex;
+      justify-content: space-between;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-inner p { margin: 0; }
+
+    @media (max-width: 1024px) {
+      .hero-inner { gap: 42px; }
+      .layout { grid-template-columns: 230px minmax(0, 1fr); gap: 34px; }
+      :root { --sidebar: 230px; }
+    }
+    @media (max-width: 768px) {
+      .menu-button { display: inline-grid; place-items: center; }
+      #search { width: min(240px, 46vw); }
+      .hero-inner { grid-template-columns: 1fr; padding: 58px 0 52px; }
+      .hero-note { max-width: 620px; }
+      .layout { display: block; width: min(100% - 32px, 820px); }
+      .sidebar {
+        position: fixed;
+        z-index: 95;
+        inset: 64px auto 0 0;
+        width: min(320px, 88vw);
+        height: calc(100vh - 64px);
+        padding: 24px;
+        border-right: 1px solid var(--line);
+        background: var(--paper);
+        transform: translateX(-102%);
+        transition: transform .2s ease;
+        box-shadow: var(--shadow);
+      }
+      body.menu-open .sidebar { transform: translateX(0); }
+      main { padding-top: 52px; }
+      .cards, .mental-model { grid-template-columns: 1fr; }
+      .mental-card + .mental-card { border-left: 0; border-top: 1px solid var(--line); }
+      .footer-inner { display: block; }
+      .footer-inner p + p { margin-top: 8px; }
+    }
+    @media (max-width: 520px) {
+      .topbar-inner { width: calc(100% - 24px); }
+      .brand span:last-child { display: none; }
+      #search { width: 190px; }
+      .hero-inner, .route, .footer-inner { width: calc(100% - 28px); }
+      h1 { font-size: 42px; }
+      .layout { width: calc(100% - 28px); }
+      .review-grid { grid-template-columns: 1fr; }
+      .review-grid dt { padding-bottom: 4px; border-bottom: 0; }
+      .review-grid dd { padding-top: 0; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+    @media print {
+      .progress, .topbar, .sidebar, .copy { display: none !important; }
+      body { background: #fff; }
+      .hero, footer { background: #fff; }
+      .layout { display: block; width: 100%; }
+      main { padding: 30px 0; }
+      section { break-inside: avoid; }
+      .codebox { box-shadow: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="返回教程顶部">
+        <span class="brand-mark">OS</span>
+        <span>OpenSpec · MVP 增量开发</span>
+      </a>
+      <div class="top-actions">
+        <div class="search-wrap">
+          <span class="search-prefix" aria-hidden="true">/</span>
+          <label class="sr-only" for="search" hidden>搜索教程</label>
+          <input id="search" type="search" placeholder="搜索命令、文件或概念" autocomplete="off">
+          <button id="clearSearch" type="button" aria-label="清除搜索">×</button>
+        </div>
+        <button class="menu-button" id="menuButton" type="button" aria-label="打开目录" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="top" class="hero">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Brownfield-first · OPSX · 单仓库实战</p>
+        <h1>已上线 MVP v1.0，如何用 OpenSpec 安全做下一次增量</h1>
+        <p class="hero-lead">不重写旧系统，不补一套假文档。只把<strong>这一次真实变更</strong>的意图、行为、设计、任务与验证证据放进同一个 Change，再让实现围绕它推进。</p>
+      </div>
+      <aside class="hero-note">
+        <small>贯穿案例</small>
+        <p><strong>任务管理工具 v1.0</strong> 已经上线。v1.1 要增加“任务优先级 + 优先级筛选”，同时保证旧数据可读、旧接口兼容、失败可回滚。</p>
+      </aside>
+    </div>
+  </div>
+
+  <div class="route-strip" aria-label="核心流程">
+    <div class="route">
+      <span class="route-step">建立基线</span><span class="route-arrow">→</span>
+      <span class="route-step">/opsx:explore</span><span class="route-arrow">→</span>
+      <span class="route-step">/opsx:propose</span><span class="route-arrow">→</span>
+      <span class="route-step">人工评审</span><span class="route-arrow">→</span>
+      <span class="route-step">/opsx:apply</span><span class="route-arrow">↔</span>
+      <span class="route-step">/opsx:update</span><span class="route-arrow">→</span>
+      <span class="route-step">验证</span><span class="route-arrow">→</span>
+      <span class="route-step">/opsx:archive</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar" aria-label="教程目录">
+      <p class="sidebar-title">教程目录</p>
+      <nav>
+        <ul class="toc" id="toc">
+          <li><a href="#s1">01 · 先建立正确心智模型</a></li>
+          <li><a href="#s2">02 · 安装与存量项目接入</a></li>
+          <li><a href="#s3">03 · 建立 v1.0 真实基线</a></li>
+          <li><a href="#s4">04 · Explore：调查而不承诺</a></li>
+          <li><a href="#s5">05 · Propose：建立 Change</a></li>
+          <li class="sub"><a href="#s5-review">四类产物怎么评审</a></li>
+          <li><a href="#s6">06 · Apply：分批实现</a></li>
+          <li><a href="#s7">07 · Update：边做边校正</a></li>
+          <li><a href="#s8">08 · Verify：多层证据</a></li>
+          <li><a href="#s9">09 · Sync 与 Archive</a></li>
+          <li><a href="#s10">10 · 异常分支与边界</a></li>
+          <li><a href="#s11">11 · 团队落地与并行 Change</a></li>
+          <li><a href="#s12">12 · 一页速查与完成门槛</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main id="content">
+      <div class="reading">
+        <div class="no-results" id="noResults">没有找到匹配内容。换一个关键词试试。</div>
+
+        <section id="s1" data-searchable>
+          <p class="section-kicker">01 · Mental model</p>
+          <h2>先建立正确心智模型</h2>
+          <p class="lead">OpenSpec 不是替代 PRD、Issue、Git 或测试。它是你与编码智能体之间的“变更级约定层”：先对这次改什么达成一致，再让代码、测试和文档围绕同一份约定收敛。</p>
+
+          <div class="mental-model">
+            <article class="mental-card">
+              <small>openspec/specs/</small>
+              <h3>当前事实</h3>
+              <p>系统现在承诺什么行为。按领域组织，例如 <code>tasks/</code>、<code>auth/</code>、<code>billing/</code>。</p>
+            </article>
+            <article class="mental-card">
+              <small>openspec/changes/</small>
+              <h3>拟议变更</h3>
+              <p>一次增量的 proposal、delta specs、design、tasks。归档后，Delta 才折叠进当前事实。</p>
+            </article>
+          </div>
+
+          <div class="rule">
+            <strong>存量项目第一原则</strong>
+            <p>不要先给 8 万行旧代码补全规格。只描述本次要改的切片：新增什么、修改什么、移除什么。每完成并归档一个 Change，主规格自然长出一圈。</p>
+          </div>
+
+          <div class="cards">
+            <article class="card"><span class="card-num">1</span><h3>Change 是工作单元</h3><p>一个可独立理解、实现、验证、归档的增量。不要把季度路线图塞进一个 Change。</p></article>
+            <article class="card"><span class="card-num">2</span><h3>Delta 描述差异</h3><p>用 ADDED、MODIFIED、REMOVED 描述变化，不重写整个目标系统。</p></article>
+            <article class="card"><span class="card-num">3</span><h3>产物是活计划</h3><p>实现中发现新事实，可以回去修 proposal、specs、design、tasks。</p></article>
+            <article class="card"><span class="card-num">4</span><h3>归档闭合循环</h3><p>只有代码通过验证、Delta 与现实一致后，才同步事实并归档 Change。</p></article>
+          </div>
+
+          <div class="callout warning">
+            <p class="callout-title">不要把 OpenSpec 当成自动批准器</p>
+            <p><code>/opsx:apply</code> 完成任务不等于可以上线；<code>/opsx:verify</code> 也不替代项目自己的测试、代码审查、灰度和产品验收。</p>
+          </div>
+        </section>
+
+        <section id="s2" data-searchable>
+          <p class="section-kicker">02 · Bootstrap</p>
+          <h2>安装与存量项目接入</h2>
+          <p>以下命令输入在 PowerShell、Terminal 或 IDE 终端中。OpenSpec 当前要求 Node.js 20.19.0 或更高版本。</p>
+
+          <div class="codebox">
+            <div class="code-head">PowerShell / Terminal · 环境检查与安装</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>node --version
+npm install -g @fission-ai/openspec@latest
+openspec --version
+
+cd path/to/your-existing-project
+openspec init</code></pre>
+          </div>
+
+          <p><code>openspec init</code> 会创建 <code>openspec/</code>，并为所选编码助手生成技能或命令文件。初始化本身不会要求你先描述整个旧系统。</p>
+
+          <h3>建议立刻补一份项目上下文</h3>
+          <p><code>openspec/config.yaml</code> 会把技术栈、工程约束和每类产物的规则注入后续生成过程。这里只写稳定事实，不放临时需求，也不要复制整份 PRD。</p>
+
+          <div class="codebox">
+            <div class="code-head">openspec/config.yaml</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>schema: spec-driven
+
+context: |
+  Product: 已上线的任务管理 MVP v1.0
+  Stack: TypeScript, React, Node.js, PostgreSQL
+  API: REST + JSON；现有客户端仍依赖 v1 字段
+  Testing: Vitest 单测；Playwright 关键路径回归
+  Release: 数据库迁移必须向后兼容并提供回滚说明
+
+rules:
+  proposal:
+    - 明确用户价值、范围外事项和回滚触发条件
+    - 列出对已上线 v1.0 用户的影响
+  specs:
+    - 场景必须包含旧数据与异常输入
+  design:
+    - 说明数据迁移、接口兼容和可观测性
+  tasks:
+    - 每组任务必须带验证方法，不能只写实现动作</code></pre>
+          </div>
+
+          <div class="callout info">
+            <p class="callout-title">命令输入位置</p>
+            <p><code>openspec init</code>、<code>openspec show</code>、<code>openspec validate</code> 输入终端；<code>/opsx:explore</code>、<code>/opsx:propose</code>、<code>/opsx:apply</code> 输入支持 OpenSpec 的 AI 编码助手对话框。</p>
+          </div>
+
+          <h3>Core 与 Expanded 怎么选</h3>
+          <table>
+            <thead><tr><th>配置</th><th>适合</th><th>主要命令</th></tr></thead>
+            <tbody>
+              <tr><td>默认 Core</td><td>希望快速跑通第一个增量</td><td>explore、propose、apply、update、sync、archive</td></tr>
+              <tr><td>Expanded</td><td>需要逐份产物控制、结构化 verify 或批量归档</td><td>new、continue、ff、verify、bulk-archive、onboard</td></tr>
+            </tbody>
+          </table>
+          <p>本教程以 Core 为主线，把 Expanded 的 <code>/opsx:verify</code> 作为推荐增强项。启用方式：</p>
+          <div class="codebox">
+            <div class="code-head">PowerShell / Terminal · 配置工作流后刷新项目指令</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>openspec config profile
+openspec update</code></pre>
+          </div>
+        </section>
+
+        <section id="s3" data-searchable>
+          <p class="section-kicker">03 · Baseline</p>
+          <h2>建立 v1.0 真实基线</h2>
+          <p class="lead">增量开发最大的风险不是不会写新功能，而是不知道旧版本已经承诺了什么。先建立可复现基线，再讨论 v1.1。</p>
+
+          <ul class="gate-list">
+            <li>记录当前分支、提交 SHA、部署版本和数据库 schema 版本。</li>
+            <li>执行仓库真实可用的 lint、typecheck、unit、integration、e2e 或 build。</li>
+            <li>跑通至少一条线上核心路径：创建任务 → 编辑 → 完成 → 重启后仍存在。</li>
+            <li>记录当前 API 样例与旧数据样例，后续用来证明向后兼容。</li>
+            <li>确认回滚方式：应用回滚、功能开关、数据库 down migration 分别怎么做。</li>
+          </ul>
+
+          <div class="codebox">
+            <div class="code-head">PowerShell / Terminal · 示例基线证据</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>git status --short
+git rev-parse HEAD
+npm run lint
+npm run typecheck
+npm test
+npm run build
+
+# 可选：把结果记录到 Change 外的项目交付系统或 PR
+# 不要伪造项目里并不存在的命令</code></pre>
+          </div>
+
+          <div class="callout danger">
+            <p class="callout-title">基线失败怎么办</p>
+            <p>先区分“原本就红”与“本次改红”。若基线本来失败，把失败项、错误文本和风险写进 proposal；不要把既有失败偷偷算成本次完成，也不要为了全绿擅自扩大范围修一大片旧问题。</p>
+          </div>
+        </section>
+
+        <section id="s4" data-searchable>
+          <p class="section-kicker">04 · Explore</p>
+          <h2>Explore：调查真实代码，但不建立承诺</h2>
+          <p><code>/opsx:explore</code> 是无承诺的调查动作。它适合在你知道用户目标、但还不知道代码插入点、兼容成本或方案优劣时使用。</p>
+
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 调查任务优先级增量</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:explore
+
+项目已上线 MVP v1.0。我准备增加任务优先级与筛选，但先不要写代码，
+也不要创建 Change。请只读调查并回答：
+
+1. 任务实体、数据库表、API DTO、前端状态分别在哪里；
+2. 新字段从数据库到 UI 的完整数据路径；
+3. 旧数据没有 priority 时，哪个默认值最安全；
+4. 哪些旧客户端、缓存、导入导出和排序逻辑会受影响；
+5. 现有测试和发布机制可以提供哪些验证证据；
+6. 给出 2 个实现方案、取舍、推荐项及回滚路径。</code></pre>
+          </div>
+
+          <h3>Explore 结束时，你应该拿到什么</h3>
+          <dl class="review-grid">
+            <dt>现状地图</dt><dd>具体到文件、表、接口和关键函数，而不是“修改后端和前端”这种空话。</dd>
+            <dt>影响半径</dt><dd>写路径、读路径、排序、过滤、缓存、导入导出、旧客户端和数据迁移。</dd>
+            <dt>关键未知</dt><dd>需要产品决定、真实环境验证或外部负责人确认的问题。</dd>
+            <dt>方案比较</dt><dd>至少包含用户影响、工程成本、兼容风险和回滚难度。</dd>
+            <dt>建议边界</dt><dd>这次 Change 做什么，哪些能力放到独立后续 Change。</dd>
+          </dl>
+
+          <div class="rule">
+            <strong>退出 Explore 的标准</strong>
+            <p>不是“聊得差不多”，而是你已经能用一句话说清用户问题、成功标准、范围、约束和推荐方案。仍有关键未知时，继续调查，不要急着 propose。</p>
+          </div>
+        </section>
+
+        <section id="s5" data-searchable>
+          <p class="section-kicker">05 · Propose</p>
+          <h2>Propose：把一个增量装进一个 Change</h2>
+          <p>当目标和边界已经清晰，使用 <code>/opsx:propose</code>。默认 spec-driven schema 会生成 proposal、delta specs、design、tasks，直到满足实现依赖。</p>
+
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 创建 Change</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:propose add-task-priority-filter
+
+为已上线任务管理 MVP v1.0 增加：
+- priority 字段：low / medium / high，旧数据默认 medium；
+- 创建与编辑任务时可选择优先级；
+- 列表可按优先级筛选；
+- 保持现有 API 字段兼容；
+- 数据迁移可回滚；
+- 本次不做多级排序、批量修改、自动优先级推荐。
+
+成功标准：
+旧数据无损；旧客户端继续可用；刷新和重启后优先级仍存在；
+筛选为空时有明确空状态；质量门全部通过；具备回滚证据。</code></pre>
+          </div>
+
+          <div class="tree" role="img" aria-label="OpenSpec Change 目录结构">openspec/
+├─ config.yaml
+├─ specs/                         ← 已归档的当前事实
+└─ changes/
+   └─ add-task-priority-filter/
+      ├─ .openspec.yaml
+      ├─ proposal.md              ← 为什么做、做什么、不做什么
+      ├─ specs/
+      │  └─ task-priority/
+      │     └─ spec.md            ← 行为增量与场景
+      ├─ design.md                ← 技术方案、兼容、迁移、回滚
+      └─ tasks.md                 ← 可验证的实现清单</div>
+
+          <h3 id="s5-review">四类产物怎么评审</h3>
+          <p>不要看到文件生成就直接 Apply。生成只代表“有草稿”，不代表“已达成约定”。</p>
+
+          <h4>1. proposal.md：评审意图与边界</h4>
+          <ul>
+            <li>用户问题是否真实，价值是否可观察？</li>
+            <li>范围内与范围外是否能阻止“顺手多做一点”？</li>
+            <li>是否点明已上线用户、旧数据、旧客户端和运营影响？</li>
+            <li>成功标准是否可以验证，回滚触发条件是否明确？</li>
+          </ul>
+
+          <h4>2. delta spec：评审外部可观察行为</h4>
+          <div class="codebox">
+            <div class="code-head">specs/task-priority/spec.md · 示例片段</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>## ADDED Requirements
+
+### Requirement: Task priority
+系统 SHALL 为每个任务提供 low、medium、high 三种优先级。
+
+#### Scenario: Existing task without priority
+- **GIVEN** 数据库中存在 v1.0 创建且没有 priority 的任务
+- **WHEN** 用户升级后首次打开任务列表
+- **THEN** 系统将该任务解释为 medium
+- **AND** 任务标题、状态与创建时间保持不变
+
+### Requirement: Priority filter
+系统 SHALL 允许用户筛选指定优先级的任务。
+
+#### Scenario: No task matches the selected priority
+- **WHEN** 用户选择 high 且没有匹配任务
+- **THEN** 页面显示明确空状态
+- **AND** 用户可以一键清除筛选</code></pre>
+          </div>
+          <p>场景写用户可观察行为，不写“调用某函数”“增加一个下拉框”。技术细节属于 design 或 tasks。</p>
+
+          <h4>3. design.md：评审实现方向和风险</h4>
+          <ul>
+            <li>数据模型：字段类型、默认值、约束、索引和迁移顺序。</li>
+            <li>兼容：旧 API 请求不带字段、旧响应消费者忽略新字段时会怎样。</li>
+            <li>前端：状态来源、筛选状态、空状态、错误恢复与无障碍。</li>
+            <li>发布：先迁移还是先发应用，是否需要功能开关，如何观察异常。</li>
+            <li>回滚：应用回滚后新字段数据如何处理，down migration 是否会丢数据。</li>
+          </ul>
+
+          <h4>4. tasks.md：评审实现顺序和证据</h4>
+          <div class="codebox">
+            <div class="code-head">tasks.md · 推荐颗粒度</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>## 1. 数据与领域模型
+- [ ] 1.1 增加可回滚迁移；验证旧数据映射为 medium
+- [ ] 1.2 扩展领域类型与序列化；覆盖非法值
+
+## 2. API
+- [ ] 2.1 创建/更新接口接受 priority；旧请求保持成功
+- [ ] 2.2 列表查询支持 priority；覆盖空结果与非法参数
+
+## 3. 前端
+- [ ] 3.1 表单增加可访问的优先级控件
+- [ ] 3.2 列表增加筛选、清除与空状态
+
+## 4. 验证与发布
+- [ ] 4.1 单测、集成、E2E、构建通过
+- [ ] 4.2 旧数据、旧请求、重启持久化验证通过
+- [ ] 4.3 记录发布、观测与回滚步骤</code></pre>
+          </div>
+
+          <div class="callout warning">
+            <p class="callout-title">评审 Gate</p>
+            <p>只有当四类产物互相一致、关键未知已解决、成功标准可验证，并且你明确同意方案后，才进入实现。OpenSpec 的流动性允许随时编辑，但不等于跳过人类决策。</p>
+          </div>
+        </section>
+
+        <section id="s6" data-searchable>
+          <p class="section-kicker">06 · Apply</p>
+          <h2>Apply：分批实现，不要把任务清单当黑箱</h2>
+          <p><code>/opsx:apply</code> 会读取当前 Change 并按 tasks 推进。对于已上线项目，建议按“数据 → API → UI → 全链验证”分批，每批都保持可检查、可恢复。</p>
+
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 明确本批范围</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:apply add-task-priority-filter
+
+先只执行 tasks 1.x：数据迁移与领域模型。
+约束：
+- 不修改 2.x、3.x；
+- 每完成一项就更新 tasks.md；
+- 运行相关单测与迁移往返验证；
+- 展示修改文件、验证结果、风险与可恢复检查点；
+- 发现设计与真实代码冲突时停止实现，先报告并更新 Change。</code></pre>
+          </div>
+
+          <div class="flow" aria-label="推荐实现批次">
+            <div class="flow-row">
+              <div class="flow-node"><strong>Batch 1</strong><span>迁移、模型、序列化</span></div>
+              <div class="flow-node"><strong>Batch 2</strong><span>API 写入、读取、兼容</span></div>
+              <div class="flow-node"><strong>Batch 3</strong><span>表单、筛选、空状态</span></div>
+              <div class="flow-node"><strong>Batch 4</strong><span>回归、E2E、构建</span></div>
+              <div class="flow-node"><strong>Release</strong><span>观测、回滚演练</span></div>
+            </div>
+          </div>
+
+          <h3>每一批结束都检查五件事</h3>
+          <ol>
+            <li><strong>Diff：</strong>只改了本批授权范围吗？有没有顺手重构？</li>
+            <li><strong>行为：</strong>新增、旧行为和失败路径分别有什么证据？</li>
+            <li><strong>契约：</strong>代码仍符合 delta spec 与 design 吗？</li>
+            <li><strong>状态：</strong>tasks 勾选是否与实际完成一致？部分完成有没有被伪装成完成？</li>
+            <li><strong>恢复：</strong>当前提交或工作区能否安全继续、撤销或交接？</li>
+          </ol>
+
+          <div class="callout info">
+            <p class="callout-title">任务勾选的含义</p>
+            <p><code>[x]</code> 应表示“实现完成且对应验证已通过”，不是“文件改过了”。无法验证时保留未完成，并说明缺少的环境、凭据或外部条件。</p>
+          </div>
+        </section>
+
+        <section id="s7" data-searchable>
+          <p class="section-kicker">07 · Update</p>
+          <h2>Update：实现中发现新事实，先校正规划再继续</h2>
+          <p>OPSX 是动作式、可迭代工作流。发现设计假设错误时，不必假装规划从未变化，也不需要重开一个“修正规划阶段”。用 <code>/opsx:update</code> 修订已有规划产物并保持相互一致；它只改规划文件，不改代码。</p>
+
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 学习驱动的修订</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:update add-task-priority-filter
+
+实现中确认：移动端 v1.0 客户端会严格校验任务响应字段，
+直接返回 priority 会导致解析失败。
+
+请先提出对 proposal、delta specs、design、tasks 的一致性修订方案：
+- 保持本次用户目标不变；
+- API 通过版本化或显式 opt-in 返回 priority；
+- 增加旧客户端兼容场景与验证任务；
+- 不修改代码，逐项展示拟议编辑，等我确认后再写入规划产物。</code></pre>
+          </div>
+
+          <table>
+            <thead><tr><th>情况</th><th>处理</th><th>判断理由</th></tr></thead>
+            <tbody>
+              <tr><td>同一意图，补边界或改实现方案</td><td>Update 当前 Change</td><td>历史思路仍有价值，更新后故事更完整</td></tr>
+              <tr><td>范围收窄，但原目标不变</td><td>Update 当前 Change</td><td>例如 v1.1 先做手动优先级，自动推荐推迟</td></tr>
+              <tr><td>用户问题已经改变</td><td>新建 Change</td><td>例如从“增加优先级”变成“重做整个任务分类系统”</td></tr>
+              <tr><td>原 Change 可以独立完成，新需求独立成立</td><td>完成并归档原 Change，再新建</td><td>保持每个 Change 可理解、可关闭</td></tr>
+            </tbody>
+          </table>
+
+          <div class="rule">
+            <strong>实用判断法</strong>
+            <p>意图相同、范围重叠超过一半、原 Change 不做这项就无法算完成，倾向 Update；反之倾向 New Change。更新保留上下文，新建提供清晰度。</p>
+          </div>
+        </section>
+
+        <section id="s8" data-searchable>
+          <p class="section-kicker">08 · Evidence</p>
+          <h2>Verify：用多层证据证明“真的完成”</h2>
+          <p class="lead">验证顺序应从工程事实到规格一致性，再到用户验收。任何一层通过，都不能替代其他层。</p>
+
+          <h3>第一层：项目自身质量命令</h3>
+          <div class="codebox">
+            <div class="code-head">PowerShell / Terminal · 以仓库实际脚本为准</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>npm run lint
+npm run typecheck
+npm test
+npm run test:integration
+npm run test:e2e
+npm run build</code></pre>
+          </div>
+
+          <h3>第二层：兼容、迁移与真实运行验证</h3>
+          <ul class="gate-list">
+            <li>迁移前的 v1.0 数据升级后可读，标题、状态和时间没有漂移。</li>
+            <li>旧请求不带 priority 仍成功，旧客户端响应契约不被破坏。</li>
+            <li>新增字段保存后刷新、重启服务或重启桌面端仍然存在。</li>
+            <li>非法 priority 得到稳定、可理解的错误，不写入脏数据。</li>
+            <li>筛选无结果、请求失败、加载中和清除筛选均有正确 UI。</li>
+            <li>回滚步骤在副本或测试环境中走通；明确是否有数据损失。</li>
+          </ul>
+
+          <h3>第三层：OpenSpec 规格一致性检查</h3>
+          <p>如果已启用 Expanded 工作流，可以运行：</p>
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 结构化核对实现与产物</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:verify add-task-priority-filter</code></pre>
+          </div>
+          <p>重点阅读三类结果：</p>
+          <dl class="review-grid">
+            <dt>Completeness</dt><dd>tasks、requirements、scenarios 是否都有实现与证据。</dd>
+            <dt>Correctness</dt><dd>实现行为是否真的满足需求和具体场景。</dd>
+            <dt>Coherence</dt><dd>proposal、specs、design、tasks 与最终代码是否相互一致。</dd>
+          </dl>
+
+          <h3>第四层：人工产品验收</h3>
+          <p>让产品负责人按用户任务验收，而不是按文件列表验收：</p>
+          <ol>
+            <li>打开升级后的旧账号，确认旧任务正常显示为 medium。</li>
+            <li>新建 high 任务，刷新后仍为 high。</li>
+            <li>编辑为 low，筛选 low 能看到，筛选 high 看不到。</li>
+            <li>清除筛选恢复完整列表；空状态不会让用户误以为数据丢失。</li>
+            <li>使用旧客户端或契约样例，确认核心路径仍可工作。</li>
+          </ol>
+
+          <div class="callout danger">
+            <p class="callout-title">不要制造比证据更强的结论</p>
+            <p>单测通过只能说单测通过；测试环境迁移成功不能说生产迁移获批；Verify 通过不能说产品已验收。最终状态必须保留尚未完成的 Gate。</p>
+          </div>
+        </section>
+
+        <section id="s9" data-searchable>
+          <p class="section-kicker">09 · Close the loop</p>
+          <h2>Sync 与 Archive：把已证实的变化折叠进当前事实</h2>
+          <p>完成实现与验证后，Delta Spec 应进入主规格，Change 则移入带日期的 archive。这样 <code>openspec/specs/</code> 才描述新的当前事实。</p>
+
+          <h3>大多数单一 Change</h3>
+          <div class="codebox">
+            <div class="code-head">AI 对话框 · 归档完成的增量</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>/opsx:archive add-task-priority-filter</code></pre>
+          </div>
+          <p>Archive 通常会检查是否需要同步 Delta，并在确认后完成合并与移动。归档前重新核对：</p>
+          <ul>
+            <li>所有 tasks 的勾选与证据一致；</li>
+            <li>最终实现没有留下未写回 specs/design 的偏差；</li>
+            <li>主规格合并后不会覆盖其他并行 Change 的事实；</li>
+            <li>Change 名称、日期和 Git 记录能够互相追溯。</li>
+          </ul>
+
+          <h3>什么时候单独 Sync</h3>
+          <p><code>/opsx:sync</code> 会把 Delta 合并进主规格，但保留 Change 继续存在。适合长周期 Change 中某段行为已经稳定，或团队希望先让其他 Change 基于新事实规划。不要为了“看起来进度快”提前同步尚未实现的行为。</p>
+
+          <div class="flow" aria-label="归档前后目录变化">
+            <div class="flow-row" style="grid-template-columns: repeat(3,1fr)">
+              <div class="flow-node"><strong>Delta</strong><span>changes/name/specs</span></div>
+              <div class="flow-node"><strong>Sync</strong><span>合并到 specs 当前事实</span></div>
+              <div class="flow-node"><strong>Archive</strong><span>changes/archive/date-name</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="s10" data-searchable>
+          <p class="section-kicker">10 · Branches</p>
+          <h2>异常分支与边界：什么时候不要机械跑主流程</h2>
+
+          <table>
+            <thead><tr><th>场景</th><th>建议动作</th><th>不要做</th></tr></thead>
+            <tbody>
+              <tr><td>线上 P0 故障</td><td>先按事故流程止血；为较大修复补紧凑 Change，并在事后同步真实规格</td><td>为了文档完整延误恢复服务</td></tr>
+              <tr><td>一行拼写或无行为变化</td><td>直接修复并走仓库正常审查</td><td>为任何微小编辑强建 Change</td></tr>
+              <tr><td>实现中出现重大新需求</td><td>停止当前 Apply，判断 Update 还是新 Change</td><td>把 scope explosion 偷塞进原 tasks</td></tr>
+              <tr><td>外部 API、账号或生产数据不可用</td><td>保留未验证状态，列出所需权限与补验步骤</td><td>用 mock 绿灯冒充真实环境通过</td></tr>
+              <tr><td>多个 Change 修改同一主规格</td><td>先处理依赖和合并顺序，逐个验证 Delta</td><td>并行归档后才发现规格互相覆盖</td></tr>
+            </tbody>
+          </table>
+
+          <h3>常见失败与纠正</h3>
+          <dl class="review-grid">
+            <dt>Proposal 太大</dt><dd>拆成能独立提供价值、独立验证和独立回滚的 Change。</dd>
+            <dt>Spec 写实现</dt><dd>把函数、表结构、组件名移到 design；spec 只保留可观察行为。</dd>
+            <dt>Tasks 不可验证</dt><dd>每项补“完成后如何证明”，不要只写“实现筛选功能”。</dd>
+            <dt>Apply 越界</dt><dd>停止、展示额外 diff，恢复到授权范围；必要时新建 Change。</dd>
+            <dt>产物与代码漂移</dt><dd>判断哪个方向才是真实意图，再更新规划或代码；不要双边都保留。</dd>
+            <dt>Archive 太早</dt><dd>恢复 Change，补齐验证和主规格一致性后再归档。</dd>
+          </dl>
+        </section>
+
+        <section id="s11" data-searchable>
+          <p class="section-kicker">11 · Team practice</p>
+          <h2>团队落地：让 OpenSpec 接入已有工程制度</h2>
+          <p>OpenSpec 最适合成为已有 Issue、分支、PR 和发布流程的中间层，而不是另造一套孤岛。</p>
+
+          <div class="cards">
+            <article class="card"><span class="card-num">P</span><h3>产品负责人</h3><p>确认问题、范围、成功标准、范围外事项与人工验收，不批准技术细节的假确定性。</p></article>
+            <article class="card"><span class="card-num">E</span><h3>工程负责人</h3><p>确认设计、迁移、兼容、观测、回滚和任务颗粒度，守住生产约束。</p></article>
+            <article class="card"><span class="card-num">A</span><h3>编码智能体</h3><p>读取真实仓库，生成和维护产物，按任务实现并提供证据；遇到冲突必须暴露。</p></article>
+            <article class="card"><span class="card-num">R</span><h3>审查者</h3><p>检查代码、测试和 Change 是否一致；Verify 报告是输入，不是审查结论。</p></article>
+          </div>
+
+          <h3>建议的 Git 关联</h3>
+          <div class="codebox">
+            <div class="code-head">命名约定示例</div>
+            <button class="copy" type="button">复制</button>
+            <pre><code>OpenSpec Change: add-task-priority-filter
+Git branch:       feat/add-task-priority-filter
+Issue:            MVP-142
+PR title:         feat(tasks): add priority and filtering
+Archive:          2026-07-28-add-task-priority-filter</code></pre>
+          </div>
+
+          <h3>并行 Change 的三条规则</h3>
+          <ol>
+            <li>每个 Change 有明确能力边界和主负责人。</li>
+            <li>若共享同一数据模型、API 或主规格，先记录依赖与合并顺序。</li>
+            <li>归档前基于最新主规格重新核对 Delta，不能只相信创建时的上下文。</li>
+          </ol>
+
+          <div class="callout info">
+            <p class="callout-title">跨仓库提醒</p>
+            <p>OpenSpec Stores 可以把规划放进独立仓库并被多个代码仓库引用，但该能力仍标注为 Beta。单仓库 MVP 不要过早升级复杂度；先把一个仓库内的 Change 循环跑顺。</p>
+          </div>
+        </section>
+
+        <section id="s12" data-searchable>
+          <p class="section-kicker">12 · Checklist</p>
+          <h2>一页速查与完成门槛</h2>
+
+          <table>
+            <thead><tr><th>时机</th><th>动作</th><th>完成信号</th></tr></thead>
+            <tbody>
+              <tr><td>接入</td><td>安装、init、配置 context/rules</td><td>AI 能读到真实工程约束</td></tr>
+              <tr><td>需求模糊</td><td>/opsx:explore</td><td>现状、影响、未知、方案、边界清楚</td></tr>
+              <tr><td>目标明确</td><td>/opsx:propose</td><td>四类产物生成且人工评审通过</td></tr>
+              <tr><td>实现</td><td>/opsx:apply</td><td>按批完成，tasks 与证据同步</td></tr>
+              <tr><td>发现新事实</td><td>/opsx:update 或新 Change</td><td>规划与真实意图重新一致</td></tr>
+              <tr><td>验证</td><td>项目测试 + 兼容/迁移 + verify + 人工验收</td><td>每个结论都有匹配强度的证据</td></tr>
+              <tr><td>闭环</td><td>/opsx:sync、/opsx:archive</td><td>主规格成为新事实，Change 可追溯</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Definition of Done</h3>
+          <ul class="gate-list">
+            <li>Proposal 的用户问题、范围和最终实现没有漂移。</li>
+            <li>每条 Requirement 和 Scenario 都有实现与验证证据。</li>
+            <li>旧数据、旧客户端、异常路径和回滚路径已验证或明确标为未验证。</li>
+            <li>项目真实质量命令通过；没有把历史失败冒充本次通过。</li>
+            <li>tasks.md 的每个勾选都对应已完成且已验证的工作。</li>
+            <li>最终代码偏差已经写回 specs/design，不存在双重事实。</li>
+            <li>产品人工验收通过；发布和生产批准仍按团队制度执行。</li>
+            <li>Delta 已正确进入主规格，Change 已按可追溯名称归档。</li>
+          </ul>
+
+          <div class="rule">
+            <strong>最后只记住这一句</strong>
+            <p>对已上线 MVP，OpenSpec 的价值不是写更多文档，而是让每一次小改动都有清晰边界、活的约定、匹配强度的证据，以及一个能回到“当前事实”的闭环。</p>
+          </div>
+
+          <h3>官方来源与版本边界</h3>
+          <p>本教程依据 2026-07-28 查阅的 Fission-AI/OpenSpec 主仓库与官方文档编写。OpenSpec 更新较快，执行前可核对以下官方地址。它们以纯文本列出，本页不会主动请求网络：</p>
+          <div class="codebox">
+            <div class="code-head">官方资料 · 仅供人工复制访问</div>
+            <pre><code>https://github.com/Fission-AI/OpenSpec
+https://github.com/Fission-AI/OpenSpec/blob/main/docs/existing-projects.md
+https://github.com/Fission-AI/OpenSpec/blob/main/docs/opsx.md
+https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md
+https://github.com/Fission-AI/OpenSpec/blob/main/docs/editing-changes.md</code></pre>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>OpenSpec 已上线 MVP v1.0 增量开发实战教程</p>
+      <p>单文件 · 零运行时外部依赖 · 适合离线阅读与打印</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var body = document.body;
+      var progressBar = document.getElementById("progressBar");
+      var menuButton = document.getElementById("menuButton");
+      var sidebar = document.getElementById("sidebar");
+      var search = document.getElementById("search");
+      var clearSearch = document.getElementById("clearSearch");
+      var noResults = document.getElementById("noResults");
+      var sections = Array.prototype.slice.call(document.querySelectorAll("section[data-searchable]"));
+      var tocLinks = Array.prototype.slice.call(document.querySelectorAll("#toc a"));
+
+      function updateProgress() {
+        var root = document.documentElement;
+        var max = root.scrollHeight - root.clientHeight;
+        var ratio = max > 0 ? root.scrollTop / max : 0;
+        progressBar.style.width = Math.max(0, Math.min(100, ratio * 100)) + "%";
+      }
+
+      function setActive(id) {
+        tocLinks.forEach(function (link) {
+          var active = link.getAttribute("href") === "#" + id;
+          link.classList.toggle("active", active);
+          if (active) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+        });
+      }
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(function (entries) {
+          var visible = entries
+            .filter(function (entry) { return entry.isIntersecting; })
+            .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; });
+          if (visible[0]) setActive(visible[0].target.id);
+        }, { rootMargin: "-18% 0px -68% 0px", threshold: [0, .1, .4] });
+        sections.forEach(function (section) { observer.observe(section); });
+      }
+
+      function setMenu(open) {
+        body.classList.toggle("menu-open", open);
+        menuButton.setAttribute("aria-expanded", String(open));
+        menuButton.setAttribute("aria-label", open ? "关闭目录" : "打开目录");
+      }
+
+      menuButton.addEventListener("click", function () {
+        setMenu(!body.classList.contains("menu-open"));
+      });
+      tocLinks.forEach(function (link) {
+        link.addEventListener("click", function () { setMenu(false); });
+      });
+      document.addEventListener("click", function (event) {
+        if (body.classList.contains("menu-open") &&
+            !sidebar.contains(event.target) &&
+            !menuButton.contains(event.target)) {
+          setMenu(false);
+        }
+      });
+
+      function bindCopyButtons() {
+        document.querySelectorAll(".copy").forEach(function (button) {
+          if (button.dataset.copyBound) return;
+          button.dataset.copyBound = "true";
+          button.addEventListener("click", function () {
+            var code = button.parentElement.querySelector("code");
+            if (!code) return;
+            var text = code.textContent;
+            var done = function () {
+              var old = button.textContent;
+              button.textContent = "已复制";
+              setTimeout(function () { button.textContent = old; }, 1300);
+            };
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard.writeText(text).then(done);
+            } else {
+              var area = document.createElement("textarea");
+              area.value = text;
+              area.setAttribute("readonly", "");
+              area.style.position = "fixed";
+              area.style.opacity = "0";
+              document.body.appendChild(area);
+              area.select();
+              try { document.execCommand("copy"); done(); } catch (error) {}
+              document.body.removeChild(area);
+            }
+          });
+        });
+      }
+      var original = sections.map(function (section) {
+        return { section: section, html: section.innerHTML, text: section.textContent.toLowerCase() };
+      });
+      bindCopyButtons();
+
+      function escapeRegExp(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      }
+
+      function runSearch() {
+        var query = search.value.trim().toLowerCase();
+        clearSearch.style.display = query ? "block" : "none";
+        var count = 0;
+
+        original.forEach(function (entry) {
+          entry.section.innerHTML = entry.html;
+          if (!query) {
+            entry.section.hidden = false;
+            count += 1;
+            return;
+          }
+          var matched = entry.text.indexOf(query) !== -1;
+          entry.section.hidden = !matched;
+          if (matched) {
+            count += 1;
+            var walker = document.createTreeWalker(entry.section, NodeFilter.SHOW_TEXT, {
+              acceptNode: function (node) {
+                if (!node.nodeValue.toLowerCase().includes(query)) return NodeFilter.FILTER_REJECT;
+                if (node.parentElement.closest("script, style, .code-head")) return NodeFilter.FILTER_REJECT;
+                return NodeFilter.FILTER_ACCEPT;
+              }
+            });
+            var nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            nodes.slice(0, 18).forEach(function (node) {
+              var fragment = document.createDocumentFragment();
+              var parts = node.nodeValue.split(new RegExp("(" + escapeRegExp(query) + ")", "ig"));
+              parts.forEach(function (part) {
+                if (part.toLowerCase() === query) {
+                  var mark = document.createElement("mark");
+                  mark.className = "search-hit";
+                  mark.textContent = part;
+                  fragment.appendChild(mark);
+                } else {
+                  fragment.appendChild(document.createTextNode(part));
+                }
+              });
+              node.parentNode.replaceChild(fragment, node);
+            });
+          }
+        });
+
+        noResults.style.display = count ? "none" : "block";
+        bindCopyButtons();
+      }
+
+      search.addEventListener("input", runSearch);
+      clearSearch.addEventListener("click", function () {
+        search.value = "";
+        runSearch();
+        search.focus();
+      });
+      search.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") clearSearch.click();
+      });
+
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      window.addEventListener("resize", function () {
+        updateProgress();
+        if (window.innerWidth > 768) setMenu(false);
+      });
+      updateProgress();
+      setActive("s1");
+    })();
+  </script>
+</body>
+</html>

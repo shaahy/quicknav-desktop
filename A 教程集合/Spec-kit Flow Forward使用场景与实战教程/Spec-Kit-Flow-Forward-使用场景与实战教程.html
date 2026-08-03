@@ -1,0 +1,1786 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="基于 GitHub Spec Kit v0.14.1 的 Flow-Forward 使用场景与增量开发实战教程">
+  <title>Spec Kit Flow-Forward｜使用场景与增量开发实战</title>
+  <style>
+    :root {
+      --paper: #f3f0e8;
+      --surface: #fffdf7;
+      --surface-2: #e9e5da;
+      --ink: #17201c;
+      --muted: #5f6b64;
+      --line: #c9cec6;
+      --brand: #126b4f;
+      --brand-strong: #0a503b;
+      --brand-soft: #d8eadf;
+      --accent: #d96f32;
+      --accent-soft: #f7e1d2;
+      --danger: #a33b35;
+      --danger-soft: #f4dcda;
+      --code: #111916;
+      --code-ink: #e8f3ec;
+      --shadow: 0 16px 42px rgba(23, 32, 28, .09);
+      --radius: 10px;
+      --sidebar: 286px;
+      --content: 860px;
+      --sans: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", Arial, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    [data-theme="dark"] {
+      --paper: #111714;
+      --surface: #19211d;
+      --surface-2: #232e29;
+      --ink: #edf2ee;
+      --muted: #aab7af;
+      --line: #3d4c45;
+      --brand: #71d5ad;
+      --brand-strong: #9ae3c6;
+      --brand-soft: #203d32;
+      --accent: #f39a61;
+      --accent-soft: #493123;
+      --danger: #ff9790;
+      --danger-soft: #472a28;
+      --code: #090e0b;
+      --code-ink: #dcebe1;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .32);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 78px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: var(--brand-strong); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    ::selection { color: var(--ink); background: var(--accent-soft); }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 10px;
+      left: 10px;
+      transform: translateY(-150%);
+      padding: 9px 14px;
+      color: var(--surface);
+      background: var(--ink);
+      border-radius: 6px;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .progress {
+      position: fixed;
+      z-index: 60;
+      inset: 0 0 auto;
+      height: 4px;
+      background: transparent;
+    }
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .topbar {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      padding: 10px 20px;
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      color: #fff;
+      background: var(--brand-strong);
+      border-radius: 7px;
+      font: 800 15px/1 var(--mono);
+    }
+    .brand-title {
+      overflow: hidden;
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .brand-title small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn, .control-btn, .copy-btn, .path-btn, .answer-btn {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: var(--surface);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .icon-btn:hover, .control-btn:hover, .copy-btn:hover, .path-btn:hover, .answer-btn:hover {
+      border-color: var(--brand);
+      background: var(--brand-soft);
+    }
+    .icon-btn:active, .control-btn:active, .path-btn:active, .answer-btn:active { transform: translateY(1px); }
+    .icon-btn { display: grid; width: 40px; height: 40px; place-items: center; }
+    .icon-btn svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .menu-btn { display: none; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      min-height: calc(100vh - 64px);
+    }
+    .sidebar {
+      position: sticky;
+      top: 65px;
+      height: calc(100vh - 65px);
+      overflow: auto;
+      padding: 25px 18px 38px;
+      border-right: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .sidebar-label {
+      margin: 0 8px 9px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .toc { display: grid; gap: 3px; }
+    .toc a {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 7px;
+      align-items: start;
+      padding: 8px 9px;
+      color: var(--muted);
+      border-left: 3px solid transparent;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.38;
+      text-decoration: none;
+    }
+    .toc a span { color: var(--brand); font: 700 11px/1.8 var(--mono); }
+    .toc a:hover, .toc a.active {
+      color: var(--ink);
+      background: var(--surface-2);
+      border-left-color: var(--accent);
+    }
+    .side-card {
+      margin: 24px 6px 0;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      font-size: 12px;
+    }
+    .side-card b { display: block; margin-bottom: 5px; color: var(--brand-strong); }
+
+    main { min-width: 0; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(66px, 9vw, 118px) clamp(24px, 7vw, 100px) 70px;
+      color: #f7faf8;
+      background: #0d3e30;
+      border-bottom: 6px solid var(--accent);
+    }
+    .hero::after {
+      content: "001 → 002 → 003";
+      position: absolute;
+      right: -22px;
+      bottom: -32px;
+      color: rgba(255, 255, 255, .07);
+      font: 800 clamp(52px, 9vw, 132px)/1 var(--mono);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 970px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: #cce8dc;
+      font: 700 12px/1.2 var(--mono);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--accent); }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-size: clamp(42px, 7.2vw, 88px);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    h1 em { display: block; margin-top: 12px; color: #81d4b3; font-style: normal; }
+    .hero-lead {
+      max-width: 720px;
+      margin: 30px 0 0;
+      color: #d9e7e0;
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.65;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 28px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border: 1px solid rgba(255, 255, 255, .28);
+      border-radius: 999px;
+      color: #eff8f3;
+      font: 650 12px/1.2 var(--mono);
+    }
+
+    .content {
+      width: min(calc(100% - 40px), var(--content));
+      margin: 0 auto;
+      padding: 72px 0 120px;
+    }
+    .chapter {
+      position: relative;
+      padding: 10px 0 82px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter:last-child { border-bottom: 0; }
+    .chapter-head {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 22px;
+      align-items: start;
+      margin-bottom: 30px;
+    }
+    .chapter-no {
+      padding-top: 7px;
+      color: var(--accent);
+      font: 800 23px/1 var(--mono);
+    }
+    .kicker {
+      margin: 0 0 6px;
+      color: var(--brand);
+      font: 800 11px/1.4 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4.5vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -.035em;
+    }
+    h3 { margin: 38px 0 14px; font-size: 22px; line-height: 1.3; }
+    h4 { margin: 24px 0 10px; font-size: 17px; }
+    p { margin: 0 0 16px; }
+    .lede { color: var(--muted); font-size: 18px; line-height: 1.75; }
+    .note {
+      margin: 24px 0;
+      padding: 17px 19px;
+      border-left: 4px solid var(--brand);
+      background: var(--brand-soft);
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .note.warning { border-left-color: var(--accent); background: var(--accent-soft); }
+    .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+    .note b { display: block; margin-bottom: 4px; }
+
+    .fact-row, .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .fact, .metric {
+      min-width: 0;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--brand);
+      border-radius: var(--radius);
+    }
+    .fact strong, .metric strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+    .fact p, .metric p { margin: 0; color: var(--muted); font-size: 13px; }
+    .metric strong { color: var(--brand-strong); font: 800 26px/1 var(--mono); }
+
+    .flow {
+      display: grid;
+      gap: 0;
+      margin: 28px 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .flow-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      min-height: 74px;
+      padding: 13px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .flow-item:last-child { border-bottom: 0; }
+    .flow-item::after {
+      content: "↓";
+      position: absolute;
+      z-index: 2;
+      bottom: -14px;
+      left: 31px;
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      color: var(--surface);
+      background: var(--brand);
+      border-radius: 50%;
+      font-weight: 900;
+    }
+    .flow-item:last-child::after { display: none; }
+    .flow-num {
+      color: var(--brand);
+      font: 800 13px/1 var(--mono);
+    }
+    .flow-item b { display: block; line-height: 1.25; }
+    .flow-item small { color: var(--muted); }
+    .flow-file {
+      max-width: 210px;
+      color: var(--muted);
+      font: 600 11px/1.35 var(--mono);
+      text-align: right;
+    }
+
+    .decision {
+      padding: clamp(20px, 4vw, 32px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .decision h3 { margin-top: 0; }
+    .question { margin: 22px 0 0; }
+    .question-title { display: block; margin-bottom: 10px; font-weight: 750; }
+    .answer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .answer-btn { min-height: 48px; padding: 10px 13px; text-align: left; }
+    .answer-btn.selected { color: var(--surface); background: var(--brand-strong); border-color: var(--brand-strong); }
+    .decision-result {
+      display: none;
+      margin-top: 22px;
+      padding: 18px;
+      border: 2px solid var(--brand);
+      border-radius: 7px;
+      background: var(--brand-soft);
+    }
+    .decision-result.show { display: block; }
+    .decision-result strong { display: block; margin-bottom: 4px; font-size: 18px; }
+
+    .compare {
+      width: 100%;
+      margin: 24px 0;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+    .compare th, .compare td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .compare th { color: var(--surface); background: var(--brand-strong); font-size: 12px; letter-spacing: .03em; }
+    .compare tr:last-child td { border-bottom: 0; }
+    .compare td:first-child { font-weight: 750; }
+    .table-wrap { overflow-x: auto; margin: 24px 0; border-radius: var(--radius); }
+    .table-wrap .compare { min-width: 690px; margin: 0; }
+
+    .switcher {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 24px 0 14px;
+      padding: 6px;
+      background: var(--surface-2);
+      border-radius: 9px;
+    }
+    .path-btn, .control-btn { padding: 9px 14px; font-weight: 700; }
+    .path-btn.active, .control-btn.active { color: #fff; background: var(--brand-strong); border-color: var(--brand-strong); }
+    .path-panel { display: none; }
+    .path-panel.active { display: block; }
+
+    .terminal {
+      position: relative;
+      overflow: hidden;
+      margin: 18px 0;
+      color: var(--code-ink);
+      background: var(--code);
+      border: 1px solid #34423a;
+      border-radius: var(--radius);
+    }
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 42px;
+      padding: 7px 10px 7px 14px;
+      color: #a9bab0;
+      background: #1b2721;
+      border-bottom: 1px solid #34423a;
+      font: 650 11px/1.2 var(--mono);
+    }
+    .terminal-head span::before { content: "●  ●  ●"; margin-right: 11px; color: #5e7467; letter-spacing: 2px; }
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow: auto;
+      font: 13px/1.72 var(--mono);
+      white-space: pre;
+      tab-size: 2;
+    }
+    code { font-family: var(--mono); }
+    p code, li code, td code {
+      padding: .12em .36em;
+      color: var(--brand-strong);
+      background: var(--surface-2);
+      border-radius: 4px;
+      font-size: .92em;
+    }
+    .copy-btn { padding: 5px 9px; color: #d8e6dd; background: transparent; border-color: #516158; font: 650 11px/1.2 var(--sans); }
+    .copy-btn:hover { color: #fff; background: #2d4338; border-color: #809889; }
+
+    .stage {
+      position: relative;
+      margin: 28px 0;
+      padding: 0 0 0 44px;
+    }
+    .stage::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      bottom: -27px;
+      left: 15px;
+      width: 2px;
+      background: var(--line);
+    }
+    .stage:last-child::before { bottom: 20px; }
+    .stage-marker {
+      position: absolute;
+      top: 1px;
+      left: 0;
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      color: #fff;
+      background: var(--brand);
+      border: 4px solid var(--paper);
+      border-radius: 50%;
+      font: 800 10px/1 var(--mono);
+    }
+    .stage h3 { margin: 0 0 6px; }
+    .stage-meta { margin-bottom: 14px; color: var(--muted); font-size: 13px; }
+    .gate {
+      margin: 14px 0;
+      padding: 13px 15px;
+      background: var(--surface);
+      border: 1px dashed var(--brand);
+      border-radius: 7px;
+    }
+    .gate b { color: var(--brand-strong); }
+
+    .checklist {
+      display: grid;
+      gap: 9px;
+      padding: 0;
+      list-style: none;
+    }
+    .checklist li {
+      position: relative;
+      padding: 12px 14px 12px 43px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+    .checklist li::before {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 15px;
+      height: 15px;
+      border: 2px solid var(--brand);
+      border-radius: 3px;
+    }
+
+    details {
+      margin: 11px 0;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+    summary {
+      position: relative;
+      padding: 15px 46px 15px 16px;
+      cursor: pointer;
+      font-weight: 750;
+      list-style: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after {
+      content: "+";
+      position: absolute;
+      top: 13px;
+      right: 17px;
+      color: var(--brand);
+      font: 800 20px/1 var(--mono);
+    }
+    details[open] summary::after { content: "−"; }
+    .detail-body { padding: 0 17px 18px; }
+
+    .source-list { display: grid; gap: 10px; padding: 0; list-style: none; }
+    .source-list li { padding: 13px 15px; background: var(--surface); border-left: 3px solid var(--brand); }
+    .source-list a { font-weight: 750; }
+    .source-list small { display: block; margin-top: 2px; color: var(--muted); }
+    .footer {
+      padding: 34px 20px 48px;
+      color: #c7d7ce;
+      background: #0b2d23;
+      text-align: center;
+      font-size: 13px;
+    }
+    .footer strong { color: #fff; }
+
+    .command-general, .command-codex { display: none; }
+    [data-command-mode="general"] .command-general { display: block; }
+    [data-command-mode="codex"] .command-codex { display: block; }
+
+    @media (max-width: 1024px) {
+      :root { --sidebar: 250px; }
+      .hero { padding-left: 48px; padding-right: 48px; }
+      .content { width: min(calc(100% - 48px), var(--content)); }
+      .fact-row, .metric-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      html { scroll-padding-top: 68px; }
+      .menu-btn { display: grid; }
+      .icon-btn, .control-btn, .copy-btn, .path-btn, .answer-btn { min-height: 44px; }
+      .brand-title small { display: none; }
+      .shell { display: block; }
+      .sidebar {
+        position: fixed;
+        z-index: 45;
+        top: 64px;
+        bottom: 0;
+        left: 0;
+        width: min(86vw, 320px);
+        height: auto;
+        transform: translateX(-105%);
+        box-shadow: var(--shadow);
+        transition: transform .25s ease;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .hero { padding: 70px 24px 58px; }
+      .content { width: min(calc(100% - 32px), var(--content)); padding-top: 52px; }
+      .chapter { padding-bottom: 62px; }
+      .chapter-head { grid-template-columns: 1fr; gap: 8px; }
+      .chapter-no { font-size: 15px; }
+      .answer-grid { grid-template-columns: 1fr; }
+      .flow-item { grid-template-columns: 38px 1fr; }
+      .flow-file { grid-column: 2; max-width: none; text-align: left; }
+      .stage { padding-left: 38px; }
+      .stage::before { left: 13px; }
+      .stage-marker { width: 27px; height: 27px; }
+    }
+
+    @media (max-width: 480px) {
+      .topbar { padding-inline: 12px; }
+      .brand-title { max-width: 150px; }
+      .hero-meta { gap: 6px; }
+      .tag { max-width: 100%; font-size: 10px; }
+      h1 { overflow-wrap: anywhere; font-size: 36px; }
+      .flow-item { padding-inline: 12px; }
+      pre { padding: 15px; font-size: 12px; }
+      .compare th, .compare td { padding: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+
+    @media print {
+      :root {
+        --paper: #fff;
+        --surface: #fff;
+        --surface-2: #f2f2f2;
+        --ink: #111;
+        --muted: #444;
+        --line: #bbb;
+        --brand: #155f47;
+        --brand-strong: #155f47;
+        --brand-soft: #e8f2ed;
+      }
+      .topbar, .sidebar, .progress, .copy-btn, .decision, .switcher { display: none !important; }
+      .shell { display: block; }
+      .hero { color: #111; background: #fff; border: 4px solid #155f47; padding: 30px; }
+      .hero::after { display: none; }
+      .hero-lead, .eyebrow, .tag { color: #222; }
+      .tag { border-color: #777; }
+      .content { width: 100%; padding: 30px 0; }
+      .chapter { break-before: page; }
+      .chapter:first-child { break-before: auto; }
+      details > * { display: block !important; }
+      .terminal { break-inside: avoid; }
+      a { color: #111; text-decoration: none; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9px; word-break: break-all; }
+    }
+  </style>
+</head>
+<body data-command-mode="general">
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="progress" aria-hidden="true"><span id="readingProgress"></span></div>
+
+  <header class="topbar">
+    <div class="brand-lockup">
+      <button class="icon-btn menu-btn" id="menuButton" aria-label="打开章节导航" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="brand-mark" aria-hidden="true">S/F</div>
+      <div class="brand-title">Spec Kit Flow-Forward<small>OFFLINE FIELD GUIDE · v0.14.1</small></div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="printButton" aria-label="打印或导出 PDF">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M7 14h10v6H7z"/></svg>
+      </button>
+      <button class="icon-btn" id="themeButton" aria-label="切换明暗主题">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" id="sidebar" aria-label="章节导航">
+      <p class="sidebar-label">学习路线</p>
+      <nav class="toc">
+        <a href="#ch01"><span>01</span>先建立正确心智模型</a>
+        <a href="#ch02"><span>02</span>判断何时向前创建</a>
+        <a href="#ch03"><span>03</span>选择命令与分支路径</a>
+        <a href="#ch04"><span>04</span>冻结现有项目基线</a>
+        <a href="#ch05"><span>05</span>第一次增量完整实战</a>
+        <a href="#ch06"><span>06</span>实现、验证与收敛</a>
+        <a href="#ch07"><span>07</span>PR、发布与回滚</a>
+        <a href="#ch08"><span>08</span>第二次迭代如何向前</a>
+        <a href="#ch09"><span>09</span>并行、错误与恢复</a>
+        <a href="#ch10"><span>10</span>命令速查与完成定义</a>
+        <a href="#ch11"><span>11</span>版本边界与官方依据</a>
+      </nav>
+      <div class="side-card">
+        <b>本页完全离线</b>
+        CSS、JavaScript 与图标均已内嵌。官方链接只在你主动点击时访问网络。
+      </div>
+    </aside>
+
+    <main id="main-content">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-inner">
+          <div class="eyebrow">Spec-driven development · Incremental delivery</div>
+          <h1 id="page-title">Flow-Forward<em>不是新开一个分支。</em></h1>
+          <p class="hero-lead">它是一条不可覆盖的产品与工程演进链。Git 分支隔离本次工作；新的 feature 目录保存这次变化为什么发生、承诺了什么，以及项目如何走到今天。</p>
+          <div class="hero-meta" aria-label="教程元信息">
+            <span class="tag">官方基线 v0.14.1</span>
+            <span class="tag">Windows PowerShell</span>
+            <span class="tag">Codex + 通用命令</span>
+            <span class="tag">已有项目增量开发</span>
+            <span class="tag">单文件离线教程</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="content">
+        <section class="chapter" id="ch01" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">01</div>
+            <div>
+              <p class="kicker">Mental model</p>
+              <h2>先把三个对象彻底分清</h2>
+            </div>
+          </header>
+          <p class="lede">Flow-forward 的历史单元是 <code>specs/&lt;feature&gt;/</code>。Git 分支和当前 feature 状态都服务于这次工作，但它们不是同一个东西。</p>
+
+          <div class="fact-row">
+            <article class="fact">
+              <strong>Feature artifact</strong>
+              <p><code>specs/002-add-task-priority/</code><br>长期保留，解释本次需求、计划、任务与决策。</p>
+            </article>
+            <article class="fact">
+              <strong>Git feature branch</strong>
+              <p><code>feat/add-task-priority</code><br>隔离代码和评审；合并后可按团队规则删除。</p>
+            </article>
+            <article class="fact">
+              <strong>Active feature state</strong>
+              <p><code>.specify/feature.json</code><br>告诉后续命令当前使用哪个 feature 目录。</p>
+            </article>
+          </div>
+
+          <div class="note">
+            <b>当前官方行为</b>
+            <code>/speckit.specify</code> 总会创建新的 spec 目录和 <code>spec.md</code>。是否创建 Git 分支，取决于可选 Git 扩展的 <code>before_specify</code> hook。分支名不决定 spec 目录名。
+          </div>
+
+          <div class="flow" aria-label="Flow-forward 演进链">
+            <div class="flow-item">
+              <span class="flow-num">001</span>
+              <div><b>任务管理 MVP</b><small>已经发布 · 基础行为</small></div>
+              <span class="flow-file">specs/001-task-manager-mvp/</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-num">002</span>
+              <div><b>新增任务优先级</b><small>Extends 001 · 保留原有权限与任务流程</small></div>
+              <span class="flow-file">specs/002-add-task-priority/</span>
+            </div>
+            <div class="flow-item">
+              <span class="flow-num">003</span>
+              <div><b>调整优先级提醒</b><small>Extends 002 · Supersedes 001 的提醒规则</small></div>
+              <span class="flow-file">specs/003-adjust-priority-reminders/</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>模型</th><th>需求变化时怎么做</th><th>最适合</th><th>主要风险</th></tr></thead>
+              <tbody>
+                <tr><td>Flow-forward</td><td>创建新的 feature 目录，旧目录保持历史原样</td><td>审计、跨团队、已上线产品</td><td>当前行为分散，需要演进索引</td></tr>
+                <tr><td>Living spec</td><td>先修改现有 <code>spec.md</code>，再传播到 plan/tasks</td><td>规格本身必须永远代表当前合同</td><td>重生成时可能丢失历史理由</td></tr>
+                <tr><td>Flow-back</td><td>允许从 spec、plan、tasks 或代码任意处开始，再人工对齐</td><td>小团队、快速探索</td><td>容易产生无声漂移</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch02" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">02</div>
+            <div>
+              <p class="kicker">Scenario decision</p>
+              <h2>什么情况应该新建 feature？</h2>
+            </div>
+          </header>
+          <p class="lede">不是每次改代码都要向前创建。关键看：原 feature 是否已经成为历史、用户可见行为是否改变、这次变化能否独立验收或回滚。</p>
+
+          <div class="decision" id="scenarioDecision">
+            <h3>三问判断器</h3>
+            <p>依次选择最符合当前情况的答案，页面会给出建议。判断器只帮助分类，最终仍以团队治理规则为准。</p>
+
+            <div class="question" data-question="released">
+              <span class="question-title">1. 原 feature 已合并或上线了吗？</span>
+              <div class="answer-grid">
+                <button class="answer-btn" data-value="yes">是，已经成为历史</button>
+                <button class="answer-btn" data-value="no">否，仍在当前开发中</button>
+              </div>
+            </div>
+            <div class="question" data-question="behavior">
+              <span class="question-title">2. 这次变化会改变用户、API、数据或权限行为吗？</span>
+              <div class="answer-grid">
+                <button class="answer-btn" data-value="yes">会改变外部行为</button>
+                <button class="answer-btn" data-value="no">不会，只改内部实现</button>
+              </div>
+            </div>
+            <div class="question" data-question="independent">
+              <span class="question-title">3. 它需要独立验收、发布或回滚吗？</span>
+              <div class="answer-grid">
+                <button class="answer-btn" data-value="yes">需要独立闭环</button>
+                <button class="answer-btn" data-value="no">仍属于原目标的澄清或漏项</button>
+              </div>
+            </div>
+            <div class="decision-result" id="decisionResult" role="status" aria-live="polite"></div>
+          </div>
+
+          <h3>快速场景表</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>场景</th><th>建议</th><th>理由</th></tr></thead>
+              <tbody>
+                <tr><td>上线后新增用户可见能力</td><td>新建 feature</td><td>这是新的产品事实，需要独立历史</td></tr>
+                <tr><td>修改已上线 API、权限、状态流或数据字段</td><td>新建 feature</td><td>涉及兼容、迁移、发布和回滚</td></tr>
+                <tr><td>当前 feature 内澄清同一目标</td><td>更新当前 artifact</td><td>它还没有冻结为历史；更新后重新 analyze</td></tr>
+                <tr><td>代码没有实现已批准的 spec</td><td>修实现偏差</td><td>不要把缺陷伪装成产品新需求</td></tr>
+                <tr><td>纯内部重构且外部行为不变</td><td>通常不新建产品 feature</td><td>按团队工程变更流程处理</td></tr>
+                <tr><td>上线后撤销功能</td><td>新建 revert/disable feature</td><td>撤销本身也是发生过的产品变化</td></tr>
+                <tr><td>目标从“固定 P0-P3”扩大为“可配置工作流”</td><td>停止扩大，拆新 feature</td><td>新目标已能独立产生价值和风险</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch03" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">03</div>
+            <div>
+              <p class="kicker">Command & branch paths</p>
+              <h2>先选命令形式，再选分支路径</h2>
+            </div>
+          </header>
+
+          <h3>命令显示模式</h3>
+          <p>Codex、ZCode 等 skills 模式常用 <code>$speckit-*</code>；其他集成通常使用 <code>/speckit.*</code>。切换后，本教程中的 AI 命令会同步变化。</p>
+          <div class="switcher" role="group" aria-label="命令显示模式">
+            <button class="control-btn active" data-command="general">通用 /speckit.*</button>
+            <button class="control-btn" data-command="codex">Codex $speckit-*</button>
+          </div>
+
+          <div class="command-general terminal">
+            <div class="terminal-head"><span>AI 对话框 · 通用命令</span><button class="copy-btn">复制</button></div>
+            <pre>/speckit.constitution
+/speckit.specify
+/speckit.clarify
+/speckit.plan
+/speckit.checklist
+/speckit.tasks
+/speckit.analyze
+/speckit.implement
+/speckit.converge</pre>
+          </div>
+          <div class="command-codex terminal">
+            <div class="terminal-head"><span>AI 对话框 · Codex skills</span><button class="copy-btn">复制</button></div>
+            <pre>$speckit-constitution
+$speckit-specify
+$speckit-clarify
+$speckit-plan
+$speckit-checklist
+$speckit-tasks
+$speckit-analyze
+$speckit-implement
+$speckit-converge</pre>
+          </div>
+
+          <div class="note warning">
+            <b>顺序提醒</b>
+            官方完整生产路径是 constitution → specify → clarify → plan → checklist → tasks → analyze → implement → converge。小功能可省略质量门，但本实战按完整路径执行。
+          </div>
+
+          <h3>Git 分支由谁创建？</h3>
+          <div class="switcher" role="tablist" aria-label="分支策略">
+            <button class="path-btn active" role="tab" aria-selected="true" data-path="hook">A · Git 扩展已启用</button>
+            <button class="path-btn" role="tab" aria-selected="false" data-path="manual">B · 未启用 Git 扩展</button>
+          </div>
+
+          <div class="path-panel active" data-path-panel="hook">
+            <div class="note">
+              <b>让 hook 拥有分支创建权</b>
+              不要提前执行 <code>git switch -c</code>。<code>before_specify</code> 会在 specification 前创建或切换编号分支。
+            </div>
+            <div class="terminal">
+              <div class="terminal-head"><span>PowerShell · 检查并回到基线</span><button class="copy-btn">复制</button></div>
+              <pre>specify extension list
+Get-Content -Encoding utf8 .specify\extensions.yml
+Get-Content -Encoding utf8 .specify\extensions\git\git-config.yml
+
+git switch &lt;default-branch&gt;
+git pull --ff-only
+git status --short</pre>
+            </div>
+          </div>
+
+          <div class="path-panel" data-path-panel="manual">
+            <div class="note">
+              <b>人工创建专用分支</b>
+              这不影响 Flow-forward。新 spec 目录仍由 <code>speckit.specify</code> 创建，分支名与目录名可以不同。
+            </div>
+            <div class="terminal">
+              <div class="terminal-head"><span>PowerShell · 手动分支</span><button class="copy-btn">复制</button></div>
+              <pre>git switch &lt;default-branch&gt;
+git pull --ff-only
+git status --short
+git switch -c feat/add-task-priority</pre>
+            </div>
+          </div>
+
+          <details>
+            <summary>为什么不建议在产品 feature 中顺手安装 Git 扩展？</summary>
+            <div class="detail-body">
+              <p>扩展会改变 `.specify/extensions/`、hook、命令或 skill 行为，这是团队工具链治理变更。把它与产品需求混在同一个 PR，会让评审者难以区分“工具变化”和“产品变化”，也增加回滚耦合。</p>
+              <p>更稳妥的做法是单独建立流程分支，执行 <code>specify extension add git</code>，审查差异并验证团队工具后再合并。</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="chapter" id="ch04" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">04</div>
+            <div>
+              <p class="kicker">Preflight</p>
+              <h2>冻结现有项目基线</h2>
+            </div>
+          </header>
+          <p class="lede">先证明你站在正确的线上版本上。否则后续失败到底来自旧问题还是新 feature，将无法解释。</p>
+
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 仓库与工具检查</span><button class="copy-btn">复制</button></div>
+            <pre>Set-Location E:\path\to\your-project
+
+git status --short
+git branch --show-current
+git remote -v
+git rev-parse HEAD
+git tag --points-at HEAD
+
+specify version
+specify version --features
+specify self check</pre>
+          </div>
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 示例测试基线（按真实项目替换）</span><button class="copy-btn">复制</button></div>
+            <pre>npm ci
+npm test
+npm run lint
+npm run typecheck
+npm run build</pre>
+          </div>
+
+          <ul class="checklist">
+            <li>源码 commit 或 tag 能对应当前线上版本。</li>
+            <li>工作树干净；若有改动，已确认归属且不会混入本 feature。</li>
+            <li>基线测试结果和已知失败已经记录。</li>
+            <li>默认分支名称已确认，不机械假设为 <code>main</code>。</li>
+            <li>本轮不会顺手升级 Spec Kit 项目模板或扩展。</li>
+          </ul>
+
+          <div class="note danger">
+            <b>看到未识别的本地改动时停止</b>
+            不要删除、覆盖、<code>git reset --hard</code>，也不要把它们顺手提交。先确认改动属于谁、是否需要保留。
+          </div>
+        </section>
+
+        <section class="chapter" id="ch05" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">05</div>
+            <div>
+              <p class="kicker">Hands-on feature 002</p>
+              <h2>第一次增量：新增任务优先级</h2>
+            </div>
+          </header>
+          <p class="lede">初始状态：<code>001-task-manager-mvp</code> 已随 v1.0.0 上线。现在新增 P0–P3 优先级，形成独立的 <code>002</code> 历史单元。</p>
+
+          <div class="stage">
+            <span class="stage-marker">01</span>
+            <h3>Specify：创建新的历史单元</h3>
+            <p class="stage-meta">执行位置：AI 对话框 · 只描述 WHAT 与 WHY</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.specify</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.specify
+
+为已上线的任务管理系统新增任务优先级能力。
+
+历史关系：
+- Extends: specs/001-task-manager-mvp/spec.md
+- Preserves: 现有任务创建、负责人分配、完成状态、权限、分页和筛选
+- Changes: 任务字段、默认排序和项目级功能开关
+- Does not supersede: MVP 的其他任务管理行为
+
+目标行为：
+1. 任务支持 P0、P1、P2、P3；P0 最高，P3 最低；
+2. 未指定优先级时默认为 P2；
+3. 有任务编辑权限的成员可以创建和编辑优先级；
+4. 默认排序：优先级、截止时间、创建时间、任务 ID；
+5. 管理员可按项目关闭入口，关闭后保留已有数据；
+6. 旧任务迁移为 P2；
+7. 现有 API 客户端保持兼容。
+
+非范围：
+- 自定义优先级；
+- AI 自动推断；
+- 跨项目优先级模板；
+- 批量修改。
+
+未知事项必须标记，不得猜测技术实现。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-specify</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-specify
+
+为已上线的任务管理系统新增任务优先级能力。
+
+历史关系：
+- Extends: specs/001-task-manager-mvp/spec.md
+- Preserves: 现有任务创建、负责人分配、完成状态、权限、分页和筛选
+- Changes: 任务字段、默认排序和项目级功能开关
+
+目标行为：支持 P0-P3；默认 P2；按权限编辑；稳定排序；项目级关闭；
+旧任务迁移为 P2；API 向后兼容。
+
+非范围：自定义优先级、AI 推断、跨项目模板、批量修改。
+只定义 WHAT 和 WHY，未知事项不得猜测。</pre>
+            </div>
+            <div class="terminal">
+              <div class="terminal-head"><span>PowerShell · 产物核验</span><button class="copy-btn">复制</button></div>
+              <pre>git branch --show-current
+git status --short
+Get-Content -Encoding utf8 .specify\feature.json
+Get-ChildItem specs -Directory | Sort-Object Name
+Get-Content -Encoding utf8 specs\002-add-task-priority\spec.md</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b>创建了一个新 feature 目录；旧 <code>001</code> 未改；每条需求可验证；默认值、权限、关闭、存量数据和异常路径都有边界。</div>
+          </div>
+
+          <div class="stage">
+            <span class="stage-marker">02</span>
+            <h3>Clarify：产品决策先于技术计划</h3>
+            <p class="stage-meta">执行位置：AI 对话框 · 一次最多聚焦一组真正阻塞的问题</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.clarify</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.clarify
+
+重点澄清：
+- P0-P3 展示名称是否固定；
+- 谁可以修改优先级；
+- 无截止时间与完全同序时如何稳定排序；
+- 功能关闭后 API 是否仍返回 priority；
+- 关闭期间是否允许 API 写入；
+- 恢复后历史值如何显示；
+- 旧任务迁移失败时如何处理；
+- 对现有移动端和外部客户端的影响。
+
+逐项提出需要产品决定的问题，不得自行选择。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-clarify</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-clarify
+
+聚焦优先级名称、修改权限、稳定排序、关闭期间 API 行为、
+恢复行为、迁移失败策略和旧客户端兼容。逐项提问，不得代替产品选择。</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b><code>rg -n "NEEDS CLARIFICATION" specs\002-add-task-priority</code> 不再找到阻塞问题；产品决定已经编码回 spec。</div>
+          </div>
+
+          <div class="stage">
+            <span class="stage-marker">03</span>
+            <h3>Plan：基于真实代码设计 HOW</h3>
+            <p class="stage-meta">执行位置：AI 对话框 · 必须先读源码与现有工程约定</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.plan</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.plan
+
+先读取现有源码，不得虚构文件或架构。重点分析：
+- 当前任务数据模型与 migration 规范；
+- 创建、更新、列表和排序链路；
+- 权限与项目功能开关；
+- API schema 与客户端兼容；
+- 测试、发布、监控和回滚方式。
+
+计划必须明确数据表示、约束、稳定排序、索引、迁移预演、
+回滚、兼容策略和性能验证。产品行为以已批准 spec 为准。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-plan</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-plan
+
+先读取真实源码。覆盖数据模型、迁移、API 兼容、权限、功能开关、
+稳定排序、索引、测试、监控与回滚；不得新增未经 spec 批准的行为。</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b>计划中的每个产品行为都有 spec 来源；迁移、兼容、回滚、性能与验证方案明确；引用的文件和模块真实存在。</div>
+          </div>
+
+          <div class="stage">
+            <span class="stage-marker">04</span>
+            <h3>Checklist：给规格文本写“单元测试”</h3>
+            <p class="stage-meta">检查需求质量，不是假装执行代码测试</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.checklist</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.checklist
+
+为任务优先级生成需求质量检查表，覆盖：
+可测试性、权限、功能关闭、默认值、稳定排序、分页、
+旧数据迁移、回滚、API 兼容、性能、监控与非范围。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-checklist</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-checklist
+
+检查可测试性、权限、开关、默认值、排序、迁移、回滚、
+API 兼容、性能、监控和非范围。只检查需求文本质量。</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b>所有阻塞项在生成 tasks 前得到处理；暂时无法处理的项有负责人、理由和退出条件。</div>
+          </div>
+
+          <div class="stage">
+            <span class="stage-marker">05</span>
+            <h3>Tasks：拆成可验证、可暂停的工作</h3>
+            <p class="stage-meta">任务顺序：契约与失败测试 → 数据 → 应用 → 验证与发布</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.tasks</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.tasks
+
+任务必须：
+- 先写证明需求的测试，再写实现；
+- 标注依赖和可安全并行项；
+- 给出明确文件或模块范围；
+- 包含前向迁移、回滚迁移和迁移预演；
+- 包含 API 兼容、回归、性能、人工验收、发布和监控；
+- 不包含本 feature 非范围内容。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-tasks</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-tasks
+
+按失败测试、数据、后端、前端、验证与发布分组；
+标注依赖和并行项；覆盖迁移、回滚、兼容、性能和验收；
+不得加入无 requirement 来源的顺便任务。</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b>每条 requirement 能映射到 task 和验证方式；不存在只有实现没有测试的行为变化，也不存在无来源任务。</div>
+          </div>
+
+          <div class="stage">
+            <span class="stage-marker">06</span>
+            <h3>Analyze：实现前消除 artifact 冲突</h3>
+            <p class="stage-meta">只读报告 · 修正源 artifact 后重新运行</p>
+            <div class="command-general terminal">
+              <div class="terminal-head"><span>/speckit.analyze</span><button class="copy-btn">复制</button></div>
+              <pre>/speckit.analyze
+
+报告 spec、plan、tasks 与 constitution 之间的：
+- 覆盖缺口；
+- 未经批准的产品行为；
+- 迁移、兼容、测试、发布或回滚漏项；
+- 默认值、权限和排序矛盾；
+- 无需求来源的任务；
+- 无验证证据的 requirement。
+
+按 CRITICAL、HIGH、MEDIUM、LOW 分类，不修改代码。</pre>
+            </div>
+            <div class="command-codex terminal">
+              <div class="terminal-head"><span>$speckit-analyze</span><button class="copy-btn">复制</button></div>
+              <pre>$speckit-analyze
+
+检查 spec、plan、tasks 与 constitution 的覆盖、冲突、漏项和越界；
+按严重度报告，不修改代码。</pre>
+            </div>
+            <div class="gate"><b>通过门槛：</b>CRITICAL/HIGH 清零；人工抽查关键 requirement → plan → task → verification 映射。</div>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch06" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">06</div>
+            <div>
+              <p class="kicker">Build & converge</p>
+              <h2>实现不是一口气跑到底</h2>
+            </div>
+          </header>
+          <p class="lede">先提交经过批准的规划产物，再要求实现阶段在高风险边界暂停。每次暂停都要有真实 diff 和测试输出。</p>
+
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 规划产物检查点</span><button class="copy-btn">复制</button></div>
+            <pre>git status --short
+git diff -- .specify\feature.json specs\002-add-task-priority
+
+git add .specify\feature.json
+git add specs\002-add-task-priority
+git commit -m "docs: specify task priority feature"</pre>
+          </div>
+          <p class="note">如果仓库约定不跟踪 <code>.specify/feature.json</code>，遵循现有规则，不要为本教程擅自改变跟踪策略。</p>
+
+          <h3>五个实现检查点</h3>
+          <div class="flow">
+            <div class="flow-item"><span class="flow-num">A</span><div><b>Contract 与失败测试</b><small>先证明测试能在实现前失败</small></div><span class="flow-file">tests · contracts</span></div>
+            <div class="flow-item"><span class="flow-num">B</span><div><b>数据与迁移</b><small>前向、回滚、预演与数据量风险</small></div><span class="flow-file">migrations · model</span></div>
+            <div class="flow-item"><span class="flow-num">C</span><div><b>后端行为</b><small>权限、校验、序列化、稳定排序</small></div><span class="flow-file">service · API</span></div>
+            <div class="flow-item"><span class="flow-num">D</span><div><b>前端行为</b><small>创建、编辑、展示、关闭状态</small></div><span class="flow-file">UI · E2E</span></div>
+            <div class="flow-item"><span class="flow-num">E</span><div><b>完整验证与发布准备</b><small>回归、性能、监控、回滚、验收</small></div><span class="flow-file">evidence · runbook</span></div>
+          </div>
+
+          <div class="command-general terminal">
+            <div class="terminal-head"><span>/speckit.implement</span><button class="copy-btn">复制</button></div>
+            <pre>/speckit.implement
+
+按 tasks.md 执行，但必须在五个检查点暂停：
+1. contract 和失败测试；
+2. 数据模型、前向迁移和回滚迁移；
+3. 后端行为；
+4. 前端行为；
+5. 回归、性能、发布与回滚准备。
+
+每个检查点报告 Task ID、修改文件、实际测试命令和结果、
+与 plan 的偏差、新发现问题、下一阶段。未确认前不得继续。</pre>
+          </div>
+          <div class="command-codex terminal">
+            <div class="terminal-head"><span>$speckit-implement</span><button class="copy-btn">复制</button></div>
+            <pre>$speckit-implement
+
+按 contract/失败测试、数据迁移、后端、前端、完整验证五段执行。
+每段结束报告任务、文件、真实测试结果和偏差，等待确认后再继续。</pre>
+          </div>
+
+          <h3>实现中发现变化，先分类</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>发现</th><th>怎么处理</th><th>下一步</th></tr></thead>
+              <tbody>
+                <tr><td>只改变技术方案</td><td>更新 plan、data-model 和相关 tasks；spec 不变</td><td>重新 analyze 后继续</td></tr>
+                <tr><td>改变用户行为，但仍是同一目标</td><td>先更新 spec 并取得产品批准，再传播到 plan/tasks</td><td>重新 analyze 后继续</td></tr>
+                <tr><td>目标已经实质改变</td><td>停止扩大当前 feature；保持或明确取消原范围</td><td>创建下一个 flow-forward feature</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>完整验证与 Converge 循环</h3>
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 示例验证集</span><button class="copy-btn">复制</button></div>
+            <pre>npm test
+npm run lint
+npm run typecheck
+npm run build
+
+# 按项目补充：
+# migration dry run / rollback rehearsal
+# API contract tests / E2E / performance / security scan</pre>
+          </div>
+          <div class="command-general terminal">
+            <div class="terminal-head"><span>/speckit.converge</span><button class="copy-btn">复制</button></div>
+            <pre>/speckit.converge
+
+对照 spec、plan、tasks、contracts、测试和实际代码，检查：
+每条 requirement 的实现与证据、迁移与回滚、API 兼容、
+权限、功能开关、稳定排序、越界实现、发布与监控准备。
+
+只把属于本 feature 的真实缺口追加到 tasks.md，不扩大范围。</pre>
+          </div>
+          <div class="command-codex terminal">
+            <div class="terminal-head"><span>$speckit-converge</span><button class="copy-btn">复制</button></div>
+            <pre>$speckit-converge
+
+对照 artifacts、测试与代码检查真实覆盖；只追加本 feature 的缺口，
+不得扩大范围。</pre>
+          </div>
+          <div class="note">
+            <b>循环直到收敛</b>
+            Converge 追加 tasks → Implement 新 tasks → 重跑真实测试 → 再次 Converge。Converge 不能替代测试，它检查的是承诺与实现是否一致。
+          </div>
+        </section>
+
+        <section class="chapter" id="ch07" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">07</div>
+            <div>
+              <p class="kicker">Review & release</p>
+              <h2>让 PR 讲清楚完整变化</h2>
+            </div>
+          </header>
+
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 最终范围检查</span><button class="copy-btn">复制</button></div>
+            <pre>git status --short
+git diff --stat &lt;default-branch&gt;...HEAD
+
+# 旧 feature 应无输出
+git diff &lt;default-branch&gt;...HEAD -- specs\001-task-manager-mvp
+
+# 审查新 feature
+git diff &lt;default-branch&gt;...HEAD -- specs\002-add-task-priority</pre>
+          </div>
+
+          <div class="note warning">
+            <b>避免 <code>git add .</code></b>
+            按 artifact、源码、测试和迁移路径明确暂存，防止把无关本地文件掩盖进提交。
+          </div>
+
+          <h3>推荐评审顺序</h3>
+          <ol>
+            <li><strong>spec.md：</strong>产品行为、边界和历史关系是否正确。</li>
+            <li><strong>plan.md：</strong>方案、迁移、兼容、回滚和性能是否合理。</li>
+            <li><strong>tasks.md：</strong>是否漏项、越界或依赖错误。</li>
+            <li><strong>测试：</strong>是否真正证明核心场景和失败路径。</li>
+            <li><strong>代码：</strong>是否忠实实现已经批准的 contract。</li>
+            <li><strong>Converge 与发布方案：</strong>是否仍有缺口或无证据勾选。</li>
+          </ol>
+
+          <details open>
+            <summary>PR 描述模板</summary>
+            <div class="detail-body">
+              <div class="terminal">
+                <div class="terminal-head"><span>Markdown</span><button class="copy-btn">复制</button></div>
+                <pre>## Product change
+- Adds P0-P3 task priority
+- Default: P2
+- Deterministic ordering and project-level feature control
+
+## Spec Kit artifacts
+- New: `specs/002-add-task-priority/`
+- Extends: `specs/001-task-manager-mvp/`
+- Historical feature modified: No
+
+## Data and compatibility
+- Migration:
+- Rollback:
+- API compatibility:
+
+## Verification
+- Unit / integration / E2E / build:
+- Migration rehearsal:
+- Product acceptance:
+- Converge result:
+
+## Release and rollback
+- Rollout:
+- Monitoring:
+- Rollback trigger:</pre>
+              </div>
+            </div>
+          </details>
+
+          <h3>已发布后的回滚仍然向前</h3>
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>阶段</th><th>处理方式</th></tr></thead>
+              <tbody>
+                <tr><td>PR 尚未合并</td><td>放弃分支即可；删除前确认没有需要保留的决策或代码。</td></tr>
+                <tr><td>已合并但尚未发布</td><td>通过新的 revert PR 恢复默认分支，不改写 Git 历史。</td></tr>
+                <tr><td>已经发布</td><td>创建新的 <code>003-revert-task-priority</code>，记录撤销原因、数据、API 影响和重新启用条件。</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch08" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">08</div>
+            <div>
+              <p class="kicker">Hands-on feature 003</p>
+              <h2>第二次迭代从新基线开始</h2>
+            </div>
+          </header>
+          <p class="lede">任务优先级上线后，产品决定：P0/P1 提前 48 小时提醒，P2/P3 保持 24 小时。这不是修改 <code>002</code>，而是创建 <code>003</code>。</p>
+
+          <div class="terminal">
+            <div class="terminal-head"><span>PowerShell · 更新到最新默认分支</span><button class="copy-btn">复制</button></div>
+            <pre>git switch &lt;default-branch&gt;
+git pull --ff-only
+git status --short
+
+# 仅在未启用 Git 扩展时手动创建
+git switch -c feat/adjust-priority-reminders</pre>
+          </div>
+
+          <div class="command-general terminal">
+            <div class="terminal-head"><span>/speckit.specify · feature 003</span><button class="copy-btn">复制</button></div>
+            <pre>/speckit.specify
+
+调整任务提醒规则，使提醒时间与任务优先级关联。
+
+历史关系：
+- Extends: specs/002-add-task-priority/spec.md
+- Supersedes: specs/001-task-manager-mvp/spec.md 中统一提前 24 小时提醒的规则
+- Preserves: 任务创建、优先级编辑、通知渠道和权限
+
+目标行为：
+- P0/P1 提前 48 小时提醒；
+- P2/P3 提前 24 小时提醒；
+- 优先级或截止时间改变时，重新计算尚未发送的提醒；
+- 已发送提醒不重复；
+- 完成或取消的任务不再提醒；
+- 明确时区、夏令时、重试和去重规则；
+- 存量任务按新规则重新计算；
+- 回滚后恢复统一提前 24 小时。
+
+不修改旧 feature 目录。只定义产品行为和验收标准。</pre>
+          </div>
+          <div class="command-codex terminal">
+            <div class="terminal-head"><span>$speckit-specify · feature 003</span><button class="copy-btn">复制</button></div>
+            <pre>$speckit-specify
+
+调整提醒规则：P0/P1 提前 48 小时，P2/P3 提前 24 小时。
+Extends 002，Supersedes 001 的统一提醒规则，保留通知渠道和权限。
+覆盖重算、去重、完成/取消、时区、重试、存量任务和回滚。
+不修改旧 feature 目录。</pre>
+          </div>
+
+          <h3>维护轻量演进索引</h3>
+          <p><code>specs/README.md</code> 不是 Spec Kit 强制文件，但它能解决 Flow-forward 最大的成本：当前事实分散在多个历史目录里。</p>
+          <div class="terminal">
+            <div class="terminal-head"><span>specs/README.md · 团队约定</span><button class="copy-btn">复制</button></div>
+            <pre># Feature Evolution Index
+
+## Task management
+
+| Feature | Status | Relationship | Released |
+|---|---|---|---|
+| 001-task-manager-mvp | released | base | v1.0.0 |
+| 002-add-task-priority | released | extends 001 | v1.1.0 |
+| 003-adjust-priority-reminders | released | extends 002; supersedes reminder rule in 001 | v1.2.0 |</pre>
+          </div>
+          <div class="note">
+            <b>索引只导航，不复制需求</b>
+            完整规则仍留在各 feature artifact。索引记录状态、关系和发布版本，并作为每次发布任务的一部分更新。
+          </div>
+        </section>
+
+        <section class="chapter" id="ch09" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">09</div>
+            <div>
+              <p class="kicker">Failure recovery</p>
+              <h2>并行、错误与恢复</h2>
+            </div>
+          </header>
+
+          <details>
+            <summary>错误 1：手动建分支后，Git hook 又创建了分支</summary>
+            <div class="detail-body">
+              <p>原因是没有先检查 Git 扩展。暂停生成，确认两个分支和未提交文件分别在哪里，再选择正确分支。不要使用 <code>git reset --hard</code> 粗暴恢复。</p>
+            </div>
+          </details>
+          <details>
+            <summary>错误 2：新需求直接修改了 001/spec.md</summary>
+            <div class="detail-body">
+              <p>把新内容迁移到新的 feature spec；旧目录恢复为默认分支原样；新 spec 添加 Extends、Supersedes 与 Preserves 关系。</p>
+            </div>
+          </details>
+          <details>
+            <summary>错误 3：分支名和 spec 目录名不同，以为工具坏了</summary>
+            <div class="detail-body">
+              <p>这是允许的正常行为。检查 <code>.specify/feature.json</code>；后续命令以其中的 feature directory 为准。仅切换 Git 分支不会自动切换 active feature。</p>
+            </div>
+          </details>
+          <details>
+            <summary>错误 4：从旧 feature 分支创建下一个 feature</summary>
+            <div class="detail-body">
+              <p>这会产生隐含依赖。除非团队明确使用 stacked branches，否则回到最新默认分支后重新创建。不要在不清楚提交关系时强行 rebase。</p>
+            </div>
+          </details>
+          <details>
+            <summary>错误 5：tasks 全勾选就准备合并</summary>
+            <div class="detail-body">
+              <p>tasks 可能漏项，勾选也可能没有真实证据。必须运行真实测试、人工验收和 Converge，并抽查需求到证据的映射。</p>
+            </div>
+          </details>
+          <details>
+            <summary>错误 6：Spec Kit 升级与产品 feature 混在一个 PR</summary>
+            <div class="detail-body">
+              <p>拆成工具升级 PR 与产品 feature PR。强制刷新项目文件前保护 constitution、templates、scripts 等自定义内容。</p>
+            </div>
+          </details>
+
+          <h3>并行 feature 与编号冲突</h3>
+          <ul class="checklist">
+            <li>创建前更新默认分支并检查远程已有 feature。</li>
+            <li>使用 Git 扩展时，让扩展管理编号与分支创建。</li>
+            <li>高并发团队可评审采用 timestamp numbering。</li>
+            <li>PR 中检查 <code>specs/&lt;编号-名称&gt;/</code> 是否冲突。</li>
+            <li>目录重命名时同步检查 <code>.specify/feature.json</code> 和交叉链接。</li>
+          </ul>
+          <div class="note warning">
+            <b>两个编号轴</b>
+            当前版本中，feature 目录编号由 <code>.specify/init-options.json</code> 的 <code>feature_numbering</code> 控制；Git 扩展分支编号由 <code>.specify/extensions/git/git-config.yml</code> 的 <code>branch_numbering</code> 控制。不要把二者混为一个设置。
+          </div>
+        </section>
+
+        <section class="chapter" id="ch10" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">10</div>
+            <div>
+              <p class="kicker">Cheat sheet</p>
+              <h2>一页带走的执行顺序</h2>
+            </div>
+          </header>
+
+          <div class="command-general terminal">
+            <div class="terminal-head"><span>AI 对话框 · 完整链路</span><button class="copy-btn">复制</button></div>
+            <pre>/speckit.specify [新 feature 的 WHAT / WHY / 历史关系 / 非范围]
+/speckit.clarify [聚焦产品歧义]
+/speckit.plan [真实架构、迁移、兼容、回滚与验证]
+/speckit.checklist [需求文本质量]
+/speckit.tasks [依赖、测试、实现、发布准备]
+/speckit.analyze
+/speckit.implement [分阶段暂停]
+/speckit.converge</pre>
+          </div>
+          <div class="command-codex terminal">
+            <div class="terminal-head"><span>Codex · 完整链路</span><button class="copy-btn">复制</button></div>
+            <pre>$speckit-specify [新 feature 的 WHAT / WHY / 历史关系 / 非范围]
+$speckit-clarify [聚焦产品歧义]
+$speckit-plan [真实架构、迁移、兼容、回滚与验证]
+$speckit-checklist [需求文本质量]
+$speckit-tasks [依赖、测试、实现、发布准备]
+$speckit-analyze
+$speckit-implement [分阶段暂停]
+$speckit-converge</pre>
+          </div>
+
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>阶段</th><th>完成定义</th></tr></thead>
+              <tbody>
+                <tr><td>Baseline</td><td>线上版本、默认分支、工作树和测试基线明确</td></tr>
+                <tr><td>Branch</td><td>当前工作在专用分支；创建权没有冲突</td></tr>
+                <tr><td>Specify</td><td>新目录创建，旧目录未改，历史关系明确</td></tr>
+                <tr><td>Clarify</td><td>关键歧义已经转化为产品决策</td></tr>
+                <tr><td>Plan</td><td>基于真实源码，迁移、兼容、性能与回滚明确</td></tr>
+                <tr><td>Checklist</td><td>需求文本阻塞项已处理</td></tr>
+                <tr><td>Tasks</td><td>Requirement 能映射到任务和验证证据</td></tr>
+                <tr><td>Analyze</td><td>CRITICAL/HIGH 清零并经过人工抽查</td></tr>
+                <tr><td>Implement</td><td>分段完成，每段有真实 diff 与测试结果</td></tr>
+                <tr><td>Converge</td><td>无剩余缺口或越界实现</td></tr>
+                <tr><td>PR</td><td>Artifacts、代码、测试、发布与回滚信息齐全</td></tr>
+                <tr><td>Release</td><td>生产版本、冒烟、监控和回滚触发条件已记录</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>推荐团队约定</h3>
+          <div class="terminal">
+            <div class="terminal-head"><span>Flow-Forward Working Agreement</span><button class="copy-btn">复制</button></div>
+            <pre>1. 每个上线后的用户可见变化创建新的 feature 目录。
+2. 已完成 feature 目录是不可改写的历史记录。
+3. 每个 feature 使用专用 Git 分支。
+4. Git 扩展启用时由 hook 创建分支，否则人工创建。
+5. Git 分支名与 feature 目录名相互独立。
+6. 新 feature 标明 Extends、Supersedes、Preserves 与 Related。
+7. Spec Kit 工具升级与产品 feature 分开评审。
+8. 实现前运行 Analyze；实现按高风险边界暂停。
+9. 真实测试与 Converge 均通过后才能合并。
+10. 已发布后的回滚也记录为新的 forward feature。
+11. specs/README.md 维护演进关系与发布状态。</pre>
+          </div>
+        </section>
+
+        <section class="chapter" id="ch11" data-section>
+          <header class="chapter-head">
+            <div class="chapter-no">11</div>
+            <div>
+              <p class="kicker">Version boundary</p>
+              <h2>哪些是官方事实，哪些是团队实践</h2>
+            </div>
+          </header>
+
+          <div class="metric-row">
+            <article class="metric"><strong>v0.14.1</strong><p>本教程核对的官方发布版本，发布于 2026-07-23。</p></article>
+            <article class="metric"><strong>2026-07-24</strong><p>本教程官方资料核对日期。</p></article>
+            <article class="metric"><strong>0</strong><p>页面运行时依赖的在线资源、模块与字体数量。</p></article>
+          </div>
+
+          <div class="table-wrap">
+            <table class="compare">
+              <thead><tr><th>内容</th><th>性质</th></tr></thead>
+              <tbody>
+                <tr><td>Flow-forward 为新需求创建新的 feature 目录，旧目录保留</td><td>官方概念与指南</td></tr>
+                <tr><td><code>.specify/feature.json</code> 定位 active feature；分支名不决定 spec 目录</td><td>当前官方行为</td></tr>
+                <tr><td>Git 扩展通过 <code>before_specify</code> 创建分支，且为 opt-in</td><td>当前官方扩展行为</td></tr>
+                <tr><td>每个 feature 一个专用分支</td><td>本教程推荐工程实践</td></tr>
+                <tr><td>Extends / Supersedes / Preserves / Related 字段</td><td>本教程推荐关系约定，不是强制 schema</td></tr>
+                <tr><td><code>specs/README.md</code> 演进索引</td><td>团队导航约定，不是 Spec Kit 强制文件</td></tr>
+                <tr><td>五阶段 Implement 人工暂停</td><td>高风险生产 feature 的推荐控制方式</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="note warning">
+            <b>版本升级时先检查能力，不要照抄旧教程</b>
+            运行 <code>specify version --features</code> 和只读的 <code>specify self check</code>。升级 CLI 与刷新项目文件是两件事；强制刷新前保护 constitution、templates、scripts 和自定义集成内容。
+          </div>
+
+          <h3>官方依据</h3>
+          <ul class="source-list">
+            <li><a href="https://github.github.com/spec-kit/concepts/spec-persistence.html" target="_blank" rel="noreferrer">Spec Persistence Models</a><small>Flow-forward、Living spec、Flow-back 的正式定义与取舍。</small></li>
+            <li><a href="https://github.github.com/spec-kit/guides/evolving-specs.html" target="_blank" rel="noreferrer">Evolving Specs in Existing Projects</a><small>现有项目如何创建后续 feature，并走完标准流程。</small></li>
+            <li><a href="https://github.github.com/spec-kit/reference/agentic-sdd.html" target="_blank" rel="noreferrer">Agentic SDD</a><small>完整命令链、命令职责和不同 agent 的调用形式。</small></li>
+            <li><a href="https://github.github.com/spec-kit/quickstart.html" target="_blank" rel="noreferrer">Quick Start Guide</a><small>推荐生产路径、active feature 状态与 Converge 循环。</small></li>
+            <li><a href="https://github.com/github/spec-kit/blob/main/templates/commands/specify.md" target="_blank" rel="noreferrer">Current Specify Command Template</a><small>目录编号、feature.json、分支与目录独立、before hook 的当前实现约束。</small></li>
+            <li><a href="https://github.com/github/spec-kit/blob/main/extensions/git/README.md" target="_blank" rel="noreferrer">Git Branching Workflow Extension</a><small>分支编号、before_specify hook、auto-commit 和配置。</small></li>
+            <li><a href="https://github.com/github/spec-kit/releases/tag/v0.14.1" target="_blank" rel="noreferrer">Spec Kit v0.14.1</a><small>本教程采用的版本基线。</small></li>
+          </ul>
+
+          <div class="note">
+            <b>最后只记住一句</b>
+            分支可以消失，历史目录不能消失。Flow-forward 保存的不是“现在长什么样”的单张快照，而是产品为何一步步变成今天这样的证据链。
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <strong>Spec Kit Flow-Forward · Offline Field Guide</strong><br>
+    基于官方 v0.14.1 行为与两份本地专题文档重构 · 2026-07-24
+  </footer>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const root = document.documentElement;
+      const body = document.body;
+      const sidebar = document.getElementById("sidebar");
+      const menuButton = document.getElementById("menuButton");
+      const themeButton = document.getElementById("themeButton");
+      const progress = document.getElementById("readingProgress");
+
+      const savedTheme = localStorage.getItem("speckit-flow-theme");
+      if (savedTheme === "dark" || savedTheme === "light") {
+        root.dataset.theme = savedTheme;
+      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        root.dataset.theme = "dark";
+      }
+
+      themeButton.addEventListener("click", () => {
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        root.dataset.theme = next;
+        localStorage.setItem("speckit-flow-theme", next);
+      });
+
+      document.getElementById("printButton").addEventListener("click", () => window.print());
+
+      menuButton.addEventListener("click", () => {
+        const open = sidebar.classList.toggle("open");
+        menuButton.setAttribute("aria-expanded", String(open));
+        menuButton.setAttribute("aria-label", open ? "关闭章节导航" : "打开章节导航");
+      });
+
+      document.querySelectorAll(".toc a").forEach(link => {
+        link.addEventListener("click", () => {
+          sidebar.classList.remove("open");
+          menuButton.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      document.addEventListener("click", event => {
+        if (window.innerWidth > 768 || !sidebar.classList.contains("open")) return;
+        if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+          sidebar.classList.remove("open");
+          menuButton.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.width = (max > 0 ? Math.min(100, window.scrollY / max * 100) : 0) + "%";
+      };
+      updateProgress();
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      window.addEventListener("resize", updateProgress);
+
+      const tocLinks = [...document.querySelectorAll(".toc a")];
+      const linkById = new Map(tocLinks.map(link => [link.getAttribute("href").slice(1), link]));
+      const sectionObserver = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        tocLinks.forEach(link => link.classList.remove("active"));
+        linkById.get(visible.target.id)?.classList.add("active");
+      }, { rootMargin: "-15% 0px -68% 0px", threshold: [0, .1, .4] });
+      document.querySelectorAll("[data-section]").forEach(section => sectionObserver.observe(section));
+
+      document.querySelectorAll("[data-command]").forEach(button => {
+        button.addEventListener("click", () => {
+          body.dataset.commandMode = button.dataset.command;
+          document.querySelectorAll("[data-command]").forEach(item => item.classList.toggle("active", item === button));
+        });
+      });
+
+      document.querySelectorAll(".path-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          const selected = button.dataset.path;
+          document.querySelectorAll(".path-btn").forEach(item => {
+            const active = item === button;
+            item.classList.toggle("active", active);
+            item.setAttribute("aria-selected", String(active));
+          });
+          document.querySelectorAll("[data-path-panel]").forEach(panel => {
+            panel.classList.toggle("active", panel.dataset.pathPanel === selected);
+          });
+        });
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(button => {
+        button.addEventListener("click", async () => {
+          const text = button.closest(".terminal")?.querySelector("pre")?.innerText || "";
+          const original = button.textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+            button.textContent = "已复制";
+          } catch {
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+            button.textContent = "已复制";
+          }
+          setTimeout(() => button.textContent = original, 1400);
+        });
+      });
+
+      const answers = {};
+      const result = document.getElementById("decisionResult");
+      document.querySelectorAll(".question").forEach(question => {
+        question.querySelectorAll(".answer-btn").forEach(button => {
+          button.addEventListener("click", () => {
+            question.querySelectorAll(".answer-btn").forEach(item => item.classList.toggle("selected", item === button));
+            answers[question.dataset.question] = button.dataset.value;
+            if (Object.keys(answers).length !== 3) return;
+
+            let title;
+            let explanation;
+            if (answers.released === "yes" && (answers.behavior === "yes" || answers.independent === "yes")) {
+              title = "建议：创建新的 Flow-forward feature";
+              explanation = "原 feature 已成为历史，而且这次变化影响外部行为或需要独立闭环。新目录应引用它扩展或替代的历史 feature，并从最新默认分支开始。";
+            } else if (answers.released === "no" && answers.independent === "no") {
+              title = "建议：留在当前 feature 内澄清";
+              explanation = "当前工作尚未冻结，而且变化仍属于原目标。更新源 artifact，重新运行 Analyze，再继续实现；不要制造不必要的历史碎片。";
+            } else if (answers.behavior === "no" && answers.independent === "no") {
+              title = "建议：按工程变更或实现偏差处理";
+              explanation = "没有外部行为变化，也不需要独立发布或回滚。若代码不符合既有 spec，修实现；若是纯重构，走团队工程流程。";
+            } else {
+              title = "灰区：先明确独立价值与回滚边界";
+              explanation = "当前信号互相冲突。先回答这项变化是否能被单独验收、发布、撤销，以及是否会让原 feature 的历史含义变得不真实；满足任一强信号时倾向新建 feature。";
+            }
+            result.innerHTML = "<strong>" + title + "</strong>" + explanation;
+            result.classList.add("show");
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

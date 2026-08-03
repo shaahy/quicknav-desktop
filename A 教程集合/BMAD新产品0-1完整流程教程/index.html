@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>BMAD 新产品 0→1 完整流程教程</title>
+  <style>
+    :root{--bg:#f4f7f6;--panel:#fff;--panel2:#f8faf9;--text:#17211f;--muted:#64706d;--line:#dce4e1;--brand:#087d68;--brand2:#05594b;--soft:#e5f5f1;--blue:#285cc4;--blueSoft:#eaf0ff;--amber:#956000;--amberSoft:#fff3d8;--purple:#7148b8;--purpleSoft:#f2ebff;--red:#b5382c;--redSoft:#ffedea;--code:#111b19;--shadow:0 12px 34px rgba(24,66,58,.09);--radius:16px}
+    html[data-theme="dark"]{--bg:#0d1211;--panel:#171d1b;--panel2:#121715;--text:#eef5f3;--muted:#a7b2af;--line:#303a37;--brand:#69d5bd;--brand2:#a0ebda;--soft:#183b33;--blue:#8badff;--blueSoft:#1c2d50;--amber:#ffc66b;--amberSoft:#423217;--purple:#c5a6ff;--purpleSoft:#31244b;--red:#ff9b91;--redSoft:#48201d;--code:#080d0c;--shadow:0 12px 34px rgba(0,0,0,.3)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;line-height:1.72}button,input,select{font:inherit}a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:286px minmax(0,1fr);min-height:100vh}aside{position:sticky;top:0;height:100vh;overflow:auto;padding:24px 18px;background:var(--panel);border-right:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}.mark{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;color:#fff;font-weight:900;background:linear-gradient(145deg,#075c4f,#19a68b);box-shadow:0 8px 20px rgba(8,125,104,.28)}.brand b{display:block;font-size:15px}.brand span{font-size:12px;color:var(--muted)}.nav-label{margin:18px 8px 6px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.09em}nav a{display:block;padding:7px 10px;border-radius:9px;color:var(--muted);font-size:13px}nav a:hover,nav a.active{background:var(--soft);color:var(--brand);text-decoration:none}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:9px 11px;cursor:pointer;font-weight:800;font-size:13px}.btn:hover{border-color:var(--brand);color:var(--brand)}.btn.primary{color:#fff;background:var(--brand);border-color:var(--brand)}
+    .hero{padding:70px clamp(24px,6vw,94px) 58px;color:#fff;background:radial-gradient(circle at 86% 12%,rgba(165,255,228,.2),transparent 27%),linear-gradient(135deg,#073b34,#087d68 56%,#1bac91)}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.13em;opacity:.82}h1{max-width:980px;margin:12px 0 17px;font-size:clamp(36px,5vw,62px);line-height:1.08;letter-spacing:-.04em}.hero p{max-width:880px;font-size:18px;opacity:.91}.hero-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;max-width:1000px;margin-top:32px}.hero-card{padding:14px;border:1px solid rgba(255,255,255,.24);border-radius:13px;background:rgba(255,255,255,.09)}.hero-card b{display:block;font-size:20px}.hero-card span{font-size:12px;opacity:.82}
+    main{max-width:1180px;margin:auto;padding:44px clamp(20px,5vw,72px) 92px}section{margin-bottom:56px;scroll-margin-top:18px}h2{margin:0 0 17px;font-size:clamp(25px,3vw,36px);letter-spacing:-.025em}h3{margin:26px 0 11px;font-size:20px}h4{margin:18px 0 7px;font-size:16px}p{margin:8px 0 14px}.lead{max-width:920px;color:var(--muted);font-size:17px}.small{color:var(--muted);font-size:12px}.tag{display:inline-block;padding:3px 9px;border-radius:999px;color:var(--brand);background:var(--soft);font-size:11px;font-weight:900}.tag.blue{color:var(--blue);background:var(--blueSoft)}.tag.amber{color:var(--amber);background:var(--amberSoft)}.tag.purple{color:var(--purple);background:var(--purpleSoft)}.tag.red{color:var(--red);background:var(--redSoft)}
+    .callout{margin:18px 0;padding:18px 20px;border-left:5px solid var(--brand);border-radius:13px;background:var(--soft)}.callout strong{color:var(--brand2)}.callout.info{border-color:var(--blue);background:var(--blueSoft)}.callout.info strong{color:var(--blue)}.callout.warn{border-color:var(--amber);background:var(--amberSoft)}.callout.warn strong{color:var(--amber)}.callout.danger{border-color:var(--red);background:var(--redSoft)}.callout.danger strong{color:var(--red)}
+    .grid2,.grid3,.grid4{display:grid;gap:16px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}.card{padding:21px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);box-shadow:var(--shadow)}.card h3,.card h4{margin-top:0}.phase{border-top:5px solid var(--brand)}.phase.blue{border-top-color:var(--blue)}.phase.purple{border-top-color:var(--purple)}.phase.amber{border-top-color:var(--amber)}
+    .table-wrap{overflow-x:auto;border-radius:12px}table{width:100%;border-collapse:collapse;margin:14px 0 22px;background:var(--panel)}th,td{padding:12px 13px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);font-size:13px}td{font-size:14px}code{padding:.1em .35em;border-radius:5px;background:var(--soft);color:var(--brand2);font-family:Consolas,monospace;font-size:.92em}pre{position:relative;overflow:auto;margin:12px 0 20px;padding:20px;border-radius:13px;color:#edf8f5;background:var(--code);font-size:13px;line-height:1.62}pre code{padding:0;background:transparent;color:inherit}.copy{position:absolute;top:9px;right:9px;border:1px solid #53605d;color:#eee;background:#26312f;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px}
+    .flow{display:grid;gap:9px;margin:22px 0}.flow-row{display:grid;grid-template-columns:45px 1fr auto;gap:13px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}.n{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:#fff;background:var(--brand);font-weight:900}.flow-row p{margin:2px 0;color:var(--muted);font-size:13px}.arrow{text-align:center;color:var(--muted);font-size:20px}
+    .step{position:relative;margin:28px 0 38px;padding-left:44px}.step:before{content:attr(data-step);position:absolute;left:0;top:0;width:31px;height:31px;display:grid;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-weight:900}.step:after{content:"";position:absolute;left:15px;top:37px;bottom:-30px;width:1px;background:var(--line)}.step:last-child:after{display:none}details{margin:12px 0;border:1px solid var(--line);border-radius:13px;background:var(--panel)}summary{padding:16px 18px;cursor:pointer;font-weight:900}details>div{padding:0 18px 18px}
+    .gate{display:grid;grid-template-columns:150px 1fr 110px;gap:12px;align-items:center;padding:13px;border-bottom:1px solid var(--line)}.gate:last-child{border-bottom:0}.gate>b:first-child{color:var(--brand)}.pass{color:var(--brand);font-weight:900;text-align:right}.artifact{display:grid;grid-template-columns:170px 1fr;gap:14px;padding:14px;border-bottom:1px solid var(--line)}.artifact:last-child{border:0}.artifact b{color:var(--brand)}
+    .selector{padding:21px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}.selector label{display:block;margin-bottom:7px;font-weight:800}.selector select{width:100%;max-width:680px;padding:11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:var(--panel2)}.selector-result{min-height:94px;margin-top:14px;padding:16px;border-radius:11px;background:var(--soft)}
+    .checklist{display:grid;gap:8px;margin:14px 0}.check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:9px;background:var(--panel2)}.check input{margin-top:6px;accent-color:var(--brand)}.progress{height:10px;overflow:hidden;border-radius:99px;background:var(--line);margin:10px 0 5px}.progress div{width:0;height:100%;background:linear-gradient(90deg,var(--brand),#77d7c1);transition:width .25s}.matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.matrix>div{padding:15px;border-radius:12px;background:var(--panel2);border:1px solid var(--line)}footer{padding:28px;text-align:center;color:var(--muted);border-top:1px solid var(--line);background:var(--panel)}.mobile{display:none;position:fixed;right:16px;bottom:16px;z-index:30;box-shadow:var(--shadow)}
+    @media(max-width:1000px){.layout{display:block}aside{display:none;position:fixed;z-index:20;inset:0 auto 0 0;width:292px;box-shadow:var(--shadow)}aside.open{display:block}.mobile{display:block}.hero-cards,.grid4,.grid3,.matrix{grid-template-columns:repeat(2,1fr)}}@media(max-width:680px){.hero{padding-top:48px}.hero-cards,.grid2,.grid3,.grid4,.matrix{grid-template-columns:1fr}.flow-row{grid-template-columns:40px 1fr}.flow-row>.tag{grid-column:2;width:max-content}.gate,.artifact{grid-template-columns:1fr}.pass{text-align:left}h1{font-size:35px}}@media print{:root{--bg:#fff;--panel:#fff;--panel2:#f7f7f7;--text:#000;--muted:#444;--line:#bbb}.layout{display:block}aside,.mobile,.copy,.no-print{display:none!important}.hero{padding:34px;color:#000;background:#fff;border-bottom:3px solid #222}.hero-card{border-color:#888}.card,details{box-shadow:none}main{max-width:none;padding:25px}details>div{display:block!important}section{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside id="sidebar">
+    <div class="brand"><div class="mark">0→1</div><div><b>BMAD 新产品开发</b><span>完整流程离线教程</span></div></div>
+    <nav>
+      <div class="nav-label">开始与全局</div>
+      <a href="#answer">01 核心结论</a><a href="#map">02 全流程地图</a><a href="#prepare">03 准备工作</a><a href="#router">04 阶段导航器</a><a href="#context">05 上下文纪律</a>
+      <div class="nav-label">规划与方案</div>
+      <a href="#analysis">06 Analysis</a><a href="#brief">07 Product Brief</a><a href="#prd">08 PRD</a><a href="#ux">09 UX</a><a href="#architecture">10 Architecture</a><a href="#epics">11 Epics & Stories</a><a href="#readiness">12 Readiness Gate</a>
+      <div class="nav-label">实现与发布</div>
+      <a href="#sprint">13 Sprint Planning</a><a href="#storyloop">14 Story 开发循环</a><a href="#testing">15 测试与质量</a><a href="#release">16 发布上线</a><a href="#change">17 变更与复盘</a>
+      <div class="nav-label">落地工具</div>
+      <a href="#example">18 贯穿案例</a><a href="#prompts">19 提示词库</a><a href="#artifacts">20 产物索引</a><a href="#gates">21 质量门禁</a><a href="#checklist">22 执行清单</a><a href="#faq">23 FAQ</a>
+    </nav>
+    <div class="actions no-print"><button class="btn" id="theme" type="button">切换主题</button><button class="btn" onclick="window.print()" type="button">打印 / PDF</button></div>
+  </aside>
+  <div>
+    <header class="hero">
+      <div class="eyebrow">IDEA · PLAN · DESIGN · SOLUTION · BUILD · RELEASE</div>
+      <h1>使用 BMAD 从 0 到 1 开发一个新产品</h1>
+      <p>这不是“让 AI 一次写完整个应用”的教程，而是一套逐层建立事实、逐层审批、按 Story 交付、用证据上线的产品工程方法。</p>
+      <div class="hero-cards"><div class="hero-card"><b>4</b><span>BMAD 核心阶段</span></div><div class="hero-card"><b>7</b><span>关键质量门禁</span></div><div class="hero-card"><b>1</b><span>贯穿式 SaaS 案例</span></div><div class="hero-card"><b>0</b><span>网页启动端口</span></div></div>
+    </header>
+    <main>
+      <section id="answer">
+        <span class="tag">先看结论</span>
+        <h2>完整 0→1 默认走 BMad Method，不走 Quick Dev</h2>
+        <p class="lead">新产品包含大量未决的用户、业务、体验和技术问题。正确路线是逐层建立上下文：Analysis → Planning → Solutioning → Implementation。每一层产物都是下一层的输入，最终由 Story 文件把已确认事实带进实现。</p>
+        <div class="callout"><strong>默认主链：</strong><code>bmad-help</code> → 可选分析与研究 → <code>bmad-product-brief</code> → <code>bmad-prd</code> → 有界面则 <code>bmad-ux</code> → <code>bmad-architecture</code> → <code>bmad-create-epics-and-stories</code> → <code>bmad-check-implementation-readiness</code> → <code>bmad-sprint-planning</code> → Story 开发循环 → 发布 → Epic 复盘。</div>
+        <div class="grid3">
+          <div class="card"><span class="tag">不是大 Prompt</span><h3>分阶段新对话</h3><p>每个主要 workflow 使用独立对话，减少上下文污染；通过正式产物完成交接。</p></div>
+          <div class="card"><span class="tag blue">不是 spec.md 主导</span><h3>Story 是实现契约</h3><p>完整流程依靠 PRD、UX、Architecture、Epics 与 Story 逐层收敛；<code>spec-*.md</code> 主要属于 Quick Flow。</p></div>
+          <div class="card"><span class="tag purple">不是自动等于正确</span><h3>Gate 决定能否前进</h3><p>规划、技术方案、实现、发布都要用可检查证据通过门禁。</p></div>
+        </div>
+      </section>
+
+      <section id="map">
+        <span class="tag">全局地图</span><h2>四阶段端到端流程</h2>
+        <div class="grid4">
+          <div class="card phase"><span class="tag">Phase 1</span><h3>Analysis</h3><p>探索问题空间、验证假设、形成产品战略输入。</p><p><b>主产物：</b>研究、Product Brief 或 PRFAQ。</p></div>
+          <div class="card phase blue"><span class="tag blue">Phase 2</span><h3>Planning</h3><p>定义为谁解决什么问题、范围和体验。</p><p><b>主产物：</b>PRD、DESIGN、EXPERIENCE。</p></div>
+          <div class="card phase purple"><span class="tag purple">Phase 3</span><h3>Solutioning</h3><p>明确如何构建，并拆成可实现的工作单元。</p><p><b>主产物：</b>Architecture、Epics、Stories、Readiness 决策。</p></div>
+          <div class="card phase amber"><span class="tag amber">Phase 4</span><h3>Implementation</h3><p>按 Story 实现、测试、审查和交付。</p><p><b>主产物：</b>代码、测试、Review、Sprint 状态、复盘。</p></div>
+        </div>
+        <div class="flow">
+          <div class="flow-row"><div class="n">1</div><div><b>想法被验证</b><p>用户、问题、市场、约束和成功假设有证据。</p></div><span class="tag">Analysis</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">2</div><div><b>产品被定义</b><p>PRD 定义 What / Why，UX 定义可见与可感知的体验。</p></div><span class="tag blue">Planning</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">3</div><div><b>方案被约束</b><p>Architecture 定义 How，Epics/Stories 定义实现顺序和验收。</p></div><span class="tag purple">Solutioning</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">4</div><div><b>价值被交付</b><p>每个 Story 经过实现、测试、Review，最终形成可发布增量。</p></div><span class="tag amber">Implementation</span></div>
+        </div>
+      </section>
+
+      <section id="prepare">
+        <span class="tag">开始前</span><h2>准备工作：让项目从第一天就可追溯</h2>
+        <div class="grid2">
+          <div class="card"><h3>工具与环境</h3><ul><li>已安装 BMAD Method 的 AI 编程环境。</li><li>独立项目目录与版本控制仓库。</li><li>可运行的开发、测试和构建环境。</li><li>产品负责人能够对范围和验收做决定。</li></ul></div>
+          <div class="card"><h3>项目治理</h3><ul><li>明确谁批准 PRD、UX、Architecture 和发布。</li><li>一个正式事实源，旧草稿不得与 final 混用。</li><li>敏感信息不进入 Prompt、文档和示例数据。</li><li>任何不可逆数据、财务、安全动作单独审批。</li></ul></div>
+        </div>
+        <h3>第一次向 BMAD 问路</h3>
+        <pre><button class="copy" type="button">复制</button><code>bmad-help
+
+我要从 0 到 1 开发一个新产品。
+产品一句话：[填写]
+当前已有材料：[想法 / 访谈 / 研究 / 无]
+预计复杂度：[简单产品 / 多模块平台 / 企业级]
+请检查已安装模块和当前项目状态，推荐第一项 workflow，并说明之后的完整路线。</code></pre>
+        <div class="callout info"><strong>说明：</strong>这段内容输入 AI IDE 的 BMAD 对话。HTML 本身无需任何安装命令、网页端口或服务器，双击即可阅读。</div>
+      </section>
+
+      <section id="router">
+        <span class="tag">交互导航</span><h2>我现在应该运行哪个 workflow？</h2>
+        <div class="selector">
+          <label for="stageSelect">选择你当前已经完成的最后一个状态</label>
+          <select id="stageSelect">
+            <option value="">请选择当前状态</option>
+            <option value="idea">只有一个产品想法</option>
+            <option value="evidence">已有研究与明确概念</option>
+            <option value="brief">Product Brief 已批准</option>
+            <option value="prd">PRD 已完成并通过验证</option>
+            <option value="ux">PRD 和 UX 已定稿</option>
+            <option value="arch">Architecture 已批准</option>
+            <option value="epics">Epics 与 Stories 已生成</option>
+            <option value="ready">Implementation Readiness 已 PASS</option>
+            <option value="sprint">Sprint Planning 已完成</option>
+            <option value="story">某个 Story 已实现</option>
+            <option value="epic">一个 Epic 的全部 Stories 已完成</option>
+          </select>
+          <div class="selector-result" id="stageResult">选择状态后，这里会显示推荐下一步、输入和通过条件。</div>
+        </div>
+      </section>
+
+      <section id="context">
+        <span class="tag">上下文工程</span><h2>质量的基础：每个 Agent 只依据已批准事实工作</h2>
+        <div class="matrix">
+          <div><b>业务事实</b><p>由最终 Product Brief / PRD 控制，不从代码猜业务意图。</p></div>
+          <div><b>体验事实</b><p>由 DESIGN.md 与 EXPERIENCE.md 控制，不用临时 Mock 反向定义体验。</p></div>
+          <div><b>技术事实</b><p>由 Architecture 与 Project Context 控制，跨 Story 保持一致。</p></div>
+          <div><b>实现事实</b><p>由当前 Story、代码、测试和 Review 证据控制。</p></div>
+        </div>
+        <h3>推荐的对话纪律</h3>
+        <ol><li>每个主要 workflow 新开对话。</li><li>开始时明确 Create / Update / Validate 意图。</li><li>只加载最新 final 上游产物与必要项目配置。</li><li>发现上游冲突先报告，不在下游偷偷改需求。</li><li>每个阶段结束记录状态、未决项、批准人和下一步。</li></ol>
+        <div class="callout warn"><strong>最常见失败：</strong>在同一长对话里混做 PRD、UX、Architecture 和编码，Agent 会把讨论中的临时想法当成最终事实。分阶段的意义就是让上下文边界可控。</div>
+      </section>
+
+      <section id="analysis">
+        <span class="tag">Phase 1 · 可选</span><h2>Analysis：先证明值得做，再定义怎么做</h2>
+        <p class="lead">Analysis 是可选阶段，但“可选”不代表“没有证据也可以跳过”。当用户问题、市场、技术可行性或商业模式不确定时，先探索比写 PRD 更便宜。</p>
+        <div class="table-wrap"><table><thead><tr><th>Workflow</th><th>适用情形</th><th>主要产物</th><th>退出条件</th></tr></thead><tbody>
+          <tr><td><code>bmad-brainstorming</code></td><td>方向模糊，需要扩展与收敛想法</td><td>创意记录与意图</td><td>出现可进一步验证的候选方向</td></tr>
+          <tr><td><code>bmad-forge-idea</code></td><td>要用反方压力测试概念</td><td>Forge 报告、成熟想法</td><td>想法被证实、调整或便宜地放弃</td></tr>
+          <tr><td>Market / Domain / Technical Research</td><td>市场、行业规则或技术假设不确定</td><td>研究发现与证据</td><td>关键假设有证据和置信度</td></tr>
+          <tr><td><code>bmad-prfaq</code></td><td>希望从客户价值反推产品</td><td>PRFAQ</td><td>价值主张和客户结果经得起质疑</td></tr>
+        </tbody></table></div>
+        <div class="callout"><strong>Gate A0：</strong>明确目标用户、核心问题、现有替代方案、为什么现在做、最危险假设、成功信号和明确不做什么。若核心问题仍是猜测，不进入 PRD。</div>
+      </section>
+
+      <section id="brief">
+        <span class="tag">Phase 1 · 推荐</span><h2>Product Brief：把证据压缩成战略起点</h2>
+        <div class="grid2">
+          <div class="card"><h3>输入</h3><ul><li>创意、访谈、市场/领域/技术研究。</li><li>商业目标、资源与时间约束。</li><li>现有替代方案与竞争差异。</li></ul></div>
+          <div class="card"><h3>输出</h3><ul><li>产品愿景与目标用户。</li><li>问题、价值主张和成功指标。</li><li>MVP 边界、风险与假设。</li></ul></div>
+        </div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-product-brief
+
+请基于以下最终研究输入创建 Product Brief：
+- 产品想法：[填写]
+- 目标用户与场景：[填写]
+- 已验证证据：[填写]
+- 商业目标与约束：[填写]
+
+请显式区分事实、假设和待验证问题；定义 MVP、Non-goals、成功指标和最大风险。
+发现材料冲突时先列出冲突，不要自行选择。</code></pre>
+        <div class="callout"><strong>Gate A1：</strong>Brief 必须回答“为谁、解决什么、为什么值得、MVP 做什么、不做什么、如何知道成功”。没有可衡量结果的愿景不能直接成为 PRD 范围。</div>
+      </section>
+
+      <section id="prd">
+        <span class="tag blue">Phase 2 · 必需</span><h2>PRD：把产品意图变成可验证要求</h2>
+        <p class="lead"><code>bmad-prd</code> 具有 Create、Update、Validate 三种意图。0→1 首次创建使用 Create；定稿前单独运行 Validate，不能把“写完”当成“通过”。</p>
+        <div class="step" data-step="1"><h3>Create</h3><p>从 Brief 和研究提取上下文，通过引导式发现形成用户、范围、功能需求、非功能需求、状态、权限、数据和验收。</p></div>
+        <div class="step" data-step="2"><h3>产品负责人逐项审阅</h3><p>确认 MVP 与未来范围、业务规则、角色权限、异常状态、成功指标和约束。争议必须决策，不能留给开发猜。</p></div>
+        <div class="step" data-step="3"><h3>Validate</h3><p>在新对话中对 final 候选稿做覆盖、矛盾、可测试性和范围检查，修复 Critical / High 问题。</p></div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-prd
+
+意图：Create。
+请完整读取最终 Product Brief、研究和项目配置，创建新产品 PRD。
+要求：
+1. 明确 Personas、Journey、MVP、Non-goals；
+2. FR / NFR 可追踪、可测试；
+3. 覆盖角色、权限、状态、异常、数据与集成边界；
+4. 冲突和缺失决策先报告，不得自行补成产品事实；
+5. 完成后给出 Validate 所需输入和质量清单。</code></pre>
+        <div class="callout"><strong>Gate P1：</strong>PRD 范围冻结；关键角色、规则、状态、权限、数据、FR/NFR 与验收可测试；Critical 和 High 验证问题清零或有明确批准的处置。</div>
+      </section>
+
+      <section id="ux">
+        <span class="tag blue">Phase 2 · 有界面则执行</span><h2>UX：分别定义“看起来怎样”和“如何工作”</h2>
+        <p class="lead">有用户界面的产品应在 PRD 后运行 <code>bmad-ux</code>。核心不是做漂亮页面，而是建立视觉事实和行为事实，让后续 Architecture、Story 与实现不再猜体验。</p>
+        <div class="grid2">
+          <div class="card"><h3>DESIGN.md</h3><p>视觉方向、设计原则、Tokens、组件、布局、响应式、可访问性与关键屏幕。</p></div>
+          <div class="card"><h3>EXPERIENCE.md</h3><p>信息架构、用户流程、状态转换、反馈、错误、空态、加载、权限与恢复路径。</p></div>
+        </div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-ux
+
+请基于 final PRD 创建本产品 UX。
+先审计 PRD 的角色、Journey、状态、权限、关键任务和 NFR，再建立 DESIGN.md 与 EXPERIENCE.md。
+每条关键用户流程必须覆盖：入口、主路径、空态、加载、错误、权限不足、取消、恢复和完成反馈。
+视觉事实与行为事实分开维护；原型不得擅自改变 PRD 业务规则。</code></pre>
+        <div class="callout"><strong>Gate P2：</strong>关键 Journey 可完整演示；每个核心页面/状态有入口；异常与恢复可描述；响应式和可访问性有标准；UX 与 PRD 不冲突。</div>
+      </section>
+
+      <section id="architecture">
+        <span class="tag purple">Phase 3</span><h2>Architecture：在多个 Agent 写代码前统一技术决定</h2>
+        <div class="grid3">
+          <div class="card"><h3>系统边界</h3><p>模块、服务、客户端、第三方、信任边界和部署单元。</p></div>
+          <div class="card"><h3>一致性决定</h3><p>技术栈、API、数据、身份权限、状态、事件、错误、观测和测试。</p></div>
+          <div class="card"><h3>质量属性</h3><p>安全、性能、可用性、扩展性、可维护性和成本的实现策略。</p></div>
+        </div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-architecture
+
+请读取 final PRD、DESIGN.md、EXPERIENCE.md 和已有项目约束，创建 Architecture。
+所有关键技术决定必须关联对应 FR/NFR 或 UX 需要，写明选择、理由、权衡和一致性规则。
+覆盖：系统边界、数据模型、API、身份权限、状态/事件、错误处理、安全、性能、观测、测试、部署与迁移。
+发现产品或 UX 未决项时停止并列出，不得用技术假设替代产品决定。</code></pre>
+        <div class="callout warn"><strong>Architecture 不负责新增需求：</strong>如果技术设计需要改变用户可见规则，应回到 PRD/UX Update，而不是在 Architecture 中悄悄重写产品。</div>
+        <div class="callout"><strong>Gate S1：</strong>所有跨 Epic 的关键技术决定明确；没有互相矛盾的技术模式；风险与 Spike 有处置；Architecture 能约束不同 Story 的实现保持一致。</div>
+      </section>
+
+      <section id="epics">
+        <span class="tag purple">Phase 3</span><h2>Epics & Stories：在架构之后拆分，才能真正可实现</h2>
+        <p class="lead">BMAD V6 将 Epics/Stories 放在 Architecture 之后。这样 Story 能继承数据、API、权限和技术模式，而不是只有业务标题。</p>
+        <div class="table-wrap"><table><thead><tr><th>层级</th><th>应包含</th><th>质量判断</th></tr></thead><tbody>
+          <tr><td><b>Epic</b></td><td>独立用户/业务价值、范围、依赖和完成标准</td><td>完成后能交付可观察结果，不只是技术分层</td></tr>
+          <tr><td><b>Story</b></td><td>用户目标、上下文、AC、异常、技术约束、测试要求、依赖</td><td>一个 Agent 在合理上下文内可完成并验证</td></tr>
+          <tr><td><b>Traceability</b></td><td>FR/NFR、UX、Architecture 决定映射</td><td>每个 active 要求有落点，每个 Story 有来源</td></tr>
+        </tbody></table></div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-create-epics-and-stories
+
+请基于 final PRD、UX 与 Architecture 创建 Epics 和 Stories。
+按可交付用户价值拆 Epic，不按前端/后端/数据库分层。
+每个 Story 必须包含：
+- 关联 FR/NFR、UX 流程与 Architecture 决定；
+- 明确 AC、错误/权限/边界状态；
+- 依赖、风险、测试和可观测性要求；
+- 可在单个实现循环内完成的范围。
+最后输出覆盖矩阵、依赖顺序和无法落位的要求。</code></pre>
+        <div class="callout"><strong>Gate S2：</strong>所有 active FR/NFR 和关键 UX 状态都有实现落点；Story 无循环依赖、无巨大模糊范围；顺序支持逐步形成可运行产品。</div>
+      </section>
+
+      <section id="readiness">
+        <span class="tag red">实施前总门禁</span><h2>Implementation Readiness：不是形式检查，而是允许开发的闸门</h2>
+        <pre><button class="copy" type="button">复制</button><code>bmad-check-implementation-readiness
+
+请对 final PRD、UX、Architecture、Epics/Stories 做实施就绪检查。
+重点验证：
+- 要求覆盖与双向追踪；
+- 业务、UX、技术决定是否互相一致；
+- Story 是否可独立实现和测试；
+- 权限、安全、数据、状态、异常、NFR 是否有落点；
+- 依赖、风险、迁移和未决项是否阻塞。
+请给出 PASS / CONCERNS / FAIL，并逐项给出证据和修复归属。</code></pre>
+        <div class="card">
+          <div class="gate"><b>PASS</b><span>关键规划材料一致、完整、可实现；可进入 Sprint Planning。</span><span class="pass">允许开发</span></div>
+          <div class="gate"><b>CONCERNS</b><span>存在风险但不一定阻塞；必须有责任人、影响、处置和接受记录。</span><span class="pass">条件通过</span></div>
+          <div class="gate"><b>FAIL</b><span>存在阻塞性缺口或冲突；回到对应上游 workflow 修复并重新检查。</span><span class="pass">禁止开发</span></div>
+        </div>
+        <div class="callout danger"><strong>禁止做法：</strong>Readiness 为 FAIL 时仍让 Dev Agent 开始“边做边补”。这会把产品未决项和架构冲突扩散到代码、测试和数据。</div>
+      </section>
+
+      <section id="sprint">
+        <span class="tag amber">Phase 4</span><h2>Sprint Planning：只初始化一次，再按优先级推进 Story</h2>
+        <p class="lead"><code>bmad-sprint-planning</code> 创建 <code>sprint-status.yaml</code>，把 Epics 和 Stories 转为可跟踪的开发序列。它不是重新定义需求。</p>
+        <div class="grid2">
+          <div class="card"><h3>排序原则</h3><ol><li>基础骨架与高风险技术验证。</li><li>最短可运行用户路径。</li><li>核心业务价值和关键状态。</li><li>异常、运营、优化和扩展能力。</li></ol></div>
+          <div class="card"><h3>进入条件</h3><ul><li>Readiness 已 PASS 或条件通过。</li><li>开发/测试环境可用。</li><li>代码规范和 Project Context 明确。</li><li>发布策略与最小验收环境可用。</li></ul></div>
+        </div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-sprint-planning
+
+请读取已批准的 Epics/Stories 与 Readiness 结论，初始化本项目 sprint-status.yaml。
+按依赖、用户价值、风险降低和可演示增量排序。
+不得新增未批准需求；阻塞项必须标记责任人与解除条件。</code></pre>
+      </section>
+
+      <section id="storyloop">
+        <span class="tag amber">核心开发循环</span><h2>每个 Story 都执行 Create → Dev → Review</h2>
+        <div class="flow">
+          <div class="flow-row"><div class="n">1</div><div><b>bmad-create-story</b><p>从 Epic 中准备下一个 Story，补齐实现上下文、AC、约束和测试。</p></div><span class="tag">Prepare</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">2</div><div><b>Story Approval</b><p>确认范围、事实来源、依赖、AC、Non-goals 和风险；不清楚则不实现。</p></div><span class="tag blue">Approve</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">3</div><div><b>bmad-dev-story</b><p>读取 Story 与项目上下文，实现代码、自动化测试和必要文档。</p></div><span class="tag purple">Build</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">4</div><div><b>bmad-code-review</b><p>验证实际 Diff、Story 声明、测试、架构一致性、安全和边界。</p></div><span class="tag red">Review</span></div><div class="arrow">↓</div>
+          <div class="flow-row"><div class="n">5</div><div><b>关闭有效问题</b><p>修复 Review 发现，重跑测试和验收，更新 Story 与 Sprint 状态。</p></div><span class="tag amber">Done</span></div>
+        </div>
+        <div class="grid3">
+          <div class="card"><h3>Create Story Gate</h3><p>输入、AC、异常、权限、依赖、技术决定、测试和 Non-goals 都清楚。</p></div>
+          <div class="card"><h3>Dev Story Gate</h3><p>代码与测试真实运行；文件清单准确；未完成项不得伪装完成。</p></div>
+          <div class="card"><h3>Code Review Gate</h3><p>Review 使用不同上下文；有效问题关闭后才能标记 Done。</p></div>
+        </div>
+        <pre><button class="copy" type="button">复制</button><code>bmad-code-review
+
+请对当前 Story 的最终实现做代码审查。
+对照 Story AC、Architecture、Project Context、实际 Diff 与测试结果，检查：
+1. 每条 AC 是否有实现和证据；
+2. 权限、数据、状态、错误、并发、重试和边界；
+3. 是否违反共享架构模式或引入兼容问题；
+4. 测试是否能抓住真实失败，而非只覆盖表面；
+5. Story 文件清单与实际改动是否一致。
+区分当前必须修复项与无关历史问题。</code></pre>
+      </section>
+
+      <section id="testing">
+        <span class="tag amber">质量体系</span><h2>测试不是 Phase 4 最后的一个步骤，而是每个 Story 的完成条件</h2>
+        <div class="table-wrap"><table><thead><tr><th>层级</th><th>证明什么</th><th>常见责任点</th></tr></thead><tbody>
+          <tr><td>静态检查</td><td>类型、格式、基础代码规则</td><td>每次实现与合入</td></tr>
+          <tr><td>单元测试</td><td>局部业务规则和边界</td><td>Story 实现者</td></tr>
+          <tr><td>集成/契约测试</td><td>模块、API、数据库、事件和第三方协作</td><td>跨边界 Story</td></tr>
+          <tr><td>用户路径 / E2E</td><td>真实入口到结果的关键 Journey</td><td>核心价值路径</td></tr>
+          <tr><td>状态与权限不变量</td><td>直接调用、并发、重放不能绕过规则</td><td>安全与数据边界</td></tr>
+          <tr><td>NFR 验证</td><td>性能、安全、可靠性、可访问性和观测</td><td>Release Gate 前</td></tr>
+        </tbody></table></div>
+        <div class="callout info"><strong>可选补充：</strong>项目缺少 API/E2E 覆盖时可使用 <code>bmad-qa-generate-e2e-tests</code> 生成测试。但测试生成不能替代 <code>bmad-code-review</code>，也不能替代产品验收。</div>
+        <div class="callout"><strong>Definition of Done：</strong>AC 有证据、自动化测试通过、关键用户路径可运行、状态/权限不变量不被绕过、Review 有效问题关闭、文档和 Sprint 状态同步。</div>
+      </section>
+
+      <section id="release">
+        <span class="tag amber">上线闭环</span><h2>BMAD 负责构建上下文；上线仍需要项目自己的 Release Gate</h2>
+        <p class="lead">部署方式取决于你的技术栈。不要把“代码 Review 通过”直接等同于“可以上线”。发布必须证明制品、配置、迁移、监控和回退都可执行。</p>
+        <div class="step" data-step="1"><h3>候选版本冻结</h3><p>确认纳入的 Stories、版本号、制品、配置、数据库迁移和已知限制。</p></div>
+        <div class="step" data-step="2"><h3>发布前验收</h3><p>运行全量回归、关键 Journey、NFR、权限/数据检查，并由产品负责人完成 UAT。</p></div>
+        <div class="step" data-step="3"><h3>发布准备</h3><p>确定灰度范围、功能开关、监控指标、告警阈值、回退触发条件和负责人。</p></div>
+        <div class="step" data-step="4"><h3>上线与观察</h3><p>按计划发布，观察错误、性能、核心业务指标和数据一致性；达到观察窗口才关闭发布。</p></div>
+        <div class="callout danger"><strong>不可逆动作：</strong>生产数据库删除、批量数据修复、财务处理、权限迁移和安全策略变更必须单独确认，先验证备份/恢复，不能由 Agent 自主执行。</div>
+      </section>
+
+      <section id="change">
+        <span class="tag">变更管理</span><h2>计划变化时，用 Correct Course；Epic 完成后做 Retrospective</h2>
+        <div class="grid2">
+          <div class="card"><h3>bmad-correct-course</h3><p>适用于开发中出现重大范围、依赖、技术或优先级变化。先评估影响，再更新 PRD/UX/Architecture/Epics/Sprint 中真正受影响的层。</p><p><b>不要：</b>直接修改当前 Story 来承载一个跨 Epic 的新方向。</p></div>
+          <div class="card"><h3>bmad-retrospective</h3><p>每个 Epic 完成后复盘估算、上下文质量、缺陷、Review、测试、流程摩擦和用户结果，把可复用经验带到下一个 Epic。</p><p><b>输出：</b>事实、原因、行动项、责任人、验证时间。</p></div>
+        </div>
+        <div class="callout warn"><strong>变更分层：</strong>用户价值/业务规则变了 → PRD Update；体验变了 → UX Update；跨模块技术决定变了 → Architecture Update；只是实现细节 → 当前 Story 内处理。</div>
+      </section>
+
+      <section id="example">
+        <span class="tag">贯穿案例</span><h2>案例：从 0 到 1 开发“团队 AI 任务台”</h2>
+        <details open><summary>阶段 1：从想法到 Product Brief</summary><div><p><b>原始想法：</b>让小团队把需求、执行和验收放在同一个 AI 协作工作台。</p><p><b>研究发现：</b>目标用户不是缺少任务工具，而是 AI 产出与正式决策脱节，交接时丢失上下文。</p><p><b>MVP：</b>创建项目、建立任务、绑定事实文档、执行检查清单、形成交付证据。</p><p><b>Non-goals：</b>首版不做企业 SSO、计费、多地区部署和开放插件市场。</p></div></details>
+        <details><summary>阶段 2：PRD 与 UX</summary><div><p><b>角色：</b>Owner、Contributor、Reviewer。</p><p><b>关键 Journey：</b>Owner 创建项目 → Contributor 接收任务并交付 → Reviewer 按证据批准或退回。</p><p><b>关键状态：</b>Draft、Ready、In Progress、Review、Changes Requested、Done、Blocked。</p><p><b>UX Gate：</b>每个状态都有入口、允许动作、反馈、异常、权限和恢复路径。</p></div></details>
+        <details><summary>阶段 3：Architecture 与 Story 拆分</summary><div><p><b>Architecture：</b>统一身份边界、项目/任务/审查数据模型、状态机、审计事件、文件引用和通知策略。</p><p><b>Epic 1：</b>项目与成员；Epic 2：任务生命周期；Epic 3：Review 与证据；Epic 4：运营与可靠性。</p><p><b>Story 示例：</b>“作为 Owner，我要邀请 Contributor，使其只能访问指定项目。”AC 覆盖邀请、过期、重复、撤销、越权和审计。</p></div></details>
+        <details><summary>阶段 4：第一个可运行增量</summary><div><p><b>顺序：</b>项目骨架 → 身份与项目 → 任务创建 → 状态流转 → Review → 通知 → 运营。</p><p><b>每个 Story：</b>Create Story 明确契约，Dev Story 实现与测试，Code Review 独立验证。</p><p><b>首个 Release：</b>邀请制灰度，观察任务完成率、Review 退回原因、错误率和权限异常。</p></div></details>
+      </section>
+
+      <section id="prompts">
+        <span class="tag">复制即用</span><h2>各阶段交接提示词</h2>
+        <p class="lead">提示词只负责建立正确上下文，不能代替你批准产品和架构决定。</p>
+        <details open><summary>阶段开始通用模板</summary><div><pre><button class="copy" type="button">复制</button><code>我要执行 [workflow 名称]，意图是 [Create / Update / Validate]。
+请先读取以下最终上游产物和项目配置：[文件列表]。
+事实优先级：[列出 final 优先顺序]。
+先输出：
+1. 已读取的输入；
+2. 发现的冲突、缺失与过期内容；
+3. 本次允许修改的边界；
+4. 计划和质量门禁。
+未确认的内容不得写成最终事实。</code></pre></div></details>
+        <details><summary>阶段结束交接模板</summary><div><pre><button class="copy" type="button">复制</button><code>请形成本阶段交接摘要：
+- 完成状态：Draft / Final / Validated；
+- 正式产物与版本；
+- 已确认决定；
+- 未决项、风险和责任人；
+- 本阶段质量门禁结果与证据；
+- 下一 workflow、必读输入和禁止覆盖的事实；
+- 需要重新进入本阶段的触发条件。</code></pre></div></details>
+        <details><summary>Story 实现前审批模板</summary><div><pre><button class="copy" type="button">复制</button><code>在开始 bmad-dev-story 前，先审查当前 Story：
+- 是否能追踪到 PRD、UX 和 Architecture；
+- AC 是否覆盖主路径、错误、空态、权限和边界；
+- 依赖是否已满足；
+- 技术约束、测试与观测是否明确；
+- Non-goals 是否阻止范围扩张。
+发现阻塞项先报告，不要直接编码。</code></pre></div></details>
+        <details><summary>发布候选审计模板</summary><div><pre><button class="copy" type="button">复制</button><code>请对 Release Candidate 做只读审计：
+- 纳入的 Epic/Stories 与完成证据；
+- 未关闭 Review、测试失败和已知限制；
+- 构建制品、配置、迁移与环境差异；
+- 核心 Journey、权限/数据不变量和 NFR 结果；
+- 监控、告警、灰度、回退与负责人。
+只报告证据和阻塞项，不执行生产变更。</code></pre></div></details>
+      </section>
+
+      <section id="artifacts">
+        <span class="tag">参考索引</span><h2>核心产物与谁消费它</h2>
+        <div class="card">
+          <div class="artifact"><b>研究 / Product Brief</b><span>由 PRD 消费，解释目标用户、问题、价值、证据、MVP 和风险。</span></div>
+          <div class="artifact"><b>prd.md</b><span>由 UX、Architecture、Epics 和验收消费，定义 What / Why、FR/NFR 与业务边界。</span></div>
+          <div class="artifact"><b>DESIGN.md</b><span>由 Architecture、Story 和前端实现消费，定义视觉事实。</span></div>
+          <div class="artifact"><b>EXPERIENCE.md</b><span>由 Architecture、Story、测试和验收消费，定义行为与状态事实。</span></div>
+          <div class="artifact"><b>Architecture</b><span>由 Epics/Stories、Dev Story 和 Code Review 消费，定义跨实现的一致技术规则。</span></div>
+          <div class="artifact"><b>Epic / Story 文件</b><span>由开发循环消费，把已确认上下文压缩为可实现、可测试的单元。</span></div>
+          <div class="artifact"><b>sprint-status.yaml</b><span>跟踪 Epic/Story 的开发序列、状态和阻塞。</span></div>
+          <div class="artifact"><b>代码 / 测试 / Review</b><span>成为发布候选和实际实现证据，并反馈后续变更与复盘。</span></div>
+        </div>
+        <div class="callout info"><strong>关于 spec.md：</strong>完整 0→1 主链没有必须生成一个统一 <code>spec.md</code> 的环节。Quick Flow 的 <code>bmad-quick-dev</code> 会形成 <code>spec-*.md</code>；完整流程则由 Story 文件承担当前实现单元的规格职责，并继承 PRD、UX 和 Architecture。</div>
+      </section>
+
+      <section id="gates">
+        <span class="tag red">质量控制</span><h2>七道门禁保护 0→1 开发质量</h2>
+        <div class="card">
+          <div class="gate"><b>G0 Idea Evidence</b><span>目标用户、问题、假设、成功信号和 Non-goals 有证据。</span><span class="pass">才写 Brief</span></div>
+          <div class="gate"><b>G1 PRD Final</b><span>范围、规则、权限、状态、FR/NFR 和验收可测试。</span><span class="pass">才做方案</span></div>
+          <div class="gate"><b>G2 UX Final</b><span>关键 Journey、状态、异常、恢复和视觉/行为事实完整。</span><span class="pass">才做架构</span></div>
+          <div class="gate"><b>G3 Solution Ready</b><span>Architecture 与 Stories 一致、可追踪、可实现。</span><span class="pass">才做 Readiness</span></div>
+          <div class="gate"><b>G4 Readiness</b><span>结论 PASS 或有批准的 CONCERNS 处置。</span><span class="pass">才开 Sprint</span></div>
+          <div class="gate"><b>G5 Story Done</b><span>AC、测试、用户路径、不变量和 Code Review 通过。</span><span class="pass">才标 Done</span></div>
+          <div class="gate"><b>G6 Release</b><span>UAT、回归、NFR、制品、监控、灰度和回退证据齐全。</span><span class="pass">才可上线</span></div>
+        </div>
+      </section>
+
+      <section id="checklist">
+        <span class="tag">执行看板</span><h2>0→1 项目可勾选清单</h2>
+        <p class="lead">勾选状态只保存在当前页面会话，刷新后重置，可用于项目评审或打印。</p>
+        <div class="progress"><div id="bar"></div></div><div class="small" id="progressText">0 / 0 已完成</div>
+        <div class="checklist">
+          <label class="check"><input class="task" type="checkbox"><span>目标用户、核心问题、证据、最大假设和成功指标已明确。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>Product Brief 的 MVP、Non-goals 和风险已批准。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>PRD 已完成 Create、负责人审阅和独立 Validate。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>PRD 的角色、权限、状态、数据、FR/NFR 和验收可测试。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>有界面时，DESIGN.md 与 EXPERIENCE.md 已定稿。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>关键用户 Journey 包含异常、空态、权限和恢复路径。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>Architecture 的跨 Epic 技术决定、NFR 和风险处置已批准。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>Epics 按用户价值拆分，Stories 可实现、可测试、可追踪。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>Implementation Readiness 已 PASS 或所有 CONCERNS 有处置。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>sprint-status.yaml 已初始化，依赖和优先级清楚。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>每个 Story 均执行 Create Story、审批、Dev Story、Code Review。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>自动化测试、关键用户路径和状态/权限不变量均已验证。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>发布候选经过 UAT、回归、NFR、迁移、监控和回退审计。</span></label>
+          <label class="check"><input class="task" type="checkbox"><span>上线观察窗口达标，Epic Retrospective 和后续行动项已完成。</span></label>
+        </div>
+      </section>
+
+      <section id="faq">
+        <span class="tag">FAQ</span><h2>常见问题</h2>
+        <details open><summary>新产品能否直接用 bmad-quick-dev？</summary><div><p>只适合范围非常小、业务和技术都已明确的工作。真正的 0→1 产品通常存在大量未决问题，应走 BMad Method；否则 Agent 会用实现假设替代产品和架构决定。</p></div></details>
+        <details><summary>Product Brief 是必需的吗？</summary><div><p>官方流程允许直接从 PRD 开始，但 0→1 默认建议先做 Brief。它能把研究、愿景、MVP 和风险压缩成稳定输入，减少 PRD 反复解释。</p></div></details>
+        <details><summary>UX 必须在 Architecture 前吗？</summary><div><p>有界面且用户体验影响系统状态、数据、权限或接口时，建议先完成 UX。Architecture 才能依据真实流程设计边界。纯后台或无显著 UX 的产品可按实际跳过。</p></div></details>
+        <details><summary>为什么 Epics/Stories 要在 Architecture 后？</summary><div><p>因为数据、API、权限和技术模式会影响 Story 的边界、依赖和验收。先有架构再拆 Story，能减少实现时反复改写。</p></div></details>
+        <details><summary>是否有统一 spec.md？</summary><div><p>完整主流程没有强制统一 <code>spec.md</code>。PRD、UX、Architecture 和 Epic/Story 共同构成规格链；当前 Story 是实现时最直接的工作契约。<code>spec-*.md</code> 主要来自 Quick Dev。</p></div></details>
+        <details><summary>如何保证不同 Agent 写出的代码一致？</summary><div><p>用 Architecture 和 Project Context 固化跨 Story 规则；每个 Story 明确引用它们；Code Review 再检查实际 Diff 是否违反这些决定。</p></div></details>
+        <details><summary>Readiness 是 FAIL 怎么办？</summary><div><p>按问题归属回到 PRD、UX、Architecture 或 Epics/Stories 修复，再重新运行检查。不要让开发在代码里自行消化阻塞。</p></div></details>
+        <details><summary>上线是否属于 BMAD workflow？</summary><div><p>BMAD 主链负责从规划到实现与质量验证；实际构建、部署、灰度、监控和回退取决于项目技术栈。教程因此提供 Release Gate，但不假装存在一个适用于所有项目的统一部署命令。</p></div></details>
+        <details><summary>这个 HTML 为什么不需要本地服务器？</summary><div><p>全部样式和脚本都内嵌在一个文件中，没有模块加载、接口请求或在线资源。直接双击 <code>index.html</code> 即可打开。</p></div></details>
+      </section>
+
+      <section>
+        <div class="callout"><strong>最终记忆句：</strong>BMAD 0→1 的核心不是多写文档，而是让“为什么做、做什么、体验怎样、如何构建、如何验收”在进入代码前逐层变成可检查事实。</div>
+        <p class="small">本教程按 2026 年 7 月 BMAD V6 的 Workflow Map 与 Getting Started 流程整理。具体命令、模块和别名以你当前项目中的 <code>bmad-help</code> 检测结果为准。本 HTML 不加载任何在线资源。</p>
+      </section>
+    </main>
+    <footer>BMAD 新产品 0→1 完整流程教程 · 单文件离线版 · 2026-07-22</footer>
+  </div>
+</div>
+<button class="btn primary mobile no-print" id="menu" type="button">目录</button>
+<script>
+(function(){
+  var root=document.documentElement,side=document.getElementById('sidebar');
+  document.getElementById('theme').addEventListener('click',function(){root.dataset.theme=root.dataset.theme==='dark'?'light':'dark'});
+  document.getElementById('menu').addEventListener('click',function(){side.classList.toggle('open')});
+  document.querySelectorAll('nav a').forEach(function(a){a.addEventListener('click',function(){side.classList.remove('open')})});
+  function fallback(text,done){var a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}finally{a.remove()}}
+  document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){var value=b.parentElement.querySelector('code').innerText;var done=function(){var old=b.textContent;b.textContent='已复制';setTimeout(function(){b.textContent=old},1200)};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(value).then(done).catch(function(){fallback(value,done)})}else{fallback(value,done)}})});
+  var routes={
+    idea:['推荐下一步：Analysis 或 bmad-product-brief','输入：产品想法、目标用户线索、商业约束。通过条件：问题、证据、假设、MVP 和 Non-goals 足以支撑 PRD。'],
+    evidence:['推荐下一步：bmad-product-brief','输入：研究、访谈和已经明确的产品概念。通过条件：Brief 的愿景、用户、价值、MVP、指标和风险获批。'],
+    brief:['推荐下一步：bmad-prd（Create）','输入：final Product Brief 与研究。完成后单独运行 Validate；PRD 范围和可测试要求通过后再前进。'],
+    prd:['推荐下一步：有界面则 bmad-ux；无显著 UX 则 bmad-architecture','输入：final/validated PRD。UX 必须覆盖 Journey、状态、权限、异常和恢复。'],
+    ux:['推荐下一步：bmad-architecture','输入：final PRD、DESIGN.md、EXPERIENCE.md 与项目约束。通过条件：跨 Epic 技术决定一致且可追踪。'],
+    arch:['推荐下一步：bmad-create-epics-and-stories','输入：PRD、UX、Architecture。按用户价值拆分，并生成要求到 Story 的覆盖矩阵。'],
+    epics:['推荐下一步：bmad-check-implementation-readiness','输入：全部 final 规划材料。只有 PASS 或批准的 CONCERNS 才可进入开发。'],
+    ready:['推荐下一步：bmad-sprint-planning','输入：已批准 Epics/Stories 和 Readiness 结论。初始化 sprint-status.yaml 并确定开发顺序。'],
+    sprint:['推荐下一步：bmad-create-story','选择下一个 Ready Story，补齐上下文、AC、依赖、测试和 Non-goals；审批后进入 Dev Story。'],
+    story:['推荐下一步：bmad-code-review','用不同上下文审查实际 Diff、AC、Architecture 与测试；关闭有效问题后更新 Story/Sprint 状态。'],
+    epic:['推荐下一步：bmad-retrospective','复盘本 Epic 的结果、缺陷、测试、上下文和流程，形成有责任人与验证时间的行动项，再开始下一 Epic。']
+  };
+  var select=document.getElementById('stageSelect'),result=document.getElementById('stageResult');
+  select.addEventListener('change',function(){var r=routes[this.value];result.innerHTML=r?'<b>'+r[0]+'</b><br>'+r[1]:'选择状态后，这里会显示推荐下一步、输入和通过条件。'});
+  var tasks=Array.from(document.querySelectorAll('.task')),bar=document.getElementById('bar'),txt=document.getElementById('progressText');
+  function progress(){var n=tasks.filter(function(x){return x.checked}).length,p=tasks.length?Math.round(n/tasks.length*100):0;bar.style.width=p+'%';txt.textContent=n+' / '+tasks.length+' 已完成（'+p+'%）'}
+  tasks.forEach(function(x){x.addEventListener('change',progress)});progress();
+  var links=Array.from(document.querySelectorAll('nav a')),sections=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+  function spy(){var current=sections[0];sections.forEach(function(s){if(s.getBoundingClientRect().top<=120)current=s});links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+current.id)})}
+  window.addEventListener('scroll',spy,{passive:true});spy();
+}());
+</script>
+</body>
+</html>

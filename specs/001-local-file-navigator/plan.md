@@ -13,7 +13,7 @@
 **Language/Version**: TypeScript 5.x (全栈: Electron main + preload + React renderer)
 
 **Primary Dependencies**:
-- **Electron 33+**: 桌面壳 (窗口管理、系统托盘、原生对话框)
+- **Electron 33+**: 桌面壳（窗口管理、单实例生命周期、原生对话框）
 - **React 18 + react-aria**: UI 渲染 + 无障碍组件基座（WCAG 2.2 AA 基线）。react-aria 提供 40+ ARIA hooks（useButton, useDialog, useListBox, useGrid 等）
 - **@radix-ui/react-dialog, @radix-ui/react-popover**: 模态框与浮层 primitives——react-aria 管理无障碍语义与焦点，radix 管理 DOM 结构、portal 和关闭/打开状态机。两者互补：aria hooks = 行为，radix primitives = 结构
 - **Vite 6**: 构建工具 (electron-vite 集成)
@@ -85,7 +85,7 @@ specs/001-local-file-navigator/
 ```text
 src/
 ├── main/                       # Electron 主进程
-│   ├── index.ts                # BrowserWindow 创建, 系统托盘, 生命周期
+│   ├── index.ts                # BrowserWindow 创建、单实例锁、退出生命周期
 │   ├── ipc.ts                  # IPC handler 注册 (contextBridge)
 │   ├── store.ts                # JSON 数据读写 (load/save/corruption)
 │   └── shell.ts                # shell.openPath / showItemInFolder / dialog 封装
@@ -142,7 +142,7 @@ tests/
 │   ├── uj2-quick-open.spec.ts  # VS-2
 │   ├── uj3-organize.spec.ts    # VS-3
 │   ├── uj4-repair.spec.ts      # VS-4
-│   ├── tray.spec.ts            # VS-5
+│   ├── lifecycle.spec.ts       # VS-5
 │   ├── persistence.spec.ts     # VS-6
 │   ├── keyboard-a11y.spec.ts   # VS-7
 │   └── zoom-resize.spec.ts     # VS-8
@@ -166,7 +166,7 @@ vite.config.ts
 
 | # | Decision | Rationale (abbreviated) |
 |---|----------|------------------------|
-| 1 | Electron 33+ | 系统托盘 API 成熟、无障碍生态完整、`shell.openPath`/`showItemInFolder` 原生映射 FR-026/028 |
+| 1 | Electron 33+ | 单实例与窗口生命周期 API 成熟、无障碍生态完整、`shell.openPath`/`showItemInFolder` 原生映射 FR-026/028 |
 | 2 | React 18 + TypeScript | react-aria 提供 WCAG 2.2 AA 基线、20 组件天然映射、TypeScript 类型安全 |
 | 3 | JSON file storage | ≤500 卡片全量读写 <50ms、无数据库依赖、人类可读易调试 |
 | 4 | 路径归一化 + 文件元信息双重校验 | 轻量、无需文件哈希、覆盖 95% 唯一性场景 |

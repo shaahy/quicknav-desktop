@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>BMAD 已上线 V1 增量开发教程</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dee8;
+      --brand: #2457d6;
+      --brand-2: #173f9f;
+      --brand-soft: #eaf0ff;
+      --green: #147d64;
+      --green-soft: #e7f6f1;
+      --amber: #a15c00;
+      --amber-soft: #fff4dd;
+      --red: #b42318;
+      --red-soft: #ffebe9;
+      --purple: #6941c6;
+      --purple-soft: #f1ebff;
+      --code: #121827;
+      --shadow: 0 12px 34px rgba(20, 32, 55, .08);
+      --radius: 16px;
+    }
+    html[data-theme="dark"] {
+      --bg: #0c111b;
+      --panel: #151c29;
+      --panel-2: #111824;
+      --text: #eef3ff;
+      --muted: #aab4c5;
+      --line: #2a3546;
+      --brand: #82a7ff;
+      --brand-2: #b5caff;
+      --brand-soft: #1c2d52;
+      --green: #69d5b5;
+      --green-soft: #15382f;
+      --amber: #ffc56f;
+      --amber-soft: #422f15;
+      --red: #ff8f88;
+      --red-soft: #461e21;
+      --purple: #c4a7ff;
+      --purple-soft: #30244b;
+      --code: #090d14;
+      --shadow: 0 12px 34px rgba(0, 0, 0, .28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+      line-height: 1.72;
+    }
+    button, input { font: inherit; }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; overflow: auto;
+      padding: 26px 20px; background: var(--panel); border-right: 1px solid var(--line);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+    .brand-mark {
+      width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center;
+      color: white; font-weight: 800; background: linear-gradient(145deg, #2457d6, #6c8fff);
+      box-shadow: 0 8px 20px rgba(36, 87, 214, .28);
+    }
+    .brand-title { font-size: 15px; font-weight: 800; line-height: 1.25; }
+    .brand-sub { color: var(--muted); font-size: 12px; }
+    .nav-title { margin: 20px 8px 7px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+    nav a {
+      display: block; padding: 8px 10px; border-radius: 9px; color: var(--muted);
+      font-size: 13px; transition: .15s ease;
+    }
+    nav a:hover, nav a.active { color: var(--brand); background: var(--brand-soft); text-decoration: none; }
+    .side-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
+    .btn {
+      border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 10px;
+      padding: 9px 11px; cursor: pointer; font-weight: 700; font-size: 13px;
+    }
+    .btn:hover { border-color: var(--brand); color: var(--brand); }
+    .btn.primary { color: white; background: var(--brand); border-color: var(--brand); }
+    .content { min-width: 0; }
+    .hero {
+      padding: 70px clamp(24px, 6vw, 90px) 54px;
+      background:
+        radial-gradient(circle at 82% 10%, rgba(108,143,255,.24), transparent 24%),
+        linear-gradient(135deg, #12265d 0%, #1f4ab8 58%, #5277df 100%);
+      color: white;
+    }
+    .eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .12em; opacity: .8; }
+    h1 { margin: 12px 0 16px; max-width: 900px; font-size: clamp(32px, 5vw, 58px); line-height: 1.12; letter-spacing: -.035em; }
+    .hero p { max-width: 850px; font-size: 18px; opacity: .9; }
+    .hero-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 34px; max-width: 980px; }
+    .hero-stat { padding: 15px; border: 1px solid rgba(255,255,255,.24); border-radius: 13px; background: rgba(255,255,255,.09); backdrop-filter: blur(7px); }
+    .hero-stat b { display: block; font-size: 20px; }
+    .hero-stat span { font-size: 12px; opacity: .8; }
+    main { max-width: 1160px; margin: 0 auto; padding: 42px clamp(20px, 5vw, 70px) 90px; }
+    section { scroll-margin-top: 18px; margin: 0 0 54px; }
+    h2 { margin: 0 0 18px; font-size: clamp(25px, 3vw, 36px); letter-spacing: -.02em; }
+    h3 { margin: 26px 0 12px; font-size: 20px; }
+    h4 { margin: 20px 0 8px; font-size: 16px; }
+    p { margin: 8px 0 14px; }
+    .lead { color: var(--muted); font-size: 17px; max-width: 900px; }
+    .callout { padding: 18px 20px; border-radius: 13px; border-left: 5px solid var(--brand); background: var(--brand-soft); margin: 18px 0; }
+    .callout strong { color: var(--brand-2); }
+    .callout.warn { border-color: var(--amber); background: var(--amber-soft); }
+    .callout.warn strong { color: var(--amber); }
+    .callout.danger { border-color: var(--red); background: var(--red-soft); }
+    .callout.danger strong { color: var(--red); }
+    .callout.success { border-color: var(--green); background: var(--green-soft); }
+    .callout.success strong { color: var(--green); }
+    .grid-2, .grid-3 { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { padding: 21px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); }
+    .card h3, .card h4 { margin-top: 0; }
+    .tag { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; color: var(--brand); background: var(--brand-soft); }
+    .tag.green { color: var(--green); background: var(--green-soft); }
+    .tag.amber { color: var(--amber); background: var(--amber-soft); }
+    .tag.red { color: var(--red); background: var(--red-soft); }
+    .tag.purple { color: var(--purple); background: var(--purple-soft); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 22px; background: var(--panel); }
+    th, td { padding: 12px 13px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: var(--panel-2); font-size: 13px; }
+    td { font-size: 14px; }
+    .table-wrap { overflow-x: auto; border-radius: 12px; }
+    code { padding: .1em .35em; border-radius: 5px; background: var(--brand-soft); color: var(--brand-2); font-family: Consolas, "SFMono-Regular", monospace; font-size: .92em; }
+    pre { position: relative; overflow: auto; margin: 12px 0 20px; padding: 19px; border-radius: 13px; color: #eaf0ff; background: var(--code); line-height: 1.6; font-size: 13px; }
+    pre code { padding: 0; color: inherit; background: transparent; }
+    .copy { position: absolute; top: 9px; right: 9px; border: 1px solid #43506a; color: #dce5f7; background: #222c3f; border-radius: 7px; padding: 5px 9px; cursor: pointer; font-size: 11px; }
+    .flow { display: grid; gap: 10px; margin: 22px 0; }
+    .flow-row { display: grid; grid-template-columns: 44px 1fr auto; gap: 13px; align-items: center; padding: 15px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+    .num { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; font-weight: 900; color: white; background: var(--brand); }
+    .flow-row p { margin: 2px 0; color: var(--muted); font-size: 13px; }
+    .arrow { text-align: center; color: var(--muted); font-size: 20px; }
+    details { margin: 12px 0; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+    summary { padding: 16px 18px; cursor: pointer; font-weight: 800; }
+    details > div { padding: 0 18px 18px; }
+    .checklist { display: grid; gap: 8px; margin: 14px 0; }
+    .check { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 9px; background: var(--panel-2); }
+    .check input { margin-top: 6px; accent-color: var(--green); }
+    .progress { height: 10px; overflow: hidden; border-radius: 999px; background: var(--line); margin: 10px 0 5px; }
+    .progress > div { width: 0; height: 100%; background: linear-gradient(90deg, var(--brand), var(--green)); transition: width .25s ease; }
+    .route-box { padding: 21px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+    .route-options { display: grid; gap: 8px; margin: 13px 0; }
+    .route-options label { display: flex; gap: 10px; padding: 9px 11px; border-radius: 9px; background: var(--panel-2); }
+    .route-result { min-height: 76px; margin-top: 14px; padding: 15px; border-radius: 11px; background: var(--brand-soft); }
+    .step { position: relative; padding-left: 42px; margin: 28px 0 38px; }
+    .step::before { content: attr(data-step); position: absolute; left: 0; top: 0; width: 29px; height: 29px; display: grid; place-items: center; color: white; background: var(--brand); border-radius: 9px; font-weight: 900; }
+    .step::after { content: ""; position: absolute; left: 14px; top: 35px; bottom: -28px; width: 1px; background: var(--line); }
+    .step:last-child::after { display: none; }
+    .gate { display: grid; grid-template-columns: 120px 1fr 120px; gap: 12px; align-items: center; padding: 13px; border-bottom: 1px solid var(--line); }
+    .gate:last-child { border-bottom: 0; }
+    .gate b:first-child { color: var(--brand); }
+    .gate .pass { color: var(--green); font-weight: 800; text-align: right; }
+    .small { color: var(--muted); font-size: 12px; }
+    .footer { padding: 28px; text-align: center; color: var(--muted); border-top: 1px solid var(--line); background: var(--panel); }
+    .mobile-menu { display: none; position: fixed; z-index: 10; right: 16px; bottom: 16px; box-shadow: var(--shadow); }
+    @media (max-width: 980px) {
+      .shell { display: block; }
+      .sidebar { display: none; position: fixed; z-index: 20; inset: 0 auto 0 0; width: 290px; box-shadow: var(--shadow); }
+      .sidebar.open { display: block; }
+      .mobile-menu { display: block; }
+      .hero-grid, .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 660px) {
+      .hero { padding-top: 48px; }
+      .hero-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .flow-row { grid-template-columns: 40px 1fr; }
+      .flow-row > .tag { grid-column: 2; width: max-content; }
+      .gate { grid-template-columns: 1fr; }
+      .gate .pass { text-align: left; }
+      h1 { font-size: 34px; }
+    }
+    @media print {
+      :root { --bg: white; --panel: white; --panel-2: #f7f7f7; --text: black; --muted: #444; --line: #bbb; }
+      .shell { display: block; }
+      .sidebar, .mobile-menu, .copy, .no-print { display: none !important; }
+      .hero { padding: 35px; color: black; background: white; border-bottom: 3px solid #222; }
+      .hero-stat { border-color: #888; }
+      main { max-width: none; padding: 26px; }
+      section { break-inside: avoid; }
+      .card, details { box-shadow: none; }
+      details > div { display: block !important; }
+      a { color: black; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">B</div>
+        <div><div class="brand-title">BMAD V1 → V1.1</div><div class="brand-sub">离线增量开发教程</div></div>
+      </div>
+      <nav id="nav">
+        <div class="nav-title">理解路径</div>
+        <a href="#decision">01 核心结论</a>
+        <a href="#model">02 事实源模型</a>
+        <a href="#router">03 变更分级器</a>
+        <a href="#overview">04 全流程总览</a>
+        <div class="nav-title">逐步执行</div>
+        <a href="#baseline">05 冻结 V1 基线</a>
+        <a href="#spec">06 建立增量 SPEC</a>
+        <a href="#upstream">07 选择性更新上游</a>
+        <a href="#stories">08 Epic 与 Stories</a>
+        <a href="#readiness">09 实施就绪检查</a>
+        <a href="#delivery">10 逐 Story 开发</a>
+        <a href="#release">11 测试与发布</a>
+        <a href="#course">12 中途变更处理</a>
+        <div class="nav-title">实操材料</div>
+        <a href="#example">13 三功能示例</a>
+        <a href="#prompts">14 可复制提示词</a>
+        <a href="#structure">15 推荐目录</a>
+        <a href="#gates">16 质量门禁</a>
+        <a href="#checklist">17 执行清单</a>
+        <a href="#faq">18 常见问题</a>
+      </nav>
+      <div class="side-actions no-print">
+        <button class="btn" id="themeBtn" type="button">切换主题</button>
+        <button class="btn" onclick="window.print()" type="button">打印 / PDF</button>
+      </div>
+    </aside>
+
+    <div class="content">
+      <header class="hero">
+        <div class="eyebrow">BMAD METHOD · BROWNFIELD INCREMENTAL DELIVERY</div>
+        <h1>已上线 V1，如何用 BMAD 开发 2–3 个小功能</h1>
+        <p>一份双击即开的离线教程。目标不是重跑完整 V1，而是建立可追溯的 V1.1 变更集，选择性更新事实源，再按 Story 完成开发、审查、回归和发布。</p>
+        <div class="hero-grid">
+          <div class="hero-stat"><b>1</b><span>一个迭代级增量契约</span></div>
+          <div class="hero-stat"><b>2–3</b><span>每个功能独立 Story</span></div>
+          <div class="hero-stat"><b>4</b><span>层质量门禁</span></div>
+          <div class="hero-stat"><b>0</b><span>不重写无关 V1 文档</span></div>
+        </div>
+      </header>
+
+      <main>
+        <section id="decision">
+          <span class="tag">先看结论</span>
+          <h2>推荐采用“轻量完整增量链”</h2>
+          <p class="lead">官方对既有项目的小改动优先推荐 <code>bmad-quick-dev</code>。但你要一次交付 2–3 个功能，而且默认可能涉及页面、API 和少量数据结构，所以更稳妥的方式是：以一个 V1.1 增量范围为总边界，每个功能独立开发和验收。</p>
+          <div class="callout success"><strong>本教程的默认方案：</strong>冻结 V1 基线 → 形成 V1.1 增量 <code>SPEC.md</code> → 只更新受影响的 PRD/UX/Architecture → 生成增量 Epic/Stories → Readiness Gate → 逐 Story 开发与对抗式 Review → Epic 回归 → 发布并建立 V1.1 新基线。</div>
+          <div class="grid-3">
+            <div class="card"><span class="tag green">保留</span><h3>V1 仍是基线</h3><p>已上线且未被本次变更触及的业务规则、交互、接口和架构决定继续有效。</p></div>
+            <div class="card"><span class="tag purple">新增</span><h3>V1.1 是变更集</h3><p>只描述新增、修改、废弃及明确不变的内容，不复制整套 V1 文档。</p></div>
+            <div class="card"><span class="tag amber">阻断</span><h3>冲突必须先解决</h3><p>SPEC、PRD、UX、Architecture 与现有代码不一致时，不允许开发 Agent 自行选一个版本。</p></div>
+          </div>
+          <div class="callout warn"><strong>关于 SPEC：</strong>BMAD 里存在两类名字相近的产物。正式的 <code>SPEC.md</code> 是意图契约；Quick Dev 常产生 <code>spec-*.md</code>。本教程用前者管理 V1.1 总边界，用 Story 管每个功能的实现边界。</div>
+        </section>
+
+        <section id="model">
+          <span class="tag">事实源</span>
+          <h2>先建立单一事实链，避免“文档互相打架”</h2>
+          <div class="table-wrap"><table>
+            <thead><tr><th>层级</th><th>回答的问题</th><th>V1.1 的处理方式</th><th>不能做的事</th></tr></thead>
+            <tbody>
+              <tr><td><b>V1 Release Baseline</b></td><td>现在生产环境到底是什么</td><td>冻结版本号、提交、数据库迁移、接口、监控与已知问题</td><td>把旧规划文档当成比生产代码更“真实”</td></tr>
+              <tr><td><b>PRD / Addendum</b></td><td>为什么做、业务规则和验收是什么</td><td>只有业务范围或 FR/NFR 变化才更新</td><td>把技术实现细节写成产品事实</td></tr>
+              <tr><td><b>DESIGN / EXPERIENCE</b></td><td>用户看到什么、如何操作、异常如何反馈</td><td>只有新增页面、状态或关键交互才更新</td><td>简单文案修改也重跑整套 UX</td></tr>
+              <tr><td><b>Architecture / ADR</b></td><td>系统边界、数据、API、权限和部署如何实现</td><td>只有架构决定变化才写增量 ADR</td><td>为局部代码调整重写总架构</td></tr>
+              <tr><td><b>V1.1 SPEC.md</b></td><td>这次迭代改什么、不改什么、怎样算成功</td><td>作为本次增量的导航和范围合同</td><td>未经确认反向覆盖正式上游事实</td></tr>
+              <tr><td><b>Story 文件</b></td><td>当前一个可交付单元具体怎么验收</td><td>每个功能一个主 Story，必要时再拆</td><td>把三个独立功能塞进一个巨型 Story</td></tr>
+            </tbody>
+          </table></div>
+          <div class="callout"><strong>优先级规则：</strong>生产现状用于描述“现在是什么”；已确认 PRD/UX/Architecture 用于描述“为什么和应该怎样”；V1.1 SPEC 只表达本次变更。若三者冲突，先报告并确认，不让开发过程暗中改写事实。</div>
+        </section>
+
+        <section id="router">
+          <span class="tag">交互工具</span>
+          <h2>用变更分级器选择最小安全路径</h2>
+          <p class="lead">勾选一个功能的真实影响，页面会给出推荐路径。对 2–3 个功能分别判断，不要按整个迭代最乐观地判断。</p>
+          <div class="route-box">
+            <div class="route-options" id="routeOptions">
+              <label><input type="checkbox" value="1"> 只改现有页面中的文案、样式、显示条件或局部校验</label>
+              <label><input type="checkbox" value="2"> 新增或修改持久化数据、数据库字段、API 合同</label>
+              <label><input type="checkbox" value="3"> 改变角色权限、审计、安全、计费或核心业务状态</label>
+              <label><input type="checkbox" value="2"> 涉及前端、后端、任务或第三方集成中的两个及以上系统</label>
+              <label><input type="checkbox" value="3"> 需求仍有关键歧义，或无法写出明确的验收标准</label>
+            </div>
+            <button class="btn primary" id="routeBtn" type="button">判断推荐路径</button>
+            <div class="route-result" id="routeResult">尚未判断。请按一个功能的实际影响勾选。</div>
+          </div>
+          <div class="grid-3" style="margin-top:16px">
+            <div class="card"><span class="tag green">A级</span><h3>Quick Dev</h3><p>单一目标、局部文件、无数据/权限/核心状态变化。每个功能单独一次 Quick Dev。</p></div>
+            <div class="card"><span class="tag amber">B级</span><h3>轻量完整增量链</h3><p>小型跨层功能。写 V1.1 SPEC、选择性更新文档、独立 Story、Readiness、Review 和回归。</p></div>
+            <div class="card"><span class="tag red">C级</span><h3>正式变更链</h3><p>权限、核心状态、合规、跨系统或架构变化。必须更新正式 PRD/UX/Architecture 并执行完整门禁。</p></div>
+          </div>
+        </section>
+
+        <section id="overview">
+          <span class="tag">全流程</span>
+          <h2>V1 → V1.1 的端到端路径</h2>
+          <div class="flow">
+            <div class="flow-row"><div class="num">1</div><div><b>冻结生产基线</b><p>确认当前代码、数据结构、接口、监控、文档和已知缺陷。</p></div><span class="tag">Baseline</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">2</div><div><b>建立 V1.1 增量 SPEC</b><p>合并 2–3 个功能的 Why、Capabilities、Constraints、Non-goals 和 Success Signal。</p></div><span class="tag purple">Intent Gate</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">3</div><div><b>影响分析与选择性更新</b><p>决定 PRD、UX、Architecture、Project Context 哪些要改，哪些明确保持不变。</p></div><span class="tag amber">Impact Gate</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">4</div><div><b>增量 Epic / Stories</b><p>一个 V1.1 Epic，每个独立用户价值一个 Story；建立依赖、AC 和测试映射。</p></div><span class="tag">Planning</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">5</div><div><b>Implementation Readiness</b><p>检查需求、UX、架构、Story、依赖和回归边界是否一致。</p></div><span class="tag red">Go / No-Go</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">6</div><div><b>逐 Story 交付</b><p>Create Story → Dev Story → 测试 → Code Review → 修复 → 再审查。</p></div><span class="tag green">Delivery</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">7</div><div><b>Epic 回归与发布</b><p>完成跨 Story、V1 回归、NFR、可观测性、迁移和回滚验证。</p></div><span class="tag red">Release Gate</span></div>
+            <div class="arrow">↓</div>
+            <div class="flow-row"><div class="num">8</div><div><b>建立 V1.1 新基线</b><p>归档增量产物、更新现状文档、记录遗留事项并复盘。</p></div><span class="tag purple">New Baseline</span></div>
+          </div>
+        </section>
+
+        <section id="baseline">
+          <span class="tag">步骤 1</span>
+          <h2>冻结 V1 生产基线</h2>
+          <p class="lead">增量开发首先要回答“当前真实系统是什么”。如果正式文档与生产代码已经漂移，先运行项目文档梳理，而不是让新功能基于旧图纸开发。</p>
+          <div class="step" data-step="1"><h3>创建迭代工作区</h3><p>建议新建 <code>iteration-v1.1</code> 目录，存放本次增量产物。不要修改或删除 V1 的定稿目录。</p></div>
+          <div class="step" data-step="2"><h3>确认基线证据</h3><div class="checklist">
+            <label class="check"><input type="checkbox" class="task"><span>生产版本号、发布提交或制品版本可定位。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>当前数据库 Schema 与迁移历史可定位。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>现有 API 合同、权限矩阵和关键业务状态可定位。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>PRD、UX、Architecture、Project Context 与代码现状的差异已记录。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>现有自动化测试、监控指标、已知问题和回滚方式可定位。</span></label>
+          </div></div>
+          <div class="step" data-step="3"><h3>按需刷新 Project Context</h3><p>如果 <code>project-context.md</code> 不存在或明显过时，在 AI IDE 的新对话中调用：</p><pre><button class="copy" type="button">复制</button><code>bmad-generate-project-context</code></pre><p>审核生成结果，确保它描述的是现有代码约定，不是 Agent 想象中的“最佳实践”。</p></div>
+          <div class="callout danger"><strong>停止条件：</strong>无法确认生产基线、关键文档明显过时、测试无法运行，或数据库迁移历史不清楚。此时先补项目现状文档和验证证据，不进入功能实现。</div>
+        </section>
+
+        <section id="spec">
+          <span class="tag">步骤 2</span>
+          <h2>建立一个 V1.1 增量 SPEC</h2>
+          <p class="lead">这份 SPEC 不是复制 PRD，而是锁定本次迭代的 WHAT。它把 2–3 个功能放在同一个发布边界中，同时明确每个功能仍需单独验收。</p>
+          <h3>调用方式</h3>
+          <p>在新的 AI IDE 对话中调用 <code>bmad-spec</code>，并提供 V1 基线、正式上游文件和本次功能清单。下面文字可直接复制：</p>
+          <pre><button class="copy" type="button">复制</button><code>使用 bmad-spec 为已上线 V1 创建 V1.1 增量规格。
+
+目标：增加以下 2–3 个小功能：[填写功能清单]。
+基线：V1 已上线，现有 PRD、UX、Architecture、project-context.md 和生产代码继续有效。
+
+要求：
+1. 只描述相对 V1 的新增、修改、废弃和明确不变项；不要重写完整 V1。
+2. 读取生产代码和最终上游文档，发现冲突先报告，不自行选择事实源。
+3. 每个功能分别写 Why、Capability、约束、非目标、成功信号和回归影响。
+4. 明确数据、API、权限、状态、UX、NFR、迁移、可观测性和回滚影响。
+5. 给出功能间依赖与建议交付顺序。
+6. 输出 SPEC.md，并保留来源与待确认项。</code></pre>
+          <h3>SPEC 最小结构</h3>
+          <pre><button class="copy" type="button">复制</button><code># V1.1 Increment SPEC
+
+## 1. Baseline
+- V1 production version / commit / release date
+- Authoritative PRD / UX / Architecture / project-context
+- Known gaps between documents and production
+
+## 2. Why
+- 本次迭代解决的用户或业务问题
+
+## 3. Capabilities
+- CAP-1：功能一
+- CAP-2：功能二
+- CAP-3：功能三（如有）
+
+## 4. Constraints
+- 必须兼容 V1 数据与接口
+- 不破坏既有权限、状态机和关键用户路径
+- 数据迁移必须可回滚或具备前向修复方案
+
+## 5. Non-goals
+- 本次明确不做的重构、平台化、顺手优化和历史缺陷
+
+## 6. Success Signals
+- 每项能力的可观察业务结果与技术验收指标
+
+## 7. Change Matrix
+- 新增 / 修改 / 废弃 / 明确不变
+
+## 8. Regression Surface
+- 受影响的 V1 页面、API、任务、权限、数据和监控
+
+## 9. Open Decisions
+- 未决项、负责人、截止点；未关闭不得进入相关 Story</code></pre>
+          <div class="callout warn"><strong>SPEC Gate：</strong>只有当所有功能都能用可判定的成功信号表达，并且 Non-goals、兼容边界、回归范围清楚后，才能进入上游更新。模糊的“优化体验”“支持导出”不算合格。</div>
+        </section>
+
+        <section id="upstream">
+          <span class="tag">步骤 3</span>
+          <h2>只更新受到影响的上游事实源</h2>
+          <div class="table-wrap"><table>
+            <thead><tr><th>变化信号</th><th>PRD</th><th>UX</th><th>Architecture</th><th>Project Context</th></tr></thead>
+            <tbody>
+              <tr><td>仅样式、文案、已有页面局部交互</td><td>通常不改</td><td>局部 Edit 或补充状态</td><td>不改</td><td>不改</td></tr>
+              <tr><td>新增业务能力、规则、验收或 NFR</td><td><b>更新或 Addendum</b></td><td>按界面影响</td><td>按技术影响</td><td>仅新增长期规则时更新</td></tr>
+              <tr><td>新增页面、关键状态、异常反馈路径</td><td>确认需求已覆盖</td><td><b>更新 DESIGN / EXPERIENCE</b></td><td>通常局部核对</td><td>通常不改</td></tr>
+              <tr><td>新增表、字段、API、事件、后台任务</td><td>确认业务语义</td><td>按需</td><td><b>更新增量 ADR / 架构章节</b></td><td>若形成新通用约定则更新</td></tr>
+              <tr><td>权限、安全、租户、计费、核心状态机变化</td><td><b>必须更新</b></td><td><b>必须核对</b></td><td><b>必须更新并评审</b></td><td><b>同步关键禁区</b></td></tr>
+            </tbody>
+          </table></div>
+          <details open><summary>PRD 更新提示词</summary><div><pre><button class="copy" type="button">复制</button><code>使用 bmad-prd 的 Update 意图处理 V1.1 增量。
+输入：V1 最终 PRD、V1.1 SPEC、生产基线与变更影响分析。
+要求：只修改受影响的业务规则、FR/NFR、验收和范围；保留未受影响的 V1 内容；输出变更清单；发现冲突先报告并等待确认。</code></pre></div></details>
+          <details><summary>UX 更新提示词</summary><div><pre><button class="copy" type="button">复制</button><code>使用 bmad-ux 的 Edit/Update 路径处理 V1.1。
+输入：V1 最终 DESIGN.md、EXPERIENCE.md、V1.1 SPEC、受影响页面和现有实现。
+要求：只修改新增页面、组件、状态、反馈与可访问性；明确复用现有模式；不得自行改变产品业务规则或未受影响视觉事实。</code></pre></div></details>
+          <details><summary>Architecture 更新提示词</summary><div><pre><button class="copy" type="button">复制</button><code>使用 bmad-architecture 对 V1.1 做增量架构评估。
+输入：V1 架构、V1.1 SPEC、更新后的 PRD/UX、生产代码与 project-context.md。
+要求：优先复用现有组件和模式；只记录新增或改变的架构决定；覆盖数据迁移、API 兼容、权限、失败恢复、可观测性和回滚；无架构变化时明确写“无需更新”及依据。</code></pre></div></details>
+          <div class="callout"><strong>编辑边界：</strong>不要让 Architecture 修改产品范围，不要让 UX 修改业务状态，不要让 SPEC 偷偷成为更高优先级的 PRD。每类事实只由对应文档负责。</div>
+        </section>
+
+        <section id="stories">
+          <span class="tag">步骤 4</span>
+          <h2>生成一个增量 Epic，每个功能独立成 Story</h2>
+          <p>在新的 AI IDE 对话中运行：</p>
+          <pre><button class="copy" type="button">复制</button><code>bmad-create-epics-and-stories</code></pre>
+          <p>建议输入 V1.1 SPEC、所有被更新的正式事实源、V1 架构与 Project Context，并明确要求“只生成 V1.1 增量内容”。</p>
+          <div class="grid-2">
+            <div class="card"><h3>推荐拆法</h3><ul><li>Epic：V1.1 小功能增强</li><li>Story 1：功能 A 的端到端用户价值</li><li>Story 2：功能 B 的端到端用户价值</li><li>Story 3：功能 C 的端到端用户价值</li><li>Story 4：仅当共享迁移/基础设施无法归属任一用户 Story 时新增</li></ul></div>
+            <div class="card"><h3>避免的拆法</h3><ul><li>按“前端 Story / 后端 Story / 测试 Story”横向拆散价值</li><li>三个功能共用一个大 Story</li><li>把历史缺陷和顺手重构塞入本迭代</li><li>把测试推迟到 Epic 结束才补</li><li>没有明确依赖却强行串行</li></ul></div>
+          </div>
+          <h3>每个 Story 必须包含</h3>
+          <div class="grid-3">
+            <div class="card"><b>业务契约</b><p>用户角色、目标、价值、可验证 AC，以及对应 SPEC/PRD 引用。</p></div>
+            <div class="card"><b>实现约束</b><p>架构模式、触碰模块、数据/API/权限边界、兼容与迁移要求。</p></div>
+            <div class="card"><b>验证契约</b><p>单元、集成、E2E、回归、NFR、监控和回滚验证。</p></div>
+          </div>
+          <div class="callout danger"><strong>拆分原则：</strong>一个 Story 完成后应当产生独立可验证的用户价值。若必须等待另一个 Story 才能验收，必须显式写依赖和集成验收，不要假装独立。</div>
+        </section>
+
+        <section id="readiness">
+          <span class="tag">步骤 5</span>
+          <h2>执行增量 Implementation Readiness</h2>
+          <p>在新的 AI IDE 对话中调用：</p>
+          <pre><button class="copy" type="button">复制</button><code>bmad-check-implementation-readiness</code></pre>
+          <p>这次检查不是重新审计整个 V1，而是检查 V1.1 变更集是否与 V1 基线一致。</p>
+          <div class="card">
+            <div class="gate"><b>范围一致</b><span>SPEC、PRD 增量和 Stories 的功能集合一致，Non-goals 没有被偷偷实现。</span><span class="pass">必须通过</span></div>
+            <div class="gate"><b>UX 完整</b><span>关键状态、空态、错误态、权限不足和成功反馈都可验收。</span><span class="pass">必须通过</span></div>
+            <div class="gate"><b>架构可行</b><span>数据/API/权限/迁移/回滚/监控均有实现路径。</span><span class="pass">必须通过</span></div>
+            <div class="gate"><b>Story 可做</b><span>每个 Story 有清晰 AC、依赖、技术约束、文件范围和测试要求。</span><span class="pass">必须通过</span></div>
+            <div class="gate"><b>回归明确</b><span>受影响 V1 路径与测试责任已映射，发布门禁可判定。</span><span class="pass">必须通过</span></div>
+          </div>
+          <div class="callout warn"><strong>准入规则：</strong><code>FAIL</code> 不开发；<code>CONCERNS</code> 必须逐项确认风险接受者和关闭方式；只有 <code>PASS</code> 或被明确接受的低风险 Concern 才进入 Sprint。</div>
+        </section>
+
+        <section id="delivery">
+          <span class="tag">步骤 6</span>
+          <h2>逐 Story 开发，不在一个长对话里连续做完</h2>
+          <p class="lead">BMAD 推荐每个工作流使用新对话，减少旧上下文污染。人工控制模式下，每个 Story 至少经历 Create、Dev、Review 三次明确的工作流。</p>
+          <div class="step" data-step="1"><h3>初始化或刷新 Sprint</h3><pre><button class="copy" type="button">复制</button><code>bmad-sprint-planning</code></pre><p>确认只纳入 V1.1 的增量 Epic/Stories，并写出依赖顺序。已有 <code>sprint-status.yaml</code> 时应更新，不要无故覆盖历史状态。</p></div>
+          <div class="step" data-step="2"><h3>Create Story：把当前 Story 准备到 ready-for-dev</h3><pre><button class="copy" type="button">复制</button><code>bmad-create-story</code></pre><p>检查 Story 是否引用了 V1.1 SPEC、相关上游章节、前一 Story 的经验、现有代码模式和测试标准。若故事仍有产品决策空缺，退回上游，不让 Dev 猜。</p></div>
+          <div class="step" data-step="3"><h3>Dev Story：按 AC 编码并同步测试</h3><pre><button class="copy" type="button">复制</button><code>bmad-dev-story</code></pre><p>要求 Dev 按任务顺序实现，运行相关测试，只勾选实际完成的任务，并维护 Dev Agent Record、Completion Notes 和 File List。</p></div>
+          <div class="step" data-step="4"><h3>Code Review：对照实际变更做对抗式审查</h3><pre><button class="copy" type="button">复制</button><code>bmad-code-review</code></pre><p>审查必须比较 Story 声明、AC、任务勾选、实际 Git 变更、文件列表、项目约定和测试证据。Critical/High 问题必须修复后再审。</p></div>
+          <div class="step" data-step="5"><h3>关闭 Story，再进入下一项</h3><p>只有代码、测试、Review、Story 记录和 Sprint 状态一致时才关闭。Story 关闭不代表可以发布，Epic 级回归仍未完成。</p></div>
+          <div class="callout"><strong>Quick Dev 的用法：</strong>若某个功能被判定为 A 级，可在单独新对话中运行 <code>bmad-quick-dev</code>。一次只给一个目标。不要把三个独立功能作为一次 Quick Dev 输入；无关发现应进入 deferred work，而不是扩大当前范围。</div>
+        </section>
+
+        <section id="release">
+          <span class="tag">步骤 7</span>
+          <h2>Epic 完成后做回归与发布门禁</h2>
+          <p>Story 测试证明“局部实现正确”；发布测试要证明“多个增量组合后，V1 仍然可用”。</p>
+          <div class="grid-2">
+            <div class="card"><h3>内置 QA 路径</h3><p>适合中小项目。Epic 中所有 Story 实现并 Review 后，运行：</p><pre><button class="copy" type="button">复制</button><code>bmad-qa-generate-e2e-tests</code></pre><p>用于补充 API 和 E2E 覆盖，并实际执行测试。</p></div>
+            <div class="card"><h3>TEA 路径</h3><p>涉及权限、合规、复杂数据或正式发布门禁时，使用 TEA 的 Test Design、ATDD、Traceability、NFR Assessment 和 Release Gate。</p><p class="small">TEA 是可选模块；未安装时用现有团队测试体系补齐相同门禁。</p></div>
+          </div>
+          <h3>四层发布证据</h3>
+          <div class="card">
+            <div class="gate"><b>代码层</b><span>Lint、类型检查、构建、单元测试、静态与依赖安全检查。</span><span class="pass">全绿</span></div>
+            <div class="gate"><b>服务层</b><span>API/契约/集成测试，数据库迁移与兼容性，失败重试与幂等。</span><span class="pass">全绿</span></div>
+            <div class="gate"><b>用户层</b><span>每个 Story AC、跨 Story 组合路径、关键 V1 回归和权限差异。</span><span class="pass">全绿</span></div>
+            <div class="gate"><b>运营层</b><span>监控、日志、告警、灰度、数据校验、回滚或前向修复演练。</span><span class="pass">有证据</span></div>
+          </div>
+          <div class="callout danger"><strong>发布禁区：</strong>“Agent 说测试通过”不是证据。保留测试输出、制品版本、迁移结果、关键路径截图/日志、监控验证和签字结论。权限、计费、数据不可逆迁移不得仅依赖 AI Review。</div>
+          <h3>上线后</h3>
+          <ol><li>运行 Smoke Test 和关键业务校验。</li><li>观察错误率、延迟、任务积压、关键业务指标和异常日志。</li><li>确认数据迁移数量和约束。</li><li>关闭发布观察窗口后，将 V1.1 标为新生产基线。</li><li>运行 <code>bmad-retrospective</code>，记录经验与遗留项。</li></ol>
+        </section>
+
+        <section id="course">
+          <span class="tag">异常路径</span>
+          <h2>中途发现变化时，先判断错在第几层</h2>
+          <div class="table-wrap"><table>
+            <thead><tr><th>发现</th><th>正确回退层</th><th>动作</th></tr></thead>
+            <tbody>
+              <tr><td>用户真正想要的不是当前功能</td><td>SPEC / PRD</td><td>停止 Story，修正意图和业务规则，再重做受影响下游</td></tr>
+              <tr><td>操作路径或状态反馈不成立</td><td>UX</td><td>更新体验事实，重新核对 Story AC 和 E2E</td></tr>
+              <tr><td>现有架构无法安全支持</td><td>Architecture</td><td>新增 ADR、迁移和回滚方案，再执行 Readiness</td></tr>
+              <tr><td>需求正确，但实现出现 Bug</td><td>Dev Story</td><td>修代码和测试，不改上游来迁就错误实现</td></tr>
+              <tr><td>发现无关历史缺陷</td><td>Deferred Work</td><td>记录并单独排期，不扩大当前 Story</td></tr>
+            </tbody>
+          </table></div>
+          <p>当变化会影响多个 Story、Sprint 范围或上游事实时，运行：</p>
+          <pre><button class="copy" type="button">复制</button><code>bmad-correct-course</code></pre>
+          <p>输出应说明：触发原因、受影响产物、已完成工作如何处理、哪些 Story 作废/重写/新增、重新进入哪个 Gate。</p>
+        </section>
+
+        <section id="example">
+          <span class="tag">完整示例</span>
+          <h2>示例：V1.1 增加三个小功能</h2>
+          <p class="lead">假设 V1 是一个已上线的运营管理应用。本次希望增加筛选记忆、CSV 导出和导出权限控制。</p>
+          <div class="table-wrap"><table>
+            <thead><tr><th>功能</th><th>影响</th><th>级别</th><th>推荐处理</th></tr></thead>
+            <tbody>
+              <tr><td>F1：列表记住上次筛选</td><td>现有页面 + 用户偏好持久化</td><td>B</td><td>UX 局部更新；确认存储位置；独立 Story；单元 + E2E</td></tr>
+              <tr><td>F2：当前结果导出 CSV</td><td>页面、API、异步任务、性能</td><td>B</td><td>PRD 增量 + UX 状态 + Architecture ADR；独立 Story</td></tr>
+              <tr><td>F3：只有特定角色可导出</td><td>权限、审计、安全</td><td>C</td><td>PRD/UX/Architecture 全部核对；权限负向测试；审计证据</td></tr>
+            </tbody>
+          </table></div>
+          <h3>建议 Epic 与顺序</h3>
+          <pre><button class="copy" type="button">复制</button><code>Epic V1.1：运营列表效率与受控导出
+
+Story 1：用户重新进入列表时恢复其上次有效筛选
+Story 2：有权限的用户导出当前筛选结果
+Story 3：系统按角色限制导出并记录审计事件
+
+推荐顺序：Story 1 → Story 3 → Story 2
+理由：先稳定筛选合同，再建立权限边界，最后开放使用该边界的导出能力。</code></pre>
+          <h3>示例验收标准</h3>
+          <div class="grid-2">
+            <div class="card"><h4>Story 2：正向 AC</h4><ol><li>导出内容与当前有效筛选、排序和用户可见字段一致。</li><li>大数据量走既定异步机制，并给出可理解状态。</li><li>文件生成成功、失败和过期均有明确反馈。</li><li>导出不会暴露用户无权查看的数据。</li></ol></div>
+            <div class="card"><h4>Story 2：负向与回归</h4><ol><li>无权限用户无法从 UI 或直接 API 绕过。</li><li>筛选条件失效时安全拒绝或回退，不导出错误全集。</li><li>导出失败不影响列表查询和 V1 既有操作。</li><li>重复请求、超时和任务重试不会生成错误审计或重复扣费。</li></ol></div>
+          </div>
+          <div class="callout success"><strong>可见结果：</strong>即使三个功能规模都不大，仍由一个 V1.1 SPEC 管理组合边界，三个 Story 分别关闭。这样某个功能延期时，不会让另外两个功能的完成状态变得含糊。</div>
+        </section>
+
+        <section id="prompts">
+          <span class="tag">操作台</span>
+          <h2>可直接复制的工作流提示词</h2>
+          <p class="lead">以下内容应输入 AI IDE 对话，而不是在 PowerShell 或终端中执行。每个工作流建议开启新对话。</p>
+          <details open><summary>0. 先让 BMad Help 识别项目状态</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-help
+
+这是一个已经通过完整 BMAD 流程开发并上线的 V1 项目。现在计划以 V1.1 增加 2–3 个小功能。请检查现有 BMAD 产物、project-context.md、生产代码和 Sprint 状态，判断本机安装版本中可用的增量工作流，不要重跑无关的 V1 阶段。</code></pre></div></details>
+          <details><summary>1. 创建 V1.1 SPEC</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-spec
+
+请为已上线 V1 创建 V1.1 增量 SPEC。只表达相对 V1 的变更；以生产代码和已确认最终文档为输入；发现冲突先报告；覆盖 Non-goals、兼容、回归、迁移、监控、回滚和每个功能的成功信号。</code></pre></div></details>
+          <details><summary>2. 生成增量 Epic 与 Stories</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-create-epics-and-stories
+
+仅针对 V1.1 SPEC 生成一个增量 Epic 和可独立验收的 Stories。读取 V1 架构、受影响的 PRD/UX 增量、project-context.md 和生产代码。不得重复生成已上线 V1 的历史 Story。</code></pre></div></details>
+          <details><summary>3. Readiness Gate</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-check-implementation-readiness
+
+只审计 V1.1 变更集与 V1 生产基线的一致性。检查范围、UX、架构、数据/API/权限、Story AC、依赖、测试、回归、迁移、监控和回滚。输出 PASS / CONCERNS / FAIL；任何冲突不得自行修正。</code></pre></div></details>
+          <details><summary>4. 开发单个 Story</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-create-story
+
+目标 Story：[填写编号与名称]。读取 V1.1 SPEC、相关正式上游、project-context.md、前序 Story 和现有代码。生成 ready-for-dev Story，补全可测试 AC、任务、架构约束、文件范围、测试和回归要求。</code></pre><pre><button class="copy" type="button">复制</button><code>bmad-dev-story
+
+实现 Story：[填写 Story 文件路径]。严格按 AC 和任务执行；不处理无关缺陷；同步实现测试；运行验证；更新完成说明、调试记录和文件清单；无法确定的产品或架构决策必须停止并报告。</code></pre></div></details>
+          <details><summary>5. 审查单个 Story</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-code-review
+
+审查 Story：[填写 Story 文件路径]。对照实际 Git 变更逐项验证 AC、任务勾选、文件清单、project-context、架构约束、测试和 V1 回归。Critical/High 未清零不得批准；无关历史问题进入 deferred work。</code></pre></div></details>
+          <details><summary>6. Epic 发布前验证</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-qa-generate-e2e-tests
+
+针对 V1.1 增量 Epic 生成并运行 API/E2E 测试，同时覆盖受影响的 V1 关键路径。输出测试范围、运行结果、失败修复和仍未覆盖的风险，不得把“测试已生成”当作“测试已通过”。</code></pre></div></details>
+        </section>
+
+        <section id="structure">
+          <span class="tag">文件组织</span>
+          <h2>推荐的增量产物目录</h2>
+          <pre><code>project-root/
+├─ src/                              # V1 生产代码与 V1.1 增量代码
+├─ tests/                            # 自动化测试
+├─ _bmad-output/
+│  ├─ project-context.md             # 项目级长期实现约束
+│  ├─ planning-artifacts/
+│  │  ├─ ...                         # V1 最终事实源，保留或归档
+│  │  └─ iteration-v1.1/
+│  │     ├─ BASELINE.md              # V1 生产基线与已知漂移
+│  │     ├─ SPEC.md                  # V1.1 增量合同
+│  │     ├─ CHANGE-MATRIX.md         # 新增/修改/废弃/不变
+│  │     ├─ prd-addendum.md           # 仅在业务事实变化时
+│  │     ├─ ux-addendum.md            # 仅在体验事实变化时
+│  │     ├─ architecture-addendum.md  # 仅在技术决定变化时
+│  │     ├─ epics.md
+│  │     └─ readiness-report.md
+│  └─ implementation-artifacts/
+│     └─ iteration-v1.1/
+│        ├─ sprint-status.yaml
+│        ├─ story-1-*.md
+│        ├─ story-2-*.md
+│        ├─ story-3-*.md
+│        ├─ deferred-work.md
+│        ├─ regression-evidence.md
+│        └─ release-gate.md
+└─ docs/
+   └─ current-system/                # 上线后更新为 V1.1 真实现状</code></pre>
+          <div class="callout warn"><strong>兼容提醒：</strong>具体目录名受你安装的 BMAD 版本和项目配置影响。不要为了匹配本示意图强行移动现有产物。关键是区分 V1 定稿、V1.1 规划和 V1.1 实施证据。</div>
+        </section>
+
+        <section id="gates">
+          <span class="tag">质量体系</span>
+          <h2>把“建议工作流”变成强制质量门禁</h2>
+          <div class="table-wrap"><table>
+            <thead><tr><th>门禁</th><th>进入条件</th><th>退出条件</th><th>失败后回到</th></tr></thead>
+            <tbody>
+              <tr><td>G0 Baseline</td><td>V1 已上线</td><td>生产现状、文档漂移和回归资产可定位</td><td>项目文档梳理</td></tr>
+              <tr><td>G1 Intent</td><td>功能输入可解释</td><td>SPEC 确认，Non-goals 与成功信号明确</td><td>需求澄清</td></tr>
+              <tr><td>G2 Impact</td><td>SPEC 已确认</td><td>PRD/UX/Architecture 更新边界确认</td><td>相应事实源</td></tr>
+              <tr><td>G3 Readiness</td><td>Stories 已生成</td><td>PASS；Concern 有责任人与处理结论</td><td>规划产物</td></tr>
+              <tr><td>G4 Story</td><td>ready-for-dev</td><td>AC、测试、Review 和记录全部关闭</td><td>Create/Dev Story</td></tr>
+              <tr><td>G5 Release</td><td>Epic Stories 全部完成</td><td>回归、NFR、迁移、监控、回滚与签字通过</td><td>Story、架构或计划</td></tr>
+              <tr><td>G6 Observation</td><td>已发布</td><td>观察窗口指标稳定并建立 V1.1 基线</td><td>回滚/前向修复</td></tr>
+            </tbody>
+          </table></div>
+          <h3>Definition of Done 建议</h3>
+          <div class="grid-2">
+            <div class="card"><h4>单 Story Done</h4><ul><li>所有 AC 有验证证据</li><li>任务勾选与实际代码一致</li><li>相关测试已运行并通过</li><li>Critical / High 审查问题清零</li><li>File List 和 Completion Notes 完整</li><li>无关工作已延期记录</li></ul></div>
+            <div class="card"><h4>V1.1 Release Done</h4><ul><li>全部 Story Done</li><li>跨 Story 与 V1 回归通过</li><li>迁移和回滚完成验证</li><li>权限与数据边界完成负向验证</li><li>监控、告警和观察窗口明确</li><li>发布结论和新基线已记录</li></ul></div>
+          </div>
+        </section>
+
+        <section id="checklist">
+          <span class="tag">执行看板</span>
+          <h2>V1.1 可勾选执行清单</h2>
+          <p class="lead">勾选状态仅保存在当前页面会话中。刷新页面会重置，适合演练和打印签字。</p>
+          <div class="progress"><div id="progressBar"></div></div>
+          <div class="small" id="progressText">0 / 0 已完成</div>
+          <div class="checklist">
+            <label class="check"><input type="checkbox" class="task"><span>G0：V1 生产版本、代码、数据、接口、权限和测试基线已冻结。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G1：三个功能已分别分级，V1.1 SPEC 已确认。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G1：Non-goals、兼容边界、成功信号和回归面明确。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G2：PRD、UX、Architecture 的更新/不更新理由已记录。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G2：Project Context 已核对，未把临时实现写成长期规则。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G3：增量 Epic/Stories 已生成，依赖和测试映射明确。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G3：Implementation Readiness 通过，Concerns 已关闭或接受。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G4：每个 Story 均完成 Create → Dev → Review → 修复 → 复审。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G4：Critical/High 清零，Story 文件记录与实际 Git 变更一致。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G5：单元、集成、API、E2E、V1 回归和 NFR 证据齐全。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G5：迁移、监控、告警、灰度和回滚/前向修复已验证。</span></label>
+            <label class="check"><input type="checkbox" class="task"><span>G6：上线观察完成，V1.1 已成为新基线并完成 Retrospective。</span></label>
+          </div>
+        </section>
+
+        <section id="faq">
+          <span class="tag">FAQ</span>
+          <h2>常见误区与处理</h2>
+          <details open><summary>2–3 个小功能必须重新跑 PRD、UX、Architecture 吗？</summary><div><p>不需要。先做影响分析，只更新被改变的事实源。局部 UI 调整可能只需要 Quick Dev；业务规则、数据、权限或架构变化才逐级提高流程强度。</p></div></details>
+          <details><summary>必须生成正式 SPEC.md 吗？</summary><div><p>官方对小更新允许直接 Quick Dev。本教程为“一个版本同时交付 2–3 个功能”增加迭代级 SPEC，是为了锁定组合边界和发布范围。若三个功能完全独立，也可以各自用 Quick Dev 生成 <code>spec-*.md</code>，但仍要有一个发布清单和回归门禁。</p></div></details>
+          <details><summary>为什么不建议一次 Quick Dev 做完三个功能？</summary><div><p>Quick Dev 强调一个连贯目标。多个独立目标会模糊完成状态、扩大审查面，并让无关问题混入当前交付。每个功能单独运行，更容易回滚、Review 和延期。</p></div></details>
+          <details><summary>旧 BMAD 规划产物应该删除吗？</summary><div><p>不要在本次任务中直接删除。既有项目指南允许归档或依赖版本历史，但这是清理操作，应先只读审计、确认恢复方式后单独执行。当前教程推荐保留 V1 定稿并新建 V1.1 增量目录。</p></div></details>
+          <details><summary>代码现状和 V1 文档不一致怎么办？</summary><div><p>先记录漂移。生产现状描述“现在是什么”，正式文档描述“已确认的意图”。判断漂移是未回写的合法变化还是产品缺陷，再更新正确的事实源。不要让新 Story 隐式选择一方。</p></div></details>
+          <details><summary>何时必须使用 Correct Course？</summary><div><p>当变化影响多个 Story、Sprint 范围、上游产品事实、关键 UX 或架构决定时使用。单纯编码 Bug 留在 Dev Story 内修复。</p></div></details>
+          <details><summary>BMAD 能保证上线质量吗？</summary><div><p>不能。BMAD 提供上下文、门禁和审查流程，真正的质量仍依赖可执行测试、独立 Review、CI、人工验收、监控、迁移与回滚证据。把推荐步骤设成强制 Gate，才形成工程质量体系。</p></div></details>
+        </section>
+
+        <section>
+          <div class="callout success"><strong>最终记忆句：</strong>已上线产品做增量，不是“重新规划整个产品”，也不是“直接让 Agent 改代码”。正确做法是：冻结当前事实，锁定增量意图，只更新受影响的事实源，然后按独立 Story 开发、审查、回归和发布。</div>
+          <p class="small">教程基于 2026 年 7 月 BMAD V6 的工作流命名与既有项目方法整理。不同安装版本可能保留旧命令别名，请先用 <code>bmad-help</code> 检查本项目实际可用工作流。本文件不加载任何在线资源。</p>
+        </section>
+      </main>
+
+      <footer class="footer">BMAD 已上线 V1 增量开发教程 · 单文件离线版 · 2026-07-22</footer>
+    </div>
+  </div>
+
+  <button class="btn primary mobile-menu no-print" id="menuBtn" type="button">目录</button>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const themeBtn = document.getElementById('themeBtn');
+      const sidebar = document.getElementById('sidebar');
+      const menuBtn = document.getElementById('menuBtn');
+
+      themeBtn.addEventListener('click', function () {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+      });
+      menuBtn.addEventListener('click', function () { sidebar.classList.toggle('open'); });
+      document.querySelectorAll('nav a').forEach(function (a) {
+        a.addEventListener('click', function () { sidebar.classList.remove('open'); });
+      });
+
+      document.querySelectorAll('.copy').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const text = button.parentElement.querySelector('code').innerText;
+          const done = function () {
+            const old = button.textContent; button.textContent = '已复制';
+            setTimeout(function () { button.textContent = old; }, 1200);
+          };
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
+          } else { fallbackCopy(text, done); }
+        });
+      });
+      function fallbackCopy(text, done) {
+        const area = document.createElement('textarea');
+        area.value = text; area.style.position = 'fixed'; area.style.opacity = '0';
+        document.body.appendChild(area); area.select();
+        try { document.execCommand('copy'); done(); } finally { area.remove(); }
+      }
+
+      const routeBtn = document.getElementById('routeBtn');
+      const routeResult = document.getElementById('routeResult');
+      routeBtn.addEventListener('click', function () {
+        const values = Array.from(document.querySelectorAll('#routeOptions input:checked')).map(function (x) { return Number(x.value); });
+        const score = values.length ? Math.max.apply(null, values) : 0;
+        if (!score) routeResult.innerHTML = '<b>推荐：先补充影响信息</b><br>没有勾选任何影响，无法安全判断。';
+        else if (score === 1) routeResult.innerHTML = '<b>A 级：每个功能单独使用 Quick Dev</b><br>保持单一目标，批准短 Spec 后实现、测试和 Review；仍需纳入 V1.1 发布回归。';
+        else if (score === 2) routeResult.innerHTML = '<b>B 级：采用本教程的轻量完整增量链</b><br>一个 V1.1 SPEC 管范围，每个功能独立 Story，选择性更新 UX/Architecture，并执行 Readiness。';
+        else routeResult.innerHTML = '<b>C 级：升级为正式变更链</b><br>必须更新受影响的 PRD、UX、Architecture，关闭权限/数据/安全决策后才能开发。';
+      });
+
+      const tasks = Array.from(document.querySelectorAll('.task'));
+      const bar = document.getElementById('progressBar');
+      const text = document.getElementById('progressText');
+      function updateProgress() {
+        const done = tasks.filter(function (x) { return x.checked; }).length;
+        const percent = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+        bar.style.width = percent + '%'; text.textContent = done + ' / ' + tasks.length + ' 已完成（' + percent + '%）';
+      }
+      tasks.forEach(function (x) { x.addEventListener('change', updateProgress); });
+      updateProgress();
+
+      const links = Array.from(document.querySelectorAll('nav a'));
+      const sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+      function spy() {
+        let current = sections[0];
+        sections.forEach(function (s) { if (s.getBoundingClientRect().top <= 120) current = s; });
+        links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + current.id); });
+      }
+      window.addEventListener('scroll', spy, { passive: true }); spy();
+    }());
+  </script>
+</body>
+</html>

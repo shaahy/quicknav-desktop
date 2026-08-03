@@ -1,0 +1,12 @@
+{
+  "source_mockup": null,
+  "source_plan": "执行计划.md",
+  "mode": "freeform",
+  "html_file": "obra-superpowers-v6.1.1-14技能速查.html",
+  "pretext_tier": "simple-layout-prepare-layout",
+  "framework": "vanilla",
+  "iterations": 1,
+  "date": "2026-07-21",
+  "screen": "obra-superpowers-skills-cheatsheet",
+  "branch": "not-a-git-repository"
+}

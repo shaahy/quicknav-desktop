@@ -48,7 +48,7 @@
 
 - [ ] T009 [P] 定义全部 TypeScript 类型和接口（Card、Category、FileReference、ViewOrder、AppData、ViewType、SurfaceId、ComponentKey、IpcResult<T>），写入 src/shared/types.ts
   - 📐 数据来源: data-model.md 实体定义 + contracts/system-bridge.md IPC 签名
-- [ ] T010 [P] 定义全部常量（卡片名最长 80 字符、类别名最长 30 字符、备注最长 500 字符、最多 500 张卡片、最多 50 个类别、保留名称列表、托盘提示文案等），写入 src/shared/constants.ts
+- [ ] T010 [P] 定义全部常量（卡片名最长 80 字符、类别名最长 30 字符、备注最长 500 字符、最多 500 张卡片、最多 50 个类别、保留名称列表等），写入 src/shared/constants.ts
 - [ ] T011 [P] 实现全部校验函数（校验卡片名、校验类别名、校验备注、检测是否有未保存修改、检测文件名是否重复），写入 src/shared/validation.ts
   - 📐 数据来源: data-model.md 校验规则 + spec.md FR-006/FR-013/FR-032
 
@@ -61,11 +61,11 @@
 
 ### Electron 主进程
 
-- [ ] T013 实现 Electron 主进程入口：创建 BrowserWindow（默认 1024×720，最小 760×560），锁定单窗口模式，冷启动进入"全部卡片"，写入 src/main/index.ts
+- [ ] T013 实现 Electron 主进程入口：创建 BrowserWindow（默认 1024×720，最小 760×560），获取单实例锁，重复启动时恢复并聚焦已有窗口，冷启动进入"全部卡片"，写入 src/main/index.ts
   - 🖐 行为来源: spec.md FR-019/FR-020 + contracts/system-bridge.md
-- [ ] T014 [P] 实现系统托盘：关闭窗口时最小化到托盘（不退出进程），右键菜单含"退出"，点击托盘图标恢复窗口，退出时将数据保存后退出进程，写入 src/main/index.ts（tray 区域）
-  - 🖐 行为来源: spec.md FR-036b + Edge Cases 系统托盘行为
-  - 🔍 CHK010: 在托盘相关代码注释中明确声明——"窗口关闭到托盘时不写盘（数据保持在内存），仅退出时写盘"
+- [ ] T014 [P] 实现应用生命周期：关闭窗口时彻底退出主进程及全部 Electron 子进程，不创建系统托盘，应用内"退出"保持相同行为，写入 src/main/index.ts
+  - 🖐 行为来源: spec.md FR-036b + Edge Cases 应用生命周期行为
+  - 🔍 CHK010: 在生命周期相关代码中明确声明——窗口关闭不得被拦截为后台隐藏
 - [ ] T015 [P] 实现 preload 脚本：通过 contextBridge.exposeInMainWorld 暴露全部 6 个 IPC 通道给渲染进程，写入 src/preload/index.ts
   - 📐 接口来源: contracts/system-bridge.md IPC Channel Registry
 
@@ -114,7 +114,7 @@
 - [ ] T027 [US1] 实现 app-shell 组件，按契约实现全部 props 和角色，写入 src/renderer/components/app-shell.tsx
   - 📐 契约: contracts/components.md#app-shell（loadingState / retryLoad / quitApp props | role="application"）
   - 🎨 视觉: DESIGN.md → `{components.app-shell}`（canvas / surface / divider）
-  - 🖐 行为: EXPERIENCE.md → Component Patterns#app-shell（冷启动进入 S01、托盘恢复保持状态、加载中禁止所有交互）
+  - 🖐 行为: EXPERIENCE.md → Component Patterns#app-shell（冷启动进入 S01、重复启动聚焦现有窗口、加载中禁止所有交互）
   - 🔍 CHK019: app-shell 加载完成后，所有文件操作入口**不得**在任何时机调用文件存在性检查——此约束在组件注释中显式声明
   - ✅ WCAG 自检: axe DevTools 扫描通过
 
@@ -390,7 +390,7 @@
 
 ## 第七阶段：润色与跨领域关注点
 
-**目标**: 无障碍审计、跨平台一致性、系统托盘、响应式布局、边界案例、性能验证、需求质量合规审计。
+**目标**: 无障碍审计、跨平台一致性、应用生命周期、响应式布局、边界案例、性能验证、需求质量合规审计。
 
 ### 无障碍审计
 
@@ -416,11 +416,11 @@
 - [ ] T089 跨平台验证：在 Windows 10+ (x64) 和 macOS 12+ (x64+arm64) 上分别执行全部 4 条用户旅程 E2E 测试；验证系统原生对话框（X01/X02/X03/X04）遵循各平台规范；增补 X04 子验证项——OS 安全提示结束后焦点回到原 file-card 主体，不落在对话框或空白区域（CHK M3）
   - 📐 验证标准: spec.md SC-005 + FR-034
 
-### 系统托盘与生命周期
+### 单实例与退出生命周期
 
-- [ ] T090 验证系统托盘行为：关闭窗口→最小化到托盘（进程保持）、点击托盘图标→恢复到关闭前的界面状态、托盘恢复时若原类别/卡片已被删除→回退到 S01 全部卡片（CHK042）、右键托盘→"退出"→保存数据后退出进程、冷启动→进入"全部卡片"，写入 tests/e2e/tray.spec.ts
+- [ ] T090 验证应用生命周期：关闭窗口→全部相关进程退出、应用内"退出"→全部相关进程退出、重复启动→不新增进程组并聚焦已有窗口、冷启动→进入"全部卡片"，写入 tests/e2e/lifecycle.spec.ts
   - 📐 验证标准: spec.md FR-036b + quickstart.md VS-5
-  - 🔍 CHK042: 托盘恢复时原上下文已失效→安全降级到 S01
+  - 🔍 CHK042: 重复启动时已有窗口最小化→恢复、显示并聚焦同一窗口
 
 ### 数据持久化
 
@@ -466,7 +466,7 @@
            第六阶段（US4: P3）← T079（保存失败阻断 Surface）、T071（error-dialog 新增 save-failed 变体）
                    │
                    ▼
-           第七阶段（润色）← T085（CHK020 文案审计）、T086（CHK019 代码路径审计）、T090（CHK042 托盘恢复降级）、T095（CHK032 并发安全）
+           第七阶段（润色）← T085（CHK020 文案审计）、T086（CHK019 代码路径审计）、T090（CHK042 单实例聚焦）、T095（CHK032 并发安全）
 ```
 
 - **第四和第五阶段可并行开发**（不同文件、不同 Surface、无代码依赖）

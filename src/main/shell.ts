@@ -11,19 +11,19 @@ import type {
   ScannedFile,
 } from '../shared/types'
 import { HTML_READ_SIZE } from '../shared/constants'
+import { resolveRelativeToAppData, resolveStoredPath } from './app-data-location'
 
 const DEV_RENDERER_ENV_KEYS = ['ELECTRON_RENDERER_URL', 'VITE_DEV_SERVER_URL'] as const
 let openPathQueue: Promise<void> = Promise.resolve()
 
 function resolveFromDataDir(dataDir: string, relativePath: string): string {
-  return path.resolve(dataDir, relativePath)
+  return resolveStoredPath(dataDir, relativePath)
 }
 
-function makeRelativeToDataDir(dataDir: string, absolutePath: string): string | null {
+function makeStoredPath(dataDir: string, absolutePath: string): string {
   const relativePath = path.relative(dataDir, absolutePath)
-  // Windows has no relative path between different drive letters.
-  if (path.isAbsolute(relativePath)) return null
-  return relativePath.replace(/\\/g, '/').normalize('NFC')
+  const storedPath = path.isAbsolute(relativePath) ? absolutePath : relativePath
+  return storedPath.replace(/\\/g, '/').normalize('NFC')
 }
 
 const SCAN_EXTENSIONS: Record<ScanFileType, ReadonlySet<string>> = {
@@ -33,6 +33,8 @@ const SCAN_EXTENSIONS: Record<ScanFileType, ReadonlySet<string>> = {
   excel: new Set(['xls', 'xlsx']),
   markdown: new Set(['md']),
 }
+
+const MAX_SCAN_DEPTH = 1
 
 function readHtmlTitleFromAbsolutePath(absolutePath: string): string | null {
   try {
@@ -68,13 +70,7 @@ export async function selectFile(
   try {
     const stat = fs.statSync(filePath)
     const ext = path.extname(filePath).replace('.', '').toLowerCase()
-    const relativePath = makeRelativeToDataDir(dataDir, filePath)
-    if (relativePath === null) {
-      return {
-        canceled: false,
-        error: '所选文件与工具不在同一磁盘，无法创建相对路径',
-      }
-    }
+    const relativePath = makeStoredPath(dataDir, filePath)
     return {
       canceled: false,
       file: {
@@ -104,13 +100,7 @@ export async function selectScanFolder(
   }
 
   const displayPath = result.filePaths[0]
-  const relativePath = makeRelativeToDataDir(dataDir, displayPath)
-  if (relativePath === null) {
-    return {
-      canceled: false,
-      error: '所选文件夹与工具不在同一磁盘，无法创建相对路径',
-    }
-  }
+  const relativePath = makeStoredPath(dataDir, displayPath)
 
   return {
     canceled: false,
@@ -140,7 +130,7 @@ export async function scanFolder(
   const files: ScannedFile[] = []
   let skippedEntries = 0
 
-  const visit = async (directoryPath: string): Promise<void> => {
+  const visit = async (directoryPath: string, depth: number): Promise<void> => {
     let entries: fs.Dirent[]
     try {
       entries = await fs.promises.readdir(directoryPath, { withFileTypes: true })
@@ -157,7 +147,9 @@ export async function scanFolder(
         continue
       }
       if (entry.isDirectory()) {
-        await visit(absolutePath)
+        if (depth < MAX_SCAN_DEPTH) {
+          await visit(absolutePath, depth + 1)
+        }
         continue
       }
       if (!entry.isFile()) continue
@@ -167,11 +159,7 @@ export async function scanFolder(
 
       try {
         const stat = await fs.promises.stat(absolutePath)
-        const relativePath = makeRelativeToDataDir(dataDir, absolutePath)
-        if (relativePath === null) {
-          skippedEntries += 1
-          continue
-        }
+        const relativePath = makeStoredPath(dataDir, absolutePath)
         const fileName = path.basename(entry.name, path.extname(entry.name))
         const isHtml = extension === 'html' || extension === 'htm'
         const suggestedName = isHtml
@@ -201,14 +189,14 @@ export async function scanFolder(
     return { files: [], skippedEntries: 0, error: '无法访问所选文件夹' }
   }
 
-  await visit(rootPath)
+  await visit(rootPath, 0)
   files.sort((left, right) => left.relativePath.localeCompare(right.relativePath, 'zh-CN'))
   return { files, skippedEntries }
 }
 
-export async function openFile(relativePath: string, dataDir: string): Promise<OpenResult> {
+export async function openFile(relativePath: string, appDataPath: string): Promise<OpenResult> {
   // CRITICAL: Do NOT pre-check file existence (CHK019, constitution III)
-  const absolutePath = resolveFromDataDir(dataDir, relativePath)
+  const absolutePath = resolveRelativeToAppData(appDataPath, relativePath)
   const nativePath = process.platform === 'win32'
     ? absolutePath.replace(/\//g, '\\')
     : absolutePath

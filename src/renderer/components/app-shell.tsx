@@ -8,7 +8,11 @@ import type {
   ReorderItem,
   ViewType,
 } from '@shared/types'
-import { VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '@shared/constants'
+import {
+  VIEW_ALL_CARDS,
+  VIEW_FAVORITES,
+  VIEW_UNCATEGORIZED,
+} from '@shared/constants'
 import { normalizePath } from '@shared/validation'
 import { useAppState, useAppDispatch } from '../contexts/AppState'
 import { useCards } from '../hooks/useCards'
@@ -65,6 +69,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
     addCard,
     addCardsBatch,
     updateCard,
+    setFavorite,
     deleteCard,
     findDuplicateByPath,
   } = useCards()
@@ -83,12 +88,14 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   } = useFileRepair()
 
   const retryRef = useRef<HTMLButtonElement>(null)
+  const favoriteFocusTargetRef = useRef<string | 'favorites-empty' | null>(null)
 
   // ── CategoryNav views ──
 
   const categoryNavViews = useMemo<CategoryNavView[]>(() => {
     const result: CategoryNavView[] = [
       { id: VIEW_ALL_CARDS, name: '全部卡片', type: 'system' },
+      { id: VIEW_FAVORITES, name: '我的收藏', type: 'system' },
       ...categories.map(c => ({
         id: `category:${c.id}` as const,
         name: c.name,
@@ -322,6 +329,40 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
     [state.currentView, state.data.cards, updateCard, showStatusBar]
   )
 
+  const handleSetFavorite = useCallback(
+    async (cardId: string, isFavorite: boolean) => {
+      let focusTargetId: string | null = null
+      const shouldRestoreFocus =
+        !isFavorite &&
+        state.currentView === VIEW_FAVORITES &&
+        state.searchQuery.trim().length === 0
+
+      if (shouldRestoreFocus) {
+        const index = visibleCards.findIndex(card => card.id === cardId)
+        focusTargetId =
+          visibleCards[index + 1]?.id ??
+          visibleCards[index - 1]?.id ??
+          null
+        favoriteFocusTargetRef.current = focusTargetId ?? 'favorites-empty'
+      }
+
+      const success = await setFavorite(cardId, isFavorite)
+      if (!success) {
+        favoriteFocusTargetRef.current = null
+        return
+      }
+
+      showStatusBar(isFavorite ? '已收藏' : '已取消收藏')
+    },
+    [
+      setFavorite,
+      showStatusBar,
+      state.currentView,
+      state.searchQuery,
+      visibleCards,
+    ]
+  )
+
   // ── Menu items computed lazily when menu is open ──
 
   const menuItems = useMemo<MenuItem[]>(() => {
@@ -369,6 +410,17 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
       },
     ]
 
+    if (card) {
+      items.push({
+        id: card.isFavorite ? 'unfavorite' : 'favorite',
+        label: card.isFavorite ? '取消收藏' : '收藏',
+        variant: 'default' as const,
+        onClick: () => {
+          handleSetFavorite(menuCardId, !card.isFavorite)
+        },
+      })
+    }
+
     // "移出当前类别" when viewing a category and card has multiple categories
     if (
       categoryId &&
@@ -396,7 +448,15 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
     })
 
     return items
-  }, [menuCardId, state.data.cards, state.currentView, handleRemoveFromCategory, incrementFailure, resetFailureCount])
+  }, [
+    menuCardId,
+    state.data.cards,
+    state.currentView,
+    handleRemoveFromCategory,
+    handleSetFavorite,
+    incrementFailure,
+    resetFailureCount,
+  ])
 
   // ── Card editing (S11) ──
 
@@ -570,6 +630,11 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
     search.setSearchQuery('')
   }, [search])
 
+  const handleViewAllCards = useCallback(() => {
+    search.setSearchQuery('')
+    dispatch({ type: 'SET_CURRENT_VIEW', viewType: VIEW_ALL_CARDS })
+  }, [dispatch, search])
+
   // ── Save error handler ──
 
   const handleSaveErrorRetry = useCallback(() => {
@@ -643,6 +708,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
 
   const hasActiveSearch = state.searchQuery.trim().length > 0
   const isCategoryView = state.currentView.startsWith('category:')
+  const isFavoritesView = state.currentView === VIEW_FAVORITES
 
   // ── Cards to display ──
   // When search is active, use scored results from useSearch (across ALL cards,
@@ -689,6 +755,28 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
   const handleCardReorderCancel = useCallback(() => {
     setIsCardReorderMode(false)
   }, [])
+
+  useEffect(() => {
+    const target = favoriteFocusTargetRef.current
+    if (!target) return
+
+    const frame = window.requestAnimationFrame(() => {
+      if (target === 'favorites-empty') {
+        document
+          .querySelector<HTMLButtonElement>('.qc-empty-state__action--primary')
+          ?.focus()
+      } else {
+        document
+          .querySelector<HTMLElement>(
+            `[data-card-id="${target}"] .qc-file-card__body`
+          )
+          ?.focus()
+      }
+      favoriteFocusTargetRef.current = null
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [visibleCards])
 
   // ── Focus retry button on error for initial focus ──
 
@@ -827,6 +915,7 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
                 viewType={state.currentView}
                 onOpenFile={handleOpenFile}
                 onShowMenu={handleShowMenu}
+                onSetFavorite={handleSetFavorite}
                 isReorderMode={false}
               />
             ))}
@@ -839,8 +928,18 @@ export function AppShell({ loadingState, retryLoad, quitApp, loadError, rebuildD
           />
         ) : (
           <EmptyState
-            variant={isCategoryView ? 'category-empty' : 'first-launch'}
-            primaryAction={{ label: '新建卡片', onClick: handleSelectFile }}
+            variant={
+              isFavoritesView
+                ? 'favorites-empty'
+                : isCategoryView
+                  ? 'category-empty'
+                  : 'first-launch'
+            }
+            primaryAction={
+              isFavoritesView
+                ? { label: '查看全部卡片', onClick: handleViewAllCards }
+                : { label: '新建卡片', onClick: handleSelectFile }
+            }
           />
         )}
 

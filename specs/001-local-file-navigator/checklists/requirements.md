@@ -34,7 +34,7 @@
 - 全部 44 条 FR（含 clarifications + 审查修复新增）均有对应来源
 - 4 条 User Story（17 个验收场景）覆盖 PRD 的 4 条用户旅程
 - 7 条 Success Criteria 覆盖 PRD 的 NFR-001 ~ NFR-007
-- 18 个 Edge Cases，含数据损坏、系统托盘行为、status-bar 计时
+- 18 个 Edge Cases，含数据损坏、单实例与退出生命周期、status-bar 计时
 - 3 条 Clarifications + 11 项交叉审查修复 (2026-07-22)：阻断 2 + 重要 4 + 建议 5
 - 新增"外部系统交互契约"集中记录 X01-X04 来源-落点映射
 - 新增"FR-组件映射"关联 spec FR 与 DESIGN.md / EXPERIENCE.md 的 20 个具名组件

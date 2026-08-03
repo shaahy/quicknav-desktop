@@ -6,6 +6,7 @@ export interface Card {
   note: string | null     // ≤500 chars, null when empty/whitespace-only
   fileReference: FileReference
   categoryIds: string[]   // at least 1 user category ID, never includes uncategorized
+  isFavorite: boolean     // membership in the system "我的收藏" view
   createdAt: string       // ISO 8601
   updatedAt: string       // ISO 8601
 }
@@ -19,14 +20,14 @@ export interface Category {
 }
 
 export interface FileReference {
-  relativePath: string    // relative to app-data.json directory; forward slashes, NFC
+  relativePath: string    // same-drive: relative to app-data.json; cross-drive: absolute; forward slashes, NFC
   fileName: string        // without extension
   extension: string       // without dot, '' if none
   fileSize: number        // bytes, for identity check
   mtimeMs: number         // modification timestamp, for identity check
 }
 
-export type ViewType = 'allCards' | `category:${string}` | 'uncategorized'
+export type ViewType = 'allCards' | 'favorites' | `category:${string}` | 'uncategorized'
 
 export interface ViewOrder {
   viewType: ViewType
@@ -34,7 +35,7 @@ export interface ViewOrder {
 }
 
 export interface AppData {
-  version: 2
+  version: 3
   cards: Card[]
   categories: Category[]
   viewOrders: ViewOrder[]

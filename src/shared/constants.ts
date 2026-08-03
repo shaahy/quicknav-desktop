@@ -5,9 +5,10 @@ export const MAX_CARDS = 500
 export const MAX_CATEGORIES = 50
 export const MAX_CATEGORY_TAGS = 2
 
-export const RESERVED_NAMES = ['全部卡片', '未分类'] as const
+export const RESERVED_NAMES = ['全部卡片', '我的收藏', '未分类'] as const
 
 export const VIEW_ALL_CARDS = 'allCards'
+export const VIEW_FAVORITES = 'favorites'
 export const VIEW_UNCATEGORIZED = 'uncategorized'
 
 export const SEARCH_DEBOUNCE_MS = 200

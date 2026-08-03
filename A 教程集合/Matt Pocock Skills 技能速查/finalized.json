@@ -1,0 +1,18 @@
+{
+  "source_repository": "https://github.com/mattpocock/skills",
+  "source_commit": "9603c1cc8118d08bc1b3bf34cf714f62178dea3b",
+  "source_version": "1.1.0",
+  "source_mockup": null,
+  "source_plan": null,
+  "mode": "freeform",
+  "html_file": "mattpocock-skills-cheatsheet.html",
+  "layout_tier": "content-heavy searchable reference",
+  "framework": "vanilla",
+  "skill_count": 29,
+  "formal_skill_count": 22,
+  "experimental_candidate_count": 7,
+  "iterations": 2,
+  "date": "2026-07-31T00:00:00+08:00",
+  "screen": "mattpocock-skills-cheatsheet",
+  "branch": "not-applicable"
+}

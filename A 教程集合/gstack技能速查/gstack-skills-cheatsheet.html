@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="garrytan/gstack 全部公开技能中文速查：用途、输入、输出、场景与角色。">
+  <title>gstack 技能速查｜55 个公开技能</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f1e8;
+      --surface: #fffdf7;
+      --ink: #181917;
+      --muted: #666961;
+      --line: #d9d5c9;
+      --line-strong: #aaa69b;
+      --accent: #f05a3f;
+      --accent-soft: #ffe2d9;
+      --lime: #d9f66f;
+      --navy: #1f3b49;
+      --safe: #18794e;
+      --warn: #a33b20;
+      --radius: 8px;
+      --shadow: 0 10px 30px rgba(24, 25, 23, .08);
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font-family: var(--sans); line-height: 1.55; }
+    button, input, select { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+    .skip { position: fixed; left: 12px; top: -80px; z-index: 100; background: var(--ink); color: white; padding: 10px 14px; }
+    .skip:focus { top: 12px; }
+    .masthead { border-bottom: 1px solid var(--line-strong); background: var(--surface); }
+    .masthead-inner { width: min(1440px, calc(100% - 32px)); margin: auto; padding: 28px 0 24px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+    .eyebrow { margin: 0 0 7px; color: var(--accent); font: 700 12px/1 var(--mono); letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(32px, 5vw, 68px); line-height: .98; letter-spacing: -.055em; max-width: 900px; }
+    .dek { margin: 15px 0 0; color: var(--muted); max-width: 850px; font-size: 15px; }
+    .edition { min-width: 230px; border-left: 4px solid var(--accent); padding: 4px 0 4px 15px; font: 12px/1.7 var(--mono); color: var(--muted); }
+    .edition strong { color: var(--ink); }
+    .workflow { width: min(1440px, calc(100% - 32px)); margin: 18px auto 0; display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--line-strong); background: var(--surface); }
+    .workflow span { min-width: 0; padding: 10px 8px; text-align: center; border-right: 1px solid var(--line); font: 700 11px/1.2 var(--mono); }
+    .workflow span:last-child { border-right: 0; }
+    .workflow b { color: var(--accent); margin-right: 4px; }
+    .toolbar-wrap { position: sticky; top: 0; z-index: 20; margin-top: 18px; border-block: 1px solid var(--line-strong); background: rgba(244, 241, 232, .94); backdrop-filter: blur(12px); }
+    .toolbar { width: min(1440px, calc(100% - 32px)); margin: auto; padding: 12px 0; display: grid; grid-template-columns: minmax(280px, 1fr) auto auto; gap: 10px; align-items: center; }
+    .searchbox { position: relative; }
+    .searchbox input { width: 100%; min-height: 46px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 0 102px 0 42px; }
+    .searchbox::before { content: "⌕"; position: absolute; left: 15px; top: 8px; color: var(--navy); font-size: 23px; }
+    .shortcut { position: absolute; right: 10px; top: 10px; color: var(--muted); font: 11px/1 var(--mono); border: 1px solid var(--line); padding: 6px 7px; border-radius: 4px; }
+    select, .control { min-height: 46px; border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 0 12px; background: var(--surface); color: var(--ink); cursor: pointer; }
+    .control { font-weight: 700; }
+    .control:hover { background: var(--lime); }
+    .layout { width: min(1440px, calc(100% - 32px)); margin: 18px auto 64px; display: grid; grid-template-columns: 252px minmax(0, 1fr); gap: 24px; }
+    aside { align-self: start; position: sticky; top: 90px; }
+    .panel { border: 1px solid var(--line-strong); background: var(--surface); padding: 14px; box-shadow: var(--shadow); }
+    .panel + .panel { margin-top: 12px; }
+    .panel h2 { margin: 0 0 10px; font: 800 12px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .filter-list { display: grid; gap: 4px; }
+    .filter-btn { width: 100%; border: 0; border-left: 3px solid transparent; background: transparent; text-align: left; padding: 8px 9px; color: var(--muted); cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+    .filter-btn:hover { color: var(--ink); background: #f1eee5; }
+    .filter-btn.active { color: var(--ink); border-left-color: var(--accent); background: var(--accent-soft); font-weight: 800; }
+    .filter-btn em { font-style: normal; font: 11px/1.7 var(--mono); }
+    .helper { margin: 0; color: var(--muted); font-size: 12px; }
+    .scenario-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .scenario-chip { border: 1px solid var(--line); border-radius: 999px; padding: 6px 9px; background: white; font-size: 11px; cursor: pointer; }
+    .scenario-chip:hover { border-color: var(--ink); }
+    .results-head { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); }
+    .results-head h2 { margin: 0; font-size: 19px; }
+    .results-head p { margin: 0; color: var(--muted); font: 12px/1.4 var(--mono); }
+    .cards { display: grid; gap: 9px; }
+    .skill { scroll-margin-top: 95px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); overflow: clip; }
+    .skill[open] { border-color: var(--ink); box-shadow: var(--shadow); }
+    .skill summary { list-style: none; cursor: pointer; padding: 15px; display: grid; grid-template-columns: minmax(190px, .72fr) minmax(240px, 1fr) auto; gap: 16px; align-items: center; }
+    .skill summary::-webkit-details-marker { display: none; }
+    .skill summary:hover { background: #f9f6ee; }
+    .skill-title { min-width: 0; }
+    .command { display: flex; align-items: center; gap: 8px; font: 800 16px/1.2 var(--mono); overflow-wrap: anywhere; }
+    .command::before { content: "/"; color: var(--accent); }
+    .skill-name { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .summary-text { color: #3d403b; font-size: 13px; }
+    .tags { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 5px; max-width: 260px; }
+    .tag { border: 1px solid var(--line); border-radius: 999px; padding: 4px 7px; color: var(--muted); font: 10px/1 var(--mono); white-space: nowrap; }
+    .tag.core { border-color: #90a22e; color: #566014; background: #f4facd; }
+    .tag.write { border-color: #df9e8d; color: var(--warn); background: #fff0eb; }
+    .detail { border-top: 1px solid var(--line); padding: 16px; background: #faf8f2; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .fact { border-left: 3px solid var(--line); padding-left: 11px; min-width: 0; }
+    .fact h3 { margin: 0 0 4px; color: var(--muted); font: 800 10px/1.2 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .fact p { margin: 0; font-size: 13px; overflow-wrap: anywhere; }
+    .example { grid-column: 1 / -1; border-left-color: var(--accent); }
+    .example code { display: block; margin-top: 6px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 5px; background: #1d211f; color: #f6f3e9; font: 12px/1.55 var(--mono); white-space: pre-wrap; }
+    .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .action { min-height: 38px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; padding: 0 11px; font-weight: 750; font-size: 12px; cursor: pointer; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; }
+    .action.primary { background: var(--ink); color: white; border-color: var(--ink); }
+    .action:hover { background: var(--lime); color: var(--ink); }
+    .empty { display: none; padding: 70px 18px; border: 1px dashed var(--line-strong); text-align: center; color: var(--muted); background: var(--surface); }
+    .empty strong { display: block; color: var(--ink); font-size: 18px; margin-bottom: 4px; }
+    .legend { margin-top: 22px; border-top: 1px solid var(--line-strong); padding-top: 18px; color: var(--muted); font-size: 12px; }
+    .legend a { color: var(--ink); }
+    footer { border-top: 1px solid var(--line-strong); background: var(--ink); color: #d9d7cf; }
+    .footer-inner { width: min(1440px, calc(100% - 32px)); margin: auto; padding: 24px 0 32px; display: flex; justify-content: space-between; gap: 24px; font-size: 12px; }
+    footer a { color: var(--lime); }
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 50; padding: 10px 13px; border-radius: 6px; background: var(--ink); color: white; font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .18s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      .masthead-inner { grid-template-columns: 1fr; }
+      .edition { border-left: 0; border-top: 3px solid var(--accent); padding: 10px 0 0; }
+      .workflow { grid-template-columns: repeat(4, 1fr); }
+      .workflow span:nth-child(4) { border-right: 0; }
+      .workflow span:nth-child(-n+4) { border-bottom: 1px solid var(--line); }
+      .toolbar { grid-template-columns: 1fr auto; }
+      .toolbar select { display: none; }
+      .layout { grid-template-columns: 1fr; }
+      aside { position: static; }
+      .panel:first-child { display: none; }
+      .skill summary { grid-template-columns: 1fr auto; }
+      .summary-text { grid-column: 1 / -1; grid-row: 2; }
+    }
+    @media (max-width: 560px) {
+      .masthead-inner, .workflow, .toolbar, .layout, .footer-inner { width: min(100% - 20px, 1440px); }
+      .workflow { grid-template-columns: repeat(2, 1fr); }
+      .workflow span { border-bottom: 1px solid var(--line); }
+      .workflow span:nth-child(even) { border-right: 0; }
+      .workflow span:last-child { grid-column: 1 / -1; border-bottom: 0; }
+      .toolbar { grid-template-columns: 1fr; }
+      .toolbar .control { display: none; }
+      .skill summary { padding: 13px; }
+      .tags { justify-content: flex-start; grid-column: 1 / -1; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .example { grid-column: auto; }
+      .footer-inner { display: block; }
+    }
+    @media print {
+      .toolbar-wrap, aside, .actions, .toast { display: none !important; }
+      body { background: white; }
+      .layout { display: block; width: 100%; margin: 0; }
+      .skill { break-inside: avoid; }
+      .skill .detail { display: block !important; }
+      .skill:not([open]) .detail { display: block; }
+      .masthead-inner, .workflow, .footer-inner { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#skills">跳到技能列表</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div>
+        <p class="eyebrow">Garry Tan's software factory · 中文速查</p>
+        <h1>gstack 技能速查</h1>
+        <p class="dek">55 个公开技能，按产研流程重排。搜任务、看输入、确认输出，再复制命令。适合产品、设计、研发、测试、技术负责人和创始人共同使用。</p>
+      </div>
+      <div class="edition">
+        <div><strong>官方版本</strong> v1.60.1.0</div>
+        <div><strong>资料口径</strong> GitHub main / SKILL.md</div>
+        <div><strong>更新日期</strong> 2026-07-21</div>
+        <div><strong>覆盖</strong> <span id="editionCount">55</span> / 55</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="workflow" aria-label="gstack 推荐工作流">
+    <span><b>01</b>思考 Think</span><span><b>02</b>规划 Plan</span><span><b>03</b>构建 Build</span><span><b>04</b>审查 Review</span><span><b>05</b>测试 Test</span><span><b>06</b>发布 Ship</span><span><b>07</b>复盘 Reflect</span>
+  </div>
+
+  <div class="toolbar-wrap">
+    <div class="toolbar">
+      <label class="searchbox">
+        <span class="sr-only" hidden>搜索技能</span>
+        <input id="search" type="search" autocomplete="off" placeholder="搜索技能、任务、角色或产物，例如：PRD、真机、部署、安全…" aria-label="搜索技能">
+        <span class="shortcut">Ctrl K /</span>
+      </label>
+      <select id="roleSelect" aria-label="按角色筛选"><option value="all">全部角色</option></select>
+      <button id="expandAll" class="control" type="button">展开全部</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside aria-label="筛选与场景入口">
+      <section class="panel">
+        <h2>按流程分类</h2>
+        <div id="categoryFilters" class="filter-list"></div>
+      </section>
+      <section class="panel">
+        <h2>我现在要…</h2>
+        <div class="scenario-chips">
+          <button class="scenario-chip" data-query="新想法">验证新想法</button>
+          <button class="scenario-chip" data-query="需求规格">写需求规格</button>
+          <button class="scenario-chip" data-query="设计评审">评审设计</button>
+          <button class="scenario-chip" data-query="根因 Bug">排查 Bug</button>
+          <button class="scenario-chip" data-query="只报告 不修改">只做验收</button>
+          <button class="scenario-chip" data-query="发布 PR">发布上线</button>
+          <button class="scenario-chip" data-query="安全审计">检查安全</button>
+          <button class="scenario-chip" data-query="iOS 真机">测 iOS</button>
+        </div>
+        <p class="helper" style="margin-top:10px">提示：按 <strong>/</strong> 或 <strong>Ctrl+K</strong> 可立即搜索。</p>
+      </section>
+    </aside>
+
+    <main id="skills">
+      <div class="results-head">
+        <div><h2 id="resultTitle">全部公开技能</h2><p id="activeFilter">官方 main 分支可调用技能</p></div>
+        <p><strong id="resultCount">55</strong> 项匹配</p>
+      </div>
+      <div id="cards" class="cards"></div>
+      <div id="empty" class="empty"><strong>没有匹配技能</strong>换个关键词，或清除分类与角色筛选。</div>
+      <div class="legend">
+        <strong>字段说明：</strong>“典型输入/典型输出”是根据官方技能工作流归纳的常用形态，不是固定 API Schema。带“可能修改”标签的技能可能编辑代码、配置、文档或外部状态，执行前应确认授权边界。
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>资料来源：<a href="https://github.com/garrytan/gstack" target="_blank" rel="noreferrer">garrytan/gstack</a> · MIT License · 非官方中文整理</div>
+      <div>快捷键：<strong>/</strong> 搜索 · <strong>Esc</strong> 清空 · 浏览器打印可生成 PDF</div>
+    </div>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const C = {
+      strategy: '产品与规划', design: '设计与体验', engineering: '工程与评审', qa: '浏览器与 QA',
+      shipping: '发布与部署', docs: '文档与沉淀', safety: '安全与边界', tools: '数据与工具', ios: 'iOS 专项'
+    };
+
+    const skills = [
+      {n:'gstack',t:'智能技能路由器',c:'strategy',r:['全员'],p:'当你不知道该调用哪项能力时，根据任务语义路由到合适的 gstack 技能。',i:'自然语言任务描述、当前仓库与会话状态。',o:'推荐或直接调用匹配技能；无匹配时直接回答。',s:'第一次使用 gstack，或任务横跨多个阶段、不确定从哪里开始。',e:'/gstack\n我有一个新功能想法，但不确定先做产品评估还是技术方案。',core:1,w:0},
+      {n:'office-hours',t:'YC 式产品拷问',c:'strategy',r:['创始人','产品经理','业务负责人'],p:'通过强制问题挑战需求表述、用户痛点和切入点，在写代码前重构问题。',i:'产品想法、目标用户、真实痛点案例、已有约束。',o:'问题重述、前提挑战、能力拆解、实施选项与设计文档。',s:'0→1 新想法、方向模糊、想判断“值不值得做”。',e:'/office-hours\n我们想做一个自动生成每日工作简报的产品。',core:1,w:1},
+      {n:'spec',t:'可执行规格与工单',c:'strategy',r:['产品经理','项目负责人','研发负责人'],p:'把模糊需求转成 backlog-ready 的规格、Issue、验收条件和任务边界。',i:'用户意图、功能描述、相关上下文或现有方案。',o:'结构化规格、用户故事、验收标准、风险与开放问题。',s:'把讨论结果交给研发、创建 GitHub Issue、补齐需求验收口径。',e:'/spec\n把“支持用户导出月度账单”整理成可开发工单。',core:1,w:1},
+      {n:'plan-ceo-review',t:'CEO / 创始人评审',c:'strategy',r:['创始人','产品负责人','业务负责人'],p:'从价值、范围和野心审视方案，寻找更强的产品机会或主动收缩。',i:'产品方案、PRD、设计文档或计划文件。',o:'十部分战略评审、范围模式、关键决策与修订后的计划。',s:'重大版本规划、商业价值评估、担心团队做了“正确但不重要”的事。',e:'/plan-ceo-review\n评审当前通知中心方案，重点检查用户价值和范围。',core:1,w:1},
+      {n:'autoplan',t:'全套计划评审流水线',c:'strategy',r:['产品负责人','技术负责人','项目负责人'],p:'自动串联 CEO、工程、设计与 DX 等评审，形成一个经多视角挑战的计划。',i:'已有计划、PRD、设计文档或功能目标。',o:'多角色评审结果、冲突点、决策项与最终计划报告。',s:'重要功能开发前，需要完整评审又不想逐个手动调用。',e:'/autoplan\n对支付重构计划执行完整评审，先不要实现。',core:1,w:1},
+      {n:'plan-tune',t:'调整提问偏好',c:'strategy',r:['高频使用者','团队管理员'],p:'查看并调节 gstack 的确认问题灵敏度，让重复决策自动化或始终询问。',i:'想调整的问题类型、历史提问记录或偏好描述。',o:'问题偏好配置与生效规则。',s:'觉得工具问得太多、太少，或某类决策已有固定团队原则。',e:'/plan-tune\n以后只在不可逆操作前询问我。',core:0,w:1},
+
+      {n:'design-consultation',t:'从零建立设计系统',c:'design',r:['设计师','产品经理','前端工程师'],p:'研究设计语境，提出视觉风险并搭建设计系统、排版、色彩和组件方向。',i:'产品定位、受众、品牌约束、参考产品与已有设计资产。',o:'设计方向、DESIGN.md、设计系统建议与真实内容 mockup。',s:'新产品从 0 到 1、品牌升级、缺少统一视觉语言。',e:'/design-consultation\n为面向专业创作者的素材管理工具建立设计系统。',core:1,w:1},
+      {n:'plan-design-review',t:'实现前设计评审',c:'design',r:['设计师','产品经理','前端工程师'],p:'按设计维度打分，描述“10 分方案”，并把确认后的改进写回计划。',i:'设计计划、原型说明、页面结构或设计文档。',o:'维度评分、AI Slop 检查、逐项决策与修订计划。',s:'原型或 UI 方案准备进入开发，希望前置发现体验问题。',e:'/plan-design-review\n评审新用户引导流程的设计计划。',core:1,w:1},
+      {n:'design-shotgun',t:'并行探索视觉方向',c:'design',r:['设计师','产品经理'],p:'一次生成多个差异明显的视觉方案，通过比较板收集选择和反馈。',i:'设计 brief、页面目标、约束与参考方向。',o:'多张设计变体、对比页面、选择记录 approved.json。',s:'视觉方向尚未确定，需要“先看方案再决定”。',e:'/design-shotgun\n为数据看板首页生成 3 个风格差异明显的方案。',core:0,w:1},
+      {n:'design-html',t:'设计转生产级 HTML',c:'design',r:['前端工程师','设计师','产品经理'],p:'把已批准设计、计划或文字描述制作成可响应、可编辑、可验证的 HTML/CSS。',i:'批准的 mockup、设计计划、DESIGN.md 或清晰页面描述。',o:'finalized.html、设计元数据与多视口验证结果。',s:'快速制作概念页、静态原型、活动页或设计实现参考。',e:'/design-html\n把已批准的定价页 mockup 制作成响应式 HTML。',core:0,w:1},
+      {n:'design-review',t:'已实现页面视觉 QA',c:'design',r:['设计师','前端工程师','测试工程师'],p:'在真实浏览器中检查视觉质量、层级、对齐与 AI Slop，并迭代修复。',i:'本地或线上页面 URL、设计参考与检查范围。',o:'视觉问题清单、截图证据、修复与复测结果。',s:'页面“看起来不对”、上线前走查、检查设计还原。',e:'/design-review http://localhost:3000/dashboard',core:1,w:1},
+      {n:'diagram',t:'生成流程图与架构图',c:'design',r:['产品经理','技术负责人','设计师'],p:'把自然语言或 Mermaid 转成清晰的流程图、架构图及可编辑资产。',i:'流程说明、架构关系、Mermaid 或图形用途。',o:'图表源码及 PNG、SVG 或 Excalidraw 等渲染资产。',s:'用户旅程、状态机、系统架构、汇报材料可视化。',e:'/diagram\n画出订单从创建、支付到退款的状态流转图。',core:0,w:1},
+
+      {n:'plan-eng-review',t:'工程经理方案评审',c:'engineering',r:['技术负责人','前端工程师','后端工程师'],p:'锁定架构、数据流、状态、错误路径、边界条件和测试矩阵。',i:'实现计划、技术设计、PRD 或架构草案。',o:'工程评审报告、图示、风险、失败模式与测试建议。',s:'复杂功能开发前、数据模型变更、跨服务集成。',e:'/plan-eng-review\n评审批量导入功能的架构、幂等和失败恢复。',core:1,w:1},
+      {n:'review',t:'合并前代码评审',c:'engineering',r:['研发工程师','技术负责人'],p:'检查当前 diff 中会通过 CI 却可能在生产出错的问题，并补查完整性缺口。',i:'当前分支改动、目标分支与测试上下文。',o:'按严重度排序的问题、可自动修复项、需确认项与通过门槛。',s:'准备提交、创建 PR、合并前最后一道工程审查。',e:'/review\n检查当前分支相对 main 的改动。',core:1,w:1},
+      {n:'investigate',t:'系统化根因调试',c:'engineering',r:['研发工程师','测试工程师','技术负责人'],p:'先追踪数据流和验证假设，再做修复；避免凭感觉连续试错。',i:'错误现象、日志、复现步骤、相关代码与环境。',o:'根因证据、排除过程、最小修复和验证结果。',s:'Bug、线上异常、间歇性问题或“修了又坏”。',e:'/investigate\n用户偶发保存失败，但前端没有报错。',core:1,w:1},
+      {n:'health',t:'代码质量仪表盘',c:'engineering',r:['技术负责人','研发工程师','测试工程师'],p:'汇总类型检查、lint、测试和代码健康信号，形成可追踪的项目评分。',i:'代码仓库与可用的质量命令。',o:'健康评分、问题摘要、趋势与建议优先级。',s:'技术治理、接手陌生仓库、迭代前后比较质量。',e:'/health\n生成当前仓库的代码质量快照。',core:0,w:0},
+      {n:'codex',t:'调用 Codex 独立意见',c:'engineering',r:['技术负责人','研发工程师'],p:'用 OpenAI Codex CLI 进行独立代码评审、对抗性挑战或连续咨询。',i:'代码 diff、问题描述、计划文件；可指定 review/challenge/consult 模式。',o:'独立审查意见、通过/失败门槛、攻击性假设或连续问答。',s:'需要第二意见、挑战方案、降低单一模型盲区。',e:'/codex review\n独立检查当前 diff 是否存在生产级风险。',core:0,w:0},
+      {n:'claude',t:'调用 Claude 独立意见',c:'engineering',r:['技术负责人','研发工程师'],p:'把计划或代码交给 Claude 做外部评审、挑战与咨询，形成另一模型视角。',i:'计划、代码、diff 或需要咨询的具体问题。',o:'外部模型评审、风险提示、反对意见与建议。',s:'对方案有分歧、希望交叉验证或寻找遗漏。',e:'/claude\n挑战这份缓存重构方案，重点找一致性问题。',core:0,w:0},
+      {n:'benchmark-models',t:'AI 模型横向评测',c:'engineering',r:['AI 工程师','技术负责人'],p:'比较多个模型在指定任务上的质量、速度、成本和稳定性。',i:'评测任务、候选模型、样本与评分标准。',o:'模型成绩、成本/延迟比较、推荐与原始结果。',s:'选择编码模型、验证升级收益、控制 AI 工作流成本。',e:'/benchmark-models\n比较候选模型完成代码评审任务的质量和成本。',core:0,w:0},
+
+      {n:'browse',t:'可编程真实浏览器',c:'qa',r:['测试工程师','前端工程师','产品经理'],p:'打开页面、点击、输入、读取状态和截图，为其他 QA 技能提供浏览器能力。',i:'URL、操作步骤、选择器或需要验证的页面状态。',o:'页面观察、截图、DOM/网络信息与操作结果。',s:'走查用户路径、截图取证、检查部署页面。',e:'/browse\n打开测试环境，完成登录并截图仪表盘。',core:1,w:0},
+      {n:'qa',t:'测试、修复与复测',c:'qa',r:['测试工程师','前端工程师','全栈工程师'],p:'系统走查产品行为，发现问题后在授权范围内修复，再回到浏览器复测。',i:'测试 URL、关键流程、账号/登录态与代码仓库。',o:'Bug 清单、截图、代码修复、回归验证与覆盖报告。',s:'功能完成后的完整 QA，研发明确允许自动修改。',e:'/qa https://staging.example.com\n重点测试注册和找回密码。',core:1,w:1},
+      {n:'qa-only',t:'只测试不修复',c:'qa',r:['测试工程师','产品经理','设计师'],p:'执行与 QA 相同的系统走查，但严格只读，输出缺陷而不改代码。',i:'测试 URL、范围、账号与验收标准。',o:'缺陷等级、复现步骤、截图证据与修复优先级。',s:'产品验收、第三方评测、需要保持代码只读。',e:'/qa-only https://staging.example.com\n验收下单到退款的完整链路。',core:1,w:0},
+      {n:'benchmark',t:'页面性能回归',c:'qa',r:['前端工程师','测试工程师','技术负责人'],p:'测量页面性能与资源指标，对比基线并定位性能退化。',i:'目标 URL、基线或对比分支、需关注的指标。',o:'性能测量、前后差异、回归判断与优化建议。',s:'页面改版、依赖升级、上线前检查 Web 性能。',e:'/benchmark https://staging.example.com/product',core:0,w:0},
+      {n:'plan-devex-review',t:'开发者体验方案评审',c:'qa',r:['技术产品经理','架构师','开发者工具团队'],p:'在实现前审查开发者人物、首次成功路径、TTHW 和全链路摩擦。',i:'API/SDK/CLI 方案、开发者画像、竞品与文档计划。',o:'DX 模式选择、摩擦图、关键问题与修订计划。',s:'开发者平台、API、SDK 或 CLI 仍处于规划阶段。',e:'/plan-devex-review\n评审公开 API 的开发者首次接入流程。',core:0,w:1},
+      {n:'devex-review',t:'真实开发者体验审计',c:'qa',r:['技术产品经理','开发者工具团队','技术负责人'],p:'像新开发者一样真实走文档、安装、鉴权和 Hello World，记录每个摩擦点。',i:'文档入口、SDK/API/CLI、测试凭证与目标用户。',o:'DX 评分卡、TTHW、截图证据、错误信息与改进清单。',s:'开发者产品上线前、文档改版后、竞品体验对标。',e:'/devex-review https://docs.example.com',core:0,w:0},
+      {n:'setup-browser-cookies',t:'导入浏览器登录态',c:'qa',r:['测试工程师','前端工程师','产品经理'],p:'从真实浏览器导入 Cookie，让 gstack 浏览器能测试需要登录的页面。',i:'目标域名、浏览器配置与用户确认。',o:'可复用的认证会话或 Cookie 配置。',s:'后台系统、付费页面、需要真实账号的端到端测试。',e:'/setup-browser-cookies\n导入 example.com 的登录状态。',core:0,w:1},
+      {n:'open-gstack-browser',t:'打开可观察浏览器',c:'qa',r:['测试工程师','产品经理','设计师'],p:'启动可视化 gstack 浏览器，让人能看到和接管自动化操作。',i:'可选 URL 或现有浏览器会话。',o:'可见浏览器窗口与后续操作入口。',s:'演示、调试选择器、人工观察 AI 操作过程。',e:'/open-gstack-browser https://staging.example.com',core:0,w:1},
+      {n:'pair-agent',t:'远程 Agent 共用浏览器',c:'qa',r:['高级用户','测试工程师','多 Agent 团队'],p:'为远程 AI Agent 提供受控浏览器访问，支持协作式页面操作。',i:'浏览器会话、协作目标与权限边界。',o:'临时访问密钥、配对会话与连接说明。',s:'多个 Agent 分工测试、远程会话需要本地认证浏览器。',e:'/pair-agent\n让远程测试 Agent 使用当前已登录浏览器。',core:0,w:1},
+
+      {n:'ship',t:'标准化提交与 PR',c:'shipping',r:['研发工程师','技术负责人','发布负责人'],p:'执行测试、评审、版本和变更日志检查，整理提交并创建或更新 PR。',i:'已完成代码、目标分支、版本策略与发布上下文。',o:'干净提交、版本/CHANGELOG 更新、PR 与检查结果。',s:'功能开发完成，准备交付评审或发布。',e:'/ship\n完成检查并为当前分支创建 PR。',core:1,w:1},
+      {n:'land-and-deploy',t:'合并、部署、生产验证',c:'shipping',r:['技术负责人','发布负责人','DevOps'],p:'把通过评审的 PR 合并，等待 CI 与部署完成，并在生产环境验证。',i:'已批准 PR、部署配置、生产 URL 与健康检查。',o:'合并结果、部署状态、生产验证和异常处置。',s:'希望把“合并到上线确认”作为一个连续闭环。',e:'/land-and-deploy\n合并当前 PR，等待生产部署并验证首页。',core:1,w:1},
+      {n:'setup-deploy',t:'接入部署配置',c:'shipping',r:['技术负责人','DevOps','研发工程师'],p:'识别项目部署方式，配置生产 URL、平台、健康检查和发布集成。',i:'仓库、部署平台账号/配置与目标环境。',o:'部署配置、环境说明与可供 ship 流程使用的设置。',s:'项目首次接入 gstack 发布流程或更换部署平台。',e:'/setup-deploy\n为这个 Vercel 项目配置生产部署验证。',core:0,w:1},
+      {n:'canary',t:'发布后金丝雀检查',c:'shipping',r:['发布负责人','测试工程师','前端工程师'],p:'上线后持续检查错误、性能和视觉异常，快速判断新版本是否健康。',i:'生产 URL、发布时间、关键页面与基线。',o:'线上健康报告、截图差异、性能信号与异常告警。',s:'刚发布、灰度观察、担心生产回归。',e:'/canary https://example.com\n监控刚上线的结算页。',core:1,w:0},
+      {n:'landing-report',t:'只读发布队列快照',c:'shipping',r:['技术负责人','项目负责人','发布负责人'],p:'查看当前待落地主线的工作、版本槽位和发布队列，不修改任何状态。',i:'当前仓库与分支/PR 状态。',o:'待合并工作、队列位置、版本窗口与阻塞项。',s:'多人并行开发、发布排期、判断谁先合并。',e:'/landing-report\n查看本周发布队列和阻塞项。',core:0,w:0},
+
+      {n:'document-generate',t:'从零生成项目文档',c:'docs',r:['产品经理','研发工程师','技术负责人'],p:'读取代码与现有上下文，生成模块、功能、API 或项目级文档。',i:'代码仓库、目标读者、文档类型与覆盖范围。',o:'结构化 Markdown 文档、示例、使用说明与边界。',s:'缺 README、接口说明、运维手册或功能使用文档。',e:'/document-generate\n为 webhook 模块生成开发者文档。',core:0,w:1},
+      {n:'document-release',t:'发布后文档闭环',c:'docs',r:['技术负责人','研发工程师','项目负责人'],p:'根据已发布改动更新 README、CHANGELOG、架构说明和使用文档。',i:'发布内容、合并记录、现有文档与代码差异。',o:'同步后的文档、变更说明与未解决文档债。',s:'功能已上线，但文档和代码尚未保持一致。',e:'/document-release\n同步刚发布的批量导入功能文档。',core:1,w:1},
+      {n:'make-pdf',t:'制作正式 PDF',c:'docs',r:['产品经理','项目负责人','管理者'],p:'把 Markdown 或内容素材排版为可发布、可打印的正式 PDF。',i:'Markdown/文档内容、版式目标与输出名称。',o:'排版后的 PDF 及必要的中间文件。',s:'培训材料、评审材料、报告和对外文档。',e:'/make-pdf\n把 docs/onboarding.md 制作成培训手册 PDF。',core:0,w:1},
+      {n:'retro',t:'迭代与工程复盘',c:'docs',r:['项目负责人','技术负责人','管理者'],p:'分析阶段内的提交、交付、质量和协作信号，提炼可执行改进。',i:'时间范围、仓库历史、PR/提交与团队关注点。',o:'复盘报告、产出统计、亮点、问题与行动项。',s:'周报、双周迭代复盘、发布周期总结。',e:'/retro\n复盘过去两周的交付和质量。',core:1,w:1},
+      {n:'context-save',t:'保存工作上下文',c:'docs',r:['全员'],p:'把当前目标、决策、进度、尝试与下一步保存为可恢复快照。',i:'当前会话与仓库状态，可附加交接说明。',o:'上下文快照、恢复入口与未完成事项。',s:'任务中断、换设备、跨会话、交接给同事或 Agent。',e:'/context-save\n保存当前进度，明天继续。',core:0,w:1},
+      {n:'context-restore',t:'恢复工作上下文',c:'docs',r:['全员'],p:'读取之前保存的快照和仓库状态，重建任务目标、决策与下一步。',i:'已保存的上下文，可指定恢复点。',o:'恢复后的任务摘要、状态核对与继续执行入口。',s:'继续旧任务、接手他人工作、会话压缩后找回上下文。',e:'/context-restore\n恢复上次保存的支付重构任务。',core:0,w:0},
+      {n:'learn',t:'管理项目经验库',c:'docs',r:['高频使用者','技术负责人'],p:'查看、搜索和清理 gstack 从项目实践中记录的可复用经验。',i:'搜索问题、项目范围或学习记录操作。',o:'经验摘要、匹配记录或清理结果。',s:'复用历史排障、检查工具学到了什么、移除错误经验。',e:'/learn\n搜索这个项目关于 Windows 路径的经验。',core:0,w:1},
+
+      {n:'cso',t:'安全负责人审计',c:'safety',r:['安全负责人','技术负责人','研发工程师'],p:'覆盖密钥、依赖、CI/CD、OWASP 与 STRIDE 的系统安全审计。',i:'代码仓库、部署配置、依赖与威胁边界。',o:'风险分级、证据、威胁模型、修复建议与安全门槛。',s:'上线前安全检查、敏感功能、月度安全审计。',e:'/cso\n审计当前仓库的鉴权、密钥和依赖风险。',core:1,w:0},
+      {n:'careful',t:'高风险操作警告模式',c:'safety',r:['研发工程师','运维','技术负责人'],p:'在执行删除、覆盖、重置等破坏性命令前增加明确警告和确认。',i:'当前会话与即将执行的操作。',o:'安全拦截、风险说明和显式确认门。',s:'生产环境、数据库操作、复杂 Git 操作。',e:'/careful\n接下来的数据库迁移请启用高风险操作警告。',core:0,w:1},
+      {n:'freeze',t:'冻结编辑目录',c:'safety',r:['研发工程师','技术负责人'],p:'把当前会话允许编辑的文件范围限制在指定目录内。',i:'允许修改的目录或文件范围。',o:'生效的编辑边界与越界阻止。',s:'只允许修某模块、共享仓库、降低误改范围。',e:'/freeze src/billing\n本次只允许修改计费模块。',core:0,w:1},
+      {n:'unfreeze',t:'解除编辑冻结',c:'safety',r:['研发工程师','技术负责人'],p:'撤销 freeze 设置，恢复正常仓库编辑范围。',i:'当前冻结状态与解除意图。',o:'已解除的编辑边界。',s:'任务范围扩大，或受限修改已经完成。',e:'/unfreeze',core:0,w:1},
+      {n:'guard',t:'组合安全防护',c:'safety',r:['研发工程师','运维','技术负责人'],p:'同时启用破坏性操作警告和目录编辑限制，形成更强会话护栏。',i:'允许编辑范围与高风险任务说明。',o:'组合安全边界、操作确认和越界拦截。',s:'生产故障、关键仓库、需要最小修改面的紧急处理。',e:'/guard src/payments\n仅允许修改支付模块，并拦截危险命令。',core:0,w:1},
+
+      {n:'scrape',t:'网页结构化抓取',c:'tools',r:['产品经理','运营','数据分析师','研发工程师'],p:'用浏览器从公开网页读取并提取结构化数据，保持只读。',i:'目标 URL、所需字段、分页/范围与输出格式。',o:'JSON 或结构化数据、抓取证据与失败记录。',s:'竞品整理、公开目录、重复读取网页数据。',e:'/scrape https://example.com/pricing\n提取所有套餐名称、价格和限制。',core:0,w:0},
+      {n:'skillify',t:'把抓取流程固化为技能',c:'tools',r:['研发工程师','数据分析师','高级用户'],p:'把一次成功的浏览器抓取流程封装成可重复使用、可测试的浏览器技能。',i:'已验证的 scrape 会话、字段定义与目标页面模式。',o:'新的浏览器技能、说明和复用入口。',s:'同一网站需要周期性抓取、团队要共享自动化流程。',e:'/skillify\n把刚完成的竞品价格抓取固化成技能。',core:0,w:1},
+      {n:'setup-gbrain',t:'接入 GBrain 知识索引',c:'tools',r:['技术负责人','高级用户'],p:'配置 GBrain，让 Agent 能对项目代码和知识做语义与符号搜索。',i:'仓库、GBrain 运行方式与索引权限。',o:'GBrain 配置、数据源绑定和搜索指导。',s:'大型代码库、跨会话知识、需要更强语义检索。',e:'/setup-gbrain\n为当前仓库配置本地 GBrain。',core:0,w:1},
+      {n:'sync-gbrain',t:'刷新 GBrain 索引',c:'tools',r:['技术负责人','研发工程师'],p:'把项目最新代码和知识资产同步到已配置的 GBrain 数据源。',i:'已配置的 GBrain、当前仓库与同步范围。',o:'更新后的索引、数据源状态与搜索可用性。',s:'代码大幅变化、搜索结果过旧、首次完整同步。',e:'/sync-gbrain --full',core:0,w:1},
+      {n:'gstack-upgrade',t:'升级 gstack',c:'tools',r:['团队管理员','高级用户'],p:'检查版本并安全升级 gstack，同时说明新能力和迁移注意事项。',i:'当前安装、升级偏好与团队模式配置。',o:'升级后的版本、变更摘要与必要迁移结果。',s:'获取新技能、修复工具问题、统一团队版本。',e:'/gstack-upgrade',core:0,w:1},
+
+      {n:'ios-qa',t:'iPhone 真机 QA',c:'ios',r:['iOS 工程师','测试工程师','技术负责人'],p:'在真实 iPhone 上运行 SwiftUI 应用测试，记录行为、截图和设备证据。',i:'iOS 项目、测试设备、目标流程与构建配置。',o:'真机测试报告、截图、复现步骤与缺陷。',s:'iOS 功能提测、手势/键盘/设备行为验证。',e:'/ios-qa\n在连接的 iPhone 上测试注册和首次引导。',core:0,w:0},
+      {n:'ios-fix',t:'修复并真机验证 iOS 问题',c:'ios',r:['iOS 工程师'],p:'根据 ios-qa 证据修改 Swift/SwiftUI 代码，并重新构建到真机验证。',i:'iOS QA 报告、项目源码与连接设备。',o:'代码修复、构建结果、真机复测证据。',s:'已有明确 iOS 缺陷，希望修复和验证连续完成。',e:'/ios-fix\n修复上一轮 ios-qa 发现的键盘遮挡问题。',core:0,w:1},
+      {n:'ios-design-review',t:'iOS HIG 视觉审查',c:'ios',r:['iOS 设计师','iOS 工程师'],p:'采集真机截图，依据 Apple HIG 与视觉维度评审 SwiftUI 应用。',i:'iOS 应用、连接设备、目标页面与设计目标。',o:'真机截图、维度评分、HIG 问题与改进建议。',s:'iOS 上线前视觉走查、适配检查、设计还原。',e:'/ios-design-review\n审查个人资料编辑页的真机视觉表现。',core:0,w:0},
+      {n:'ios-sync',t:'同步 iOS 调试桥',c:'ios',r:['iOS 工程师'],p:'刷新 DebugBridge、ViewModel 访问器和真机自动化所需的调试能力。',i:'iOS 项目与最新代码结构。',o:'同步后的调试桥、访问器与集成状态。',s:'新增 ViewModel、升级 gstack、真机自动化无法访问新界面。',e:'/ios-sync',core:0,w:1},
+      {n:'ios-clean',t:'移除 iOS 调试桥',c:'ios',r:['iOS 工程师','发布负责人'],p:'在发布前移除 DebugBridge 等仅用于自动化 QA 的调试代码。',i:'已集成调试桥的 iOS 项目。',o:'清理后的发布代码与残留检查。',s:'App Store 构建、正式发布前安全清理。',e:'/ios-clean\n发布前移除所有 gstack 调试桥代码。',core:0,w:1}
+    ];
+
+    const categories = ['all','strategy','design','engineering','qa','shipping','docs','safety','tools','ios'];
+    let activeCategory = 'all';
+    let allExpanded = false;
+    const cards = document.querySelector('#cards');
+    const search = document.querySelector('#search');
+    const roleSelect = document.querySelector('#roleSelect');
+    const empty = document.querySelector('#empty');
+    const resultCount = document.querySelector('#resultCount');
+    const resultTitle = document.querySelector('#resultTitle');
+    const activeFilter = document.querySelector('#activeFilter');
+    const expandAll = document.querySelector('#expandAll');
+    const toast = document.querySelector('#toast');
+
+    function esc(value) {
+      return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+    }
+
+    function renderCategories() {
+      const target = document.querySelector('#categoryFilters');
+      target.innerHTML = categories.map(c => {
+        const count = c === 'all' ? skills.length : skills.filter(x => x.c === c).length;
+        return `<button class="filter-btn ${c === activeCategory ? 'active' : ''}" data-category="${c}"><span>${c === 'all' ? '全部技能' : C[c]}</span><em>${count}</em></button>`;
+      }).join('');
+      target.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+        activeCategory = btn.dataset.category;
+        renderCategories(); render();
+      }));
+    }
+
+    function initRoles() {
+      const roles = [...new Set(skills.flatMap(s => s.r))].sort((a,b) => a.localeCompare(b,'zh-CN'));
+      roleSelect.insertAdjacentHTML('beforeend', roles.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join(''));
+    }
+
+    function searchable(s) { return [s.n,s.t,C[s.c],...s.r,s.p,s.i,s.o,s.s,s.e].join(' ').toLowerCase(); }
+
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      const role = roleSelect.value;
+      const filtered = skills.filter(s =>
+        (activeCategory === 'all' || s.c === activeCategory) &&
+        (role === 'all' || s.r.includes(role)) &&
+        (!q || q.split(/\s+/).every(token => searchable(s).includes(token)))
+      );
+      resultCount.textContent = filtered.length;
+      resultTitle.textContent = activeCategory === 'all' ? '全部公开技能' : C[activeCategory];
+      activeFilter.textContent = [q ? `搜索：${search.value.trim()}` : '', role !== 'all' ? `角色：${role}` : '', activeCategory !== 'all' ? `分类：${C[activeCategory]}` : ''].filter(Boolean).join(' · ') || '官方 main 分支可调用技能';
+      empty.style.display = filtered.length ? 'none' : 'block';
+      cards.innerHTML = filtered.map(s => `
+        <details class="skill" id="skill-${s.n}" ${allExpanded || q ? 'open' : ''}>
+          <summary>
+            <div class="skill-title"><div class="command">${esc(s.n)}</div><div class="skill-name">${esc(s.t)}</div></div>
+            <div class="summary-text">${esc(s.p)}</div>
+            <div class="tags"><span class="tag">${esc(C[s.c])}</span>${s.core ? '<span class="tag core">核心流程</span>' : ''}${s.w ? '<span class="tag write">可能修改</span>' : '<span class="tag">默认只读</span>'}</div>
+          </summary>
+          <div class="detail">
+            <div class="detail-grid">
+              <div class="fact"><h3>典型输入</h3><p>${esc(s.i)}</p></div>
+              <div class="fact"><h3>典型输出</h3><p>${esc(s.o)}</p></div>
+              <div class="fact"><h3>使用场景</h3><p>${esc(s.s)}</p></div>
+              <div class="fact"><h3>适用角色</h3><p>${esc(s.r.join('、'))}</p></div>
+              <div class="fact example"><h3>调用示例</h3><code>${esc(s.e)}</code></div>
+            </div>
+            <div class="actions">
+              <button class="action primary copy" type="button" data-copy="/${esc(s.n)}">复制命令</button>
+              <a class="action" href="https://github.com/garrytan/gstack/tree/main/${esc(s.n)}" target="_blank" rel="noreferrer">查看官方技能</a>
+            </div>
+          </div>
+        </details>`).join('');
+      cards.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', async e => {
+        e.preventDefault();
+        try { await navigator.clipboard.writeText(btn.dataset.copy); showToast(`已复制 ${btn.dataset.copy}`); }
+        catch { showToast('复制失败，请手动选择命令'); }
+      }));
+    }
+
+    function showToast(message) {
+      toast.textContent = message; toast.classList.add('show');
+      clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    search.addEventListener('input', render);
+    roleSelect.addEventListener('change', render);
+    expandAll.addEventListener('click', () => {
+      allExpanded = !allExpanded;
+      expandAll.textContent = allExpanded ? '收起全部' : '展开全部';
+      document.querySelectorAll('.skill').forEach(el => el.open = allExpanded);
+    });
+    document.querySelectorAll('.scenario-chip').forEach(btn => btn.addEventListener('click', () => {
+      search.value = btn.dataset.query; activeCategory = 'all'; roleSelect.value = 'all';
+      renderCategories(); render(); search.focus();
+    }));
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey && e.key.toLowerCase() === 'k') || (e.key === '/' && document.activeElement !== search)) { e.preventDefault(); search.focus(); search.select(); }
+      if (e.key === 'Escape') { search.value = ''; activeCategory = 'all'; roleSelect.value = 'all'; renderCategories(); render(); search.blur(); }
+    });
+    window.addEventListener('hashchange', () => {
+      const el = document.querySelector(location.hash); if (el?.tagName === 'DETAILS') el.open = true;
+    });
+
+    initRoles(); renderCategories(); render();
+    if (skills.length !== 55) console.error(`覆盖异常：预期 55，实际 ${skills.length}`);
+    document.querySelector('#editionCount').textContent = skills.length;
+  </script>
+</body>
+</html>

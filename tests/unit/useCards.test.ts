@@ -17,11 +17,12 @@ const mocks = vi.hoisted(() => {
     searchQuery: string
   } = {
     data: {
-      version: 2,
+      version: 3,
       cards: [],
       categories: [],
       viewOrders: [
         { viewType: 'allCards', cardIds: [] },
+        { viewType: 'favorites', cardIds: [] },
         { viewType: 'uncategorized', cardIds: [] },
       ],
     },
@@ -73,6 +74,7 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
       mtimeMs: 0,
     },
     categoryIds: [],
+    isFavorite: false,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
@@ -81,11 +83,12 @@ function makeCard(overrides: Partial<Card> & { id: string }): Card {
 
 function resetState(): void {
   mocks.state.data = {
-    version: 2,
+    version: 3,
     cards: [],
     categories: [],
     viewOrders: [
       { viewType: 'allCards', cardIds: [] },
+      { viewType: 'favorites', cardIds: [] },
       { viewType: 'uncategorized', cardIds: [] },
     ],
   }
@@ -509,6 +512,92 @@ describe('useCards', () => {
   })
 
   // ── deleteCard ──
+
+  describe('setFavorite', () => {
+    it('persists favorite membership before dispatching the state change', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', isFavorite: false }),
+      ]
+      mocks.state.data.viewOrders = [
+        { viewType: 'allCards', cardIds: ['card-1'] },
+        { viewType: 'favorites', cardIds: [] },
+        { viewType: 'uncategorized', cardIds: ['card-1'] },
+      ]
+
+      const { setFavorite } = useCards()
+      const success = await setFavorite('card-1', true)
+
+      expect(success).toBe(true)
+      const savedData = mocks.electronAPI.saveAppData.mock.calls[0][0]
+      expect(savedData.cards[0].isFavorite).toBe(true)
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'favorites'
+        ).cardIds
+      ).toEqual(['card-1'])
+      expect(mocks.dispatch).toHaveBeenCalledWith({
+        type: 'SET_CARD_FAVORITE',
+        cardId: 'card-1',
+        isFavorite: true,
+      })
+    })
+
+    it('removes an unfavorited card and appends it at the end when favorited again', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', isFavorite: true }),
+        makeCard({ id: 'card-2', isFavorite: true }),
+      ]
+      mocks.state.data.viewOrders = [
+        { viewType: 'allCards', cardIds: ['card-1', 'card-2'] },
+        { viewType: 'favorites', cardIds: ['card-1', 'card-2'] },
+        { viewType: 'uncategorized', cardIds: ['card-1', 'card-2'] },
+      ]
+
+      const { setFavorite } = useCards()
+      expect(await setFavorite('card-1', false)).toBe(true)
+      let savedData = mocks.electronAPI.saveAppData.mock.calls[0][0]
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'favorites'
+        ).cardIds
+      ).toEqual(['card-2'])
+
+      mocks.state.data = savedData
+      vi.clearAllMocks()
+      expect(await useCards().setFavorite('card-1', true)).toBe(true)
+      savedData = mocks.electronAPI.saveAppData.mock.calls[0][0]
+      expect(
+        savedData.viewOrders.find(
+          (viewOrder: { viewType: string }) => viewOrder.viewType === 'favorites'
+        ).cardIds
+      ).toEqual(['card-2', 'card-1'])
+    })
+
+    it('does not dispatch when saving the favorite state fails', async () => {
+      mocks.state.data.cards = [
+        makeCard({ id: 'card-1', isFavorite: false }),
+      ]
+      mocks.state.data.viewOrders = [
+        { viewType: 'allCards', cardIds: ['card-1'] },
+        { viewType: 'favorites', cardIds: [] },
+        { viewType: 'uncategorized', cardIds: ['card-1'] },
+      ]
+      mocks.electronAPI.saveAppData.mockResolvedValueOnce({
+        error: 'permission-denied',
+      })
+
+      const success = await useCards().setFavorite('card-1', true)
+
+      expect(success).toBe(false)
+      expect(mocks.dispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'SET_CARD_FAVORITE' })
+      )
+      expect(mocks.dispatch).toHaveBeenCalledWith({
+        type: 'SET_SAVE_ERROR',
+        error: 'permission-denied',
+      })
+    })
+  })
 
   describe('deleteCard', () => {
     it('removes card and removes it from all viewOrders', async () => {

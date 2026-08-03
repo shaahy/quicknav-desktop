@@ -8,7 +8,7 @@ interface EmptyStateProps {
    * - `category-empty`: Current category view has no cards.
    * - `no-results`: Search query matched nothing.
    */
-  variant: 'first-launch' | 'category-empty' | 'no-results'
+  variant: 'first-launch' | 'category-empty' | 'favorites-empty' | 'no-results'
   /** Search query displayed in the 'no-results' description. */
   searchQuery?: string | null
   /** Primary call-to-action (rendered as solid button or clear-search link). */
@@ -24,6 +24,7 @@ export function EmptyState({
   secondaryAction,
 }: EmptyStateProps) {
   const isNoResults = variant === 'no-results'
+  const isFavoritesEmpty = variant === 'favorites-empty'
 
   return (
     <div className="qc-empty-state" role="status">
@@ -47,8 +48,14 @@ export function EmptyState({
           </>
         ) : (
           <>
-            <h2 className="qc-empty-state__title">添加常用文件</h2>
-            <p className="qc-empty-state__description">应用不会扫描磁盘。</p>
+            <h2 className="qc-empty-state__title">
+              {isFavoritesEmpty ? '还没有收藏卡片' : '添加常用文件'}
+            </h2>
+            <p className="qc-empty-state__description">
+              {isFavoritesEmpty
+                ? '点击卡片右下角的桃心，把常用卡片集中到这里。'
+                : '应用不会扫描磁盘。'}
+            </p>
             <div className="qc-empty-state__actions">
               {primaryAction && (
                 <button

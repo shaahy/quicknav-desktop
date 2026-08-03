@@ -250,7 +250,7 @@ export function ScanDialog({
                 扫描批量添加卡片
               </Dialog.Title>
               <Dialog.Description className="qc-scan-dialog__description">
-                递归扫描文件夹，确认名称与类别后一次性添加。
+                扫描根目录及一级子文件夹，确认名称与类别后一次性添加。
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>

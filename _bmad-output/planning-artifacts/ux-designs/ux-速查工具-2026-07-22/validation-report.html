@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: 本地文件导航工具</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header class="report-header">
+      <div class="title">
+        <h1>本地文件导航工具 — UX Design Validation Report</h1>
+        <div class="subtitle">E:/元梦工作空间/速查工具/_bmad-output/planning-artifacts/ux-designs/ux-速查工具-2026-07-22</div>
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p>整体为 <strong>strong</strong>：DESIGN.md 与 EXPERIENCE.md 均已进入 <code>status: final</code>，可被 Architecture 与 Story/Dev 稳定抽取。UJ、需求、token、组件、Surface 状态、4 个正式 Mock、平台边界与实现保留项均形成可验收闭环；本轮完整重跑 8 个维度，未发现 Critical、High、Medium 或 Low finding。</p>
+      <p>无障碍回归复核确认上一轮 1 个 High 与 4 个 Medium 已全部闭合；跨平台与系统边界复核确认此前 1 个 Medium 与 1 个 Low 已关闭。两个额外 lens 均未改变 Rubric 的 strong 判断，也没有发现新的 finding。</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Bloat &amp; overspecification</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <section class="dimension"><details><summary><h2>1. Flow coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>从三份 sources 提取并核对 UJ-1～UJ-4、FR-001～FR-026 与 NFR-001～NFR-007。四条 Key Flow 均保留上游名称，使用具名主人公“怡哥”，包含编号步骤、Climax 与适用 failure paths；外部系统返回落点规则已消除 UJ-4 原有歧义。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>2. Token completeness</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>16 个颜色 token 均为六位 hex；63 个唯一 token 引用全部解析。主要承重色组合具备 AA 目标，焦点外环几何与复杂状态下 3:1 可见变化验收明确。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>3. Component coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>frontmatter、DESIGN.md Components 与 EXPERIENCE.md Component Patterns 使用同一组 20 个规范键。action-menu 与 reorder-control 的禁用文字、标记、原因、轮廓和不可激活语义已补齐，并禁止只靠透明度或颜色表达。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>4. State coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>S01～S18 与 X01～X04 的空态、冷启动、加载失败、焦点、搜索、表单、排序、删除、失败、冲突、修复、成功反馈及系统返回焦点均有明确 Treatment；技术恢复机制仍留给 Architecture。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>5. Visual reference coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>正式 mockups 包含 key-home.html、key-add-card.html、key-edit-card.html、key-repair-failure.html 4 个 HTML；wireframes 无正式文件，imports 为空。两份 Spine 共含 12 个有效相对链接，全部解析到上述 4 个正式 Mock；每个 Mock 均有具体命名和 Surface 映射，无 orphan、broken link 或含糊引用。.working 只保留过程证据，不作为正式视觉参考；后续视觉产物与 Spine 冲突时以 Spine 为准。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>6. Bloat &amp; overspecification</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>两份 Spine 以 token、组件表、IA、状态、交互和旅程承载契约。未冻结桌面框架、存储、文件唯一性、同步写盘时点、构建或打包方案；排序规则使用可观察结果描述。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>7. Inheritance discipline</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>三条 sources 均可解析；UJ 名称与上游一致；核心术语无漂移；20 个组件键一致；视觉 token 全部解析；外部系统 Surface 和返回落点使用统一 S/X 编号。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="dimension"><details><summary><h2>8. Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary><div class="dim-body"><div class="dim-judgment"><p>DESIGN.md 章节顺序规范；EXPERIENCE.md 包含全部默认章节，并保留 Responsive &amp; Platform 与 Inspiration &amp; Anti-patterns。新增章节只记录可执行启发和关键拒绝项。</p><p>Findings：无。</p></div></div></details></section>
+
+    <section class="reviewer-section"><details><summary><h2>无障碍审查</h2><span class="reviewer-source">review-accessibility.md</span></summary><div class="dim-body"><div class="dim-judgment"><p><strong>strong。</strong>上轮 findings 已全部核销：X01 返回按来源闭合；S10/S11、类别复选组与启动失败具备可验收语义；状态条不会定时移除当前焦点；应用区域与卡片集合具备结构语义；文字间距、200% 等价缩放与最小支持窗口重排边界明确。</p><p>Critical 0 · High 0 · Medium 0 · Low 0。</p></div></div></details></section>
+
+    <section class="reviewer-section"><details><summary><h2>跨平台与系统边界审查</h2><span class="reviewer-source">review-platform-boundary.md</span></summary><div class="dim-body"><div class="dim-judgment"><p><strong>通过。</strong>X01～X04 的取消、成功、失败与回焦路径逐来源唯一；Windows/macOS 产品能力和验收结果一致，差异仅留在原生系统界面。排序采用产品结果措辞，不暗示同步写盘；Architecture 技术选择空间完整保留。</p><p>Critical 0 · High 0 · Medium 0 · Low 0。</p></div></div></details></section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li>两份 Spine 均为 status: final，updated: 2026-07-22；frontmatter 完整；三条 sources 可解析；UJ 4 项、FR 26 项、NFR 7 项连续唯一。</li>
+        <li>16 个颜色 token 均为 hex；63 个唯一 token 引用，unresolved 0；20 个组件键集合差异 0。</li>
+        <li>S01～S18 与 X01～X04 均有行为归属；冷启动、加载失败和外部系统返回焦点已闭合。</li>
+        <li>Formal visuals：mockups 有 4 个正式 HTML；wireframes 0 个正式文件；imports 0 个文件。</li>
+        <li>Links：两份 Spine 共 12 个有效相对链接，resolved 12、broken 0；4 个正式 Mock 均被引用，orphan 0。</li>
+        <li>Working/formal boundary：.working 仅承载过程证据；正式视觉参考仅从 mockups 链接。</li>
+        <li>两份 Spine 均未使用 Mermaid，无语法问题。</li>
+        <li>三个 reviewer 当前计数均为 Critical 0、High 0、Medium 0、Low 0。</li>
+        <li>Reviewer files：review-rubric.md、review-accessibility.md、review-platform-boundary.md。</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: E:/元梦工作空间/速查工具/_bmad-output/planning-artifacts/ux-designs/ux-速查工具-2026-07-22/review-rubric.md</span>
+        <span>Generated: 2026-07-22T16:08:39+08:00</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

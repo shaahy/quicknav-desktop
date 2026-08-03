@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>速查工具 · 首页与卡片整理关键屏幕</title>
+  <style>
+    /*
+      Governed by DESIGN.md:
+      Brand & Style; Colors; Typography; Layout & Spacing; Elevation & Depth; Shapes;
+      Components: app-shell, category-nav, category-item, view-header, global-search,
+      toolbar-button, file-card, file-type-mark, category-tag, reorder-control.
+      Governed by EXPERIENCE.md:
+      Information Architecture S01/S08; Component Patterns; State Patterns S01/S08;
+      Interaction Primitives; Accessibility Floor; Responsive & Platform;
+      Key Flows UJ-2 (steps 1–6), UJ-3 (steps 4–5).
+    */
+    :root {
+      --canvas: #F4F3EC;
+      --surface: #FFFDF7;
+      --surface-subtle: #E8E9E1;
+      --text: #1B211D;
+      --muted: #566158;
+      --disabled: #747D76;
+      --border: #253229;
+      --border-muted: #A9AFA9;
+      --action: #1F6248;
+      --action-hover: #154532;
+      --focus: #6D43B5;
+      --success: #216E39;
+      --danger: #A52A2A;
+      --sidebar: 208px;
+      --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: #DDDFDA;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    .page { min-width: 1120px; padding: 28px 40px 48px; }
+    .page-head { width: 1024px; margin: 0 auto 20px; }
+    .page-head h1 { margin: 0 0 6px; font-size: 26px; line-height: 1.3; }
+    .page-head p { margin: 0; color: var(--muted); }
+    .specimen { width: 1024px; margin: 0 auto 38px; }
+    .caption {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+    .caption strong { font-size: 16px; }
+    .caption span { color: var(--muted); font-size: 13px; }
+    .app {
+      width: 1024px;
+      height: 720px;
+      overflow: hidden;
+      background: var(--canvas);
+      border: 2px solid var(--border);
+      box-shadow: 0 12px 32px rgba(27, 33, 29, .12);
+    }
+    .window-bar {
+      height: 36px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 12px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font: 12px/1 var(--mono);
+    }
+    .window-title { grid-column: 2; font-weight: 700; }
+    .window-controls { grid-column: 3; justify-self: end; display: flex; gap: 14px; color: var(--muted); }
+    .shell { height: calc(100% - 36px); display: grid; grid-template-columns: var(--sidebar) minmax(0, 1fr); }
+    .sidebar {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-right: 2px solid var(--border);
+    }
+    .brand {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: #FFFFFF;
+      background: var(--border);
+      font: 700 13px/1 var(--mono);
+    }
+    .nav-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 52px;
+      padding: 0 12px 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-head strong { font-size: 13px; }
+    .nav-actions { display: flex; gap: 5px; }
+    .icon-button, .more, .move-button, .drag-handle {
+      display: inline-grid;
+      place-items: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .icon-button { font-weight: 800; }
+    .category-list { padding-top: 8px; }
+    .category {
+      min-height: 44px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px 0 16px;
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .category:first-child { border-top: 1px solid var(--border-muted); }
+    .category.active {
+      color: #FFFFFF;
+      background: var(--action);
+      border-color: var(--action);
+      font-weight: 700;
+    }
+    .category-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .category-count { font: 12px/1 var(--mono); }
+    .category-more {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+    .category-system-bottom { margin-top: auto; border-top: 1px solid var(--border); }
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 12px 16px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font: 11px/1.45 var(--mono);
+    }
+    .main { min-width: 0; display: flex; flex-direction: column; background: var(--canvas); }
+    .view-header {
+      padding: 18px 20px 14px;
+      background: var(--canvas);
+      border-bottom: 2px solid var(--border);
+    }
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .title-block h2 { margin: 0; font-size: 22px; line-height: 1.3; }
+    .view-meta { margin: 3px 0 0; color: var(--muted); font: 12px/1.4 var(--mono); }
+    .search-wrap {
+      width: 310px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 11px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 2px;
+    }
+    .search-icon { font-size: 18px; line-height: 1; }
+    .search-wrap input { min-width: 0; width: 100%; color: var(--text); background: transparent; border: 0; outline: 0; }
+    .search-wrap input::placeholder { color: var(--muted); opacity: 1; }
+    .toolbar { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+    .button {
+      min-height: 36px;
+      padding: 0 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .button.primary { margin-left: auto; color: #FFFFFF; background: var(--action); border-color: var(--action); }
+    .button.mode { color: #FFFFFF; background: var(--action); border-color: var(--action); }
+    .mode-hint { color: var(--muted); font-size: 12px; }
+    .card-region { flex: 1; min-height: 0; overflow: hidden; padding: 16px 20px 20px; }
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .file-card {
+      position: relative;
+      min-width: 0;
+      min-height: 218px;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .card-top {
+      min-height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 7px 6px 12px;
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .type-mark { display: flex; align-items: center; gap: 7px; color: var(--muted); font: 11px/1 var(--mono); }
+    .file-icon {
+      width: 22px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      border: 1px solid var(--border-muted);
+      font: 700 9px/1 var(--mono);
+    }
+    .more { min-width: 32px; font-size: 18px; line-height: 1; }
+    .card-body { flex: 1; padding: 13px 12px 10px; }
+    .card-body h3 { margin: 0 0 8px; padding-right: 4px; font-size: 16px; line-height: 1.4; }
+    .card-body p {
+      margin: 0;
+      color: var(--muted);
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .tags { min-height: 30px; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 5px; margin-top: 13px; }
+    .tag {
+      padding: 2px 6px;
+      color: var(--action);
+      background: var(--canvas);
+      border: 1px solid var(--action);
+      border-radius: 2px;
+      font: 10px/1.4 var(--mono);
+    }
+    .card-footer {
+      min-height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border-muted);
+      font: 11px/1 var(--mono);
+    }
+    .open-cue { color: var(--action); font-family: var(--sans); font-weight: 700; }
+    .sort-card { min-height: 218px; border-width: 2px; }
+    .sort-card .card-top { padding-left: 7px; }
+    .sort-index { color: var(--action); font: 700 12px/1 var(--mono); }
+    .reorder-strip {
+      min-height: 47px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 7px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-subtle);
+    }
+    .drag-handle { min-width: 34px; cursor: grab; font: 700 15px/1 var(--mono); }
+    .move-button { flex: 1; min-width: 0; font-size: 12px; font-weight: 700; }
+    .move-button[disabled] { color: var(--disabled); background: var(--surface); border-style: dashed; }
+    .sort-card .card-body { cursor: default; }
+    .focus-demo { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .mode-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 20px;
+      padding: 8px 11px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 0;
+      font-size: 12px;
+    }
+    .mode-banner strong { color: var(--action); }
+    @media (prefers-reduced-motion: no-preference) {
+      button { transition: background-color 120ms ease, color 120ms ease; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-head">
+      <h1>速查工具 · 首页关键屏幕</h1>
+      <p>1024 × 720 桌面基线。Mock 用于解释 Spine，不替代行为与验收合同。</p>
+    </header>
+
+    <section class="specimen" aria-labelledby="caption-normal">
+      <p class="caption" id="caption-normal"><strong>S01 · 全部卡片正常态</strong><span>固定类别栏、常驻搜索、三列索引卡；卡片主体负责打开，更多按钮负责管理。</span></p>
+      <div class="app" role="img" aria-label="速查工具全部卡片正常态，包含固定左侧类别栏和三列卡片网格">
+        <header class="window-bar"><span class="window-title">速查工具</span><span class="window-controls" aria-hidden="true">—　□　×</span></header>
+        <div class="shell">
+          <aside class="sidebar" aria-label="类别导航">
+            <div class="brand"><span class="brand-mark">速</span><span>速查工具</span></div>
+            <div class="nav-head"><strong>类别</strong><div class="nav-actions"><button class="icon-button" aria-label="整理类别">↕</button><button class="icon-button" aria-label="新建类别">＋</button></div></div>
+            <nav class="category-list" aria-label="类别">
+              <div class="category active" aria-current="page"><span class="category-name">全部卡片</span><span class="category-count">12</span></div>
+              <div class="category"><span class="category-name">当前项目</span><button class="category-more" aria-label="更多操作：当前项目">⋮</button></div>
+              <div class="category"><span class="category-name">常用模板</span><button class="category-more" aria-label="更多操作：常用模板">⋮</button></div>
+              <div class="category"><span class="category-name">会议资料</span><button class="category-more" aria-label="更多操作：会议资料">⋮</button></div>
+            </nav>
+            <div class="category category-system-bottom"><span class="category-name">未分类</span><span class="category-count">1</span></div>
+            <div class="sidebar-foot">本机独立数据<br>不会扫描磁盘</div>
+          </aside>
+          <section class="main" aria-label="全部卡片主内容">
+            <header class="view-header">
+              <div class="title-row">
+                <div class="title-block"><h2>全部卡片</h2><p class="view-meta">12 个文件 · 当前视图手动顺序</p></div>
+                <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input type="text" placeholder="搜索全部卡片" aria-label="搜索全部卡片"></label>
+              </div>
+              <div class="toolbar"><button class="button">整理排序</button><button class="button primary">＋ 选择文件</button></div>
+            </header>
+            <div class="card-region">
+              <div class="card-grid" aria-label="全部卡片，共 12 张">
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">DOCX</span>.docx</span><button class="more" aria-label="更多操作：产品需求文档">⋮</button></div><div class="card-body"><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则、功能范围与验收边界。</p><div class="tags"><span class="tag">当前项目</span><span class="tag">会议资料</span></div></div><div class="card-footer"><span>1 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">XLSX</span>.xlsx</span><button class="more" aria-label="更多操作：项目预算表">⋮</button></div><div class="card-body"><h3>项目预算表</h3><p>研发、设计和测试资源投入测算，含各阶段预算备注。</p><div class="tags"><span class="tag">当前项目</span></div></div><div class="card-footer"><span>2 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">MD</span>.md</span><button class="more" aria-label="更多操作：周会记录">⋮</button></div><div class="card-body"><h3>周会记录</h3><p>本周交付、风险、负责人和下一步待确认事项。</p><div class="tags"><span class="tag">会议资料</span></div></div><div class="card-footer"><span>3 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">PPTX</span>.pptx</span><button class="more" aria-label="更多操作：首次会面演示稿">⋮</button></div><div class="card-body"><h3>首次会面演示稿</h3><p>首次沟通使用的演示文稿结构与图表化表达。</p><div class="tags"><span class="tag">常用模板</span><span class="tag">会议资料</span><span class="tag">+1</span></div></div><div class="card-footer"><span>4 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">PDF</span>.pdf</span><button class="more" aria-label="更多操作：用户访谈提纲">⋮</button></div><div class="card-body"><h3>用户访谈提纲</h3><p>首轮访谈问题、观察重点与记录结构。</p><div class="tags"><span class="tag">常用模板</span></div></div><div class="card-footer"><span>5 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+                <article class="file-card"><div class="card-top"><span class="type-mark"><span class="file-icon">TXT</span>.txt</span><button class="more" aria-label="更多操作：版本交付清单">⋮</button></div><div class="card-body"><h3>版本交付清单</h3><p>版本文件、演示路径、验收证据与发布前检查项。</p><div class="tags"><span class="tag">当前项目</span></div></div><div class="card-footer"><span>6 / 12</span><span class="open-cue">单击打开 ↗</span></div></article>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="specimen" aria-labelledby="caption-sort">
+      <p class="caption" id="caption-sort"><strong>S08 · 卡片整理排序态</strong><span>卡片停止主打开；拖动手柄与键盘上移／下移并存，移动立即生效且只影响当前视图。</span></p>
+      <div class="app" role="img" aria-label="速查工具卡片整理排序态，每张卡片显示拖动手柄和上移下移按钮">
+        <header class="window-bar"><span class="window-title">速查工具</span><span class="window-controls" aria-hidden="true">—　□　×</span></header>
+        <div class="shell">
+          <aside class="sidebar" aria-label="类别导航">
+            <div class="brand"><span class="brand-mark">速</span><span>速查工具</span></div>
+            <div class="nav-head"><strong>类别</strong><div class="nav-actions"><button class="icon-button" aria-label="整理类别">↕</button><button class="icon-button" aria-label="新建类别">＋</button></div></div>
+            <nav class="category-list" aria-label="类别">
+              <div class="category active" aria-current="page"><span class="category-name">全部卡片</span><span class="category-count">12</span></div>
+              <div class="category"><span class="category-name">当前项目</span><button class="category-more" aria-label="更多操作：当前项目">⋮</button></div>
+              <div class="category"><span class="category-name">常用模板</span><button class="category-more" aria-label="更多操作：常用模板">⋮</button></div>
+              <div class="category"><span class="category-name">会议资料</span><button class="category-more" aria-label="更多操作：会议资料">⋮</button></div>
+            </nav>
+            <div class="category category-system-bottom"><span class="category-name">未分类</span><span class="category-count">1</span></div>
+            <div class="sidebar-foot">整理中只改变<br>全部卡片顺序</div>
+          </aside>
+          <section class="main" aria-label="全部卡片整理排序">
+            <header class="view-header">
+              <div class="title-row">
+                <div class="title-block"><h2>全部卡片</h2><p class="view-meta">整理排序 · 12 个文件</p></div>
+                <label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input type="text" placeholder="搜索全部卡片" aria-label="搜索全部卡片"></label>
+              </div>
+              <div class="toolbar"><button class="button mode">完成整理</button><span class="mode-hint">拖动，或使用每张卡片底部的上移／下移</span><button class="button primary">＋ 选择文件</button></div>
+            </header>
+            <div class="mode-banner"><strong>整理模式</strong><span>卡片主体暂不打开文件。位置变化立即生效，无需另行保存。</span></div>
+            <div class="card-region">
+              <div class="card-grid" aria-label="全部卡片整理排序，共 12 张">
+                <article class="file-card sort-card"><div class="card-top"><button class="drag-handle" aria-label="拖动产品需求文档">⠿</button><span class="type-mark"><span class="file-icon">DOCX</span>.docx</span><span class="sort-index">1 / 12</span></div><div class="card-body"><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则、功能范围与验收边界。</p><div class="tags"><span class="tag">当前项目</span><span class="tag">会议资料</span></div></div><div class="reorder-strip"><button class="move-button" disabled aria-label="产品需求文档已在顶部，不能上移">上移　不可用</button><button class="move-button" aria-label="下移产品需求文档">下移 ↓</button></div></article>
+                <article class="file-card sort-card focus-demo"><div class="card-top"><button class="drag-handle" aria-label="拖动项目预算表">⠿</button><span class="type-mark"><span class="file-icon">XLSX</span>.xlsx</span><span class="sort-index">2 / 12</span></div><div class="card-body"><h3>项目预算表</h3><p>研发、设计和测试资源投入测算，含各阶段预算备注。</p><div class="tags"><span class="tag">当前项目</span></div></div><div class="reorder-strip"><button class="move-button" aria-label="上移项目预算表">上移 ↑</button><button class="move-button" aria-label="下移项目预算表">下移 ↓</button></div></article>
+                <article class="file-card sort-card"><div class="card-top"><button class="drag-handle" aria-label="拖动周会记录">⠿</button><span class="type-mark"><span class="file-icon">MD</span>.md</span><span class="sort-index">3 / 12</span></div><div class="card-body"><h3>周会记录</h3><p>本周交付、风险、负责人和下一步待确认事项。</p><div class="tags"><span class="tag">会议资料</span></div></div><div class="reorder-strip"><button class="move-button" aria-label="上移周会记录">上移 ↑</button><button class="move-button" aria-label="下移周会记录">下移 ↓</button></div></article>
+                <article class="file-card sort-card"><div class="card-top"><button class="drag-handle" aria-label="拖动首次会面演示稿">⠿</button><span class="type-mark"><span class="file-icon">PPTX</span>.pptx</span><span class="sort-index">4 / 12</span></div><div class="card-body"><h3>首次会面演示稿</h3><p>首次沟通使用的演示文稿结构与图表化表达。</p><div class="tags"><span class="tag">常用模板</span><span class="tag">会议资料</span><span class="tag">+1</span></div></div><div class="reorder-strip"><button class="move-button" aria-label="上移首次会面演示稿">上移 ↑</button><button class="move-button" aria-label="下移首次会面演示稿">下移 ↓</button></div></article>
+                <article class="file-card sort-card"><div class="card-top"><button class="drag-handle" aria-label="拖动用户访谈提纲">⠿</button><span class="type-mark"><span class="file-icon">PDF</span>.pdf</span><span class="sort-index">5 / 12</span></div><div class="card-body"><h3>用户访谈提纲</h3><p>首轮访谈问题、观察重点与记录结构。</p><div class="tags"><span class="tag">常用模板</span></div></div><div class="reorder-strip"><button class="move-button" aria-label="上移用户访谈提纲">上移 ↑</button><button class="move-button" aria-label="下移用户访谈提纲">下移 ↓</button></div></article>
+                <article class="file-card sort-card"><div class="card-top"><button class="drag-handle" aria-label="拖动版本交付清单">⠿</button><span class="type-mark"><span class="file-icon">TXT</span>.txt</span><span class="sort-index">6 / 12</span></div><div class="card-body"><h3>版本交付清单</h3><p>版本文件、演示路径、验收证据与发布前检查项。</p><div class="tags"><span class="tag">当前项目</span></div></div><div class="reorder-strip"><button class="move-button" aria-label="上移版本交付清单">上移 ↑</button><button class="move-button" aria-label="下移版本交付清单">下移 ↓</button></div></article>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

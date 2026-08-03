@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>BMAD Quick Dev：已有 V1 增量开发教程</title>
+  <style>
+    :root{
+      --bg:#f3f7f5;--panel:#fff;--panel2:#f7faf8;--text:#15231f;--muted:#61726c;
+      --line:#d7e2dd;--brand:#08785d;--brand2:#055b46;--soft:#e5f5ef;--blue:#2457d6;
+      --blue-soft:#eaf0ff;--amber:#9a5b00;--amber-soft:#fff3d8;--red:#b42318;
+      --red-soft:#ffebe9;--purple:#6941c6;--purple-soft:#f1ebff;--code:#111a18;
+      --shadow:0 12px 34px rgba(22,54,45,.08);--radius:16px
+    }
+    html[data-theme="dark"]{
+      --bg:#0b1210;--panel:#141e1b;--panel2:#101815;--text:#edf7f3;--muted:#a4b5af;
+      --line:#293a35;--brand:#6ed7b8;--brand2:#9be6cf;--soft:#173a31;--blue:#86aaff;
+      --blue-soft:#1c2d52;--amber:#ffc46a;--amber-soft:#433016;--red:#ff9088;
+      --red-soft:#461f21;--purple:#c3a6ff;--purple-soft:#30234b;--code:#080e0c;
+      --shadow:0 12px 34px rgba(0,0,0,.3)
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;line-height:1.72}
+    button,input{font:inherit}a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}
+    aside{position:sticky;top:0;height:100vh;overflow:auto;padding:25px 19px;background:var(--panel);border-right:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}.mark{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(145deg,#08785d,#31ac88);box-shadow:0 8px 20px rgba(8,120,93,.25)}
+    .brand b{display:block;font-size:15px;line-height:1.25}.brand span{font-size:12px;color:var(--muted)}
+    .nav-label{margin:19px 8px 6px;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.09em}nav a{display:block;padding:8px 10px;border-radius:9px;color:var(--muted);font-size:13px}nav a:hover,nav a.active{background:var(--soft);color:var(--brand);text-decoration:none}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:10px;padding:9px 11px;cursor:pointer;font-weight:800;font-size:13px}.btn:hover{border-color:var(--brand);color:var(--brand)}.btn.primary{color:#fff;background:var(--brand);border-color:var(--brand)}
+    .hero{padding:68px clamp(24px,6vw,90px) 55px;color:#fff;background:radial-gradient(circle at 84% 12%,rgba(117,239,201,.28),transparent 24%),linear-gradient(135deg,#0b3329,#08785d 58%,#35a986)}
+    .eyebrow{font-size:12px;font-weight:900;letter-spacing:.13em;opacity:.8}h1{max-width:900px;margin:12px 0 17px;font-size:clamp(34px,5vw,60px);line-height:1.1;letter-spacing:-.04em}.hero p{max-width:850px;font-size:18px;opacity:.9}
+    .hero-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;max-width:980px;margin-top:32px}.hero-card{padding:14px;border:1px solid rgba(255,255,255,.24);border-radius:13px;background:rgba(255,255,255,.09)}.hero-card b{display:block;font-size:20px}.hero-card span{font-size:12px;opacity:.8}
+    main{max-width:1160px;margin:auto;padding:42px clamp(20px,5vw,70px) 90px}section{margin-bottom:54px;scroll-margin-top:18px}h2{margin:0 0 17px;font-size:clamp(25px,3vw,36px);letter-spacing:-.025em}h3{margin:26px 0 11px;font-size:20px}h4{margin:18px 0 7px;font-size:16px}p{margin:8px 0 14px}.lead{max-width:900px;color:var(--muted);font-size:17px}
+    .tag{display:inline-block;padding:3px 9px;border-radius:999px;color:var(--brand);background:var(--soft);font-size:11px;font-weight:900}.tag.blue{color:var(--blue);background:var(--blue-soft)}.tag.amber{color:var(--amber);background:var(--amber-soft)}.tag.red{color:var(--red);background:var(--red-soft)}.tag.purple{color:var(--purple);background:var(--purple-soft)}
+    .callout{margin:18px 0;padding:18px 20px;border-left:5px solid var(--brand);border-radius:13px;background:var(--soft)}.callout strong{color:var(--brand2)}.callout.warn{border-color:var(--amber);background:var(--amber-soft)}.callout.warn strong{color:var(--amber)}.callout.danger{border-color:var(--red);background:var(--red-soft)}.callout.danger strong{color:var(--red)}.callout.info{border-color:var(--blue);background:var(--blue-soft)}.callout.info strong{color:var(--blue)}
+    .grid2,.grid3{display:grid;gap:16px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:21px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);box-shadow:var(--shadow)}.card h3,.card h4{margin-top:0}
+    .table-wrap{overflow-x:auto;border-radius:12px}table{width:100%;border-collapse:collapse;margin:14px 0 22px;background:var(--panel)}th,td{padding:12px 13px;border:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel2);font-size:13px}td{font-size:14px}
+    code{padding:.1em .35em;border-radius:5px;background:var(--soft);color:var(--brand2);font-family:Consolas,monospace;font-size:.92em}pre{position:relative;overflow:auto;margin:12px 0 20px;padding:20px;border-radius:13px;color:#eaf7f2;background:var(--code);font-size:13px;line-height:1.62}pre code{padding:0;background:transparent;color:inherit}.copy{position:absolute;top:9px;right:9px;border:1px solid #3c514a;color:#dcebe6;background:#1c2c27;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11px}
+    .flow{display:grid;gap:9px;margin:22px 0}.flow-row{display:grid;grid-template-columns:43px 1fr auto;gap:13px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:13px;background:var(--panel)}.n{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:#fff;background:var(--brand);font-weight:900}.flow-row p{margin:2px 0;color:var(--muted);font-size:13px}.arrow{text-align:center;color:var(--muted);font-size:20px}
+    .step{position:relative;margin:28px 0 38px;padding-left:43px}.step:before{content:attr(data-step);position:absolute;left:0;top:0;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;color:#fff;background:var(--brand);font-weight:900}.step:after{content:"";position:absolute;left:14px;top:36px;bottom:-29px;width:1px;background:var(--line)}.step:last-child:after{display:none}
+    details{margin:12px 0;border:1px solid var(--line);border-radius:13px;background:var(--panel)}summary{padding:16px 18px;cursor:pointer;font-weight:900}details>div{padding:0 18px 18px}
+    .gate{display:grid;grid-template-columns:130px 1fr 110px;gap:12px;align-items:center;padding:13px;border-bottom:1px solid var(--line)}.gate:last-child{border-bottom:0}.gate>b:first-child{color:var(--brand)}.pass{color:var(--brand);font-weight:900;text-align:right}
+    .checklist{display:grid;gap:8px;margin:14px 0}.check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:9px;background:var(--panel2)}.check input{margin-top:6px;accent-color:var(--brand)}.progress{height:10px;overflow:hidden;border-radius:99px;background:var(--line);margin:10px 0 5px}.progress div{width:0;height:100%;background:linear-gradient(90deg,var(--brand),#5fc9a8);transition:width .25s}.small{color:var(--muted);font-size:12px}
+    .judge{padding:21px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}.judge label{display:flex;gap:10px;padding:9px 11px;margin:7px 0;border-radius:9px;background:var(--panel2)}.judge-result{min-height:76px;margin-top:14px;padding:15px;border-radius:11px;background:var(--soft)}
+    .split{display:grid;grid-template-columns:1fr 70px 1fr;gap:13px;align-items:stretch}.split-mid{display:grid;place-items:center;color:var(--muted);font-weight:900}.danger-zone{border:2px solid var(--red);box-shadow:none}
+    footer{padding:28px;text-align:center;color:var(--muted);border-top:1px solid var(--line);background:var(--panel)}.mobile{display:none;position:fixed;right:16px;bottom:16px;z-index:30;box-shadow:var(--shadow)}
+    @media(max-width:980px){.layout{display:block}aside{display:none;position:fixed;z-index:20;inset:0 auto 0 0;width:290px;box-shadow:var(--shadow)}aside.open{display:block}.mobile{display:block}.hero-cards,.grid3{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:680px){.hero{padding-top:48px}.hero-cards,.grid2,.grid3,.split{grid-template-columns:1fr}.split-mid{padding:3px}.flow-row{grid-template-columns:40px 1fr}.flow-row>.tag{grid-column:2;width:max-content}.gate{grid-template-columns:1fr}.pass{text-align:left}h1{font-size:34px}}
+    @media print{:root{--bg:#fff;--panel:#fff;--panel2:#f7f7f7;--text:#000;--muted:#444;--line:#bbb}.layout{display:block}aside,.mobile,.copy,.no-print{display:none!important}.hero{padding:34px;color:#000;background:#fff;border-bottom:3px solid #222}.hero-card{border-color:#888}.card,details{box-shadow:none}main{max-width:none;padding:25px}details>div{display:block!important}section{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside id="sidebar">
+      <div class="brand"><div class="mark">QD</div><div><b>BMAD Quick Dev</b><span>已有 V1 增量开发</span></div></div>
+      <nav>
+        <div class="nav-label">先做判断</div>
+        <a href="#answer">01 核心结论</a><a href="#fit">02 适用边界</a><a href="#judge">03 快速判断器</a><a href="#principle">04 工作原理</a>
+        <div class="nav-label">完整教程</div>
+        <a href="#prepare">05 V1 准备</a><a href="#intent">06 单一意图</a><a href="#invoke">07 启动 Quick Dev</a><a href="#approve">08 审批 Spec</a><a href="#execute">09 实现与验证</a><a href="#review">10 Review 与分流</a><a href="#finish">11 验收与交付</a>
+        <div class="nav-label">多功能迭代</div>
+        <a href="#multi">12 2–3 个功能怎么跑</a><a href="#release">13 版本级回归</a><a href="#upgrade">14 何时升级流程</a>
+        <div class="nav-label">可直接使用</div>
+        <a href="#example">15 完整示例</a><a href="#prompts">16 提示词模板</a><a href="#artifacts">17 产物与目录</a><a href="#checklist">18 执行清单</a><a href="#faq">19 常见问题</a>
+      </nav>
+      <div class="actions no-print"><button class="btn" id="theme" type="button">切换主题</button><button class="btn" onclick="window.print()" type="button">打印 / PDF</button></div>
+    </aside>
+    <div>
+      <header class="hero">
+        <div class="eyebrow">ONE INTENT · ONE SPEC · ONE REVIEWABLE CHANGE</div>
+        <h1>用 BMAD Quick Dev 为已有 V1 做小功能增量</h1>
+        <p>从一个清晰目标出发，经过意图压缩、Spec 审批、实现、自检、对抗式 Review 和问题分流，交付一组可审查、可测试、可回退的代码变更。</p>
+        <div class="hero-cards"><div class="hero-card"><b>1</b><span>一次只做一个目标</span></div><div class="hero-card"><b>3</b><span>三个高价值人工检查点</span></div><div class="hero-card"><b>6+</b><span>内部执行阶段</span></div><div class="hero-card"><b>0</b><span>无需启动本地网页端口</span></div></div>
+      </header>
+      <main>
+        <section id="answer">
+          <span class="tag">先看结论</span><h2>Quick Dev 不是“跳过规划”，而是把规划压缩到一次执行里</h2>
+          <p class="lead">它适合已有 V1 中边界清楚、风险可控的小改动。完整过程仍包含：理解目标、读取现有项目、决定直接实现还是先写短 Spec、获得批准、实现与测试、自检、对抗式 Review、修复或延期无关问题、交付结果。</p>
+          <div class="callout"><strong>推荐用法：</strong>如果 V1.1 有 2–3 个独立小功能，执行 2–3 次 Quick Dev。每次一个功能、一个 <code>spec-{slug}.md</code>、一组代码变更和一次 Review。全部完成后再做一次版本级组合回归。</div>
+          <div class="grid3"><div class="card"><span class="tag">输入</span><h3>单一意图</h3><p>一个用户可理解的目标、清晰边界、可验证结果，以及 V1 中不能破坏的行为。</p></div><div class="card"><span class="tag blue">过程</span><h3>长执行，少打断</h3><p>人工集中在意图澄清、Spec 批准和最终验收，而不是每改一个文件就确认。</p></div><div class="card"><span class="tag purple">输出</span><h3>可审查变更</h3><p>Spec、代码、测试、Review Trail、延期事项，以及是否可交付的明确结论。</p></div></div>
+        </section>
+
+        <section id="fit">
+          <span class="tag">边界</span><h2>什么适合 Quick Dev，什么不适合</h2>
+          <div class="split"><div class="card"><span class="tag">适合</span><h3>小、清楚、局部</h3><ul><li>已有页面的小功能或体验增强</li><li>明确原因的 Bug 修复</li><li>少量文件内的重构</li><li>配置、校验、提示、筛选和排序调整</li><li>复用现有模式的 API 或字段扩展</li><li>一个已有 BMAD Story 的快速实现</li></ul></div><div class="split-mid">VS</div><div class="card danger-zone"><span class="tag red">不适合</span><h3>模糊、高风险、跨边界</h3><ul><li>多个彼此独立的目标混在一起</li><li>核心权限、计费、安全或状态机变化</li><li>跨多个系统的协调式改造</li><li>新的平台级架构或数据迁移策略</li><li>需求还不能写出可判定验收</li><li>需要团队长期维护的新架构决定</li></ul></div></div>
+          <div class="callout warn"><strong>数量不是唯一标准：</strong>“只加一个按钮”也可能触发权限、审计和隐私风险；“修改十个相似文案”反而可能是一个低风险目标。判断依据是扩散面和决策风险，不是文件数。</div>
+        </section>
+
+        <section id="judge">
+          <span class="tag">交互工具</span><h2>Quick Dev 适用性判断器</h2><p class="lead">针对一个功能逐项勾选。判断器只做路线提示，真正的边界仍要在 Spec 审批时确认。</p>
+          <div class="judge"><div id="questions">
+            <label><input type="checkbox" data-risk="1"> 目标可以用一句话表达，并只有一个主要用户结果</label>
+            <label><input type="checkbox" data-risk="1"> 能复用 V1 现有页面、服务、数据或测试模式</label>
+            <label><input type="checkbox" data-risk="2"> 会新增数据库字段、API 合同或后台任务</label>
+            <label><input type="checkbox" data-risk="3"> 会改变权限、安全、计费、租户或核心状态</label>
+            <label><input type="checkbox" data-risk="3"> 关键需求仍存在多个合理解释，需要产品决策</label>
+            <label><input type="checkbox" data-risk="3"> 失败后可能造成不可逆数据变化或大范围生产影响</label>
+          </div><button class="btn primary" id="judgeBtn" type="button">给出路线建议</button><div class="judge-result" id="judgeResult">尚未判断。请按一个功能的实际情况勾选。</div></div>
+        </section>
+
+        <section id="principle">
+          <span class="tag">原理</span><h2>Quick Dev 的内部工作链</h2>
+          <div class="flow">
+            <div class="flow-row"><div class="n">1</div><div><b>接收并压缩意图</b><p>把自由表达压成一个连贯、无冲突、可执行的目标。</p></div><span class="tag">Intent</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">2</div><div><b>读取现有上下文</b><p>识别技术栈、Project Context、相关代码、测试和可用规划产物。</p></div><span class="tag blue">Context</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">3</div><div><b>路由到最小安全路径</b><p>零扩散面的改动可直接做；其余先形成短 Spec 并等待批准。</p></div><span class="tag amber">Route</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">4</div><div><b>实现并运行测试</b><p>按批准边界修改代码，不顺手处理无关问题。</p></div><span class="tag">Build</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">5</div><div><b>自检与对抗式 Review</b><p>从 Diff、边界、错误路径、验收和回归角度查问题。</p></div><span class="tag red">Review</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">6</div><div><b>修复、回退或延期</b><p>当前变更导致的问题立即修；意图/Spec 错误回到源头；无关问题写入 deferred work。</p></div><span class="tag purple">Resolve</span></div><div class="arrow">↓</div>
+            <div class="flow-row"><div class="n">7</div><div><b>呈现最终结果</b><p>给出改动、测试、Review Trail、剩余风险和交付建议。</p></div><span class="tag">Present</span></div>
+          </div>
+          <div class="callout info"><strong>三个高价值人工检查点：</strong>第一，确认 Agent 理解的是你真正想做的事；第二，批准冻结后的 Spec；第三，审查最终产品和证据。Quick Dev 减少的是低价值打断，不是取消人的判断。</div>
+        </section>
+
+        <section id="prepare">
+          <span class="tag">步骤 1</span><h2>为已有 V1 准备可用上下文</h2>
+          <p class="lead">Quick Dev 会扫描现有项目，但它不可能从混乱或过时的代码库中自动得到正确产品事实。开始前先确保 V1 的真实边界可定位。</p>
+          <div class="step" data-step="1"><h3>确认当前生产基线</h3><p>至少知道 V1 对应的代码分支/提交、当前数据库结构、关键接口、权限、测试入口、已知缺陷和发布回退方式。</p></div>
+          <div class="step" data-step="2"><h3>确认 Project Context</h3><p>推荐存在并保持最新的 <code>_bmad-output/project-context.md</code>。它应记录技术栈、目录、命名、测试和不可违反的实现约束。</p><pre><button class="copy" type="button">复制</button><code>bmad-generate-project-context</code></pre><p class="small">上面是 AI IDE 中调用的 BMAD 工作流名，不是本教程网页的启动命令。</p></div>
+          <div class="step" data-step="3"><h3>提供最相关的事实源</h3><p>不要把全部历史文档无差别塞给 Agent。优先给：当前功能相关的最终 PRD/UX/Architecture、现有代码、相关测试和一个明确的 V1 不变清单。</p></div>
+          <div class="callout danger"><strong>停止条件：</strong>文档和生产代码严重不一致、现有测试不能运行、关键权限/数据行为未知。此时先运行项目文档梳理或正式影响分析，不应直接 Quick Dev。</div>
+        </section>
+
+        <section id="intent">
+          <span class="tag">步骤 2</span><h2>把一个功能写成“单一意图包”</h2>
+          <p>好的输入不需要很长，但必须让 Agent 知道用户结果、边界、验收、回归和可用事实源。</p>
+          <pre><button class="copy" type="button">复制</button><code># Quick Dev Intent
+
+## 目标
+让 [用户角色] 能够 [完成一个结果]，从而 [获得价值]。
+
+## 当前 V1 行为
+- 现在用户怎样操作
+- 相关页面 / API / 数据 / 权限是什么
+
+## 本次改变
+- 只列一个主要目标
+
+## 明确不做
+- 不做的重构、平台化、历史缺陷和扩展能力
+
+## 验收
+- 正常路径的可观察结果
+- 错误、空数据、重复操作、无权限等边界结果
+
+## V1 回归边界
+- 哪些既有行为必须保持不变
+
+## 相关输入
+- 最终 PRD/UX/Architecture 章节
+- 相关代码与测试路径
+
+## 停止并询问
+- 哪些产品、数据或架构决策不允许 Agent 自行推测</code></pre>
+          <div class="grid2"><div class="card"><h3>合格示例</h3><p>“让运营人员再次进入订单列表时恢复其上次有效筛选；只针对当前用户和当前租户；清除无效条件；不增加跨设备同步；不得改变默认权限和查询结果。”</p></div><div class="card"><h3>不合格示例</h3><p>“优化订单列表体验，顺便把筛选、导出、权限、性能和老代码都改好。”这里至少包含五个目标，且验收不可判定。</p></div></div>
+        </section>
+
+        <section id="invoke">
+          <span class="tag">步骤 3</span><h2>在新对话中启动 Quick Dev</h2>
+          <p class="lead">每个功能使用一个新对话，避免上一个功能的假设、Review 结论或延期事项污染下一个功能。</p>
+          <h3>最稳妥的启动提示</h3>
+          <pre><button class="copy" type="button">复制</button><code>bmad-quick-dev
+
+这是一个已经上线的 V1 项目。本次只处理一个增量目标：
+[粘贴单一意图包]
+
+执行要求：
+1. 先读取 project-context.md、相关最终规划产物、现有实现和测试。
+2. 以 V1 当前生产行为为兼容基线，发现文档与代码冲突先报告。
+3. 只处理本目标，不顺手重构或修复无关历史问题。
+4. 先给出理解和影响范围；需要 Spec 时必须等我批准后再实现。
+5. 同步实现测试，运行验证，并执行对抗式 Review。
+6. 当前变更导致的问题必须修复；无关问题写入 deferred-work.md。
+7. 最终给出改动文件、测试证据、Review Trail、剩余风险和回退建议。</code></pre>
+          <h3>Quick Dev 可接受的其他输入</h3>
+          <div class="table-wrap"><table><thead><tr><th>输入</th><th>适用情况</th><th>补充要求</th></tr></thead><tbody>
+            <tr><td>自然语言</td><td>范围清楚的小功能或 Bug</td><td>仍要写 Non-goals 和验收</td></tr>
+            <tr><td>本地意图文件</td><td>内容较长或需要团队先审阅</td><td>提供明确文件路径和优先级</td></tr>
+            <tr><td>Issue / 工单</td><td>团队已有单一需求入口</td><td>确认 Agent 能访问，并核对工单是否过时</td></tr>
+            <tr><td>既有 BMAD Story</td><td>想用 Quick Dev 快速实现某一 Story</td><td>Quick Dev 会读取内容，但不要假设它自动维护全部 Sprint 语义</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section id="approve">
+          <span class="tag">步骤 4</span><h2>认真审批短 Spec，这是最重要的前置门禁</h2>
+          <p>当前版本 Quick Dev 通常直接生成带状态的 <code>spec-{slug}.md</code>，支持多个并行会话使用不同文件。不要只看标题，要逐项检查执行边界。</p>
+          <div class="card"><div class="gate"><b>Problem</b><span>解决的是真实用户问题，而不是直接描述某个实现方案。</span><span class="pass">确认</span></div><div class="gate"><b>Scope</b><span>只有一个目标；修改范围和明确不做均可判定。</span><span class="pass">确认</span></div><div class="gate"><b>Context</b><span>引用了正确的 V1 事实、代码模式和 Project Context。</span><span class="pass">确认</span></div><div class="gate"><b>Acceptance</b><span>正常、异常、边界、权限和回归结果都可观察。</span><span class="pass">确认</span></div><div class="gate"><b>Implementation</b><span>文件、数据、API 和测试范围合理，没有暗含新架构。</span><span class="pass">确认</span></div><div class="gate"><b>Risk</b><span>迁移、兼容、监控和回退与真实风险匹配。</span><span class="pass">确认</span></div></div>
+          <div class="callout warn"><strong>不要批准“看起来差不多”的 Spec：</strong>批准后 Agent 会更长时间自主执行。一个模糊词可能扩散成错误数据结构、错误权限或大量无关改动。</div>
+          <h3>批准时可直接回复</h3><pre><button class="copy" type="button">复制</button><code>我确认当前 Spec 的目标、范围、Non-goals、验收和 V1 回归边界。
+请按该 Spec 实现。任何超出边界的新产品决策、架构决定、不可逆数据变化或权限变化必须停止并询问，不得自行扩大范围。</code></pre>
+        </section>
+
+        <section id="execute">
+          <span class="tag">步骤 5</span><h2>让 Quick Dev 实现，但要求它提供真实验证</h2>
+          <p>实现阶段应当读取实际代码、复用现有模式、修改最小必要范围并同步测试。不要把“代码生成完成”等同于“功能完成”。</p>
+          <div class="grid3"><div class="card"><h3>代码约束</h3><ul><li>复用 V1 现有模式</li><li>避免顺手大重构</li><li>兼容既有数据/API</li><li>记录所有实际修改文件</li></ul></div><div class="card"><h3>测试约束</h3><ul><li>覆盖每条验收标准</li><li>补边界与错误路径</li><li>运行相关 V1 回归</li><li>报告命令和真实结果</li></ul></div><div class="card"><h3>停止条件</h3><ul><li>需要新产品决定</li><li>需要改变核心架构</li><li>发现不可逆迁移风险</li><li>现有事实发生冲突</li></ul></div></div>
+          <div class="callout info"><strong>验证证据至少包含：</strong>执行了哪些测试、通过/失败数量、未运行的测试及原因、构建/类型/Lint 结果、受影响 V1 路径的回归结果。仅写“测试通过”信息不足。</div>
+        </section>
+
+        <section id="review">
+          <span class="tag">步骤 6</span><h2>理解 Review 的三类结果，修在正确的层</h2>
+          <div class="table-wrap"><table><thead><tr><th>发现类型</th><th>例子</th><th>处理方式</th></tr></thead><tbody>
+            <tr><td><b>当前实现问题</b></td><td>空值崩溃、权限绕过、AC 未实现、测试错误</td><td>在本次 Quick Dev 中修复并重新验证</td></tr>
+            <tr><td><b>意图或 Spec 问题</b></td><td>Agent 实现正确，但需求理解本身错了</td><td>回到意图/Spec，重新批准后再实现，不用补丁掩盖</td></tr>
+            <tr><td><b>无关历史问题</b></td><td>Review 发现相邻模块旧 Bug，但非当前变更导致</td><td>记录到 <code>deferred-work.md</code>，另开 Quick Dev</td></tr>
+          </tbody></table></div>
+          <p>Quick Dev 的 Review 重点不是找得越多越好，而是对发现进行分流，保持当前变更聚焦。Review Trail 应追加到 Spec 或相应实施产物中，让你看到发现、决定和修复结果。</p>
+          <div class="callout danger"><strong>不能延期的发现：</strong>当前改动引入的回归、未实现的验收、数据破坏、权限绕过、安全漏洞、虚假的任务完成声明。把这些写进 deferred work 等于带病交付。</div>
+        </section>
+
+        <section id="finish">
+          <span class="tag">步骤 7</span><h2>最终验收：看 Diff、证据和用户结果</h2>
+          <div class="step" data-step="1"><h3>核对用户可见结果</h3><p>按 Spec 的验收标准实际走一遍功能，不只看单元测试。确认成功、失败、空态、刷新、重复操作和权限差异。</p></div>
+          <div class="step" data-step="2"><h3>核对变更范围</h3><p>查看实际 Diff 和文件清单。任何未在 Spec 范围内的修改都需要解释，无法解释就撤出本次变更。</p></div>
+          <div class="step" data-step="3"><h3>核对测试与 Review Trail</h3><p>确认测试真实运行，所有当前变更相关的高风险问题已关闭，延期项确实与本功能无关。</p></div>
+          <div class="step" data-step="4"><h3>决定交付或继续修复</h3><p>只有证据满足 Definition of Done 才合入或发布。若已生成本地提交，也应先由人确认后再推送或创建 PR。</p></div>
+          <div class="card"><div class="gate"><b>范围</b><span>实际变更等于批准的 Spec，无偷偷加料。</span><span class="pass">通过</span></div><div class="gate"><b>行为</b><span>所有验收和关键 V1 回归均有证据。</span><span class="pass">通过</span></div><div class="gate"><b>质量</b><span>构建、类型、Lint、测试和 Review 达标。</span><span class="pass">通过</span></div><div class="gate"><b>运营</b><span>需要时具备日志、监控、数据校验和回退方案。</span><span class="pass">通过</span></div></div>
+        </section>
+
+        <section id="multi">
+          <span class="tag">多功能策略</span><h2>2–3 个小功能：串行跑 2–3 次 Quick Dev</h2>
+          <p class="lead">Quick Dev 的基本单位是一个连贯目标，不是一个版本。V1.1 可以包含多个 Quick Dev 结果，但每次运行必须独立。</p>
+          <div class="flow"><div class="flow-row"><div class="n">A</div><div><b>功能 A：新对话 → Quick Dev → 验收 → 独立变更</b><p>完成后记录受影响模块、测试和延期事项。</p></div><span class="tag">Run 1</span></div><div class="arrow">↓</div><div class="flow-row"><div class="n">B</div><div><b>功能 B：基于合入后的最新代码重新扫描</b><p>不要复用 A 的长对话；若依赖 A，在意图中显式写明。</p></div><span class="tag blue">Run 2</span></div><div class="arrow">↓</div><div class="flow-row"><div class="n">C</div><div><b>功能 C：独立 Spec、实现和 Review</b><p>如果 C 暴露共享架构风险，停止并升级流程。</p></div><span class="tag purple">Run 3</span></div><div class="arrow">↓</div><div class="flow-row"><div class="n">R</div><div><b>V1.1 版本级组合回归</b><p>验证 A+B+C 的交互、共享数据、权限、性能和 V1 关键路径。</p></div><span class="tag red">Release</span></div></div>
+          <h3>为什么不一次输入三个功能</h3><ul><li>无法清楚判断每个功能是否完成。</li><li>Review 很难区分问题属于哪个变更。</li><li>一个功能失败时难以独立回退。</li><li>上下文扩张会增加 Agent 漂移和顺手重构。</li><li>deferred work 容易与另一个功能的正式范围混淆。</li></ul>
+          <div class="callout"><strong>允许合并的例外：</strong>多个动作共同构成一个不可分割的用户结果，例如“增加筛选开关并显示对应结果计数”。若每个动作单独交付没有用户价值，可以作为一个 Quick Dev 目标。</div>
+        </section>
+
+        <section id="release">
+          <span class="tag">版本门禁</span><h2>Quick Dev 完成后仍要做 V1.1 组合回归</h2>
+          <div class="table-wrap"><table><thead><tr><th>层级</th><th>验证内容</th><th>通过标准</th></tr></thead><tbody>
+            <tr><td>单功能</td><td>每次 Quick Dev 的 Spec、验收、测试和 Review</td><td>各自独立通过</td></tr>
+            <tr><td>功能组合</td><td>2–3 个功能是否共享状态、数据、权限或组件并产生冲突</td><td>组合路径通过</td></tr>
+            <tr><td>V1 回归</td><td>登录、权限、主交易/主流程、数据写入、关键查询</td><td>无新增回归</td></tr>
+            <tr><td>非功能</td><td>性能、安全、可访问性、日志、告警、兼容</td><td>满足原 V1 或本次明确阈值</td></tr>
+            <tr><td>发布运营</td><td>迁移、灰度、监控、数据校验、回退或前向修复</td><td>有真实证据和责任人</td></tr>
+          </tbody></table></div>
+          <div class="callout warn"><strong>Quick Dev 不负责替代发布治理：</strong>它交付的是一个小目标的实现闭环。多个闭环组成版本时，仍需要版本级测试、发布审批和上线观察。</div>
+        </section>
+
+        <section id="upgrade">
+          <span class="tag red">退出条件</span><h2>出现这些信号，停止 Quick Dev 并升级流程</h2>
+          <div class="grid2"><div class="card danger-zone"><h3>需求与产品信号</h3><ul><li>无法收敛成一个目标</li><li>验收存在多种产品解释</li><li>需要改变正式业务规则或 NFR</li><li>涉及多个角色和复杂流程重设计</li></ul></div><div class="card danger-zone"><h3>技术与风险信号</h3><ul><li>需要新架构、重大 ADR 或跨系统协调</li><li>权限、安全、计费、租户边界变化</li><li>不可逆迁移或大规模数据修复</li><li>回归面无法在局部上下文内判断</li></ul></div></div>
+          <h3>升级后的推荐路径</h3><pre><button class="copy" type="button">复制</button><code>停止当前 Quick Dev，不继续实现。
+
+1. 将已澄清意图沉淀为正式 SPEC 或 PRD 增量。
+2. 按影响更新 UX / Architecture / Project Context。
+3. 创建增量 Epic 与 Stories。
+4. 执行 Implementation Readiness。
+5. 进入 Create Story → Dev Story → Code Review 的完整循环。</code></pre>
+        </section>
+
+        <section id="example">
+          <span class="tag">完整示例</span><h2>示例：订单列表记住上次有效筛选</h2>
+          <p class="lead">这是一个适合 Quick Dev 的 V1 增量：单一用户结果、复用现有页面和筛选逻辑、不改变权限、不增加跨设备同步。</p>
+          <h3>输入意图</h3><pre><button class="copy" type="button">复制</button><code>bmad-quick-dev
+
+目标：让运营人员再次进入订单列表时，恢复该用户上次提交成功的有效筛选条件，减少重复设置。
+
+V1 当前行为：
+- 每次进入列表都使用默认筛选。
+- 已有筛选组件、URL 参数解析和“清除筛选”功能。
+
+本次范围：
+- 在当前浏览器保存当前用户最后一次有效筛选。
+- 再次进入列表时恢复；无效或已下线的筛选项自动丢弃。
+- 点击“清除筛选”同时清除保存值并恢复 V1 默认值。
+
+Non-goals：
+- 不做跨设备同步。
+- 不新增数据库字段或后端 API。
+- 不改变默认权限、查询逻辑、排序和结果字段。
+- 不重构整个列表状态管理。
+
+验收：
+1. 用户提交有效筛选后离开并返回，筛选与结果一致恢复。
+2. 保存值损坏、版本过旧或包含无效选项时安全回到默认值。
+3. 不同用户不读取对方筛选。
+4. 清除后刷新仍保持默认值。
+5. 原有 URL 筛选优先级按现有规则执行，不产生循环覆盖。
+
+相关输入：project-context.md、订单列表页面、筛选状态模块和现有 E2E 测试。
+任何涉及后端存储、跨设备同步或权限变化的方案必须停止并询问。</code></pre>
+          <h3>预期 Spec 要点</h3><div class="grid3"><div class="card"><h4>边界</h4><p>浏览器本地、当前用户、现有筛选 Schema；不触碰服务器数据。</p></div><div class="card"><h4>实现</h4><p>复用已有序列化/校验模式；读失败安全回退；清除动作原子更新 UI 与存储。</p></div><div class="card"><h4>测试</h4><p>恢复、清除、损坏值、用户隔离、无效选项、URL 优先级与 V1 默认行为。</p></div></div>
+          <h3>Review 中应重点攻击</h3><ul><li>是否把敏感筛选条件以不安全方式持久化。</li><li>用户切换后是否误读上一个用户的值。</li><li>保存值损坏是否导致白屏。</li><li>URL、默认值和本地值是否形成覆盖循环。</li><li>筛选项下线后是否仍发出无效查询。</li><li>“清除筛选”是否只清 UI 而未清存储。</li></ul>
+        </section>
+
+        <section id="prompts">
+          <span class="tag">复制即用</span><h2>常用提示词模板</h2><p class="lead">以下内容输入 AI IDE 对话，不是网页启动命令。</p>
+          <details open><summary>模板 1：开始一个小功能</summary><div><pre><button class="copy" type="button">复制</button><code>bmad-quick-dev
+
+这是已上线 V1 的一个小功能增量。本次只处理：[一句话目标]。
+请先读取 project-context.md、相关最终文档、现有代码和测试；冻结 V1 不变边界；需要 Spec 时先让我审批；实现后运行测试和对抗式 Review；无关问题进入 deferred-work.md。</code></pre></div></details>
+          <details><summary>模板 2：要求 Agent 收缩范围</summary><div><pre><button class="copy" type="button">复制</button><code>当前方案超出本次 Quick Dev 边界。请保留唯一用户目标，移除以下内容：[列出重构/平台化/历史缺陷]。把无关工作记录为 deferred work，并重新给出精简 Spec，等待我批准。</code></pre></div></details>
+          <details><summary>模板 3：发现事实源冲突</summary><div><pre><button class="copy" type="button">复制</button><code>停止实现。请列出生产代码、最终 PRD/UX/Architecture 和当前 Spec 的冲突：冲突内容、涉及文件/章节、对用户和数据的影响、需要谁决策。不得自行修改事实源或选择其中一个版本。</code></pre></div></details>
+          <details><summary>模板 4：要求补足测试证据</summary><div><pre><button class="copy" type="button">复制</button><code>不要只报告“测试通过”。请列出实际执行的构建、类型、Lint、单元、集成、E2E 和回归验证；给出通过/失败数量、未运行项及原因，并逐条映射 Spec 验收标准。</code></pre></div></details>
+          <details><summary>模板 5：最终验收</summary><div><pre><button class="copy" type="button">复制</button><code>请按最终验收格式交付：
+1. 用户可见变化；2. 实际修改文件；3. 每条验收的证据；4. 测试结果；5. Review Trail；6. 已修复问题；7. deferred work；8. 剩余风险；9. 回退建议；10. 是否建议交付及理由。</code></pre></div></details>
+        </section>
+
+        <section id="artifacts">
+          <span class="tag">产物</span><h2>一次 Quick Dev 应留下什么</h2>
+          <div class="table-wrap"><table><thead><tr><th>产物</th><th>作用</th><th>检查重点</th></tr></thead><tbody>
+            <tr><td><code>spec-{slug}.md</code></td><td>冻结目标、范围、任务、状态和 Review Trail</td><td>是否与实际实现一致，是否有批准边界</td></tr>
+            <tr><td>源代码变更</td><td>实现一个目标</td><td>是否最小必要、遵循现有模式</td></tr>
+            <tr><td>测试变更与结果</td><td>证明验收和回归</td><td>是否真实运行、是否覆盖错误路径</td></tr>
+            <tr><td><code>deferred-work.md</code></td><td>保存与当前目标无因果关系的发现</td><td>不得包含当前变更必须修复的问题</td></tr>
+            <tr><td>本地提交或待审 Diff</td><td>便于人工审查和团队交付</td><td>未经授权不应自动推送或对外创建 PR</td></tr>
+          </tbody></table></div>
+          <pre><code>project-root/
+├─ src/                                  # V1 与当前增量代码
+├─ tests/                                # 对应测试
+├─ _bmad-output/
+│  ├─ project-context.md                 # 项目长期规则
+│  └─ implementation-artifacts/
+│     ├─ spec-remember-order-filters.md  # 本次 Quick Dev Spec
+│     └─ deferred-work.md                # 无关发现积压
+└─ ...</code></pre>
+          <div class="callout warn"><strong>版本差异：</strong>实际目录、Spec 字段和是否自动形成提交取决于你的 BMAD 安装版本、IDE 和自定义配置。先运行 <code>bmad-help</code> 检查本项目可用命令，不要为匹配示意目录强行移动文件。</div>
+        </section>
+
+        <section id="checklist">
+          <span class="tag">执行看板</span><h2>单次 Quick Dev 可勾选清单</h2><p class="lead">状态只保留在当前页面会话，刷新后重置，适合演练或打印。</p>
+          <div class="progress"><div id="bar"></div></div><div class="small" id="progressText">0 / 0 已完成</div>
+          <div class="checklist">
+            <label class="check"><input class="task" type="checkbox"><span>已确认这是一个目标，不是多个独立需求集合。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>已确认 V1 生产基线、相关代码、测试和最终事实源。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>project-context.md 存在且与当前代码约定一致。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>意图包含目标、V1 行为、范围、Non-goals、验收和回归。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>已使用新对话启动 bmad-quick-dev。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>已审查并明确批准 Spec，未放任模糊项。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>实际变更未超出 Spec，所有文件均可解释。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>每条验收均有测试或可复核的行为证据。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>构建、类型、Lint、相关测试和 V1 回归已实际运行。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>当前变更相关的高风险 Review 问题已修复并复验。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>deferred work 只包含无关历史问题。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>人工已核对 Diff、用户结果、风险和回退建议。</span></label>
+            <label class="check"><input class="task" type="checkbox"><span>若属于 V1.1 多功能版本，组合回归和发布门禁也已通过。</span></label>
+          </div>
+        </section>
+
+        <section id="faq">
+          <span class="tag">FAQ</span><h2>常见问题</h2>
+          <details open><summary>Quick Dev 会不会完全不生成 Spec？</summary><div><p>它会根据扩散面选择最小安全路径。极小的一次性改动可能直接实现；其他改动会先形成短 Spec 并要求批准。当前版本通常使用带状态的 <code>spec-{slug}.md</code>，不是固定单例文件。</p></div></details>
+          <details><summary>能否把三个小功能一起交给 Quick Dev？</summary><div><p>如果是三个独立用户结果，不建议。分别运行三次，最后做版本级组合回归。只有多个动作共同构成一个不可分割目标时才合并。</p></div></details>
+          <details><summary>Quick Dev 会读取原 PRD、UX 和 Architecture 吗？</summary><div><p>当前工作流具备规划产物感知能力，会选择性加载相关内容。你仍应在输入中指出权威文件和冲突处理规则，避免它读取旧稿或错误分片。</p></div></details>
+          <details><summary>Quick Dev 的自我 Review 是否足够？</summary><div><p>不够。它能提高发现率，但不能替代人工 Diff Review、CI、真实环境验证、安全/性能检查和发布治理。高风险项目可再使用独立代码审查或 TEA 测试门禁。</p></div></details>
+          <details><summary>发现旧代码问题，要不要顺手修？</summary><div><p>只有该问题由当前变更引入或阻断当前验收时才在本次修复。其他问题写入 deferred work，另开一次 Quick Dev，避免范围失控。</p></div></details>
+          <details><summary>什么时候应该放弃 Quick Dev？</summary><div><p>当需求不清、扩散面跨多个系统、需要新架构决定、改变权限/计费/核心状态、包含不可逆迁移，或团队需要正式长期文档时，升级到增量 Full Method。</p></div></details>
+          <details><summary>HTML 为什么双击就能用？</summary><div><p>本文件把样式和交互脚本全部内嵌，没有在线字体、图片、CSS、JavaScript 或接口请求。浏览器直接打开本地文件即可。</p></div></details>
+        </section>
+
+        <section><div class="callout"><strong>最终记忆句：</strong>Quick Dev 的速度来自“一个目标、一个冻结边界、一次长执行”，不是来自跳过质量。对已有 V1，先保护基线，再让 Agent 快。</div><p class="small">本教程按 2026 年 7 月 BMAD V6 Quick Dev 的既有项目、意图压缩、Spec 审批、Review 分流和 deferred work 机制整理。具体命令别名与产物位置以本项目安装版本和 <code>bmad-help</code> 检测结果为准。本 HTML 不加载任何在线资源。</p></section>
+      </main>
+      <footer>BMAD Quick Dev 已有 V1 增量开发教程 · 单文件离线版 · 2026-07-22</footer>
+    </div>
+  </div>
+  <button class="btn primary mobile no-print" id="menu" type="button">目录</button>
+  <script>
+    (function(){
+      var root=document.documentElement,side=document.getElementById('sidebar');
+      document.getElementById('theme').addEventListener('click',function(){root.dataset.theme=root.dataset.theme==='dark'?'light':'dark'});
+      document.getElementById('menu').addEventListener('click',function(){side.classList.toggle('open')});
+      document.querySelectorAll('nav a').forEach(function(a){a.addEventListener('click',function(){side.classList.remove('open')})});
+      function fallback(text,done){var a=document.createElement('textarea');a.value=text;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}finally{a.remove()}}
+      document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){var value=b.parentElement.querySelector('code').innerText;var done=function(){var old=b.textContent;b.textContent='已复制';setTimeout(function(){b.textContent=old},1200)};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(value).then(done).catch(function(){fallback(value,done)})}else{fallback(value,done)}})});
+      document.getElementById('judgeBtn').addEventListener('click',function(){var list=Array.from(document.querySelectorAll('#questions input:checked'));var risks=list.map(function(x){return Number(x.dataset.risk)});var max=risks.length?Math.max.apply(null,risks):0;var out=document.getElementById('judgeResult');if(!max){out.innerHTML='<b>需要补充信息</b><br>至少确认单一目标、复用模式或风险项。'}else if(max===1){out.innerHTML='<b>适合 Quick Dev</b><br>一次只做这个目标，审批短 Spec，完成测试、Review 和人工验收。'}else if(max===2){out.innerHTML='<b>有条件使用 Quick Dev</b><br>必须走 Spec 路径，明确兼容、迁移和回归；若产生长期架构决定则升级正式流程。'}else{out.innerHTML='<b>不建议继续 Quick Dev</b><br>先做正式需求/UX/架构影响分析，进入增量 Full Method。'}});
+      var tasks=Array.from(document.querySelectorAll('.task')),bar=document.getElementById('bar'),txt=document.getElementById('progressText');function progress(){var n=tasks.filter(function(x){return x.checked}).length,p=tasks.length?Math.round(n/tasks.length*100):0;bar.style.width=p+'%';txt.textContent=n+' / '+tasks.length+' 已完成（'+p+'%）'}tasks.forEach(function(x){x.addEventListener('change',progress)});progress();
+      var links=Array.from(document.querySelectorAll('nav a')),sections=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);function spy(){var current=sections[0];sections.forEach(function(s){if(s.getBoundingClientRect().top<=120)current=s});links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+current.id)})}window.addEventListener('scroll',spy,{passive:true});spy();
+    }());
+  </script>
+</body>
+</html>

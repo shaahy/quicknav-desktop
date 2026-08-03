@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>速查工具 · 编辑卡片关键屏幕</title>
+  <style>
+    /*
+      Governing Spine sections:
+      DESIGN.md — Brand & Style; Colors; Typography; Layout & Spacing; Elevation & Depth;
+                  Shapes; Components (`app-shell`, `category-nav`, `view-header`, `global-search`,
+                  `file-card`, `card-form-dialog`, `category-checklist`, `form-field`, `toolbar-button`).
+      EXPERIENCE.md — Information Architecture S01/S11; Component Patterns (`card-form-dialog`,
+                      `category-checklist`, `form-field`); State Patterns S11 修改态;
+                      Interaction Primitives; Accessibility Floor; Responsive & Platform;
+                      UJ-3 steps 1–2.
+      Spine remains authoritative; this static mock is visual reference only.
+    */
+    :root {
+      --canvas: #F4F3EC;
+      --surface: #FFFDF7;
+      --surface-subtle: #E8E9E1;
+      --text: #1B211D;
+      --text-muted: #566158;
+      --border: #253229;
+      --border-muted: #A9AFA9;
+      --action: #1F6248;
+      --action-hover: #154532;
+      --focus: #6D43B5;
+      --warning: #895400;
+      --shadow: rgba(27, 33, 29, .22);
+      --sans: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; background: #D9DDD8; }
+    body {
+      margin: 0;
+      min-width: 1024px;
+      min-height: 720px;
+      color: var(--text);
+      background: #D9DDD8;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    button, input, textarea { color: inherit; font: inherit; }
+    button { cursor: default; }
+    .device {
+      position: relative;
+      width: 1024px;
+      height: 720px;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--canvas);
+      border: 1px solid var(--border);
+    }
+    .window-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 36px;
+      padding: 0 12px 0 14px;
+      background: var(--surface);
+      border-bottom: 2px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .window-controls { display: flex; gap: 7px; }
+    .window-controls span {
+      display: block;
+      width: 11px;
+      height: 11px;
+      border: 1px solid var(--border);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 208px 1fr;
+      height: calc(100% - 36px);
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      padding: 16px 12px 12px;
+      background: var(--surface);
+      border-right: 2px solid var(--border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      color: #FFFFFF;
+      background: var(--border);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .nav-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 4px 8px;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .square-icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 18px;
+    }
+    .nav-list { display: grid; gap: 3px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 42px;
+      padding: 0 10px;
+      border-top: 1px solid var(--border-muted);
+      font-size: 13px;
+    }
+    .nav-item.active {
+      color: #FFFFFF;
+      background: var(--action);
+      border-color: var(--action);
+      font-weight: 700;
+    }
+    .count { font-family: var(--mono); font-size: 11px; }
+    .nav-bottom { margin-top: auto; border-bottom: 1px solid var(--border-muted); }
+    .workspace { min-width: 0; padding: 20px 22px; }
+    .view-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .view-head h1 { margin: 0; font-size: 22px; line-height: 1.3; }
+    .view-head p { margin: 3px 0 0; color: var(--text-muted); font-family: var(--mono); font-size: 12px; }
+    .search {
+      display: flex;
+      align-items: center;
+      width: 274px;
+      height: 36px;
+      padding: 0 11px;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 2px;
+    }
+    .toolbar { display: flex; gap: 8px; margin: 14px 0 12px; }
+    .button {
+      min-height: 36px;
+      padding: 7px 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-weight: 650;
+    }
+    .button.primary { margin-left: auto; color: #FFFFFF; background: var(--action); border-color: var(--action); }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .card {
+      position: relative;
+      min-height: 132px;
+      padding: 13px 38px 12px 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .card h2 { margin: 0 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border-muted); font-size: 14px; }
+    .card p { margin: 0; color: var(--text-muted); font-size: 12px; }
+    .more {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .backdrop {
+      position: absolute;
+      inset: 36px 0 0;
+      z-index: 4;
+      background: rgba(27, 33, 29, .48);
+    }
+    .dialog {
+      position: absolute;
+      z-index: 5;
+      top: 54px;
+      left: 50%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      width: 704px;
+      max-height: 638px;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 16px 38px var(--shadow);
+    }
+    .dialog-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 16px 18px 14px;
+      border-bottom: 2px solid var(--border);
+    }
+    .dialog-title-wrap { display: flex; align-items: center; gap: 12px; }
+    .file-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .dialog h2 { margin: 0; font-size: 18px; line-height: 1.35; }
+    .dialog-subtitle { margin: 2px 0 0; color: var(--text-muted); font-size: 12px; }
+    .dirty {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 2px;
+      color: var(--warning);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .dirty::before { content: ""; width: 8px; height: 8px; background: var(--warning); }
+    .dialog-body {
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      gap: 18px;
+      min-height: 0;
+      overflow: auto;
+      padding: 15px 18px 14px;
+    }
+    .field { min-width: 0; margin-bottom: 13px; }
+    .field:last-child { margin-bottom: 0; }
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .limit { color: var(--text-muted); font-family: var(--mono); font-size: 11px; font-weight: 400; }
+    .input,
+    .textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 2px;
+    }
+    .input { height: 38px; padding: 0 10px; }
+    .input.focused { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .textarea { min-height: 118px; resize: none; padding: 9px 10px; line-height: 1.55; }
+    .path-panel { padding-top: 1px; }
+    .path-box {
+      min-height: 74px;
+      padding: 9px 10px;
+      overflow-wrap: anywhere;
+      background: var(--canvas);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+    .path-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 7px; margin-top: 7px; }
+    .path-actions .button { min-height: 34px; padding: 6px 8px; font-size: 12px; }
+    .replace { width: 100%; margin-top: 7px; }
+    .checklist {
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: var(--surface);
+    }
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 36px;
+      padding: 7px 9px;
+      border-bottom: 1px solid var(--border-muted);
+      font-size: 13px;
+    }
+    .check-row:last-of-type { border-bottom: 0; }
+    .checkbox {
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      color: #FFFFFF;
+      background: var(--action);
+      border: 2px solid var(--action);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .checkbox.empty { color: transparent; background: var(--surface); border-color: var(--border); }
+    .new-category {
+      width: 100%;
+      min-height: 36px;
+      padding: 7px 9px;
+      color: var(--action);
+      background: var(--canvas);
+      border: 0;
+      border-top: 1px solid var(--border);
+      text-align: left;
+      font-weight: 700;
+    }
+    .group-help { margin: 6px 0 0; color: var(--text-muted); font-size: 11px; }
+    .dialog-footer {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 58px;
+      padding: 10px 18px;
+      border-top: 2px solid var(--border);
+    }
+    .footer-note { margin-right: auto; color: var(--text-muted); font-size: 12px; }
+    .dialog-footer .button { min-width: 82px; }
+    .dialog-footer .button.primary { margin-left: 0; }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="device" aria-label="速查工具 1024×720 编辑卡片关键屏幕">
+    <header class="window-bar">
+      <span>速查工具</span>
+      <span class="window-controls" aria-hidden="true"><span></span><span></span><span></span></span>
+    </header>
+    <div class="shell" aria-hidden="true">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">速</span><span>速查工具</span></div>
+        <div class="nav-heading"><span>类别</span><button class="square-icon" tabindex="-1">＋</button></div>
+        <nav class="nav-list">
+          <div class="nav-item active"><span>全部卡片</span><span class="count">12</span></div>
+          <div class="nav-item"><span>当前项目</span><span class="count">5</span></div>
+          <div class="nav-item"><span>常用模板</span><span class="count">4</span></div>
+          <div class="nav-item"><span>会议资料</span><span class="count">3</span></div>
+        </nav>
+        <div class="nav-item nav-bottom"><span>未分类</span><span class="count">1</span></div>
+      </aside>
+      <section class="workspace">
+        <header class="view-head"><div><h1>全部卡片</h1><p>12 个文件 · 手动排序</p></div><div class="search">搜索全部卡片</div></header>
+        <div class="toolbar"><button class="button" tabindex="-1">整理排序</button><button class="button primary" tabindex="-1">＋ 选择文件</button></div>
+        <div class="cards">
+          <article class="card"><button class="more" tabindex="-1">⋮</button><h2>产品需求文档</h2><p>速查工具 V1 的最终产品规则与验收边界。</p></article>
+          <article class="card"><button class="more" tabindex="-1">⋮</button><h2>项目预算表</h2><p>研发与设计资源投入测算。</p></article>
+          <article class="card"><button class="more" tabindex="-1">⋮</button><h2>周会记录</h2><p>本周交付、风险与待确认事项。</p></article>
+        </div>
+      </section>
+    </div>
+
+    <div class="backdrop" aria-hidden="true"></div>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="edit-title" aria-describedby="edit-summary">
+      <header class="dialog-header">
+        <div class="dialog-title-wrap">
+          <span class="file-mark" aria-hidden="true">DOCX</span>
+          <div><h2 id="edit-title">编辑卡片</h2><p class="dialog-subtitle" id="edit-summary">修改卡片信息或重新关联源文件。</p></div>
+        </div>
+        <span class="dirty">有未保存的修改</span>
+      </header>
+
+      <div class="dialog-body">
+        <div>
+          <div class="field">
+            <label class="field-label" for="card-name"><span>名称</span><span class="limit">6 / 80</span></label>
+            <input class="input focused" id="card-name" value="项目预算总表" aria-describedby="name-help">
+            <span id="name-help" class="group-help">单行纯文字，名称不能与现有卡片完全相同。</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="card-note"><span>备注</span><span class="limit">47 / 500</span></label>
+            <textarea class="textarea" id="card-note">2026 年研发、设计与外部采购预算汇总。
+每周五更新实际支出，月末核对预算偏差与待审批项目。</textarea>
+          </div>
+        </div>
+
+        <div>
+          <fieldset class="field" style="margin:0 0 13px;padding:0;border:0">
+            <legend class="field-label" style="width:100%"><span>类别</span><span class="limit">已选择 2 个</span></legend>
+            <div class="checklist" role="group" aria-label="选择类别">
+              <label class="check-row"><span class="checkbox" aria-hidden="true">✓</span><input type="checkbox" checked hidden>当前项目</label>
+              <label class="check-row"><span class="checkbox" aria-hidden="true">✓</span><input type="checkbox" checked hidden>常用模板</label>
+              <label class="check-row"><span class="checkbox empty" aria-hidden="true">✓</span><input type="checkbox" hidden>会议资料</label>
+              <button class="new-category" type="button">＋ 新建类别</button>
+            </div>
+            <p class="group-help">至少选择一个用户自建类别。</p>
+          </fieldset>
+
+          <div class="field path-panel">
+            <div class="field-label"><span>源文件</span><span class="limit">只读路径</span></div>
+            <div class="path-box" role="textbox" aria-readonly="true">E:\元梦工作空间\速查工具\项目资料\2026-项目预算总表.xlsx</div>
+            <div class="path-actions">
+              <button class="button" type="button">复制路径</button>
+              <button class="button" type="button">在文件管理器中显示</button>
+            </div>
+            <button class="button replace" type="button">重新选择文件</button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="dialog-footer">
+        <span class="footer-note">源文件不会被移动、重命名或修改。</span>
+        <button class="button" type="button">取消</button>
+        <button class="button primary" type="button">保存</button>
+      </footer>
+    </section>
+  </main>
+</body>
+</html>

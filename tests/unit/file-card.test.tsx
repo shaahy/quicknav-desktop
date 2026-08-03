@@ -28,6 +28,7 @@ function createCard(overrides: Partial<Card> = {}): Card {
       mtimeMs: 1234567890,
     },
     categoryIds: ['cat-1'],
+    isFavorite: false,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
     ...overrides,
@@ -37,10 +38,12 @@ function createCard(overrides: Partial<Card> = {}): Card {
 describe('FileCard', () => {
   let onOpenFile: ReturnType<typeof vi.fn>
   let onShowMenu: ReturnType<typeof vi.fn>
+  let onSetFavorite: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     onOpenFile = vi.fn()
     onShowMenu = vi.fn()
+    onSetFavorite = vi.fn()
   })
 
   afterEach(() => {
@@ -295,5 +298,73 @@ describe('FileCard', () => {
     )
     const moreBtn = screen.getByRole('button', { name: /更多操作/ })
     expect(moreBtn).toHaveAttribute('aria-label', '更多操作：测试文档')
+  })
+
+  it('renders an unselected favorite button in the bottom-right action slot', () => {
+    const card = createCard({ isFavorite: false })
+    render(
+      <FileCard
+        card={card}
+        index={0}
+        total={1}
+        viewType={VIEW_ALL}
+        onOpenFile={onOpenFile}
+        onShowMenu={onShowMenu}
+        onSetFavorite={onSetFavorite}
+        isReorderMode={false}
+      />
+    )
+
+    const favoriteButton = screen.getByRole('button', {
+      name: '收藏：测试卡片',
+    })
+    expect(favoriteButton).toHaveAttribute('aria-pressed', 'false')
+    expect(favoriteButton).toHaveClass('qc-file-card__favorite-btn')
+    expect(favoriteButton).toHaveTextContent('♡')
+  })
+
+  it('toggles favorite without opening the card', () => {
+    const card = createCard({ isFavorite: true })
+    render(
+      <FileCard
+        card={card}
+        index={0}
+        total={1}
+        viewType={VIEW_ALL}
+        onOpenFile={onOpenFile}
+        onShowMenu={onShowMenu}
+        onSetFavorite={onSetFavorite}
+        isReorderMode={false}
+      />
+    )
+
+    const favoriteButton = screen.getByRole('button', {
+      name: '取消收藏：测试卡片',
+    })
+    expect(favoriteButton).toHaveTextContent('♥')
+    fireEvent.click(favoriteButton)
+
+    expect(onSetFavorite).toHaveBeenCalledWith('card-1', false)
+    expect(onOpenFile).not.toHaveBeenCalled()
+  })
+
+  it('disables favorite changes in reorder mode', () => {
+    const card = createCard()
+    render(
+      <FileCard
+        card={card}
+        index={0}
+        total={1}
+        viewType={VIEW_ALL}
+        onOpenFile={onOpenFile}
+        onShowMenu={onShowMenu}
+        onSetFavorite={onSetFavorite}
+        isReorderMode
+      />
+    )
+
+    expect(
+      screen.getByRole('button', { name: '收藏：测试卡片' })
+    ).toBeDisabled()
   })
 })

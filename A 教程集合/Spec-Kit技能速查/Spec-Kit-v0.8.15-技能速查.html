@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GitHub Spec Kit v0.8.15 官方 10 项 Agent Skills 中文速查：使用、输入、输出、场景与建议角色。">
+  <title>Spec Kit v0.8.15 技能速查</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --ink: #18212f;
+      --muted: #5d6878;
+      --line: #dce2e9;
+      --brand: #0969da;
+      --brand-soft: #eaf3ff;
+      --green: #1a7f37;
+      --green-soft: #dafbe1;
+      --amber: #9a6700;
+      --amber-soft: #fff8c5;
+      --violet: #8250df;
+      --violet-soft: #f2ecff;
+      --danger: #cf222e;
+      --shadow: 0 12px 36px rgba(31, 35, 40, .08);
+      --radius: 16px;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #0d1117;
+      --ink: #e6edf3;
+      --muted: #9da7b3;
+      --line: #30363d;
+      --brand: #58a6ff;
+      --brand-soft: #10243e;
+      --green: #3fb950;
+      --green-soft: #102d19;
+      --amber: #d29922;
+      --amber-soft: #30260d;
+      --violet: #a371f7;
+      --violet-soft: #261a3d;
+      --danger: #ff7b72;
+      --shadow: 0 14px 42px rgba(0, 0, 0, .28);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      line-height: 1.58;
+    }
+    button, input, select { font: inherit; }
+    button, select { cursor: pointer; }
+    a { color: var(--brand); }
+    :focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: 2px; }
+    .wrap { width: min(1180px, calc(100% - 32px)); margin-inline: auto; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 58px 0 36px;
+      background:
+        radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--brand) 14%, transparent), transparent 30%),
+        linear-gradient(180deg, var(--surface), var(--bg));
+      border-bottom: 1px solid var(--line);
+    }
+    .eyebrow { margin: 0 0 10px; color: var(--brand); font-weight: 750; letter-spacing: .04em; }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+    .lead { max-width: 780px; margin: 18px 0 0; color: var(--muted); font-size: 1.08rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .pill, .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 650;
+    }
+    .hero-actions { position: absolute; top: 20px; right: max(16px, calc((100vw - 1180px) / 2)); display: flex; gap: 8px; }
+    .icon-btn, .btn {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 8px 12px;
+      font-weight: 700;
+    }
+    .icon-btn:hover, .btn:hover { border-color: var(--brand); color: var(--brand); }
+    main { padding: 30px 0 70px; }
+    .section { margin-top: 28px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    h2 { margin: 0; font-size: 1.38rem; letter-spacing: -.02em; }
+    .section-note { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
+    .notice {
+      border: 1px solid color-mix(in srgb, var(--amber) 36%, var(--line));
+      border-left: 4px solid var(--amber);
+      border-radius: 12px;
+      background: var(--amber-soft);
+      padding: 14px 16px;
+      color: var(--ink);
+    }
+    .notice strong { color: var(--amber); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(112px, 1fr));
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 2px 12px;
+      scrollbar-width: thin;
+    }
+    .flow-step {
+      position: relative;
+      min-height: 104px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 13px 12px;
+      background: var(--surface);
+      color: var(--ink);
+      text-align: left;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .flow-step:hover { transform: translateY(-2px); border-color: var(--brand); box-shadow: var(--shadow); }
+    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -9px; top: 39px; z-index: 2; color: var(--muted); }
+    .flow-no { display: block; color: var(--muted); font-size: .72rem; font-weight: 750; }
+    .flow-name { display: block; margin-top: 3px; color: var(--brand); font-family: ui-monospace, Consolas, monospace; font-weight: 800; font-size: .78rem; }
+    .flow-label { display: block; margin-top: 5px; font-size: .83rem; font-weight: 720; }
+    .side-skill { margin-top: 10px; border-style: dashed; background: var(--violet-soft); }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+      gap: 10px;
+      padding: 12px;
+      margin-top: 24px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      box-shadow: 0 8px 30px rgba(31,35,40,.07);
+      backdrop-filter: blur(14px);
+    }
+    .control { width: 100%; min-height: 42px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-2); color: var(--ink); padding: 8px 10px; }
+    .control::placeholder { color: var(--muted); }
+    .result-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 16px 2px 12px; color: var(--muted); }
+    .result-line strong { color: var(--ink); }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: 0 1px 0 rgba(31,35,40,.03);
+      overflow: hidden;
+    }
+    .card[data-kind="辅助"] { border-top: 4px solid var(--violet); }
+    .card[data-kind="主流程"] { border-top: 4px solid var(--brand); }
+    .card-head { padding: 18px 18px 13px; border-bottom: 1px solid var(--line); }
+    .card-title-line { display: flex; align-items: start; justify-content: space-between; gap: 10px; }
+    .card h3 { margin: 0; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; color: var(--brand); font-size: 1.05rem; }
+    .cn-title { margin-top: 4px; font-size: .95rem; font-weight: 760; }
+    .summary { margin: 10px 0 0; color: var(--muted); font-size: .92rem; }
+    .card-body { display: grid; gap: 14px; padding: 16px 18px 18px; }
+    .field h4 { margin: 0 0 6px; color: var(--muted); font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; }
+    .field p { margin: 0; font-size: .9rem; }
+    .field ul { margin: 0; padding-left: 19px; font-size: .9rem; }
+    .field li + li { margin-top: 3px; }
+    .io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .io-box { border-radius: 11px; padding: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+    .role-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .role-list .tag { background: var(--green-soft); color: var(--green); border-color: transparent; }
+    .codebox { position: relative; border-radius: 11px; background: #111827; color: #e5edf6; padding: 13px 44px 13px 13px; overflow: auto; }
+    .codebox code { white-space: pre-wrap; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .82rem; }
+    .copy { position: absolute; top: 7px; right: 7px; border: 1px solid #384357; border-radius: 7px; background: #222b3a; color: #e5edf6; padding: 5px 7px; font-size: .72rem; }
+    .copy:hover { background: #344055; }
+    .source { display: inline-flex; align-items: center; gap: 4px; font-size: .84rem; font-weight: 700; }
+    .empty { display: none; border: 1px dashed var(--line); border-radius: 14px; padding: 34px; text-align: center; color: var(--muted); background: var(--surface); }
+    .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .legend > div { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 14px; }
+    .legend strong { display: block; margin-bottom: 5px; }
+    .legend p { margin: 0; color: var(--muted); font-size: .88rem; }
+    footer { padding: 28px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: .86rem; }
+    footer p { margin: 5px 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 920px) {
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .toolbar .search { grid-column: 1 / -1; }
+      .cards { grid-template-columns: 1fr; }
+      .legend { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 20px, 1180px); }
+      .hero { padding-top: 76px; }
+      .hero-actions { right: 10px; }
+      .toolbar { position: static; grid-template-columns: 1fr; }
+      .toolbar .search { grid-column: auto; }
+      .io-grid { grid-template-columns: 1fr; }
+      .card-head, .card-body { padding-left: 14px; padding-right: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+    @media print {
+      :root { --bg: #fff; --surface: #fff; --ink: #111; --muted: #444; --line: #bbb; }
+      .hero-actions, .toolbar, .copy, .flow-step::after { display: none !important; }
+      .hero { padding: 24px 0; }
+      main { padding-top: 12px; }
+      .cards { display: block; }
+      .card { break-inside: avoid; margin-bottom: 12px; box-shadow: none; }
+      .flow { grid-template-columns: repeat(3, 1fr); overflow: visible; }
+      a { color: #111; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-actions" aria-label="页面工具">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深浅主题">深色</button>
+      <button class="icon-btn" type="button" onclick="window.print()">打印</button>
+    </div>
+    <div class="wrap">
+      <p class="eyebrow">GITHUB SPEC KIT · AGENT SKILLS</p>
+      <h1>技能速查</h1>
+      <p class="lead">先找到你现在所处的阶段，再确认技能的输入、输出和主责角色。内容基于官方稳定版 v0.8.15，覆盖 9 项 SDD 主流程技能与 1 项任务发布辅助技能。</p>
+      <div class="meta-row">
+        <span class="pill">版本 v0.8.15</span>
+        <span class="pill">10 项官方技能</span>
+        <span class="pill">中文 · 单文件 · 离线可用</span>
+        <span class="pill">整理日期 2026-07-21</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="notice" aria-label="重要口径">
+      <strong>口径说明：</strong>“技能”指初始化 Spec Kit 后由编码智能体执行的 <code>/speckit.*</code> 或 <code>$speckit-*</code> Agent Skills，不包含 <code>specify init</code> 等 CLI 管理命令，也不包含社区 Extensions、Presets 与 Workflows。角色是基于产物责任给出的建议主责，不是官方权限模型。
+    </section>
+
+    <section class="section" aria-labelledby="flowTitle">
+      <div class="section-head">
+        <div>
+          <h2 id="flowTitle">完整 SDD 路径</h2>
+          <p class="section-note">点击阶段可直接筛选对应技能；小需求可走 specify → plan → tasks → implement → converge。</p>
+        </div>
+      </div>
+      <div class="flow" id="flow"></div>
+      <button class="flow-step side-skill" type="button" data-filter-skill="taskstoissues">
+        <span class="flow-no">辅助出口</span>
+        <span class="flow-name">taskstoissues</span>
+        <span class="flow-label">把任务发布为 GitHub Issues</span>
+      </button>
+    </section>
+
+    <section class="section" aria-labelledby="skillsTitle">
+      <div class="section-head">
+        <div>
+          <h2 id="skillsTitle">技能卡片</h2>
+          <p class="section-note">搜索会匹配名称、用途、输入、输出、场景和角色。</p>
+        </div>
+      </div>
+      <div class="toolbar" role="search" aria-label="筛选技能">
+        <label class="sr-only" for="search">关键词</label>
+        <input class="control search" id="search" type="search" placeholder="搜索：权限、歧义、架构、测试、GitHub Issues…" autocomplete="off">
+        <label class="sr-only" for="phase">阶段</label>
+        <select class="control" id="phase"><option value="">全部阶段</option></select>
+        <label class="sr-only" for="role">角色</label>
+        <select class="control" id="role"><option value="">全部角色</option></select>
+        <label class="sr-only" for="kind">类型</label>
+        <select class="control" id="kind"><option value="">全部类型</option><option>主流程</option><option>辅助</option></select>
+        <button class="btn" id="reset" type="button">重置</button>
+      </div>
+      <div class="result-line" aria-live="polite"><span>当前显示 <strong id="count">10</strong> 项</span><span id="activeHint">全部技能</span></div>
+      <div class="cards" id="cards"></div>
+      <div class="empty" id="empty">没有匹配的技能。试试减少筛选条件或点击“重置”。</div>
+    </section>
+
+    <section class="section" aria-labelledby="readTitle">
+      <div class="section-head"><div><h2 id="readTitle">三条使用判断</h2><p class="section-note">避免把不同质量门混为一谈。</p></div></div>
+      <div class="legend">
+        <div><strong>clarify：消除需求歧义</strong><p>问题属于“到底要什么、边界是什么”时，回到 spec.md，由产品与关键干系人确认。</p></div>
+        <div><strong>analyze：检查文档之间</strong><p>对照 spec、plan、tasks 找冲突和漏项。它只报告，不直接修改这些产物。</p></div>
+        <div><strong>converge：检查实现结果</strong><p>对照代码与三类产物找交付缺口；只允许把缺口追加为 tasks.md 中的新任务。</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>基线：</strong>GitHub Spec Kit v0.8.15（稳定版）。不同智能体的调用形式不同：常见形式为 <code>/speckit.xxx</code>；Codex skills 模式通常为 <code>$speckit-xxx</code>。</p>
+      <p><strong>更新提示：</strong>运行 <code>specify self check</code> 可只读检查新版本。升级后应重新核对技能模板与项目内集成文件。</p>
+      <p><a href="https://github.com/github/spec-kit/tree/v0.8.15" target="_blank" rel="noreferrer">v0.8.15 仓库</a> · <a href="https://github.github.com/spec-kit/reference/agentic-sdd.html" target="_blank" rel="noreferrer">Agentic SDD 官方参考</a> · <a href="https://github.github.com/spec-kit/installation.html" target="_blank" rel="noreferrer">官方安装与技能清单</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const skills = [
+      {
+        id: "constitution", title: "建立 / 更新项目宪章", phase: "治理", kind: "主流程", order: 1,
+        summary: "把团队不可轻易突破的工程原则写成项目治理基线，并让后续规划与实现接受这些原则检查。",
+        usage: "/speckit.constitution <原则与治理要求>",
+        codex: "$speckit-constitution 为项目建立安全、测试、兼容性与性能原则，并定义原则变更的治理方式。",
+        inputs: ["团队工程原则：质量、测试、安全、性能、可访问性等", "现有 .specify/memory/constitution.md（更新时）", "相关模板与命令定义，用于一致性同步"],
+        outputs: ["创建或更新 .specify/memory/constitution.md", "必要时同步依赖模板中的宪章检查与治理要求", "版本、批准日期及修订说明"],
+        scenarios: ["新项目启动，先建立不可妥协的工程底线", "团队测试、安全或架构原则发生正式变化", "发现后续产物反复违背同一类团队规则"],
+        roles: ["产品负责人", "技术负责人", "架构师", "工程经理"],
+        pre: "项目已完成 Spec Kit 初始化；原则应可判断是否合规，避免只写“保持高质量”。",
+        next: "通常进入 specify；宪章变化后应复核现有 spec、plan 与 tasks。",
+        source: "constitution.md"
+      },
+      {
+        id: "specify", title: "定义功能规格", phase: "需求", kind: "主流程", order: 2,
+        summary: "把自然语言意图转成面向用户、可验证的功能规格，回答做什么、为什么做、为谁做。",
+        usage: "/speckit.specify <功能描述：WHAT / WHY>",
+        codex: "$speckit-specify 为企业知识库增加带来源引用的问答功能；说明目标用户、关键行为、边界和可衡量成功标准，不预设技术栈。",
+        inputs: ["目标用户、问题、用户价值与业务目标", "核心用户旅程、范围内 / 范围外事项", "已知规则、约束、边界条件和成功标准"],
+        outputs: ["当前功能目录中的 spec.md", "用户故事、功能需求、边界条件与成功标准", "激活当前 feature 的项目状态；Git 分支仅在启用 Git 扩展时涉及"],
+        scenarios: ["从 0 到 1 定义新产品或新模块", "为现有系统创建边界清晰的增量功能", "把模糊需求转成可评审、可验收的正式规格"],
+        roles: ["产品经理", "业务负责人", "产品负责人", "UX 设计师"],
+        pre: "只描述产品意图和可观察行为；技术栈、数据库和架构决策留给 plan。",
+        next: "有明显歧义先 clarify；需求清楚后进入 plan。",
+        source: "specify.md"
+      },
+      {
+        id: "clarify", title: "澄清规格歧义", phase: "澄清", kind: "主流程", order: 3,
+        summary: "围绕当前 spec.md 提出最多五个高价值问题，并把确认答案直接编码回规格。可多轮聚焦不同主题。",
+        usage: "/speckit.clarify [可选：聚焦领域]",
+        codex: "$speckit-clarify 聚焦权限、状态流转、删除恢复与异常路径；逐项提问，不替产品负责人猜答案。",
+        inputs: ["当前功能的 spec.md", "可选聚焦领域，如权限、数据生命周期或异常处理", "产品负责人 / 干系人的明确答案"],
+        outputs: ["更新后的 spec.md", "新增或更新的 Clarifications 记录", "由答案修订的需求、用户故事与边界说明"],
+        scenarios: ["需求含糊，技术方案会因不同答案走向不同", "权限、状态、默认值、异常路径尚未明确", "analyze 发现需求层缺口，需要回到源头修正"],
+        roles: ["产品经理", "产品负责人", "业务负责人", "架构师", "QA"],
+        pre: "必须已有当前 feature 和 spec.md；高影响未知项应由人确认，不应由智能体静默假设。",
+        next: "可重复执行直到关键歧义收敛，然后进入 plan。",
+        source: "clarify.md"
+      },
+      {
+        id: "plan", title: "生成技术实施计划", phase: "方案", kind: "主流程", order: 4,
+        summary: "读取规格与宪章，把技术栈、架构、数据模型、契约和验证方式落实为可执行设计。",
+        usage: "/speckit.plan <技术栈、架构与工程约束>",
+        codex: "$speckit-plan 沿用现有 TypeScript 与 PostgreSQL 架构；给出数据模型、API 契约、迁移回滚、测试和性能验证方案，不新增框架。",
+        inputs: ["spec.md 与项目宪章", "技术栈、架构选择、依赖和运行环境约束", "现有代码库、模式、接口与需要研究的未知项"],
+        outputs: ["plan.md", "按需要生成 research.md、data-model.md、quickstart.md", "按需要生成 contracts/ 下的接口契约，并更新智能体上下文"],
+        scenarios: ["确定技术实现路径和受影响模块", "复杂功能需要研究、数据设计或接口契约", "在任务拆分前评审迁移、兼容、回滚与非功能风险"],
+        roles: ["架构师", "技术负责人", "高级开发者", "DevOps", "安全负责人"],
+        pre: "至少已有 spec.md；技术选择不得偷偷改变未批准的产品行为。",
+        next: "高要求项目先 checklist；确认方案后进入 tasks。",
+        source: "plan.md"
+      },
+      {
+        id: "checklist", title: "生成需求质量检查表", phase: "质检", kind: "主流程", order: 5,
+        summary: "生成“需求文本的单元测试”，检查规格是否完整、清晰、一致和可验证，而不是执行代码测试。",
+        usage: "/speckit.checklist [可选：检查主题]",
+        codex: "$speckit-checklist 聚焦管理员权限、数据删除、API 兼容、回滚和性能指标，检查需求是否写完整。",
+        inputs: ["当前 feature 的 spec.md 与可用设计产物", "可选质量主题：UX、安全、权限、API、性能等", "目标受众、风险重点或合规要求"],
+        outputs: ["feature 目录 checklists/ 下的领域检查表 Markdown", "可逐条判断的需求质量问题", "对缺失、含糊或不可验证表达的暴露"],
+        scenarios: ["生产级功能在任务拆分前做需求质检", "高风险权限、安全、迁移或合规需求", "评审者需要一致的规格审查口径"],
+        roles: ["产品经理", "QA", "架构师", "安全负责人", "评审者"],
+        pre: "它检查“需求写得是否可用”，不等同于测试用例，也不证明代码已经正确。",
+        next: "发现缺口回到 specify / clarify；通过后进入 tasks。",
+        source: "checklist.md"
+      },
+      {
+        id: "tasks", title: "生成可执行任务清单", phase: "拆解", kind: "主流程", order: 6,
+        summary: "根据规格与技术设计，产出按依赖排序、按用户故事组织、带并行标记和文件路径的任务。",
+        usage: "/speckit.tasks",
+        codex: "$speckit-tasks 按用户故事拆分任务，标出依赖、可并行项、准确文件路径、测试任务和每阶段检查点。",
+        inputs: ["plan.md 与 spec.md", "可用的 research.md、data-model.md、contracts/、quickstart.md", "宪章中的测试与交付约束"],
+        outputs: ["tasks.md", "Setup、Foundational、各用户故事与 Polish 阶段", "依赖顺序、[P] 并行标记、任务 ID、目标文件路径和检查点"],
+        scenarios: ["把已批准方案转成开发可领取的工作项", "复杂功能需要明确依赖和并行关系", "希望每个用户故事能够独立实现和验证"],
+        roles: ["技术负责人", "开发者", "QA", "项目经理"],
+        pre: "应已有 plan.md；若希望测试先行，应在规格、宪章或计划中明确测试要求。",
+        next: "生产级功能建议先 analyze；也可用 taskstoissues 发布任务。",
+        source: "tasks.md"
+      },
+      {
+        id: "analyze", title: "跨产物一致性分析", phase: "质检", kind: "主流程", order: 7,
+        summary: "只读对照 spec.md、plan.md 与 tasks.md，报告冲突、重复、歧义、覆盖缺口和宪章违规。",
+        usage: "/speckit.analyze",
+        codex: "$speckit-analyze 检查 spec、plan、tasks 的一致性与覆盖率，按严重度报告问题；不要直接修改文件。",
+        inputs: ["spec.md、plan.md、tasks.md", "项目宪章", "当前 feature 的相关设计产物"],
+        outputs: ["只读分析报告", "按严重度组织的冲突、缺口、重复与覆盖发现", "可选修复建议，但须经用户批准后由上游技能处理"],
+        scenarios: ["implement 前做最后的文档一致性门禁", "确认每项需求都有设计路径与实施任务", "方案或任务重生成后检查是否产生漂移"],
+        roles: ["产品经理", "架构师", "技术负责人", "QA", "评审者"],
+        pre: "必须已有三份核心产物；本技能不编辑文件，应回到产生问题的上游产物修正。",
+        next: "清理高优问题并重新 analyze；通过后进入 implement。",
+        source: "analyze.md"
+      },
+      {
+        id: "implement", title: "按任务实施功能", phase: "实施", kind: "主流程", order: 8,
+        summary: "按 tasks.md 的依赖顺序执行开发与测试，尊重并行标记，并持续记录任务完成状态。",
+        usage: "/speckit.implement [可选：限定阶段或故事]",
+        codex: "$speckit-implement 只实现 Setup 与 Foundational 阶段，运行相关测试并汇报结果；完成后停止，等待确认。",
+        inputs: ["tasks.md、plan.md、spec.md 与宪章", "当前代码库、依赖、构建和测试环境", "可选实施范围：特定阶段、故事或任务"],
+        outputs: ["代码、测试、配置、迁移与文档变更", "tasks.md 中完成项的状态更新", "构建、测试、验证结果和未解决问题"],
+        scenarios: ["按已批准任务实现小型完整功能", "大型功能按阶段分批开发与验证", "修复实现问题后继续执行剩余任务"],
+        roles: ["开发者", "技术负责人", "QA", "DevOps"],
+        pre: "本地工具会以当前用户权限执行命令；大型功能应限定批次并设置人工检查点。",
+        next: "验证实现后进入 converge；发现规格或方案问题则回到对应上游技能。",
+        source: "implement.md"
+      },
+      {
+        id: "converge", title: "验证实现是否收敛", phase: "收敛", kind: "主流程", order: 9,
+        summary: "在实施后对照代码与 spec、plan、tasks 检查遗漏；若有缺口，只把新任务追加到 tasks.md。",
+        usage: "/speckit.converge",
+        codex: "$speckit-converge 对照当前实现与 spec、plan、tasks 检查缺口；不得改删代码，只能在确有缺口时追加收敛任务。",
+        inputs: ["已经对当前 tasks.md 执行过 implement 的代码库", "spec.md、plan.md、tasks.md", "测试、配置、迁移和相关交付证据"],
+        outputs: ["分级发现摘要与 Converged / Tasks appended 结果", "无缺口时 tasks.md 保持逐字节不变", "有缺口时只在 tasks.md 的 Convergence 区追加任务"],
+        scenarios: ["实现完成后确认承诺与代码一致", "发现漏实现的需求、测试、迁移或非功能约束", "循环 implement → converge，直到无剩余缺口"],
+        roles: ["开发者", "QA", "技术负责人", "评审者", "产品经理"],
+        pre: "仅在 implement 已处理当前 tasks.md 后运行；它不是代码审查，也不替代运行时测试。",
+        next: "若追加任务，重新 implement 后再 converge；收敛后进入团队评审或 PR。",
+        source: "converge.md"
+      },
+      {
+        id: "taskstoissues", title: "把任务转为 GitHub Issues", phase: "协作", kind: "辅助", order: 10,
+        summary: "读取 tasks.md，把可追踪任务发布为当前 GitHub 仓库的 Issues，用于团队分派与进度管理。",
+        usage: "/speckit.taskstoissues",
+        codex: "$speckit-taskstoissues 读取当前 feature 的 tasks.md，按依赖与用户故事创建 GitHub Issues；创建前先展示发布清单并等待确认。",
+        inputs: ["当前 feature 的 tasks.md", "可识别的 GitHub 远程仓库", "可用且已授权的 GitHub Issues 写入工具 / 集成"],
+        outputs: ["GitHub Issues", "从任务描述、依赖、阶段和文件路径整理出的 Issue 内容", "创建结果与 Issue 链接；不会替代本地 tasks.md"],
+        scenarios: ["团队使用 GitHub Issues 分派 Spec Kit 任务", "需要把本地任务清单转成跨成员可追踪工作项", "开发前建立任务与仓库协作入口"],
+        roles: ["项目经理", "技术负责人", "仓库维护者", "开发负责人"],
+        pre: "这是对外写入操作。必须确认目标仓库、授权和发布粒度；创建 Issues 前应由用户明确批准。",
+        next: "Issues 用于协作追踪；实际实现仍以已批准的 spec、plan、tasks 为依据。",
+        source: "taskstoissues.md"
+      }
+    ];
+
+    const phaseOrder = ["治理", "需求", "澄清", "方案", "质检", "拆解", "实施", "收敛", "协作"];
+    const flowIds = ["constitution", "specify", "clarify", "plan", "checklist", "tasks", "analyze", "implement", "converge"];
+    const sourceBase = "https://github.com/github/spec-kit/blob/v0.8.15/templates/commands/";
+    const $ = selector => document.querySelector(selector);
+    const esc = text => String(text).replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    const phaseSelect = $("#phase"), roleSelect = $("#role"), kindSelect = $("#kind"), search = $("#search");
+
+    function fillSelect(select, values) {
+      values.forEach(value => select.insertAdjacentHTML("beforeend", `<option value="${esc(value)}">${esc(value)}</option>`));
+    }
+    fillSelect(phaseSelect, phaseOrder.filter(p => skills.some(s => s.phase === p)));
+    fillSelect(roleSelect, [...new Set(skills.flatMap(s => s.roles))].sort((a,b) => a.localeCompare(b, "zh-CN")));
+
+    $("#flow").innerHTML = flowIds.map((id, index) => {
+      const s = skills.find(x => x.id === id);
+      return `<button class="flow-step" type="button" data-filter-skill="${s.id}"><span class="flow-no">${String(index + 1).padStart(2,"0")} · ${s.phase}</span><span class="flow-name">${s.id}</span><span class="flow-label">${s.title}</span></button>`;
+    }).join("");
+
+    function list(items) { return `<ul>${items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`; }
+    function card(s) {
+      return `<article class="card" data-kind="${s.kind}" id="skill-${s.id}">
+        <div class="card-head">
+          <div class="card-title-line"><div><h3>/speckit.${s.id}</h3><div class="cn-title">${esc(s.title)}</div></div><span class="tag">${s.kind} · ${s.phase}</span></div>
+          <p class="summary">${esc(s.summary)}</p>
+        </div>
+        <div class="card-body">
+          <div class="field"><h4>使用方式</h4><div class="codebox"><code>${esc(s.usage)}</code><button class="copy" type="button" data-copy="${esc(s.usage)}">复制</button></div></div>
+          <div class="field"><h4>Codex 调用示例</h4><div class="codebox"><code>${esc(s.codex)}</code><button class="copy" type="button" data-copy="${esc(s.codex)}">复制</button></div></div>
+          <div class="io-grid">
+            <div class="io-box field"><h4>输入</h4>${list(s.inputs)}</div>
+            <div class="io-box field"><h4>输出</h4>${list(s.outputs)}</div>
+          </div>
+          <div class="field"><h4>典型使用场景</h4>${list(s.scenarios)}</div>
+          <div class="field"><h4>建议主责 / 参与角色</h4><div class="role-list">${s.roles.map(r => `<span class="tag">${esc(r)}</span>`).join("")}</div></div>
+          <div class="field"><h4>使用前检查</h4><p>${esc(s.pre)}</p></div>
+          <div class="field"><h4>下一步</h4><p>${esc(s.next)}</p></div>
+          <a class="source" href="${sourceBase + s.source}" target="_blank" rel="noreferrer">查看 v0.8.15 官方技能模板 ↗</a>
+        </div>
+      </article>`;
+    }
+
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      const listData = skills.filter(s => {
+        const hay = [s.id,s.title,s.phase,s.kind,s.summary,s.usage,s.codex,s.pre,s.next,...s.inputs,...s.outputs,...s.scenarios,...s.roles].join(" ").toLowerCase();
+        return (!q || hay.includes(q)) && (!phaseSelect.value || s.phase === phaseSelect.value) && (!roleSelect.value || s.roles.includes(roleSelect.value)) && (!kindSelect.value || s.kind === kindSelect.value);
+      });
+      $("#cards").innerHTML = listData.map(card).join("");
+      $("#count").textContent = listData.length;
+      $("#empty").style.display = listData.length ? "none" : "block";
+      const labels = [q && `关键词“${q}”`, phaseSelect.value, roleSelect.value, kindSelect.value].filter(Boolean);
+      $("#activeHint").textContent = labels.length ? labels.join(" · ") : "全部技能";
+    }
+    [search, phaseSelect, roleSelect, kindSelect].forEach(el => el.addEventListener(el === search ? "input" : "change", render));
+    $("#reset").addEventListener("click", () => { search.value = phaseSelect.value = roleSelect.value = kindSelect.value = ""; render(); search.focus(); });
+    document.addEventListener("click", async event => {
+      const filter = event.target.closest("[data-filter-skill]");
+      if (filter) {
+        search.value = filter.dataset.filterSkill;
+        phaseSelect.value = roleSelect.value = kindSelect.value = "";
+        render();
+        $("#skillsTitle").scrollIntoView({behavior:"smooth", block:"start"});
+      }
+      const copy = event.target.closest("[data-copy]");
+      if (copy) {
+        const original = copy.textContent;
+        try { await navigator.clipboard.writeText(copy.dataset.copy); copy.textContent = "已复制"; }
+        catch { copy.textContent = "请手动复制"; }
+        setTimeout(() => copy.textContent = original, 1300);
+      }
+    });
+
+    const savedTheme = localStorage.getItem("spec-kit-cheatsheet-theme");
+    if (savedTheme === "dark") document.documentElement.dataset.theme = "dark";
+    function syncThemeLabel() { $("#themeBtn").textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色"; }
+    $("#themeBtn").addEventListener("click", () => {
+      document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      localStorage.setItem("spec-kit-cheatsheet-theme", document.documentElement.dataset.theme);
+      syncThemeLabel();
+    });
+    syncThemeLabel();
+    render();
+  </script>
+</body>
+</html>

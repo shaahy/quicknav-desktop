@@ -1,9 +1,28 @@
 node_modules/
 dist/
 out/
+coverage/
+playwright-report/
+test-results/
 .worktrees/
-_bmad-output/
 *.log
 *.backup.json
+*.tmp
 .env
-.env.local
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Edge QA browser profiles are reproducible test artifacts, not tutorials.
+A 教程集合/**/edge-qa-*/
+A 教程集合/**/.edge-qa-*/
+
+# Local task output directories.
+MD卡片打开与退出修复/
+Windows快速启动器/
+卡片相对路径改造/
+默认窗口尺寸优化/
+扫描批量添加卡片/
+我的收藏功能设计/
+页面空白排查与修复/
+GitHub仓库托管/

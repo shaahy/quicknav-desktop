@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="BMAD、Spec Kit与Superpowers四种组合开发流程的精简对比矩阵">
+  <title>四种组合开发流程精简对比矩阵</title>
+  <style>
+    :root{
+      --paper:#f3f1eb;--surface:#fffdf9;--ink:#18231f;--muted:#61706a;--line:#d7ddd7;
+      --deep:#132b26;--green:#176b5b;--green-soft:#dceee8;--blue:#315f88;--blue-soft:#e1ebf4;
+      --amber:#9b5519;--amber-soft:#f7e7d5;--red:#a33f36;--red-soft:#f7e3e0;
+      --violet:#65507e;--violet-soft:#ebe5f1;--shadow:0 14px 38px rgba(20,43,38,.08);
+      --sans:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;
+      --serif:"Iowan Old Style","Palatino Linotype","Songti SC","SimSun",serif;
+      --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+      --c1:#315f88;--c2:#176b5b;--c3:#9b5519;--c4:#65507e;
+    }
+    *{box-sizing:border-box}
+    html{max-width:100%;overflow-x:clip;background:var(--paper)}
+    body{margin:0;max-width:100%;overflow-x:clip;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.62}
+    button{font:inherit}
+    button:focus-visible{outline:3px solid #e0a268;outline-offset:2px}
+    .topline{height:5px;background:linear-gradient(90deg,var(--c1) 0 25%,var(--c2) 25% 50%,var(--c3) 50% 75%,var(--c4) 75%)}
+    main{width:100%;max-width:1580px;margin:auto;padding:34px 24px 52px}
+    header{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:22px}
+    h1{font:820 clamp(28px,3.2vw,48px)/1.18 var(--serif);margin:0 0 7px}
+    .subtitle{margin:0;max-width:1000px;color:var(--muted);font-size:14px}
+    .subtitle b{color:var(--ink)}
+    .legend{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;min-width:260px}
+    .badge{display:inline-block;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:850;white-space:nowrap}
+    .parallel{background:var(--green-soft);color:var(--green)}.serial{background:var(--amber-soft);color:var(--amber)}
+    .high{background:var(--blue-soft);color:var(--blue)}.risk{background:var(--red-soft);color:var(--red)}
+    .mixed{background:var(--violet-soft);color:var(--violet)}.neutral{background:#ecefeb;color:#55625d}
+    .mobile-tabs{display:none;gap:6px;overflow:auto;margin:0 0 10px;padding-bottom:2px}
+    .mobile-tabs button{border:1px solid var(--line);background:white;border-radius:999px;padding:7px 11px;white-space:nowrap;cursor:pointer;font-size:12px;font-weight:800}
+    .mobile-tabs button.active{background:var(--deep);border-color:var(--deep);color:white}
+    .table-wrap{overflow:visible;border:1px solid var(--line);border-radius:14px;background:white;box-shadow:var(--shadow)}
+    table{width:100%;min-width:1280px;border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:13px}
+    caption{text-align:left;padding:11px 13px;color:var(--muted);font-size:11px;background:#f6f5f1;border-bottom:1px solid var(--line)}
+    th,td{padding:14px 13px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top;text-align:left;overflow-wrap:anywhere}
+    tr:last-child th,tr:last-child td{border-bottom:0}th:last-child,td:last-child{border-right:0}
+    thead th{position:sticky;top:0;z-index:4;background:var(--deep);color:white;padding-top:18px;padding-bottom:18px}
+    thead th:first-child{left:0;z-index:7;width:180px}
+    tbody th{position:sticky;left:0;z-index:3;width:180px;background:#f2f2ed;font-weight:850}
+    tbody tr:hover th,tbody tr:hover td{background:#f0f5f2}
+    .combo-head{border-top:5px solid var(--combo)}
+    .combo-head[data-combo-col="1"]{--combo:var(--c1)}.combo-head[data-combo-col="2"]{--combo:var(--c2)}
+    .combo-head[data-combo-col="3"]{--combo:var(--c3)}.combo-head[data-combo-col="4"]{--combo:var(--c4)}
+    .combo-no{display:block;color:#b8d3cb;font-size:10px;letter-spacing:.08em;margin-bottom:5px}
+    .combo-title{display:block;font:760 17px/1.28 var(--serif);margin-bottom:6px}
+    .combo-flow{display:block;color:#b9cec8;font:11px/1.45 var(--mono)}
+    .cell-title{display:block;font-weight:850;margin:7px 0 4px}
+    .cell-body{display:block;color:#4b5954}
+    .key-row th{background:#e9e5da}
+    .key-row td{background:#fffcf4}
+    .key-row:hover th,.key-row:hover td{background:#f8f1df!important}
+    .key-note{display:block;margin-top:8px;padding:8px 9px;border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:5px;color:#663710;font-size:11px}
+    .recommend{display:block;margin-top:7px;color:var(--green);font-weight:800}
+    .footnote{margin:11px 2px 0;color:var(--muted);font-size:11px}
+    @media(max-width:1400px){
+      main{padding:24px 14px 38px}header{display:block}.legend{justify-content:flex-start;min-width:0;margin-top:12px}
+      .mobile-tabs{display:flex}
+      table{min-width:0;table-layout:fixed}thead th:first-child,tbody th{width:38%}
+      body[data-focus="1"] [data-combo-col]:not([data-combo-col="1"]),
+      body[data-focus="2"] [data-combo-col]:not([data-combo-col="2"]),
+      body[data-focus="3"] [data-combo-col]:not([data-combo-col="3"]),
+      body[data-focus="4"] [data-combo-col]:not([data-combo-col="4"]){display:none}
+      th,td{padding:12px 10px}.combo-title{font-size:15px}.combo-flow{font-size:10px}
+    }
+    @media(max-width:480px){main{padding-left:10px;padding-right:10px}h1{font-size:27px}.subtitle{font-size:12px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+    @media print{
+      .topline,.mobile-tabs{display:none!important}main{padding:10px;max-width:none}header{margin-bottom:12px}
+      table{min-width:0;font-size:8px}.table-wrap{overflow:visible;box-shadow:none}thead th,tbody th{position:static}
+      body [data-combo-col]{display:table-cell!important}th,td{padding:7px 6px}.combo-title{font-size:11px}.combo-flow{font-size:7px}
+    }
+  </style>
+</head>
+<body data-focus="3">
+<div class="topline"></div>
+<main>
+  <header>
+    <div>
+      <h1>四种组合开发流程对比矩阵</h1>
+      <p class="subtitle"><b>核心变量：</b>BMAD交付PRD时，下游先拆出全量Task，可批量并行；BMAD交付正式Story时，按“出一个、开发一个”推进，跨Story整体串行。</p>
+    </div>
+    <div class="legend" aria-label="标记说明">
+      <span class="badge parallel">并行 / 高吞吐</span>
+      <span class="badge serial">串行 / 高聚焦</span>
+      <span class="badge risk">较高风险</span>
+    </div>
+  </header>
+
+  <nav class="mobile-tabs" aria-label="移动端组合切换">
+    <button type="button" data-focus-btn="1" onclick="setFocus('1')">组合1</button>
+    <button type="button" data-focus-btn="3" onclick="setFocus('3')" class="active">组合3</button>
+    <button type="button" data-focus-btn="4" onclick="setFocus('4')">组合4</button>
+    <button type="button" data-focus-btn="2" onclick="setFocus('2')">组合2</button>
+  </nav>
+
+  <div class="table-wrap">
+    <table>
+      <caption>精简为10项。并行效率与质量风险采用怡哥的项目实战观察；具体结果仍受Task依赖、Agent能力、测试策略和集成Gate影响。</caption>
+      <thead>
+        <tr>
+          <th scope="col">对比项</th>
+          <th scope="col" class="combo-head" data-combo-col="1">
+            <span class="combo-no">组合 1</span>
+            <span class="combo-title">BMAD PRD → Spec Kit → Superpowers</span>
+            <span class="combo-flow">产品事实 → 全量规格/Task → 并行TDD</span>
+          </th>
+          <th scope="col" class="combo-head" data-combo-col="2">
+            <span class="combo-no">组合 2</span>
+            <span class="combo-title">BMAD完整流程</span>
+            <span class="combo-flow">产品 → 架构 → Epic → Story → 开发</span>
+          </th>
+          <th scope="col" class="combo-head" data-combo-col="3">
+            <span class="combo-no">组合 3</span>
+            <span class="combo-title">BMAD Story → Superpowers</span>
+            <span class="combo-flow">完整规划 → 逐Story → Story内TDD</span>
+          </th>
+          <th scope="col" class="combo-head" data-combo-col="4">
+            <span class="combo-no">组合 4</span>
+            <span class="combo-title">BMAD PRD → Superpowers</span>
+            <span class="combo-flow">产品事实 → 全量Task → 并行TDD</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1. 正式流程链路</th>
+          <td data-combo-col="1"><span class="badge mixed">三段式</span><span class="cell-title">专业分层最细</span><span class="cell-body">BMAD定产品，Spec Kit形成完整Feature规格与Task，Superpowers负责TDD实现。</span></td>
+          <td data-combo-col="2"><span class="badge neutral">单框架</span><span class="cell-title">BMAD全生命周期</span><span class="cell-body">PRD、UX、架构、Epic、Sprint、Story、开发与评审在同一体系内推进。</span></td>
+          <td data-combo-col="3"><span class="badge mixed">双框架</span><span class="cell-title">BMAD规划，SP执行</span><span class="cell-body">BMAD一直负责到正式Story；每个Story再交给Superpowers实施与验证。</span></td>
+          <td data-combo-col="4"><span class="badge mixed">双框架</span><span class="cell-title">产品后直接工程化</span><span class="cell-body">BMAD完成产品和UX，Superpowers一次性规划全量工程任务并实施。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">2. BMAD交付边界</th>
+          <td data-combo-col="1"><span class="badge high">PRD级</span><span class="cell-title">交付产品事实</span><span class="cell-body">主要交付PRD、DESIGN、EXPERIENCE；Feature规格和任务拆分由Spec Kit补齐。</span></td>
+          <td data-combo-col="2"><span class="badge serial">Story级</span><span class="cell-title">交付聚焦实施上下文</span><span class="cell-body">BMAD完成架构、Epic/Sprint，并逐个创建可开发Story。</span></td>
+          <td data-combo-col="3"><span class="badge serial">Story级</span><span class="cell-title">交付正式Story</span><span class="cell-body">Story携带AC、依赖和必要架构/UX上下文，是Superpowers的范围事实源。</span></td>
+          <td data-combo-col="4"><span class="badge high">PRD级</span><span class="cell-title">交付产品事实</span><span class="cell-body">主要交付PRD、DESIGN、EXPERIENCE；工程设计与任务拆分全部交给Superpowers。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">3. 架构与实施规划</th>
+          <td data-combo-col="1"><span class="badge high">Spec Kit主导</span><span class="cell-title">Feature计划较完整</span><span class="cell-body">constitution、clarify、plan、tasks可以形成完整Feature包；系统级架构仍需明确补充。</span></td>
+          <td data-combo-col="2"><span class="badge high">BMAD主导</span><span class="cell-title">全局规划最完整</span><span class="cell-body">Architecture、Epics、Readiness、Sprint和Story共同保证依赖顺序与技术一致性。</span></td>
+          <td data-combo-col="3"><span class="badge high">BMAD主导</span><span class="cell-title">全局计划完整</span><span class="cell-body">BMAD控制架构与Story边界；Superpowers只把当前Story细化为工程步骤。</span></td>
+          <td data-combo-col="4"><span class="badge mixed">Superpowers主导</span><span class="cell-title">工程计划强、全局产品规划薄</span><span class="cell-body">可生成清晰实施计划，但缺少正式Epic、Readiness和Sprint依赖视图。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">4. 全量Task可见性</th>
+          <td data-combo-col="1"><span class="badge parallel">全量可见</span><span class="cell-title">先拆完整Task集合</span><span class="cell-body">Spec Kit从PRD/Feature规格生成全量Task，便于提前识别可并行项和依赖项。</span></td>
+          <td data-combo-col="2"><span class="badge serial">Story逐步展开</span><span class="cell-title">列表可见，细节逐Story生成</span><span class="cell-body">Epic中可看到Story规划，但正式开发上下文按“创建一个Story、完成一个Story”展开。</span></td>
+          <td data-combo-col="3"><span class="badge serial">Story逐步展开</span><span class="cell-title">当前只工程化一个Story</span><span class="cell-body">全局Story队列存在，但Superpowers拿到的是当前正式Story，不是全量Story的完整Task集合。</span></td>
+          <td data-combo-col="4"><span class="badge parallel">全量可见</span><span class="cell-title">PRD一次拆成完整计划</span><span class="cell-body">Superpowers先生成全量工程Task，再按依赖关系选择串行或并行执行。</span></td>
+        </tr>
+
+        <tr class="key-row">
+          <th scope="row">5. Subagent并行模式</th>
+          <td data-combo-col="1"><span class="badge parallel">跨Task批量并行</span><span class="cell-title">并行能力强</span><span class="cell-body">全量Task形成后，可把互不依赖的任务分派给多个Subagent并行开发。</span><span class="key-note">并行前必须先锁定共享接口、数据模型和集成顺序。</span></td>
+          <td data-combo-col="2"><span class="badge serial">跨Story串行</span><span class="cell-title">整体偏串行</span><span class="cell-body">BMAD按逐Story创建、开发、评审推进；在该实战方式下不做跨Story批量并行。</span><span class="key-note">换来更稳定的上下文与逐Story验收。</span></td>
+          <td data-combo-col="3"><span class="badge serial">跨Story串行</span><span class="cell-title">仅Story内部可并行</span><span class="cell-body">上游Story仍是“出一个、开发一个”；Superpowers只能并行当前Story内部互不依赖的工程任务。</span><span class="key-note">Subagent能力不能突破上游Story供给节奏。</span></td>
+          <td data-combo-col="4"><span class="badge parallel">跨Task批量并行</span><span class="cell-title">并行能力最直接</span><span class="cell-body">PRD被拆成全量Task后，可直接用Subagent同时开发多个独立模块或能力。</span><span class="key-note">并行宽度最大，也最依赖强集成治理。</span></td>
+        </tr>
+
+        <tr class="key-row">
+          <th scope="row">6. 开发效率</th>
+          <td data-combo-col="1"><span class="badge parallel">高吞吐</span><span class="cell-title">前置规格较慢，实施并行较快</span><span class="cell-body">Spec Kit增加一次规格与Task准备，但完成后可批量并行，适合任务量较大的项目。</span></td>
+          <td data-combo-col="2"><span class="badge serial">低吞吐</span><span class="cell-title">流程最稳但最慢</span><span class="cell-body">逐Story创建、开发、评审带来较多等待与会话切换，整体交付周期较长。</span></td>
+          <td data-combo-col="3"><span class="badge serial">中低吞吐</span><span class="cell-title">Story间串行，Story内可加速</span><span class="cell-body">Superpowers能提高单Story开发速度，但无法消除BMAD逐Story供给造成的串行瓶颈。</span></td>
+          <td data-combo-col="4"><span class="badge parallel">最高吞吐</span><span class="cell-title">链路最短、并行最直接</span><span class="cell-body">跳过Spec Kit和BMAD Story层，完成全量计划后即可批量启动Subagent。</span></td>
+        </tr>
+
+        <tr class="key-row">
+          <th scope="row">7. Bug与功能遗漏风险</th>
+          <td data-combo-col="1"><span class="badge risk">中高风险</span><span class="cell-title">规格减少需求遗漏，并行增加集成Bug</span><span class="cell-body">Spec Kit能强化Feature完整性；但多个Subagent并行仍容易出现接口偏差、重复实现和集成缺陷。</span></td>
+          <td data-combo-col="2"><span class="badge high">低风险</span><span class="cell-title">逐Story聚焦，质量稳定</span><span class="cell-body">每次上下文小、AC明确，并在进入下一Story前完成开发与评审，功能遗漏和联动偏差较少。</span></td>
+          <td data-combo-col="3"><span class="badge high">最低风险</span><span class="cell-title">Story聚焦 + Superpowers TDD</span><span class="cell-body">BMAD保证Story上下文和验收完整，Superpowers保证测试优先与双阶段评审；代价是速度较低。</span></td>
+          <td data-combo-col="4"><span class="badge risk">最高风险</span><span class="cell-title">并行快，但上下文容易碎片化</span><span class="cell-body">缺少Spec Kit完整规格和BMAD Story Gate时，Subagent更容易各自理解PRD，造成功能遗漏、接口不一致和返工。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">8. TDD与质量控制</th>
+          <td data-combo-col="1"><span class="badge high">强</span><span class="cell-title">规格场景 + Superpowers TDD</span><span class="cell-body">可把Spec Kit场景映射为失败测试；还需增加跨Task集成测试和全局回归。</span></td>
+          <td data-combo-col="2"><span class="badge mixed">中强</span><span class="cell-title">Story开发与Code Review完整</span><span class="cell-body">BMAD有测试和评审流程，但严格RED–GREEN–REFACTOR需要额外写入项目规则和Gate。</span></td>
+          <td data-combo-col="3"><span class="badge high">最强</span><span class="cell-title">聚焦Story的严格TDD</span><span class="cell-body">AC可直接映射失败测试，之后执行最小实现、重构、规格符合性和代码质量双评审。</span></td>
+          <td data-combo-col="4"><span class="badge high">局部强</span><span class="cell-title">单Task TDD强，全局覆盖需补</span><span class="cell-body">每个Task可以严格TDD，但测试通过不代表PRD全部功能和跨模块场景都已覆盖。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">9. 交接、追溯与变更成本</th>
+          <td data-combo-col="1"><span class="badge risk">成本最高</span><span class="cell-title">两次交接、三层工件</span><span class="cell-body">PRD→spec/tasks→SP plan需要维护双向追溯；变更时可能同步三套事实。</span></td>
+          <td data-combo-col="2"><span class="badge high">最统一</span><span class="cell-title">单框架状态链</span><span class="cell-body">跨框架漂移最低，Correct Course可处理重大变化；代价是流程操作较多。</span></td>
+          <td data-combo-col="3"><span class="badge high">边界最清楚</span><span class="cell-title">Story定WHAT，SP Plan定HOW</span><span class="cell-body">每个Story交接一次，发现范围问题退回BMAD；完成证据应回写Story与Sprint状态。</span></td>
+          <td data-combo-col="4"><span class="badge mixed">交接最少</span><span class="cell-title">链路短，但追溯较弱</span><span class="cell-body">PRD直接到工程Task，变更同步快；缺少Story层后，Task与产品验收的映射更依赖人工维护。</span></td>
+        </tr>
+
+        <tr>
+          <th scope="row">10. 最适用场景</th>
+          <td data-combo-col="1"><span class="badge high">规格治理型</span><span class="cell-title">需要全量Feature契约且任务可并行</span><span class="cell-body">适合Spec Kit是组织标准、多人/多Agent并行、愿意承担较高规格与集成治理成本的项目。</span><span class="recommend">选择理由：独立规格资产 + 高并行。</span></td>
+          <td data-combo-col="2"><span class="badge high">统一治理型</span><span class="cell-title">复杂、合规、质量优先</span><span class="cell-body">适合更看重全生命周期一致性、审计和稳定质量，可以接受较低开发吞吐的项目。</span><span class="recommend">选择理由：单一体系 + 低遗漏。</span></td>
+          <td data-combo-col="3"><span class="badge high">质量优先型</span><span class="cell-title">中大型产品的高质量Story交付</span><span class="cell-body">适合Bug和功能遗漏代价高、需要BMAD完整规划与Superpowers严格TDD，但不追求跨Story批量并行的项目。</span><span class="recommend">选择理由：质量最高，效率较低。</span></td>
+          <td data-combo-col="4"><span class="badge parallel">速度优先型</span><span class="cell-title">边界清晰、可模块化并行</span><span class="cell-body">适合强技术负责人在场、模块接口能提前冻结、需要最大化Subagent吞吐并能承受更高返工风险的项目。</span><span class="recommend">选择理由：效率最高，风险也最高。</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote">注：这里的“串行”指怡哥当前采用的BMAD逐Story实战方式；不代表框架在所有版本、自动化模式或人工编排下绝对不能并行。</p>
+</main>
+<script>
+  function reorderCombinations(){
+    const order=["1","3","4","2"];
+    document.querySelectorAll("table tr").forEach(row=>{
+      const cells=new Map([...row.querySelectorAll("[data-combo-col]")].map(cell=>[cell.dataset.comboCol,cell]));
+      order.forEach(id=>{if(cells.has(id)) row.appendChild(cells.get(id));});
+    });
+  }
+  function setFocus(value){
+    document.body.dataset.focus=value;
+    document.querySelectorAll("[data-focus-btn]").forEach(button=>{
+      button.classList.toggle("active",button.dataset.focusBtn===value);
+    });
+  }
+  reorderCombinations();
+</script>
+</body>
+</html>

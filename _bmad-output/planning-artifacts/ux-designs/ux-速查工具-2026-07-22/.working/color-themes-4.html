@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>速查工具 · 结构化索引配色对比</title>
+  <style>
+    /*
+      A 冷静蓝图: canvas #F2F5F7; surface #FFFFFF; text #101820; text-muted #4B5964; border #17242D;
+                  action #0057B8; action-hover #003F85; focus #7C3AED; success #147D3F; warning #8A4B00; danger #B42318.
+      B 档案绿标: canvas #F4F3EC; surface #FFFDF7; text #1B211D; text-muted #566158; border #253229;
+                  action #1F6248; action-hover #154532; focus #6D43B5; success #216E39; warning #895400; danger #A52A2A.
+      C 铅字酒红: canvas #F5F0EC; surface #FFFCF8; text #211718; text-muted #645456; border #2A1C1E;
+                  action #8D2440; action-hover #64172C; focus #005FCC; success #247143; warning #8A5000; danger #B42318.
+      D 工业紫标: canvas #F2F1F6; surface #FFFFFF; text #19171F; text-muted #595562; border #25212C;
+                  action #5A3FA3; action-hover #412D78; focus #006B75; success #1D7445; warning #885000; danger #A9232E.
+      所有 token 均按浅色界面的 AA 目标选取；最终组件组合、字号与状态仍需实现阶段逐项验证对比度。
+    */
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body { margin: 0; background: #E3E5E7; color: #151719; font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+    button { font: inherit; }
+    .page { max-width: 1500px; margin: 0 auto; padding: 32px; }
+    .intro { margin-bottom: 22px; }
+    .intro h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: .01em; }
+    .intro p { max-width: 980px; margin: 0; color: #51575D; font-size: 14px; line-height: 1.65; }
+    .themes { display: grid; grid-template-columns: repeat(2, minmax(520px, 1fr)); gap: 24px; }
+    .theme { --canvas: #F2F5F7; --surface: #FFFFFF; --text: #101820; --muted: #4B5964; --border: #17242D; --action: #0057B8; --action-hover: #003F85; --focus: #7C3AED; --success: #147D3F; --warning: #8A4B00; --danger: #B42318; background: var(--surface); border: 2px solid var(--border); }
+    .theme-b { --canvas: #F4F3EC; --surface: #FFFDF7; --text: #1B211D; --muted: #566158; --border: #253229; --action: #1F6248; --action-hover: #154532; --focus: #6D43B5; --success: #216E39; --warning: #895400; --danger: #A52A2A; }
+    .theme-c { --canvas: #F5F0EC; --surface: #FFFCF8; --text: #211718; --muted: #645456; --border: #2A1C1E; --action: #8D2440; --action-hover: #64172C; --focus: #005FCC; --success: #247143; --warning: #8A5000; --danger: #B42318; }
+    .theme-d { --canvas: #F2F1F6; --surface: #FFFFFF; --text: #19171F; --muted: #595562; --border: #25212C; --action: #5A3FA3; --action-hover: #412D78; --focus: #006B75; --success: #1D7445; --warning: #885000; --danger: #A9232E; }
+    .theme-head { padding: 18px 20px 15px; color: var(--text); border-bottom: 2px solid var(--border); background: var(--surface); }
+    .theme-kicker { display: block; margin-bottom: 5px; color: var(--action); font: 700 10px/1.2 ui-monospace, "Cascadia Mono", "SFMono-Regular", monospace; letter-spacing: .12em; text-transform: uppercase; }
+    .theme-head h2 { margin: 0; font-size: 20px; }
+    .theme-head p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .tokens { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; border-bottom: 2px solid var(--border); }
+    .token { min-height: 76px; padding: 9px 8px; color: var(--text); background: var(--surface); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .token:nth-child(6n) { border-right: 0; }
+    .token:nth-last-child(-n+5) { border-bottom: 0; }
+    .swatch { display: block; width: 100%; height: 25px; margin-bottom: 7px; border: 1px solid var(--border); background: var(--swatch); }
+    .token-name { display: block; overflow: hidden; font: 700 9px/1.2 ui-monospace, "Cascadia Mono", "SFMono-Regular", monospace; white-space: nowrap; text-overflow: ellipsis; }
+    .token-value { display: block; margin-top: 3px; color: var(--muted); font: 9px/1.2 ui-monospace, "Cascadia Mono", "SFMono-Regular", monospace; }
+    .sample { display: grid; grid-template-columns: 146px 1fr; min-height: 360px; color: var(--text); background: var(--canvas); border-top: 5px solid var(--border); }
+    .sidebar { display: flex; flex-direction: column; padding: 13px 9px; background: var(--surface); border-right: 2px solid var(--border); }
+    .brand { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+    .brand-mark { display: grid; place-items: center; width: 27px; height: 27px; color: var(--surface); background: var(--border); font: 700 10px/1 ui-monospace, "Cascadia Mono", monospace; }
+    .side-label { margin: 0 5px 6px; color: var(--muted); font: 700 9px/1.2 ui-monospace, "Cascadia Mono", monospace; letter-spacing: .1em; }
+    .category { display: flex; justify-content: space-between; gap: 6px; padding: 8px 6px; border-top: 1px solid var(--border); font-size: 11px; }
+    .category.active { color: var(--surface); background: var(--action); border-color: var(--action); font-weight: 700; }
+    .category:last-child { margin-top: auto; border-bottom: 1px solid var(--border); }
+    .count { font: 9px/1.5 ui-monospace, "Cascadia Mono", monospace; }
+    .workspace { min-width: 0; padding: 15px 16px 16px; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .view-title { margin: 0; font-size: 17px; }
+    .view-meta { margin: 3px 0 0; color: var(--muted); font: 9px/1.2 ui-monospace, "Cascadia Mono", monospace; }
+    .search { width: 195px; height: 32px; padding: 8px 9px; color: var(--muted); background: var(--surface); border: 2px solid var(--border); font: 10px/1.2 ui-monospace, "Cascadia Mono", monospace; }
+    .actions { display: flex; gap: 7px; margin: 10px 0; }
+    .btn { height: 29px; padding: 0 9px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 0; font-size: 10px; font-weight: 700; }
+    .btn.primary { margin-left: auto; color: #FFFFFF; background: var(--action); border-color: var(--action); }
+    .btn.primary:hover { background: var(--action-hover); }
+    .content-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .file-card { position: relative; min-height: 100px; padding: 11px 34px 10px 11px; color: var(--text); background: var(--surface); border: 1px solid var(--border); }
+    .file-card:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .file-card h3 { margin: 0 0 7px; padding-bottom: 7px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .file-card p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
+    .more { position: absolute; top: 4px; right: 4px; width: 25px; height: 25px; padding: 0; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 0; }
+    .tag { display: inline-block; margin-top: 8px; padding: 2px 5px; color: var(--action); background: var(--canvas); border: 1px solid var(--action); font: 8px/1.2 ui-monospace, "Cascadia Mono", monospace; }
+    .failure { display: grid; grid-template-columns: 8px 1fr; margin-top: 9px; color: var(--text); background: var(--surface); border: 2px solid var(--border); }
+    .failure-mark { background: var(--danger); }
+    .failure-body { padding: 9px 10px; }
+    .failure h3 { margin: 0 0 3px; color: var(--danger); font-size: 11px; }
+    .failure p { margin: 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
+    .failure-actions { display: flex; gap: 6px; margin-top: 7px; }
+    .failure-actions span { padding: 3px 6px; border: 1px solid var(--border); font-size: 8px; font-weight: 700; }
+    .failure-actions .repair { color: #FFFFFF; background: var(--action); border-color: var(--action); }
+    .note { padding: 9px 12px; color: var(--muted); background: var(--surface); border-top: 1px solid var(--border); font-size: 10px; line-height: 1.5; }
+    @media (max-width: 1180px) { .themes { grid-template-columns: 1fr; } .theme { max-width: 760px; width: 100%; margin: 0 auto; } }
+    @media (max-width: 680px) { .page { padding: 16px; } .tokens { grid-template-columns: repeat(3, 1fr); } .token:nth-child(3n) { border-right: 0; } .token:nth-child(6n) { border-right: 0; } .sample { grid-template-columns: 118px 1fr; } .content-grid { grid-template-columns: 1fr; } .search { width: 150px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <h1>结构化索引 · 浅色语义配色</h1>
+      <p>四个方案共享同一套高对比线框、方形组件、紧凑网格和可审计信息层级，只比较颜色语义。所有方案以 AA 为设计目标；最终仍需结合实际字号、字重、悬停、禁用和焦点状态逐项验证。</p>
+    </header>
+    <section class="themes" aria-label="四种主题方案">
+
+      <article class="theme theme-a">
+        <header class="theme-head"><span class="theme-kicker">A / BLUEPRINT</span><h2>冷静蓝图</h2><p><strong>情绪寄存：</strong>精确、可信、理性。冷白画布配工程蓝，强调高频行动与可复核状态。</p></header>
+        <div class="tokens" aria-label="冷静蓝图语义颜色">
+          <div class="token"><span class="swatch" style="--swatch:#F2F5F7"></span><span class="token-name">canvas</span><span class="token-value">#F2F5F7</span></div><div class="token"><span class="swatch" style="--swatch:#FFFFFF"></span><span class="token-name">surface</span><span class="token-value">#FFFFFF</span></div><div class="token"><span class="swatch" style="--swatch:#101820"></span><span class="token-name">text</span><span class="token-value">#101820</span></div><div class="token"><span class="swatch" style="--swatch:#4B5964"></span><span class="token-name">text-muted</span><span class="token-value">#4B5964</span></div><div class="token"><span class="swatch" style="--swatch:#17242D"></span><span class="token-name">border</span><span class="token-value">#17242D</span></div><div class="token"><span class="swatch" style="--swatch:#0057B8"></span><span class="token-name">action</span><span class="token-value">#0057B8</span></div><div class="token"><span class="swatch" style="--swatch:#003F85"></span><span class="token-name">action-hover</span><span class="token-value">#003F85</span></div><div class="token"><span class="swatch" style="--swatch:#7C3AED"></span><span class="token-name">focus</span><span class="token-value">#7C3AED</span></div><div class="token"><span class="swatch" style="--swatch:#147D3F"></span><span class="token-name">success</span><span class="token-value">#147D3F</span></div><div class="token"><span class="swatch" style="--swatch:#8A4B00"></span><span class="token-name">warning</span><span class="token-value">#8A4B00</span></div><div class="token"><span class="swatch" style="--swatch:#B42318"></span><span class="token-name">danger</span><span class="token-value">#B42318</span></div>
+        </div>
+        <div class="sample"><aside class="sidebar"><div class="brand"><span class="brand-mark">01</span>速查工具</div><div class="side-label">类别索引</div><div class="category active"><span>全部卡片</span><span class="count">012</span></div><div class="category"><span>当前项目</span><span class="count">005</span></div><div class="category"><span>常用模板</span><span class="count">004</span></div><div class="category"><span>未分类</span><span class="count">001</span></div></aside><section class="workspace"><div class="topline"><div><h3 class="view-title">全部卡片</h3><p class="view-meta">12 个文件 · 手动排序</p></div><div class="search">搜索全部卡片</div></div><div class="actions"><button class="btn">整理排序</button><button class="btn primary">＋ 选择文件</button></div><div class="content-grid"><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则与验收边界。</p><span class="tag">当前项目</span></article><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>项目预算表</h3><p>研发与设计资源投入测算。</p><span class="tag">当前项目</span></article></div><div class="failure"><span class="failure-mark"></span><div class="failure-body"><h3>无法打开文件</h3><p>“项目预算表”仍被保留。可重新选择文件或关闭。</p><div class="failure-actions"><span class="repair">重新选择文件</span><span>删除卡片</span><span>关闭</span></div></div></div></section></div>
+        <footer class="note">适合：强调效率、可靠性与系统反馈；蓝色行动语义最接近成熟生产力工具。</footer>
+      </article>
+
+      <article class="theme theme-b">
+        <header class="theme-head"><span class="theme-kicker">B / ARCHIVE</span><h2>档案绿标</h2><p><strong>情绪寄存：</strong>稳健、沉静、长期可用。暖灰纸面与档案绿降低冷硬感，但秩序骨架不变。</p></header>
+        <div class="tokens" aria-label="档案绿标语义颜色">
+          <div class="token"><span class="swatch" style="--swatch:#F4F3EC"></span><span class="token-name">canvas</span><span class="token-value">#F4F3EC</span></div><div class="token"><span class="swatch" style="--swatch:#FFFDF7"></span><span class="token-name">surface</span><span class="token-value">#FFFDF7</span></div><div class="token"><span class="swatch" style="--swatch:#1B211D"></span><span class="token-name">text</span><span class="token-value">#1B211D</span></div><div class="token"><span class="swatch" style="--swatch:#566158"></span><span class="token-name">text-muted</span><span class="token-value">#566158</span></div><div class="token"><span class="swatch" style="--swatch:#253229"></span><span class="token-name">border</span><span class="token-value">#253229</span></div><div class="token"><span class="swatch" style="--swatch:#1F6248"></span><span class="token-name">action</span><span class="token-value">#1F6248</span></div><div class="token"><span class="swatch" style="--swatch:#154532"></span><span class="token-name">action-hover</span><span class="token-value">#154532</span></div><div class="token"><span class="swatch" style="--swatch:#6D43B5"></span><span class="token-name">focus</span><span class="token-value">#6D43B5</span></div><div class="token"><span class="swatch" style="--swatch:#216E39"></span><span class="token-name">success</span><span class="token-value">#216E39</span></div><div class="token"><span class="swatch" style="--swatch:#895400"></span><span class="token-name">warning</span><span class="token-value">#895400</span></div><div class="token"><span class="swatch" style="--swatch:#A52A2A"></span><span class="token-name">danger</span><span class="token-value">#A52A2A</span></div>
+        </div>
+        <div class="sample"><aside class="sidebar"><div class="brand"><span class="brand-mark">01</span>速查工具</div><div class="side-label">类别索引</div><div class="category active"><span>全部卡片</span><span class="count">012</span></div><div class="category"><span>当前项目</span><span class="count">005</span></div><div class="category"><span>常用模板</span><span class="count">004</span></div><div class="category"><span>未分类</span><span class="count">001</span></div></aside><section class="workspace"><div class="topline"><div><h3 class="view-title">全部卡片</h3><p class="view-meta">12 个文件 · 手动排序</p></div><div class="search">搜索全部卡片</div></div><div class="actions"><button class="btn">整理排序</button><button class="btn primary">＋ 选择文件</button></div><div class="content-grid"><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则与验收边界。</p><span class="tag">当前项目</span></article><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>项目预算表</h3><p>研发与设计资源投入测算。</p><span class="tag">当前项目</span></article></div><div class="failure"><span class="failure-mark"></span><div class="failure-body"><h3>无法打开文件</h3><p>“项目预算表”仍被保留。可重新选择文件或关闭。</p><div class="failure-actions"><span class="repair">重新选择文件</span><span>删除卡片</span><span>关闭</span></div></div></div></section></div>
+        <footer class="note">适合：强调本地、安定与资料归档感；较温和，但仍保持硬边界和高密度。</footer>
+      </article>
+
+      <article class="theme theme-c">
+        <header class="theme-head"><span class="theme-kicker">C / LETTERPRESS</span><h2>铅字酒红</h2><p><strong>情绪寄存：</strong>严谨、编辑化、有主张。象牙纸面配酒红标记，像被清楚校订的索引册。</p></header>
+        <div class="tokens" aria-label="铅字酒红语义颜色">
+          <div class="token"><span class="swatch" style="--swatch:#F5F0EC"></span><span class="token-name">canvas</span><span class="token-value">#F5F0EC</span></div><div class="token"><span class="swatch" style="--swatch:#FFFCF8"></span><span class="token-name">surface</span><span class="token-value">#FFFCF8</span></div><div class="token"><span class="swatch" style="--swatch:#211718"></span><span class="token-name">text</span><span class="token-value">#211718</span></div><div class="token"><span class="swatch" style="--swatch:#645456"></span><span class="token-name">text-muted</span><span class="token-value">#645456</span></div><div class="token"><span class="swatch" style="--swatch:#2A1C1E"></span><span class="token-name">border</span><span class="token-value">#2A1C1E</span></div><div class="token"><span class="swatch" style="--swatch:#8D2440"></span><span class="token-name">action</span><span class="token-value">#8D2440</span></div><div class="token"><span class="swatch" style="--swatch:#64172C"></span><span class="token-name">action-hover</span><span class="token-value">#64172C</span></div><div class="token"><span class="swatch" style="--swatch:#005FCC"></span><span class="token-name">focus</span><span class="token-value">#005FCC</span></div><div class="token"><span class="swatch" style="--swatch:#247143"></span><span class="token-name">success</span><span class="token-value">#247143</span></div><div class="token"><span class="swatch" style="--swatch:#8A5000"></span><span class="token-name">warning</span><span class="token-value">#8A5000</span></div><div class="token"><span class="swatch" style="--swatch:#B42318"></span><span class="token-name">danger</span><span class="token-value">#B42318</span></div>
+        </div>
+        <div class="sample"><aside class="sidebar"><div class="brand"><span class="brand-mark">01</span>速查工具</div><div class="side-label">类别索引</div><div class="category active"><span>全部卡片</span><span class="count">012</span></div><div class="category"><span>当前项目</span><span class="count">005</span></div><div class="category"><span>常用模板</span><span class="count">004</span></div><div class="category"><span>未分类</span><span class="count">001</span></div></aside><section class="workspace"><div class="topline"><div><h3 class="view-title">全部卡片</h3><p class="view-meta">12 个文件 · 手动排序</p></div><div class="search">搜索全部卡片</div></div><div class="actions"><button class="btn">整理排序</button><button class="btn primary">＋ 选择文件</button></div><div class="content-grid"><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则与验收边界。</p><span class="tag">当前项目</span></article><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>项目预算表</h3><p>研发与设计资源投入测算。</p><span class="tag">当前项目</span></article></div><div class="failure"><span class="failure-mark"></span><div class="failure-body"><h3>无法打开文件</h3><p>“项目预算表”仍被保留。可重新选择文件或关闭。</p><div class="failure-actions"><span class="repair">重新选择文件</span><span>删除卡片</span><span>关闭</span></div></div></div></section></div>
+        <footer class="note">适合：强调独特识别度与编辑秩序；行动酒红和危险红需依靠标签、图标共同区分。</footer>
+      </article>
+
+      <article class="theme theme-d">
+        <header class="theme-head"><span class="theme-kicker">D / INDUSTRIAL</span><h2>工业紫标</h2><p><strong>情绪寄存：</strong>克制、现代、技术化。冷灰画布配深紫操作色，建立非传统但稳定的桌面工具识别。</p></header>
+        <div class="tokens" aria-label="工业紫标语义颜色">
+          <div class="token"><span class="swatch" style="--swatch:#F2F1F6"></span><span class="token-name">canvas</span><span class="token-value">#F2F1F6</span></div><div class="token"><span class="swatch" style="--swatch:#FFFFFF"></span><span class="token-name">surface</span><span class="token-value">#FFFFFF</span></div><div class="token"><span class="swatch" style="--swatch:#19171F"></span><span class="token-name">text</span><span class="token-value">#19171F</span></div><div class="token"><span class="swatch" style="--swatch:#595562"></span><span class="token-name">text-muted</span><span class="token-value">#595562</span></div><div class="token"><span class="swatch" style="--swatch:#25212C"></span><span class="token-name">border</span><span class="token-value">#25212C</span></div><div class="token"><span class="swatch" style="--swatch:#5A3FA3"></span><span class="token-name">action</span><span class="token-value">#5A3FA3</span></div><div class="token"><span class="swatch" style="--swatch:#412D78"></span><span class="token-name">action-hover</span><span class="token-value">#412D78</span></div><div class="token"><span class="swatch" style="--swatch:#006B75"></span><span class="token-name">focus</span><span class="token-value">#006B75</span></div><div class="token"><span class="swatch" style="--swatch:#1D7445"></span><span class="token-name">success</span><span class="token-value">#1D7445</span></div><div class="token"><span class="swatch" style="--swatch:#885000"></span><span class="token-name">warning</span><span class="token-value">#885000</span></div><div class="token"><span class="swatch" style="--swatch:#A9232E"></span><span class="token-name">danger</span><span class="token-value">#A9232E</span></div>
+        </div>
+        <div class="sample"><aside class="sidebar"><div class="brand"><span class="brand-mark">01</span>速查工具</div><div class="side-label">类别索引</div><div class="category active"><span>全部卡片</span><span class="count">012</span></div><div class="category"><span>当前项目</span><span class="count">005</span></div><div class="category"><span>常用模板</span><span class="count">004</span></div><div class="category"><span>未分类</span><span class="count">001</span></div></aside><section class="workspace"><div class="topline"><div><h3 class="view-title">全部卡片</h3><p class="view-meta">12 个文件 · 手动排序</p></div><div class="search">搜索全部卡片</div></div><div class="actions"><button class="btn">整理排序</button><button class="btn primary">＋ 选择文件</button></div><div class="content-grid"><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>产品需求文档</h3><p>速查工具 V1 的最终产品规则与验收边界。</p><span class="tag">当前项目</span></article><article class="file-card"><button class="more" aria-label="更多操作">⋮</button><h3>项目预算表</h3><p>研发与设计资源投入测算。</p><span class="tag">当前项目</span></article></div><div class="failure"><span class="failure-mark"></span><div class="failure-body"><h3>无法打开文件</h3><p>“项目预算表”仍被保留。可重新选择文件或关闭。</p><div class="failure-actions"><span class="repair">重新选择文件</span><span>删除卡片</span><span>关闭</span></div></div></div></section></div>
+        <footer class="note">适合：强调现代技术工具感与品牌识别；紫色行动、青色焦点彼此分离，状态清楚。</footer>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

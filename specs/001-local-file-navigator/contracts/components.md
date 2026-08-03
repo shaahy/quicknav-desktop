@@ -19,7 +19,7 @@
 
 - 左侧固定宽度 208px `category-nav`，右侧 `main` 区 flex-grow
 - 画布色 `{colors.canvas}`，壳与侧栏分割线 `{colors.border}` 1-2px
-- 冷启动进入 S01（全部卡片）；托盘恢复保持关闭前的 Surface
+- 冷启动进入 S01（全部卡片）；重复启动聚焦已有窗口并保持当前 Surface
 
 ## category-nav
 
@@ -110,10 +110,14 @@
 | `viewType` | `ViewType` | 当前视图类型 |
 | `onOpenFile` | `(cardId: string) => void` | 主打开动作 |
 | `onShowMenu` | `(cardId: string) => void` | 更多按钮 |
+| `onSetFavorite` | `(cardId: string, isFavorite: boolean) => void` | 收藏状态切换 |
 | `isReorderMode` | `boolean` | 整理模式中禁用打开 |
 
 - 主体 onClick → `onOpenFile` (非整理模式)
 - 更多按钮独立焦点和 onClick → `onShowMenu`
+- 右下角桃心按钮使用至少 44×44px 独立热区，onClick → `onSetFavorite`，不得冒泡触发主打开
+- 桃心按钮通过空心/实心桃心提供非颜色状态，并暴露动态 `aria-label` 与 `aria-pressed`
+- 整理模式中桃心按钮禁用
 - 1px `{colors.border}`，焦点 `{colors.focus}` 外环
 - 名称+元信息由分隔线组织
 - 最多两行备注摘要，无备注不留空位

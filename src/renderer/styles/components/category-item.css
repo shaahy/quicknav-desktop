@@ -75,6 +75,10 @@
   line-height: 1.4;
 }
 
+.qc-category-item--active .qc-category-item__count {
+  color: var(--color-on-action);
+}
+
 /* ── More button ── */
 
 .qc-category-item__more-btn {

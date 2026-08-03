@@ -24,6 +24,7 @@ describe('validateCardName', () => {
 describe('validateCategoryName', () => {
   it('returns error for reserved name', () => {
     expect(validateCategoryName('全部卡片', [])).toBe('保留名称，不可使用')
+    expect(validateCategoryName('我的收藏', [])).toBe('保留名称，不可使用')
     expect(validateCategoryName('未分类', [])).toBe('保留名称，不可使用')
   })
   it('returns error for empty after trim', () => {

@@ -25,8 +25,8 @@
 | FR-016 | 至少 1 类别 + 多类别时才能移出 | 移出禁用逻辑 | T030 (category-checklist), T052 (S02) | ❌ 无测试 | ❌ | 🔴 MISSING_TEST |
 | FR-017 | 删除类别确认 + 孤儿进未分类 | S13 显示总数 + 进入未分类数 | T058 (S13), T025 (useCategories.deleteCategory) | ✅ useCategories 测了 orphan | ❌ | ⚠️ MISSING_E2E |
 | FR-018 | 未分类有卡片时显示 + 加入类别后自动离开 | 显示/隐藏逻辑 | T053 (S03), T025 (useCategories) | ✅ useCategories 测了 visibility | ❌ | PASS |
-| FR-019 | 固定左侧栏 + 右侧主区单窗口 | 208px sidebar + flex main, 单 BrowserWindow | T013 (index.ts), T027 (app-shell), T048 (category-nav) | ✅ app-shell.test.tsx | ✅ responsive | PASS |
-| FR-020 | 冷启动进全部卡片 / 托盘恢复保持状态 | index.ts isQuitting 逻辑 | T013 (index.ts), T042 (S01) | ✅ app-shell 测了冷启动 | ✅ tray | PASS |
+| FR-019 | 固定左侧栏 + 右侧主区单窗口 | 208px sidebar + flex main，关闭窗口彻底退出 | T013 (index.ts), T027 (app-shell), T048 (category-nav) | ✅ app-shell.test.tsx + main-lifecycle.test.ts | ✅ lifecycle | PASS |
+| FR-020 | 冷启动进全部卡片 / 重复启动聚焦已有窗口 | single-instance lock + second-instance 聚焦 | T013 (index.ts), T042 (S01) | ✅ main-lifecycle.test.ts | ✅ lifecycle | PASS |
 | FR-021 | 各视图独立手动顺序 | viewOrders 数组 per viewType | T023 (AppState), T049 (reorder-control) | ✅ useSort.test.ts | ❌ | ⚠️ MISSING_E2E |
 | FR-022 | 整理模式禁用主打开 + 立即生效 | UI <16ms 更新 | T049 (reorder-control), T055 (S08) | ✅ useSort 测了即时更新 | ❌ | ⚠️ MISSING_E2E |
 | FR-023 | 全局搜索跨全部卡片实时匹配 | useSearch 搜索名称为全部卡片 | T063 (global-search), T065 (useSearch) | ✅ useSearch.test.ts (10 tests) | ✅ search-locate | PASS |
@@ -43,9 +43,9 @@
 | FR-033 | 首页备注最多两行超出省略 | CSS line-clamp | T040 (file-card) | ✅ file-card 测了 note render | ❌ | PASS |
 | FR-034 | Win + macOS 版本一致 | electron-builder NSIS + DMG | T089 (platform verify) | ❌ 未做 | ❌ | 🔴 MISSING_E2E |
 | FR-035 | 不提供迁移/同步/导入/导出 | 功能排除 + UI 不暗示 | T036 (S05 文案), T085 (CHK020 审计) | ✅ CHK020 0 hits | ❌ | PASS |
-| FR-036 | 正常关闭/重启/升级保留数据 | JSON fsync 持久化 | T016 (store.ts), T014 (tray), T091 (persistence E2E) | ✅ store.test.ts | ✅ persistence | PASS |
+| FR-036 | 正常关闭/重启/升级保留数据 | JSON fsync 持久化 | T016 (store.ts), T014 (lifecycle), T091 (persistence E2E) | ✅ store.test.ts | ✅ persistence | PASS |
 | FR-036a | 数据损坏 → 阻断 + 重试 + 重建 | loadError 状态 → error UI | T017 (store.ts), T077 (AppLoadState), T079 (app-shell C3 fix) | ✅ app-shell 测了 error state | ❌ | ⚠️ MISSING_E2E |
-| FR-036b | 系统托盘最小化 + 右键退出 | close → hide, tray context menu | T014 (index.ts tray), T090 (tray E2E) | ✅ tray.spec.ts | ✅ tray | PASS |
+| FR-036b | 单实例 + 关闭彻底退出 | requestSingleInstanceLock；close → window-all-closed → app.quit | T014 (index.ts lifecycle), T090 (lifecycle E2E) | ✅ main-lifecycle.test.ts | ✅ lifecycle | PASS |
 | FR-037 | 全键盘操作 Tab/方向键/Enter/Space/Esc | keyboard workflow | T083 (keyboard E2E) | ✅ keyboard-a11y.spec.ts | ✅ | PASS |
 | FR-038 | 状态不只用颜色区分 | icon + text + border 组合 | 多个组件 | ⚠️ 审计通过但无逐组件验证 | ❌ | PASS |
 | FR-039 | 卡片独立可访问名称 | file-card aria-label | T040 (file-card) | ✅ file-card.test.tsx | ❌ | PASS |

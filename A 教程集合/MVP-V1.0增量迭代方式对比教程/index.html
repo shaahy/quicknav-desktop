@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="面向已完成 MVP V1.0 项目的五种增量迭代开发方式对比教程">
+  <title>MVP V1.0 增量迭代：五种开发方式怎么选</title>
+  <style>
+    :root {
+      --paper: #f4f0e8;
+      --surface: #fffdf8;
+      --surface-2: #ebe5da;
+      --ink: #1c2a2b;
+      --muted: #5d6967;
+      --line: #c7c0b5;
+      --line-strong: #7e8985;
+      --accent: #0d615b;
+      --accent-2: #9f4b2f;
+      --accent-soft: #dceae6;
+      --warn: #8a5a00;
+      --warn-soft: #f4e7c2;
+      --danger: #8b332f;
+      --danger-soft: #f2d9d5;
+      --good: #25623d;
+      --good-soft: #dce9df;
+      --focus: #005fcc;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", Arial, sans-serif;
+      --serif: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", SimSun, serif;
+      --max: 1540px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(28, 42, 43, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 100% 32px;
+      font-family: var(--sans);
+      line-height: 1.65;
+    }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    button, input, select { font: inherit; }
+    button, select, input[type="search"] {
+      min-height: 44px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      color: var(--ink);
+    }
+    button { cursor: pointer; }
+    button:hover { border-color: var(--accent); color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .skip-link {
+      position: fixed;
+      left: 12px;
+      top: -80px;
+      z-index: 99;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: white;
+    }
+    .skip-link:focus { top: 12px; }
+
+    .hero {
+      border-bottom: 2px solid var(--ink);
+      background: var(--surface);
+    }
+    .hero-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 64px 28px 42px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(290px, .8fr);
+      gap: 48px;
+      align-items: end;
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent-2);
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 950px;
+      font-family: var(--serif);
+      font-size: clamp(2.25rem, 5vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: -.045em;
+    }
+    .lead {
+      max-width: 900px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.25rem);
+    }
+    .hero-meta {
+      border-left: 4px solid var(--accent);
+      padding-left: 20px;
+    }
+    .hero-meta table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .hero-meta th, .hero-meta td {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .hero-meta th { width: 34%; color: var(--muted); font-weight: 650; }
+
+    .layout {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 28px 72px;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 32px;
+    }
+    .side {
+      position: sticky;
+      top: 0;
+      align-self: start;
+      max-height: 100vh;
+      overflow-y: auto;
+      padding: 28px 0;
+    }
+    .side h2 {
+      margin: 0 0 12px;
+      font-size: .82rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .side nav { display: grid; gap: 4px; }
+    .side a {
+      padding: 8px 10px;
+      border-left: 3px solid transparent;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+    }
+    .side a:hover, .side a.active {
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--ink);
+    }
+    .legend {
+      margin-top: 24px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 248, .7);
+      font-size: .78rem;
+    }
+
+    main { min-width: 0; }
+    section {
+      scroll-margin-top: 18px;
+      padding: 54px 0 10px;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+    .section-no {
+      display: grid;
+      place-items: center;
+      width: 64px;
+      height: 64px;
+      border: 2px solid var(--ink);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 2.7vw, 2.55rem);
+      line-height: 1.2;
+    }
+    .section-intro { margin: 5px 0 0; color: var(--muted); }
+
+    .notice {
+      margin: 18px 0;
+      padding: 14px 18px;
+      border-left: 5px solid var(--warn);
+      background: var(--warn-soft);
+    }
+    .notice strong { display: block; margin-bottom: 3px; }
+    .takeaway {
+      margin: 20px 0;
+      padding: 18px 20px;
+      border: 2px solid var(--accent);
+      background: var(--accent-soft);
+    }
+    .takeaway strong { color: var(--accent); }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(200px, 1fr) auto auto;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid var(--line-strong);
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(8px);
+    }
+    .toolbar input[type="search"] { width: 100%; padding: 0 12px; }
+    .toolbar button { padding: 0 14px; }
+    .search-status { min-height: 1.4em; margin: 6px 0 0; color: var(--muted); font-size: .82rem; }
+
+    .table-wrap {
+      position: relative;
+      margin: 16px 0 26px;
+      overflow: auto;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      scrollbar-color: var(--line-strong) var(--surface-2);
+    }
+    table.compare {
+      width: 100%;
+      min-width: 1120px;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .9rem;
+    }
+    table.compare.compact { min-width: 840px; }
+    .compare caption {
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line-strong);
+      background: var(--ink);
+      color: white;
+      text-align: left;
+      font-weight: 760;
+      letter-spacing: .02em;
+    }
+    .compare th, .compare td {
+      padding: 14px 15px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .compare thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #e6e0d5;
+      color: var(--ink);
+      font-size: .82rem;
+      line-height: 1.35;
+    }
+    .compare tbody tr:nth-child(even) td,
+    .compare tbody tr:nth-child(even) th { background-color: #faf7f0; }
+    .compare tbody tr:hover td,
+    .compare tbody tr:hover th { background-color: #eef4f1; }
+    .compare th:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      min-width: 175px;
+      max-width: 240px;
+      background: #ede7dc;
+      font-weight: 760;
+    }
+    .compare thead th:first-child { z-index: 4; background: #d9d2c5; }
+    .compare td:last-child, .compare th:last-child { border-right: 0; }
+    .compare tr:last-child td, .compare tr:last-child th { border-bottom: 0; }
+    .compare ul { margin: 0; padding-left: 18px; }
+    .compare li + li { margin-top: 5px; }
+    code {
+      padding: .08em .32em;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      font-family: var(--mono);
+      font-size: .9em;
+    }
+    .flow {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: .85rem;
+      line-height: 1.55;
+    }
+    .tag {
+      display: inline-block;
+      margin: 1px 3px 1px 0;
+      padding: 2px 7px;
+      border: 1px solid currentColor;
+      font-size: .73rem;
+      font-weight: 750;
+      line-height: 1.45;
+      white-space: nowrap;
+    }
+    .tag.good { color: var(--good); background: var(--good-soft); }
+    .tag.warn { color: var(--warn); background: var(--warn-soft); }
+    .tag.bad { color: var(--danger); background: var(--danger-soft); }
+    .tag.neutral { color: var(--muted); background: var(--surface-2); }
+    .rating { font-family: var(--mono); white-space: nowrap; letter-spacing: .05em; }
+    .yes { color: var(--good); font-weight: 760; }
+    .partial { color: var(--warn); font-weight: 760; }
+    .no { color: var(--danger); font-weight: 760; }
+    .method-title { display: block; margin-bottom: 4px; font-weight: 800; }
+    .method-sub { display: block; color: var(--muted); font-size: .8rem; }
+
+    details {
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    details + details { margin-top: 10px; }
+    summary {
+      cursor: pointer;
+      padding: 13px 16px;
+      font-weight: 760;
+    }
+    details[open] summary { border-bottom: 1px solid var(--line); background: var(--surface-2); }
+    .details-body { padding: 4px 16px 16px; }
+
+    .weights {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(240px, 1fr));
+      gap: 10px 24px;
+      padding: 16px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+    }
+    .weight-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.5fr) 52px;
+      gap: 8px;
+      align-items: center;
+      font-size: .86rem;
+    }
+    .weight-row output { font-family: var(--mono); text-align: right; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .total-weight {
+      margin: 8px 0 14px;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .total-weight.invalid { color: var(--danger); font-weight: 760; }
+    .score-bar {
+      display: inline-block;
+      height: 8px;
+      margin-right: 8px;
+      background: var(--accent);
+      vertical-align: middle;
+    }
+    .winner td, .winner th { box-shadow: inset 4px 0 var(--accent); }
+
+    .source-url {
+      overflow-wrap: anywhere;
+      font-family: var(--mono);
+      font-size: .78rem;
+    }
+    .footnote { color: var(--muted); font-size: .82rem; }
+    .footer {
+      margin-top: 56px;
+      padding: 30px 0;
+      border-top: 2px solid var(--ink);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .print-only { display: none; }
+    .is-hidden { display: none !important; }
+
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+      .layout { grid-template-columns: 1fr; }
+      .side {
+        position: static;
+        max-height: none;
+        padding: 18px 0 0;
+      }
+      .side nav {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+      .side a {
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      .side a.active { border-color: var(--accent); }
+      .legend { display: none; }
+    }
+    @media (max-width: 768px) {
+      .hero-inner { padding: 42px 18px 30px; }
+      .layout { padding: 0 14px 48px; }
+      .section-head { grid-template-columns: 48px 1fr; gap: 12px; }
+      .section-no { width: 44px; height: 44px; font-size: .86rem; }
+      section { padding-top: 42px; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .toolbar input { grid-column: 1 / -1; }
+      .weights { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 2.25rem; }
+      .hero-meta { padding-left: 14px; }
+      .compare th, .compare td { padding: 11px 12px; }
+      table.compare { font-size: .84rem; }
+      .toolbar { position: static; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #151a1a;
+        --surface: #1d2423;
+        --surface-2: #29312f;
+        --ink: #eef3ef;
+        --muted: #b1bdb8;
+        --line: #48524f;
+        --line-strong: #75807c;
+        --accent: #66c9bd;
+        --accent-2: #e29372;
+        --accent-soft: #203c38;
+        --warn: #e9bd67;
+        --warn-soft: #493a1f;
+        --danger: #f29a91;
+        --danger-soft: #482927;
+        --good: #8bd0a2;
+        --good-soft: #233d2d;
+      }
+      .compare thead th { background: #343d3a; }
+      .compare th:first-child { background: #29312f; }
+      .compare thead th:first-child { background: #3d4643; }
+      .compare tbody tr:nth-child(even) td,
+      .compare tbody tr:nth-child(even) th { background-color: #202826; }
+      .compare tbody tr:hover td,
+      .compare tbody tr:hover th { background-color: #263d38; }
+    }
+    @media print {
+      :root {
+        --paper: #fff;
+        --surface: #fff;
+        --surface-2: #f3f3f3;
+        --ink: #000;
+        --muted: #444;
+        --line: #bbb;
+        --line-strong: #555;
+        --accent: #000;
+      }
+      body { background: white; font-size: 9pt; }
+      .hero-inner, .layout { max-width: none; padding-left: 0; padding-right: 0; }
+      .hero-inner { display: block; padding-top: 0; }
+      .hero-meta { margin-top: 18px; }
+      .layout { display: block; }
+      .side, .toolbar, .weights, .interactive-note { display: none !important; }
+      section { break-before: page; padding-top: 16px; }
+      section:first-of-type { break-before: auto; }
+      .table-wrap { overflow: visible; border-color: #555; }
+      table.compare { min-width: 0; font-size: 7.5pt; }
+      .compare th, .compare td { padding: 5px 6px; }
+      .compare thead th, .compare th:first-child { position: static; }
+      .print-only { display: block; }
+      a { color: #000; text-decoration: none; }
+      details { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <p class="eyebrow">Brownfield Incremental Development / 决策教程</p>
+        <h1>MVP V1.0 已完成，下一轮功能该用哪种开发方式？</h1>
+        <p class="lead">把“直接对话、Superpowers、OpenSpec、BMAD Quick Dev、Spec Kit Flow-Forward”放在同一张尺子上比较。结论不是谁最强，而是谁在你的变更规模、风险和留痕要求下最划算。</p>
+      </div>
+      <div class="hero-meta" aria-label="教程元信息">
+        <table>
+          <tr><th>适用对象</th><td>懂技术的产品负责人、技术负责人、AI 独立开发者</td></tr>
+          <tr><th>默认前提</th><td>已有可运行 MVP、基础测试与代码仓库</td></tr>
+          <tr><th>比较日期</th><td>2026-07-28</td></tr>
+          <tr><th>阅读方式</th><td>先看结论，再按风险回查证据</td></tr>
+          <tr><th>离线状态</th><td>零外部依赖，单文件可直接打开</td></tr>
+        </table>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="side" aria-label="章节导航">
+      <h2>阅读路线</h2>
+      <nav id="toc">
+        <a href="#boundary">00 概念校准</a>
+        <a href="#snapshot">01 一页结论</a>
+        <a href="#workflow">02 工作链路</a>
+        <a href="#artifacts">03 产物与真相源</a>
+        <a href="#control">04 人机控制</a>
+        <a href="#quality">05 质量与风险</a>
+        <a href="#cost">06 成本与效率</a>
+        <a href="#scenarios">07 场景适配</a>
+        <a href="#practice">08 实战示例</a>
+        <a href="#score">09 加权评分</a>
+        <a href="#decision">10 选型规则</a>
+        <a href="#recommendation">11 总结建议</a>
+        <a href="#sources">12 依据与边界</a>
+      </nav>
+      <div class="legend">
+        <strong>评分说明</strong><br>
+        5 = 很强 / 很适合<br>
+        4 = 强<br>
+        3 = 可用但有代价<br>
+        2 = 弱<br>
+        1 = 很弱 / 不匹配<br><br>
+        分数是面向“已完成 MVP 的增量迭代”的决策模型，不是通用排行榜。
+      </div>
+    </aside>
+
+    <main id="main">
+      <section id="boundary">
+        <div class="section-head">
+          <div class="section-no">00</div>
+          <div>
+            <h2>先把五个对象放在同一层理解</h2>
+            <p class="section-intro">它们本来并不完全同类。若不先校准，比较会产生“拿执行方法和文档策略比速度”的错觉。</p>
+          </div>
+        </div>
+
+        <div class="notice">
+          <strong>重要校正</strong>
+          Spec Kit 的 Flow-Forward 是规格持久化模型，不是单独的 CLI 工作流。本文所称“Spec Kit Flow-Forward”，指使用 Spec Kit 的 <code>Specify → Plan → Tasks → Implement</code> 主链路，并约定已完成 feature 目录不再修改；需求变化时新建 feature 目录。[S4][S5]
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 0-1｜五种方式的类型与公平比较口径</caption>
+            <thead>
+              <tr><th>方式</th><th>本质类型</th><th>本文如何操作化</th><th>主要解决的问题</th><th>不天然解决的问题</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>直接与大模型对话</th>
+                <td>无固定流程的基准方式</td>
+                <td>在同一或连续对话中描述需求，让模型直接读代码、修改、测试</td>
+                <td>以最低启动成本快速得到代码改动</td>
+                <td>长期规格、变更留痕、稳定 Gate、跨会话一致性</td>
+              </tr>
+              <tr>
+                <th>Superpowers</th>
+                <td>技能驱动的软件开发方法</td>
+                <td>Brainstorming → worktree → plan → TDD 实现 → 双阶段审查 → 收尾</td>
+                <td>把工程纪律强制嵌入 Agent 行为，减少“说完成但没验证”</td>
+                <td>产品级长期主规格的持续合并与治理</td>
+              </tr>
+              <tr>
+                <th>OpenSpec</th>
+                <td>面向增量变化的规格协议层</td>
+                <td>Explore/Propose → delta specs/design/tasks → Apply → Verify（expanded profile）→ Archive</td>
+                <td>区分“当前事实”与“拟议变化”，完成后把增量合回真相源</td>
+                <td>默认并不等于严格 TDD、独立代码审查或分支治理</td>
+              </tr>
+              <tr>
+                <th>BMAD Quick Dev</th>
+                <td>低人工中断的一体化快速开发流</td>
+                <td>压缩意图 → 判断一击直达或完整路径 → 冻结 spec → 实现 → 分层审查</td>
+                <td>在安全边界足够清楚后，让模型长时间自主执行</td>
+                <td>跨大量增量变更的长期规范合并，不是其核心定位</td>
+              </tr>
+              <tr>
+                <th>Spec Kit Flow-Forward</th>
+                <td>SDD 主链路 + 不可变历史约定</td>
+                <td>每次变化建立新 feature 目录；旧 spec/plan/tasks 保留为历史记录</td>
+                <td>获得清晰时间线、审核证据和“当时为何这样做”的可追溯性</td>
+                <td>跨 feature 的统一当前视图，需要额外索引、链接或汇总习惯</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="snapshot">
+        <div class="section-head">
+          <div class="section-no">01</div>
+          <div>
+            <h2>一页结论：先看它们各自擅长什么</h2>
+            <p class="section-intro">如果你只读一张表，就读这一张。后续章节负责解释这些判断从哪里来。</p>
+          </div>
+        </div>
+
+        <div class="toolbar interactive-note" aria-label="表格工具">
+          <input id="table-search" type="search" placeholder="搜索所有表格，例如：TDD、留痕、小改动、审计" aria-label="搜索表格内容">
+          <button id="expand-all" type="button">展开说明</button>
+          <button id="print-page" type="button">打印 / PDF</button>
+        </div>
+        <p id="search-status" class="search-status" aria-live="polite"></p>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 1-1｜执行级总览</caption>
+            <thead>
+              <tr>
+                <th>维度</th>
+                <th>直接对话</th>
+                <th>Superpowers</th>
+                <th>OpenSpec</th>
+                <th>BMAD Quick Dev</th>
+                <th>Spec Kit Flow-Forward</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>一句话定位</th>
+                <td>最快开工，最依赖人的判断与上下文管理</td>
+                <td>工程质量优先的强纪律执行系统</td>
+                <td>最贴合既有系统增量变更的规格闭环</td>
+                <td>以少量高价值确认换取较长自主执行</td>
+                <td>以不可变历史换取审计与演进解释力</td>
+              </tr>
+              <tr>
+                <th>最适合</th>
+                <td>极小、低风险、可立即验证的改动</td>
+                <td>中高风险代码、复杂调试、质量债敏感模块</td>
+                <td>中长期持续迭代、多人协作、需保持当前规格</td>
+                <td>边界明确的小中型功能、负责人不想频繁被打断</td>
+                <td>合规、强审计、多版本决策追溯</td>
+              </tr>
+              <tr>
+                <th>最大优点</th>
+                <td><span class="tag good">零仪式</span> 开始成本最低</td>
+                <td><span class="tag good">工程纪律</span> TDD、审查、验证、隔离</td>
+                <td><span class="tag good">增量真相源</span> delta 合并回当前规格</td>
+                <td><span class="tag good">注意力效率</span> 减少低价值人工轮次</td>
+                <td><span class="tag good">历史清晰</span> 旧产物保持不可变</td>
+              </tr>
+              <tr>
+                <th>最大代价</th>
+                <td><span class="tag bad">漂移</span> 需求、代码和结论易散落</td>
+                <td><span class="tag warn">流程重</span> 小改动也可能付出完整仪式</td>
+                <td><span class="tag warn">需维护</span> Archive/Verify 不能长期省略</td>
+                <td><span class="tag warn">依赖边界</span> 前置意图压缩差会放大偏差</td>
+                <td><span class="tag warn">碎片化</span> 同一能力散落多个 feature</td>
+              </tr>
+              <tr>
+                <th>默认推荐等级</th>
+                <td><span class="rating">★★☆☆☆</span><br><span class="method-sub">只作微改通道</span></td>
+                <td><span class="rating">★★★★☆</span><br><span class="method-sub">高质量执行层</span></td>
+                <td><span class="rating">★★★★★</span><br><span class="method-sub">默认规格主干</span></td>
+                <td><span class="rating">★★★★☆</span><br><span class="method-sub">快速功能通道</span></td>
+                <td><span class="rating">★★★☆☆</span><br><span class="method-sub">审计条件成立时升级</span></td>
+              </tr>
+              <tr>
+                <th>不建议使用时</th>
+                <td>跨模块、数据迁移、安全权限、多人并行</td>
+                <td>文案、样式微调等低爆炸半径改动</td>
+                <td>一次性原型或需求极不稳定的探索阶段</td>
+                <td>目标仍矛盾、外部依赖未确认、需密集产品共创</td>
+                <td>同一能力高频反复修改且团队没有索引治理</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="takeaway">
+          <strong>核心判断：</strong>
+          已完成 MVP 后，真正难的不是“让模型写代码”，而是让每次变化有边界、能验证、能回到可信的当前状态。OpenSpec 最直接解决这个长期问题；Superpowers 更擅长把一次实现做扎实；BMAD Quick Dev 更擅长减少你的监督成本。
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="section-head">
+          <div class="section-no">02</div>
+          <div>
+            <h2>工作链路：从一句需求到可合并代码</h2>
+            <p class="section-intro">比较的不只是步骤数量，而是每一步是否产生稳定边界、谁负责确认、失败时回退到哪里。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 2-1｜端到端链路对照</caption>
+            <thead>
+              <tr><th>阶段</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>0. 入口</th>
+                <td class="flow">“帮我增加收藏功能”</td>
+                <td class="flow">识别为创造性工作 → 自动触发 brainstorming</td>
+                <td class="flow">/opsx:explore（可选）或 /opsx:propose</td>
+                <td class="flow">输入意图、Issue、计划文本或 Story 内容</td>
+                <td class="flow">为本次变化新建 feature 目录</td>
+              </tr>
+              <tr>
+                <th>1. 需求收敛</th>
+                <td>取决于提示词；模型可能边问边改，也可能直接假设</td>
+                <td>逐项澄清、给出备选方案、分段展示设计并要求批准</td>
+                <td>Explore 先读代码和讨论选择；Proposal 固化 why/what</td>
+                <td>把杂乱请求压成单一、无矛盾、可执行目标</td>
+                <td>在新 <code>spec.md</code> 中描述此次变化，不改旧 feature</td>
+              </tr>
+              <tr>
+                <th>2. 规格/设计</th>
+                <td>通常存在于对话；除非主动要求写文件</td>
+                <td>保存设计文档，再生成细粒度实现计划</td>
+                <td>proposal → delta specs → design → tasks，各产物可回访</td>
+                <td>小且零爆炸半径可直达；其余生成并批准冻结 spec</td>
+                <td><code>spec.md</code> → <code>plan.md</code>，并保留历史目录</td>
+              </tr>
+              <tr>
+                <th>3. 隔离/准备</th>
+                <td>不固定；可能直接改当前分支</td>
+                <td>创建 Git worktree/分支、执行项目设置、验证干净基线</td>
+                <td>工具本身以规格目录为中心；分支/worktree 需项目约定补充</td>
+                <td>依赖具体宿主和配置；重点是安全边界而非固定 Git 策略</td>
+                <td>feature 目录天然分隔文档；代码分支仍需另行约定</td>
+              </tr>
+              <tr>
+                <th>4. 任务拆解</th>
+                <td>可临时列 Todo，也可能整块生成</td>
+                <td>任务细到约 2–5 分钟，包含文件、代码、命令和预期结果</td>
+                <td><code>tasks.md</code> 作为变更内清单，Apply 时逐项勾选</td>
+                <td>完整路径才规划；一击直达路径省略不必要拆解</td>
+                <td>生成 <code>tasks.md</code>，作为该 feature 的永久历史组成</td>
+              </tr>
+              <tr>
+                <th>5. 实现</th>
+                <td>模型直接编辑、运行测试；行为高度依赖当前提示</td>
+                <td>子代理逐任务或批次执行；严格 RED → GREEN → REFACTOR</td>
+                <td>Apply 按已批准工件实现并更新任务状态</td>
+                <td>在清晰边界内长时间自主执行，减少中途打断</td>
+                <td>Implement 按 tasks 执行，不回写旧 feature 产物</td>
+              </tr>
+              <tr>
+                <th>6. 审查</th>
+                <td>需显式要求；同一上下文可能出现自证偏差</td>
+                <td>先查规格符合性，再查代码质量；关键问题阻断</td>
+                <td>可用 expanded profile 的 Verify 对照实现与工件；它报告问题但不自动阻断 Archive [S6]</td>
+                <td>审查发现按意图层、规格层、局部实现层分流修正</td>
+                <td>内置工作流可设 spec/plan Gate；实现审查需配置或补充</td>
+              </tr>
+              <tr>
+                <th>7. 收尾</th>
+                <td>通常给出“完成”摘要；规格是否同步不确定</td>
+                <td>跑完整验证，选择合并/PR/保留/丢弃并清理 worktree</td>
+                <td>Archive 把 delta 合入 <code>openspec/specs/</code> 并归档 change</td>
+                <td>人最终验收；局部问题局部修，边界问题回退重生</td>
+                <td>关闭 feature 并保持目录不可变；下一次变化另起目录</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <details>
+          <summary>为什么“失败回退层级”比多跑一次测试更重要？</summary>
+          <div class="details-body">
+            <table class="compare compact">
+              <caption>表 2-2｜错误来源与正确修法</caption>
+              <thead><tr><th>错误来源</th><th>只补代码的后果</th><th>正确动作</th><th>表现较好的方式</th></tr></thead>
+              <tbody>
+                <tr><th>意图错误</th><td>代码越补越偏，测试只证明错误需求被稳定实现</td><td>重新澄清目标和边界</td><td>BMAD Quick Dev、Superpowers Brainstorming</td></tr>
+                <tr><th>规格遗漏</th><td>出现大量局部补丁，规格继续落后</td><td>修改/重建规格，再重新派生任务</td><td>OpenSpec、BMAD Quick Dev、Spec Kit</td></tr>
+                <tr><th>设计不成立</th><td>接口和数据模型反复返工</td><td>回到 design/plan，记录新发现</td><td>OpenSpec、Superpowers、Spec Kit</td></tr>
+                <tr><th>局部实现缺陷</th><td>若重做全部规格，成本过高</td><td>局部修复、补测试、复审</td><td>Superpowers、BMAD Quick Dev</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section id="artifacts">
+        <div class="section-head">
+          <div class="section-no">03</div>
+          <div>
+            <h2>产物与真相源：下一次迭代从哪里继续</h2>
+            <p class="section-intro">MVP 后最常见的隐性债务不是代码，而是“没人知道哪份描述还算数”。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 3-1｜核心产物、生命周期与当前事实</caption>
+            <thead>
+              <tr><th>维度</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>主要产物</th>
+                <td>聊天记录、代码 diff、临时 Todo</td>
+                <td>设计文档、实现计划、测试、提交、审查结果</td>
+                <td>主 specs；每个 change 的 proposal、delta spec、design、tasks</td>
+                <td>冻结 spec、实现 diff、分层审查与最终结果</td>
+                <td>每个 feature 的 spec、plan、tasks 及实现历史</td>
+              </tr>
+              <tr>
+                <th>“当前系统做什么”</th>
+                <td><span class="no">没有固定答案</span><br>常靠代码和人的记忆</td>
+                <td><span class="partial">间接表达</span><br>设计/计划侧重此次工作</td>
+                <td><span class="yes">明确</span><br><code>openspec/specs/</code> 是当前真相</td>
+                <td><span class="partial">本次边界清楚</span><br>长期主规格不是核心</td>
+                <td><span class="partial">需汇总</span><br>事实分布于按时间排列的 feature</td>
+              </tr>
+              <tr>
+                <th>“本次要改什么”</th>
+                <td>对话中的当前要求</td>
+                <td>批准的设计与实现计划</td>
+                <td>change 目录内的 delta specs</td>
+                <td>批准并冻结的 quick spec</td>
+                <td>新 feature 目录的 spec</td>
+              </tr>
+              <tr>
+                <th>完成后的动作</th>
+                <td>可选写总结；无固定闭环</td>
+                <td>验证并完成分支收尾</td>
+                <td>Archive 将 delta 合并回主 specs</td>
+                <td>最终审查，按错误层级修正</td>
+                <td>将本 feature 视为不可变历史，下一变更新建目录</td>
+              </tr>
+              <tr>
+                <th>跨会话恢复</th>
+                <td><span class="rating">★☆☆☆☆</span><br>依赖聊天摘要或重新读仓库</td>
+                <td><span class="rating">★★★★☆</span><br>计划与提交提供恢复点</td>
+                <td><span class="rating">★★★★★</span><br>主规格 + 活跃 change 边界清楚</td>
+                <td><span class="rating">★★★☆☆</span><br>本次 spec 清楚，长期仍需外部基线</td>
+                <td><span class="rating">★★★★☆</span><br>历史完整，但需找到正确 lineage</td>
+              </tr>
+              <tr>
+                <th>规格漂移主风险</th>
+                <td>聊天结论不回写，后续模型按旧信息工作</td>
+                <td>设计/计划完成后没有更新产品级主规格</td>
+                <td>忘记 Archive，活跃 change 与主 specs 长期分叉</td>
+                <td>多次 quick spec 之间缺乏统一当前视图</td>
+                <td>多个不可变 feature 相互覆盖或引用关系不清</td>
+              </tr>
+              <tr>
+                <th>最小治理动作</th>
+                <td>每次改动至少生成 change note + 验收记录</td>
+                <td>把产品行为变更同步到长期规格</td>
+                <td>把 Verify + Archive 设为完成定义的一部分</td>
+                <td>将关键行为变更回写主规格或变更索引</td>
+                <td>维护 capability → feature lineage 索引与 supersedes 链接</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 3-2｜OpenSpec 与 Flow-Forward 最容易混淆的差异</caption>
+            <thead><tr><th>问题</th><th>OpenSpec 默认心智模型</th><th>Spec Kit Flow-Forward 约定</th><th>对 MVP 增量开发的影响</th></tr></thead>
+            <tbody>
+              <tr><th>旧规格能否被本次变化更新</th><td>完成后把 delta 合入主规格，使主规格描述新现实</td><td>已完成 feature 目录不改；新需求另起 feature</td><td>OpenSpec 查询当前行为更直接；Flow-Forward 查看历史更直接</td></tr>
+              <tr><th>当前真相集中在哪里</th><td><code>openspec/specs/</code></td><td>取决于团队索引/汇总约定，可能分布在多个 feature</td><td>长期迭代频繁时，OpenSpec 的认知负担通常更低</td></tr>
+              <tr><th>审计证据</th><td>change archive + 合并后的主规格</td><td>每个 feature 原始产物保持不可变</td><td>强监管或需还原“当时认知”时，Flow-Forward 更强</td></tr>
+              <tr><th>主要失败模式</th><td>漏 archive 或错误合并 delta</td><td>重复、碎片化、后来的 feature 没有链接被替代对象</td><td>二者都需要完成定义，不能只生成文件不治理</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="control">
+        <div class="section-head">
+          <div class="section-no">04</div>
+          <div>
+            <h2>人机控制：你的注意力花在哪里</h2>
+            <p class="section-intro">“人工轮次少”不等于“失去控制”。关键是把人放在高杠杆决策点，而非频繁批准机械动作。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 4-1｜确认点、自主性与偏差控制</caption>
+            <thead><tr><th>控制问题</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>需求阶段人工参与</th>
+                <td>不固定；完全由提示方式决定</td>
+                <td>高：逐步提问、方案选择、分段设计批准</td>
+                <td>中：Explore 可反复讨论，Proposal 后集中审阅</td>
+                <td>中：前期意图访谈集中投入，之后显著减少</td>
+                <td>中高：spec 和 plan Gate 通常显式保留</td>
+              </tr>
+              <tr>
+                <th>实现阶段人工参与</th>
+                <td>常见为高频来回，也可一句话放权</td>
+                <td>子代理模式较低；批次执行模式有阶段检查点</td>
+                <td>Apply 可较自主，但发现工件冲突应停下</td>
+                <td>低：设计目标就是在安全边界内长跑</td>
+                <td>中：取决于 workflow 的 Gate 和实现配置</td>
+              </tr>
+              <tr>
+                <th>强制停点</th>
+                <td>没有天然停点</td>
+                <td>设计批准、计划疑问、审查 Critical、分支收尾选择</td>
+                <td>主要靠团队约定；工件是 enabler，不被设计成僵硬瀑布 Gate</td>
+                <td>目标矛盾、无法安全推断、最终验收、问题需回退上层</td>
+                <td>官方 workflow 可在 spec 与 plan 后配置审批 Gate</td>
+              </tr>
+              <tr>
+                <th>偏差发现时</th>
+                <td>看当前操作者是否意识到；容易继续补丁</td>
+                <td>先审规格符合性，再审代码质量</td>
+                <td>回看 proposal/spec/design/tasks 并更新活跃 change</td>
+                <td>判断偏差进入于意图、spec 或实现，按层回退</td>
+                <td>新变化不能篡改旧历史，应建立后继 feature 说明修正</td>
+              </tr>
+              <tr>
+                <th>最适合的负责人风格</th>
+                <td>愿意持续盯过程、能即时判断代码与产品偏差</td>
+                <td>重证据、愿意为工程质量支付流程成本</td>
+                <td>重长期产品一致性、接受维护规范工件</td>
+                <td>希望前置确认后自主完成、只在关键点介入</td>
+                <td>重审计、责任链和不可变历史</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="quality">
+        <div class="section-head">
+          <div class="section-no">05</div>
+          <div>
+            <h2>质量与风险：哪些护栏是内置的</h2>
+            <p class="section-intro">“支持测试”与“强制证据”是两回事。下表只评价默认工作流倾向，不把可以手工补充的能力算成内置能力。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 5-1｜质量护栏覆盖</caption>
+            <thead><tr><th>护栏</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th></tr></thead>
+            <tbody>
+              <tr><th>需求批准后再编码</th><td class="no">不保证</td><td class="yes">强制倾向</td><td class="yes">核心理念</td><td class="yes">完整路径明确要求</td><td class="yes">可设 spec Gate</td></tr>
+              <tr><th>现有仓库上下文读取</th><td class="partial">看提示</td><td class="yes">设计前先探索上下文</td><td class="yes">Explore/变更工件围绕现有系统</td><td class="yes">先压缩意图并判断安全路径</td><td class="yes">Specify/Plan 以项目上下文为输入</td></tr>
+              <tr><th>Git 隔离工作区</th><td class="no">不内置</td><td class="yes">明确 worktree 流程</td><td class="partial">需团队补充</td><td class="partial">非核心固定机制</td><td class="partial">需团队补充</td></tr>
+              <tr><th>严格测试先行</th><td class="no">不内置</td><td class="yes">RED-GREEN-REFACTOR</td><td class="partial">可写入 design/tasks</td><td class="partial">强调质量但不等同于 Superpowers 式强制 TDD</td><td class="partial">可在 constitution/tasks 中约束</td></tr>
+              <tr><th>规格符合性审查</th><td class="partial">需显式要求</td><td class="yes">第一阶段独立审查</td><td class="yes">Verify/工件对照</td><td class="yes">审查会定位 spec 层问题</td><td class="yes">Gate + artifact analysis 可配置</td></tr>
+              <tr><th>代码质量审查</th><td class="partial">需显式要求</td><td class="yes">第二阶段审查</td><td class="partial">不是核心默认强项</td><td class="yes">上下文无关审查是重要设计点</td><td class="partial">需 workflow/Agent 补充</td></tr>
+              <tr><th>完成前验证证据</th><td class="partial">取决于提示纪律</td><td class="yes">verification-before-completion</td><td class="partial">expanded profile 提供 Verify；需团队把结果设为 Gate [S6]</td><td class="yes">最终产品审查</td><td class="partial">取决于实现步骤定义</td></tr>
+              <tr><th>长期规格同步</th><td class="no">不内置</td><td class="partial">需接入外部主规格</td><td class="yes">Archive 合并 delta</td><td class="partial">需外部主规格/索引</td><td class="partial">保留历史强，统一当前视图弱</td></tr>
+              <tr><th>不可变历史审计</th><td class="no">聊天记录不等同工程审计</td><td class="partial">Git/计划提供部分历史</td><td class="yes">change archive 完整</td><td class="partial">本次工件可留存</td><td class="yes">核心约定</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 5-2｜典型失败模式与防御动作</caption>
+            <thead><tr><th>方式</th><th>最可能失败在哪里</th><th>早期信号</th><th>最低成本防御</th><th>何时应停止使用该路径</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>直接对话</th>
+                <td>模型补齐未确认假设；测试只覆盖演示路径；对话压缩后丢边界</td>
+                <td>频繁出现“顺便优化”、验收口径改变、同一问题反复解释</td>
+                <td>先写 1 页变更卡：目标、非目标、AC、影响文件、验证命令</td>
+                <td>涉及数据迁移、权限、资金、安全、跨模块或多人并行</td>
+              </tr>
+              <tr>
+                <th>Superpowers</th>
+                <td>流程对小改动过重；机械 TDD 产生低价值测试；细粒度计划快速过时</td>
+                <td>准备时间明显大于实现时间；任务计划被连续技术发现推翻</td>
+                <td>只对中高风险启用完整链；允许微改进入受控快速通道</td>
+                <td>变更几分钟可完成且具备确定性回归验证</td>
+              </tr>
+              <tr>
+                <th>OpenSpec</th>
+                <td>Change 开了不归档；delta 错误修改主规格；文档完成但代码审查不足</td>
+                <td><code>changes/</code> 长期堆积；主 specs 与生产行为不一致</td>
+                <td>把 Verify + Archive + 主规格 diff 审查列入 DoD</td>
+                <td>团队不愿意维护任何长期规格，且没人对 Archive 负责</td>
+              </tr>
+              <tr>
+                <th>BMAD Quick Dev</th>
+                <td>意图压缩不充分却进入长跑；错误边界导致自主执行放大偏差</td>
+                <td>spec 中仍有“可能、看情况、按常规”等未决词；外部依赖不清</td>
+                <td>在批准前做矛盾扫描和 blast radius 检查；高风险点保留 Gate</td>
+                <td>产品仍处探索期，需要持续共创而非冻结目标</td>
+              </tr>
+              <tr>
+                <th>Spec Kit Flow-Forward</th>
+                <td>同一能力散落于多个 feature；新成员误读旧 spec 为当前事实</td>
+                <td>搜索同一术语出现多个互相冲突的版本；无法回答“现在到底怎样”</td>
+                <td>维护 capability index、<code>supersedes</code> 链接和当前状态摘要</td>
+                <td>需求高频反复且团队无精力治理 lineage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="cost">
+        <div class="section-head">
+          <div class="section-no">06</div>
+          <div>
+            <h2>成本与效率：不要只看第一次出代码有多快</h2>
+            <p class="section-intro">总成本 = 启动仪式 + 人工确认 + Agent 消耗 + 返工 + 下一次恢复上下文 + 规格治理。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 6-1｜相对成本模型</caption>
+            <thead><tr><th>成本项</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th></tr></thead>
+            <tbody>
+              <tr><th>首次安装/学习</th><td><span class="rating">★☆☆☆☆</span> 最低</td><td><span class="rating">★★★★☆</span> 技能多、规则强</td><td><span class="rating">★★★☆☆</span> 需理解 spec/change/archive</td><td><span class="rating">★★★☆☆</span> 需掌握意图压缩与审查逻辑</td><td><span class="rating">★★★★☆</span> 工具 + 持久化治理约定</td></tr>
+              <tr><th>单次小改启动</th><td><span class="rating">★★★★★</span> 最快</td><td><span class="rating">★★☆☆☆</span> 可能过重</td><td><span class="rating">★★★★☆</span> change 有轻量成本</td><td><span class="rating">★★★★★</span> 可路由一击直达</td><td><span class="rating">★★☆☆☆</span> 新 feature 成本固定</td></tr>
+              <tr><th>中型功能首轮速度</th><td><span class="rating">★★★★☆</span> 快但风险后置</td><td><span class="rating">★★★☆☆</span> 前慢后稳</td><td><span class="rating">★★★★☆</span> 边界清晰后顺畅</td><td><span class="rating">★★★★★</span> 目标就是减少监督</td><td><span class="rating">★★★☆☆</span> Gate 与产物较多</td></tr>
+              <tr><th>返工控制</th><td><span class="rating">★★☆☆☆</span></td><td><span class="rating">★★★★★</span></td><td><span class="rating">★★★★☆</span></td><td><span class="rating">★★★★☆</span></td><td><span class="rating">★★★★☆</span></td></tr>
+              <tr><th>长期上下文恢复</th><td><span class="rating">★☆☆☆☆</span></td><td><span class="rating">★★★★☆</span></td><td><span class="rating">★★★★★</span></td><td><span class="rating">★★★☆☆</span></td><td><span class="rating">★★★★☆</span></td></tr>
+              <tr><th>文档维护负担</th><td><span class="rating">★★★★★</span> 最低，但债务外溢</td><td><span class="rating">★★★☆☆</span></td><td><span class="rating">★★★☆☆</span></td><td><span class="rating">★★★★☆</span></td><td><span class="rating">★★☆☆☆</span> 索引治理重要</td></tr>
+              <tr><th>对负责人注意力</th><td>容易持续占用</td><td>前期与 Gate 占用较多</td><td>集中在 proposal/verify/archive</td><td>前置集中，执行期最低</td><td>规划 Gate + lineage 维护</td></tr>
+              <tr><th>Agent/Token 倾向</th><td>单轮低，返工与重读可能高</td><td>较高：计划、TDD、多个审查上下文</td><td>中：工件生成与核对，但复用性高</td><td>中：前置压缩后长跑，减少重复对话</td><td>中高：每次保留完整 feature 工件</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="footnote">注意：这里是相对结构判断，不是实测工时承诺。真实成本取决于仓库规模、模型、测试速度、上下文窗口、团队纪律与变更风险。</p>
+      </section>
+
+      <section id="scenarios">
+        <div class="section-head">
+          <div class="section-no">07</div>
+          <div>
+            <h2>场景适配：同一个项目可以有多条受控通道</h2>
+            <p class="section-intro">不要强迫所有变化使用同一重量。应按 blast radius（出错影响范围）路由。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 7-1｜变更类型适配矩阵</caption>
+            <thead><tr><th>典型变化</th><th>直接对话</th><th>Superpowers</th><th>OpenSpec</th><th>BMAD Quick Dev</th><th>Spec Kit Flow-Forward</th><th>首选</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>文案、间距、确定性样式微调</th>
+                <td class="yes">5/5</td><td>2/5</td><td>3/5</td><td class="yes">5/5</td><td>1/5</td>
+                <td><strong>直接对话</strong><br><span class="method-sub">有截图/测试作确定性验收</span></td>
+              </tr>
+              <tr>
+                <th>单模块、小功能、无数据迁移</th>
+                <td>3/5</td><td>4/5</td><td>4/5</td><td class="yes">5/5</td><td>3/5</td>
+                <td><strong>BMAD Quick Dev</strong><br><span class="method-sub">少量 Gate，长时间自主</span></td>
+              </tr>
+              <tr>
+                <th>跨模块用户功能</th>
+                <td>1/5</td><td>4/5</td><td class="yes">5/5</td><td>4/5</td><td>4/5</td>
+                <td><strong>OpenSpec</strong><br><span class="method-sub">delta 边界 + 当前规格闭环</span></td>
+              </tr>
+              <tr>
+                <th>复杂状态机、并发、数据一致性</th>
+                <td>1/5</td><td class="yes">5/5</td><td>4/5</td><td>4/5</td><td>4/5</td>
+                <td><strong>OpenSpec + Superpowers</strong><br><span class="method-sub">规格闭环 + TDD/独立审查</span></td>
+              </tr>
+              <tr>
+                <th>安全、权限、支付、不可逆删除</th>
+                <td>1/5</td><td class="yes">5/5</td><td class="yes">5/5</td><td>3/5</td><td class="yes">5/5</td>
+                <td><strong>OpenSpec/Flow-Forward + Superpowers</strong><br><span class="method-sub">需要审计、Gate 与工程证据</span></td>
+              </tr>
+              <tr>
+                <th>高频连续迭代同一能力</th>
+                <td>2/5</td><td>3/5</td><td class="yes">5/5</td><td>4/5</td><td>2/5</td>
+                <td><strong>OpenSpec</strong><br><span class="method-sub">主 specs 持续表达当前现实</span></td>
+              </tr>
+              <tr>
+                <th>法规/合同/客户验收需回溯每次决策</th>
+                <td>1/5</td><td>4/5</td><td>4/5</td><td>3/5</td><td class="yes">5/5</td>
+                <td><strong>Spec Kit Flow-Forward</strong><br><span class="method-sub">不可变 feature 历史</span></td>
+              </tr>
+              <tr>
+                <th>需求仍在探索、需要持续产品共创</th>
+                <td>4/5</td><td class="yes">5/5</td><td>4/5</td><td>2/5</td><td>2/5</td>
+                <td><strong>Superpowers Brainstorming / OpenSpec Explore</strong></td>
+              </tr>
+              <tr>
+                <th>单人开发、负责人时间极少</th>
+                <td>3/5</td><td>3/5</td><td>4/5</td><td class="yes">5/5</td><td>2/5</td>
+                <td><strong>BMAD Quick Dev</strong><br><span class="method-sub">但必须先清除意图矛盾</span></td>
+              </tr>
+              <tr>
+                <th>多人/多 Agent 并行交付</th>
+                <td>1/5</td><td class="yes">5/5</td><td class="yes">5/5</td><td>3/5</td><td>4/5</td>
+                <td><strong>OpenSpec + Superpowers worktree</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="practice">
+        <div class="section-head">
+          <div class="section-no">08</div>
+          <div>
+            <h2>同一需求实战：给 MVP 增加“我的收藏”</h2>
+            <p class="section-intro">假设 V1.0 已有内容卡片、分类浏览和本地持久化；V1.1 要增加收藏入口、收藏视图、重启后保留与取消收藏。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare">
+            <caption>表 8-1｜五种方式如何推进同一增量功能</caption>
+            <thead><tr><th>方式</th><th>推荐输入</th><th>过程产物</th><th>关键验收</th><th>最可能遗漏</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>直接对话</th>
+                <td>“在现有卡片加收藏，新增我的收藏视图，先读相关代码再改；持久化成功后才能更新 UI；覆盖重启测试。”</td>
+                <td>代码 diff、测试输出、总结</td>
+                <td>
+                  <ul>
+                    <li>点击收藏/取消收藏</li>
+                    <li>收藏视图独立排序</li>
+                    <li>重启后仍正确</li>
+                  </ul>
+                </td>
+                <td>是否把收藏误建成普通分类；失败写入时 UI 是否错误乐观更新</td>
+              </tr>
+              <tr>
+                <th>Superpowers</th>
+                <td>先描述用户目标与约束，让 brainstorming 提问后批准设计</td>
+                <td>设计、worktree、细粒度计划、先失败测试、实现、两阶段审查</td>
+                <td>每个任务 RED/GREEN 证据；规格符合性与代码质量分开审</td>
+                <td>流程可能显著重于功能本身；需控制测试是否真正证明重启语义</td>
+              </tr>
+              <tr>
+                <th>OpenSpec</th>
+                <td><code>/opsx:propose add-favorites</code>，明确 ADDED 收藏行为与 MODIFIED 卡片行为</td>
+                <td>proposal、delta specs、design、tasks；Apply 后 Archive 合入主 specs</td>
+                <td>主规格最终能回答收藏是什么、如何排序、失败时如何表现</td>
+                <td>只做工件一致性，未必自动得到强 TDD 或独立代码质量审查</td>
+              </tr>
+              <tr>
+                <th>BMAD Quick Dev</th>
+                <td>输入完整目标、非目标、数据兼容、持久化顺序、验收命令</td>
+                <td>意图压缩结果、quick spec（若需完整路径）、实现和分层审查</td>
+                <td>审查能区分：收藏定义错、spec 漏重启、还是实现局部错误</td>
+                <td>若最初没指出“收藏不是分类”，长跑可能把错误模型实现得很完整</td>
+              </tr>
+              <tr>
+                <th>Spec Kit Flow-Forward</th>
+                <td>新建 <code>011-add-favorites</code>，链接 V1.0 相关 feature，声明 supersedes/extends 关系</td>
+                <td>不可变 spec、plan、tasks 与实现记录</td>
+                <td>能还原 V1.1 当时为何新增该视图，以及与 V1.0 分类模型的区别</td>
+                <td>将来收藏再改时会出现另一个 feature；必须维护能力演进索引</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 8-2｜无论选哪种方式，都不能省略的最小变更卡</caption>
+            <thead><tr><th>字段</th><th>本例内容</th><th>为什么必要</th></tr></thead>
+            <tbody>
+              <tr><th>目标</th><td>用户可收藏任意内容卡片，并在“我的收藏”中浏览</td><td>定义用户价值，而不是只给技术动作</td></tr>
+              <tr><th>非目标</th><td>不做云同步、批量收藏、收藏夹分组</td><td>抑制模型顺手扩展</td></tr>
+              <tr><th>模型边界</th><td>收藏是独立系统视图/排序，不是普通分类</td><td>阻止复用错误抽象</td></tr>
+              <tr><th>状态顺序</th><td>持久化成功后才更新 Renderer 状态；失败保持原状态并提示</td><td>避免 UI 与磁盘事实分叉</td></tr>
+              <tr><th>兼容性</th><td>旧数据无收藏字段时按空集合迁移；不丢失其他设置</td><td>MVP 后增量常见的真实风险</td></tr>
+              <tr><th>验收</th><td>单元/集成测试、构建、重启隔离检查、取消收藏、空状态</td><td>稳态测试不能证明重启与迁移</td></tr>
+              <tr><th>完成定义</th><td>代码、测试、规格/变更记录同步，审查无阻断问题</td><td>“代码能跑”不等于增量闭环</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="score">
+        <div class="section-head">
+          <div class="section-no">09</div>
+          <div>
+            <h2>加权评分：把你的偏好显式化</h2>
+            <p class="section-intro">默认权重针对“已完成 MVP、要持续增量迭代”的中小团队。拖动权重可观察结论如何变化。</p>
+          </div>
+        </div>
+
+        <div class="weights interactive-note" id="weights" aria-label="评分权重调整">
+          <label class="weight-row">迭代速度 <input type="range" min="0" max="40" value="20" data-key="speed"><output>20%</output></label>
+          <label class="weight-row">变更可追溯 <input type="range" min="0" max="40" value="20" data-key="trace"><output>20%</output></label>
+          <label class="weight-row">Brownfield 适配 <input type="range" min="0" max="40" value="15" data-key="brownfield"><output>15%</output></label>
+          <label class="weight-row">工程质量 <input type="range" min="0" max="40" value="15" data-key="quality"><output>15%</output></label>
+          <label class="weight-row">上下文持续性 <input type="range" min="0" max="40" value="10" data-key="context"><output>10%</output></label>
+          <label class="weight-row">团队协作 <input type="range" min="0" max="40" value="10" data-key="team"><output>10%</output></label>
+          <label class="weight-row">低运营成本 <input type="range" min="0" max="40" value="10" data-key="cost"><output>10%</output></label>
+        </div>
+        <p id="weight-total" class="total-weight" aria-live="polite">当前权重合计：100%。动态总分按实际合计归一化。</p>
+
+        <div class="table-wrap">
+          <table class="compare compact" id="score-table">
+            <caption>表 9-1｜面向 MVP 增量迭代的可解释评分（1–5 分）</caption>
+            <thead><tr><th>方式</th><th>速度</th><th>追溯</th><th>既有系统</th><th>质量</th><th>上下文</th><th>协作</th><th>低成本</th><th>加权总分</th></tr></thead>
+            <tbody>
+              <tr data-method="直接对话" data-scores="5,1,3,2,1,1,5">
+                <th>直接对话</th><td>5</td><td>1</td><td>3</td><td>2</td><td>1</td><td>1</td><td>5</td><td class="total-score"></td>
+              </tr>
+              <tr data-method="Superpowers" data-scores="3,3,4,5,3,4,2">
+                <th>Superpowers</th><td>3</td><td>3</td><td>4</td><td>5</td><td>3</td><td>4</td><td>2</td><td class="total-score"></td>
+              </tr>
+              <tr data-method="OpenSpec" data-scores="4,5,5,3,5,5,3">
+                <th>OpenSpec</th><td>4</td><td>5</td><td>5</td><td>3</td><td>5</td><td>5</td><td>3</td><td class="total-score"></td>
+              </tr>
+              <tr data-method="BMAD Quick Dev" data-scores="5,3,4,4,3,3,4">
+                <th>BMAD Quick Dev</th><td>5</td><td>3</td><td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td class="total-score"></td>
+              </tr>
+              <tr data-method="Spec Kit Flow-Forward" data-scores="2,5,4,4,4,5,2">
+                <th>Spec Kit Flow-Forward</th><td>2</td><td>5</td><td>4</td><td>4</td><td>4</td><td>5</td><td>2</td><td class="total-score"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 9-2｜分数背后的证据，而不是“拍脑袋排名”</caption>
+            <thead><tr><th>方式</th><th>高分来自</th><th>失分来自</th><th>改变什么会明显提升</th></tr></thead>
+            <tbody>
+              <tr><th>直接对话</th><td>几乎零启动成本、微改速度最快</td><td>无稳定真相源、审查和长期上下文</td><td>加最小变更卡、独立审查、规格同步</td></tr>
+              <tr><th>Superpowers</th><td>强 TDD、worktree、规格/质量双审、完成验证</td><td>仪式和 Agent 消耗高，长期产品主规格不是核心</td><td>按风险裁剪，并接入 OpenSpec/主规格</td></tr>
+              <tr><th>OpenSpec</th><td>delta 专为 existing system 变化设计，archive 回到当前事实</td><td>默认代码工程纪律不如 Superpowers 强</td><td>把测试、独立 review 与 Git 隔离写入项目约定</td></tr>
+              <tr><th>BMAD Quick Dev</th><td>安全路径路由、较少人工打断、分层纠错</td><td>长期规格整合与不可变审计不是主强项</td><td>接入长期主规格，并明确高风险 Gate</td></tr>
+              <tr><th>Spec Kit Flow-Forward</th><td>不可变历史、多人审计和需求演进时间线</td><td>重复、碎片化、维护索引的固定成本</td><td>自动维护 capability index 和 supersedes 图谱</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="decision">
+        <div class="section-head">
+          <div class="section-no">10</div>
+          <div>
+            <h2>选型规则：先问四个问题</h2>
+            <p class="section-intro">选择不是从工具名开始，而是从变化的风险、寿命、协作和审计要求开始。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 10-1｜四问决策法</caption>
+            <thead><tr><th>顺序</th><th>问题</th><th>如果“是”</th><th>如果“否”</th></tr></thead>
+            <tbody>
+              <tr><th>Q1</th><td>出错是否会影响数据、安全、资金、权限、迁移或多个模块？</td><td>不要直接对话；进入 OpenSpec/Flow-Forward，并采用 Superpowers 质量执行</td><td>继续 Q2</td></tr>
+              <tr><th>Q2</th><td>本次需求是否小、明确、可逆，并有确定性回归验证？</td><td>优先 BMAD Quick Dev；极小变化可直接对话</td><td>继续 Q3</td></tr>
+              <tr><th>Q3</th><td>未来是否会频繁修改同一能力，需要随时回答“当前行为是什么”？</td><td>优先 OpenSpec，完成后必须 Verify + Archive</td><td>继续 Q4</td></tr>
+              <tr><th>Q4</th><td>是否必须保留每个阶段当时的批准内容，且不能被后来改写？</td><td>采用 Spec Kit Flow-Forward，并维护 lineage 索引</td><td>OpenSpec 或 BMAD Quick Dev 即可；按质量风险叠加 Superpowers</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 10-2｜三档流程路由，可直接写进团队约定</caption>
+            <thead><tr><th>通道</th><th>进入条件</th><th>推荐流程</th><th>最低 Gate</th><th>禁止项</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>L1 微改通道</th>
+                <td>单文件/局部、可逆、无模型变化、回归命令确定</td>
+                <td>直接对话或 BMAD Quick Dev 一击直达</td>
+                <td>先读相关代码；展示 diff；运行定向测试和构建</td>
+                <td>不得涉及数据迁移、权限、安全、公开 API</td>
+              </tr>
+              <tr>
+                <th>L2 标准增量通道</th>
+                <td>新增用户行为、跨 2–3 模块、需要长期记住</td>
+                <td>OpenSpec change → Apply → Verify → Archive；关键逻辑使用 TDD</td>
+                <td>Proposal/spec 批准；测试绿；主规格合并审查</td>
+                <td>不得跳过 Archive 后声称完整闭环</td>
+              </tr>
+              <tr>
+                <th>L3 高风险通道</th>
+                <td>安全、支付、迁移、并发、一致性、不可逆操作、合规</td>
+                <td>OpenSpec 或 Flow-Forward + Superpowers 完整执行/独立审查</td>
+                <td>规格 Gate、设计 Gate、RED/GREEN、独立双审、回滚/恢复演练</td>
+                <td>不得自主推断关键产品/安全决策；不得以内部测试代替发布批准</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="recommendation">
+        <div class="section-head">
+          <div class="section-no">11</div>
+          <div>
+            <h2>总结建议：用 OpenSpec 管变化，用风险决定执行重量</h2>
+            <p class="section-intro">这是针对“已完成 MVP V1.0，后续持续增量”的建议，不是绿地项目的通用答案。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 11-1｜最终建议</caption>
+            <thead><tr><th>建议层级</th><th>选择</th><th>理由</th><th>落地规则</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>默认主干</th>
+                <td><strong>OpenSpec</strong></td>
+                <td>它最直接解决 MVP 后的核心矛盾：既要快速改变既有系统，又要让完成后的规格重新描述当前现实。delta specs 避免每次重写全量规格，Archive 关闭变化闭环。</td>
+                <td>每个非微小用户行为建立 change；完成定义必须包含 Verify、Archive 和主规格 diff 审查。</td>
+              </tr>
+              <tr>
+                <th>执行质量层</th>
+                <td><strong>按风险引入 Superpowers</strong></td>
+                <td>OpenSpec 擅长管理“为什么改、改什么、最终事实”，Superpowers 擅长“怎样把这次代码做扎实”。二者职责互补，不必让每个文案改动都走完整 TDD 仪式。</td>
+                <td>L2 的关键逻辑使用 TDD/完成验证；L3 使用 worktree、细粒度计划、规格审查、代码质量审查和分支收尾。</td>
+              </tr>
+              <tr>
+                <th>快速通道</th>
+                <td><strong>BMAD Quick Dev</strong></td>
+                <td>边界明确的小中型功能，最适合先集中压缩意图，再减少人工中断。它比无流程直接对话更安全，又比完整 SDD 更轻。</td>
+                <td>只有目标无矛盾、影响范围可枚举、外部依赖已确认时才能进入长跑；行为变化仍要回写长期规格。</td>
+              </tr>
+              <tr>
+                <th>微改例外</th>
+                <td><strong>直接对话</strong></td>
+                <td>对确定性、低风险、可逆改动，流程成本可能超过实现价值。</td>
+                <td>限制在 L1；至少保留目标/非目标、diff、测试证据。跨模块或修改数据模型立即升级。</td>
+              </tr>
+              <tr>
+                <th>审计升级</th>
+                <td><strong>Spec Kit Flow-Forward</strong></td>
+                <td>当“不允许后来改写当时批准内容”比“随时看到统一当前规格”更重要时，不可变历史才值得其碎片化成本。</td>
+                <td>必须同时维护 capability index、supersedes 链与当前状态摘要，否则不要选。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="takeaway">
+          <strong>一句话落地：</strong>
+          不建议在五种方式里只选一个并强制覆盖全部变化。建议建立三档路由：微改用直接对话/Quick Dev，标准功能以 OpenSpec 为主干，高风险功能在 OpenSpec 或 Flow-Forward 之上叠加 Superpowers 的 TDD、隔离与独立审查。
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 11-2｜如果你坚持只选一种</caption>
+            <thead><tr><th>你的首要目标</th><th>只选一种时</th><th>你必须接受的代价</th></tr></thead>
+            <tbody>
+              <tr><th>最快交付且自己能持续盯住</th><td>BMAD Quick Dev</td><td>需另建长期规格同步规则</td></tr>
+              <tr><th>长期持续迭代且当前事实可信</th><td>OpenSpec</td><td>需补强 TDD、Git 隔离和独立代码审查</td></tr>
+              <tr><th>工程质量和验证纪律优先</th><td>Superpowers</td><td>流程较重，产品级主规格仍需另外维护</td></tr>
+              <tr><th>合规审计和不可变历史优先</th><td>Spec Kit Flow-Forward</td><td>必须治理重复、索引和演进链</td></tr>
+              <tr><th>只做极小、短命、可逆修改</th><td>直接对话</td><td>不可把这套习惯外推到跨模块与高风险功能</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="section-head">
+          <div class="section-no">12</div>
+          <div>
+            <h2>依据、推断与适用边界</h2>
+            <p class="section-intro">事实与建议分开。官方资料描述工具机制；评分和组合建议是基于 MVP 增量场景的分析判断。</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 12-1｜官方资料来源（链接不参与页面运行，断网不影响正文）</caption>
+            <thead><tr><th>编号</th><th>来源</th><th>本文使用的事实</th><th>地址</th></tr></thead>
+            <tbody>
+              <tr id="s1"><th>S1</th><td>Superpowers 官方 GitHub</td><td>Basic Workflow、TDD、worktree、计划、子代理/批次执行、双阶段审查、分支收尾</td><td class="source-url"><a href="https://github.com/obra/superpowers">https://github.com/obra/superpowers</a></td></tr>
+              <tr id="s2"><th>S2</th><td>OpenSpec Core Concepts</td><td>specs 是当前真相；change 是工作单元；delta 描述变化；archive 合并变化回主规格</td><td class="source-url"><a href="https://openspec.dev/docs/overview">https://openspec.dev/docs/overview</a></td></tr>
+              <tr id="s3"><th>S3</th><td>BMAD Method Quick Dev</td><td>压缩意图、最小安全路径、减少低价值人工轮次、按错误进入层级回退、上下文无关审查</td><td class="source-url"><a href="https://docs.bmad-method.org/explanation/quick-dev/">https://docs.bmad-method.org/explanation/quick-dev/</a></td></tr>
+              <tr id="s4"><th>S4</th><td>GitHub Spec Kit — Spec Persistence Models</td><td>Flow-Forward 是不可变 feature 历史约定；优势是审计，代价是重复/碎片化；不是默认 CLI 设置</td><td class="source-url"><a href="https://github.github.io/spec-kit/concepts/spec-persistence.html">https://github.github.io/spec-kit/concepts/spec-persistence.html</a></td></tr>
+              <tr id="s5"><th>S5</th><td>GitHub Spec Kit — Workflows</td><td>Full SDD Cycle 为 specify → review spec → plan → review plan → tasks → implement；workflow 可定义 Gate 和分支</td><td class="source-url"><a href="https://github.github.io/spec-kit/reference/workflows.html">https://github.github.io/spec-kit/reference/workflows.html</a></td></tr>
+              <tr id="s6"><th>S6</th><td>OpenSpec OPSX Workflow / Reviewing a Change</td><td><code>/opsx:verify</code> 位于 expanded profile，用于校验实现与工件；它报告 CRITICAL/WARNING/SUGGESTION，但不会自动阻断 Archive</td><td class="source-url"><a href="https://openspec.dev/docs/opsx">https://openspec.dev/docs/opsx</a><br><a href="https://openspec.dev/docs/reviewing-changes">https://openspec.dev/docs/reviewing-changes</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table class="compare compact">
+            <caption>表 12-2｜结论可信度边界</caption>
+            <thead><tr><th>内容类型</th><th>性质</th><th>如何理解</th></tr></thead>
+            <tbody>
+              <tr><th>工作流步骤与官方定位</th><td>官方资料事实</td><td>以 2026-07-28 核对到的官方页面为准；工具升级后命令名可能变化</td></tr>
+              <tr><th>评分、星级和场景首选</th><td>分析模型</td><td>服务于“已有 MVP 的持续增量”这一前提，不是实验测量或绝对排名</td></tr>
+              <tr><th>组合建议</th><td>工程/产品治理推断</td><td>OpenSpec 管长期变化、Superpowers 管实现质量，是职责互补推断，不是任一项目的官方唯一推荐</td></tr>
+              <tr><th>成本与 Token</th><td>相对趋势</td><td>没有承诺具体工时或金额；应在真实仓库用 2–3 个代表性功能试运行校准</td></tr>
+              <tr><th>“直接对话”</th><td>基准组</td><td>其能力取决于你主动加入多少计划、测试和审查；一旦规则稳定，其实已开始形成自定义工作流</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p><strong>MVP V1.0 增量迭代方式对比教程</strong></p>
+        <p>本文件不加载任何远程字体、样式、脚本、图片或模块。外部链接仅作为可选资料地址，不参与页面渲染和交互。</p>
+        <p class="print-only">打印说明：交互权重采用打印前最后一次调整结果。</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const navLinks = [...document.querySelectorAll("#toc a")];
+      const sections = navLinks
+        .map(link => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean);
+
+      const observer = new IntersectionObserver(entries => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute("href") === `#${visible.target.id}`;
+          link.classList.toggle("active", isActive);
+          if (isActive) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }, { rootMargin: "-15% 0px -65% 0px", threshold: [0, .2, .5] });
+      sections.forEach(section => observer.observe(section));
+
+      const search = document.querySelector("#table-search");
+      const searchStatus = document.querySelector("#search-status");
+      const rows = [...document.querySelectorAll("table.compare tbody tr")];
+      const normalize = value => value.trim().toLocaleLowerCase("zh-CN");
+
+      search.addEventListener("input", () => {
+        const query = normalize(search.value);
+        let matches = 0;
+        rows.forEach(row => {
+          const hit = !query || normalize(row.textContent).includes(query);
+          row.classList.toggle("is-hidden", !hit);
+          if (hit && query) matches += 1;
+        });
+        document.querySelectorAll(".table-wrap").forEach(wrap => {
+          const bodyRows = [...wrap.querySelectorAll("tbody tr")];
+          wrap.classList.toggle("is-hidden", Boolean(query) && bodyRows.length > 0 && bodyRows.every(row => row.classList.contains("is-hidden")));
+        });
+        searchStatus.textContent = query ? `找到 ${matches} 行匹配内容。清空搜索可恢复全部表格。` : "";
+      });
+
+      const expandButton = document.querySelector("#expand-all");
+      let expanded = false;
+      expandButton.addEventListener("click", () => {
+        expanded = !expanded;
+        document.querySelectorAll("details").forEach(item => { item.open = expanded; });
+        expandButton.textContent = expanded ? "收起说明" : "展开说明";
+      });
+
+      document.querySelector("#print-page").addEventListener("click", () => window.print());
+
+      const weightInputs = [...document.querySelectorAll("#weights input[type='range']")];
+      const scoreRows = [...document.querySelectorAll("#score-table tbody tr")];
+      const weightTotal = document.querySelector("#weight-total");
+
+      function updateScores() {
+        const weights = weightInputs.map(input => Number(input.value));
+        const sum = weights.reduce((total, weight) => total + weight, 0);
+        weightInputs.forEach(input => {
+          input.nextElementSibling.value = `${input.value}%`;
+        });
+        weightTotal.textContent = `当前权重合计：${sum}%。动态总分按实际合计归一化。`;
+        weightTotal.classList.toggle("invalid", sum === 0);
+
+        let best = -Infinity;
+        const calculated = scoreRows.map(row => {
+          const scores = row.dataset.scores.split(",").map(Number);
+          const total = sum === 0
+            ? 0
+            : scores.reduce((result, score, index) => result + score * weights[index], 0) / sum;
+          best = Math.max(best, total);
+          return { row, total };
+        });
+
+        calculated.forEach(({ row, total }) => {
+          row.classList.toggle("winner", total === best && best > 0);
+          const cell = row.querySelector(".total-score");
+          const width = Math.round((total / 5) * 90);
+          cell.innerHTML = `<span class="score-bar" style="width:${width}px" aria-hidden="true"></span><strong>${total.toFixed(2)}</strong>`;
+          cell.setAttribute("aria-label", `${row.dataset.method} 加权总分 ${total.toFixed(2)}，满分 5 分`);
+        });
+      }
+
+      weightInputs.forEach(input => input.addEventListener("input", updateScores));
+      updateScores();
+    })();
+  </script>
+</body>
+</html>

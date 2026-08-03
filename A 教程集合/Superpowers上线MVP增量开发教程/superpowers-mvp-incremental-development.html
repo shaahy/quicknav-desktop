@@ -1,0 +1,1441 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="面向已经上线的 MVP V1.0，使用 obra/superpowers 进行安全增量开发的 Codex App 实战教程。">
+  <title>Superpowers：已上线 MVP V1.0 增量开发实战</title>
+  <style>
+    :root {
+      --paper: #f6f2e9;
+      --paper-2: #ece5d7;
+      --ink: #20231f;
+      --muted: #667067;
+      --panel: #fffdf8;
+      --panel-2: #f3eee3;
+      --line: #d6cdbd;
+      --accent: #c75b22;
+      --accent-dark: #8d3813;
+      --accent-soft: #f9e5d8;
+      --green: #286247;
+      --green-soft: #e0eee5;
+      --amber: #99630c;
+      --amber-soft: #f8edce;
+      --red: #a2352b;
+      --red-soft: #f7dfdc;
+      --blue: #315e78;
+      --blue-soft: #e0ebf0;
+      --terminal: #171b18;
+      --terminal-ink: #eaf0e8;
+      --shadow: 0 14px 36px rgba(49, 42, 30, .09);
+      --radius: 14px;
+      --sidebar: 292px;
+    }
+    html[data-theme="dark"] {
+      --paper: #151714;
+      --paper-2: #1c201c;
+      --ink: #edf0e8;
+      --muted: #a8b0a7;
+      --panel: #1e221e;
+      --panel-2: #252a25;
+      --line: #3a413a;
+      --accent: #f08a4c;
+      --accent-dark: #ffb181;
+      --accent-soft: #482719;
+      --green: #7fc6a0;
+      --green-soft: #1d392a;
+      --amber: #e8bb68;
+      --amber-soft: #3f321b;
+      --red: #ee8d85;
+      --red-soft: #452321;
+      --blue: #8cc1dc;
+      --blue-soft: #203744;
+      --terminal: #0e100e;
+      --terminal-ink: #edf4eb;
+      --shadow: 0 14px 36px rgba(0, 0, 0, .24);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+      line-height: 1.72;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--accent-dark); text-underline-offset: 3px; }
+    code, pre { font-family: Consolas, "Cascadia Code", "SFMono-Regular", monospace; }
+    code {
+      padding: .12em .36em;
+      border-radius: 5px;
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+      font-size: .92em;
+    }
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 22px 18px 28px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      z-index: 30;
+    }
+    .brand {
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 11px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 10px;
+      color: #fffaf0;
+      background: var(--accent);
+      font: 900 23px/1 Georgia, serif;
+      transform: rotate(-2deg);
+    }
+    .brand strong { display: block; font-size: 14px; line-height: 1.25; }
+    .brand small { color: var(--muted); font-size: 11px; }
+    .search {
+      width: 100%;
+      margin: 0 0 12px;
+      padding: 9px 11px;
+      color: var(--ink);
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: none;
+    }
+    .search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+    .nav-group { margin: 16px 8px 6px; color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+    nav a {
+      display: block;
+      padding: 7px 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    nav a:hover, nav a.active { color: var(--accent-dark); background: var(--accent-soft); }
+    nav a.hidden { display: none; }
+    .side-tools {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 18px;
+    }
+    .btn {
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 12px;
+    }
+    .btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent-dark); outline: none; }
+    .btn.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+    .reading-progress {
+      position: fixed;
+      z-index: 50;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: var(--accent);
+    }
+    .content { min-width: 0; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 70px clamp(24px, 6vw, 88px) 56px;
+      color: #f8f1e5;
+      background: #232a24;
+      border-bottom: 6px solid var(--accent);
+    }
+    .hero::after {
+      content: "V1.0 → V1.1";
+      position: absolute;
+      right: -18px;
+      bottom: -25px;
+      color: rgba(255,255,255,.055);
+      font: 900 clamp(72px, 12vw, 160px)/1 Georgia, serif;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .kicker { color: #f0b48f; font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+    h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 12px 0 18px;
+      font: 900 clamp(34px, 5.5vw, 66px)/1.08 Georgia, "Microsoft YaHei UI", serif;
+      letter-spacing: -.035em;
+    }
+    .hero-lead {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0;
+      color: #d7ded5;
+      font-size: 17px;
+    }
+    .hero-facts {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 28px;
+    }
+    .hero-facts span {
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      font-size: 12px;
+    }
+    main { max-width: 1160px; margin: 0 auto; padding: 42px clamp(20px, 5vw, 68px) 90px; }
+    section {
+      scroll-margin-top: 18px;
+      margin: 0 0 64px;
+    }
+    section.search-hidden { display: none; }
+    h2 {
+      margin: 0 0 10px;
+      font: 900 clamp(26px, 3vw, 38px)/1.22 Georgia, "Microsoft YaHei UI", serif;
+      letter-spacing: -.02em;
+    }
+    h3 { margin: 28px 0 10px; font-size: 20px; line-height: 1.35; }
+    h4 { margin: 20px 0 7px; font-size: 16px; }
+    p { margin: 8px 0 14px; }
+    ul, ol { padding-left: 1.35em; }
+    li { margin: 5px 0; }
+    .lead { max-width: 920px; margin-top: 0; color: var(--muted); font-size: 16px; }
+    .section-no { display: block; margin-bottom: 5px; color: var(--accent); font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+    .callout {
+      margin: 18px 0;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--accent);
+      border-radius: 10px;
+      background: var(--accent-soft);
+    }
+    .callout strong { color: var(--accent-dark); }
+    .callout.green { border-left-color: var(--green); background: var(--green-soft); }
+    .callout.green strong { color: var(--green); }
+    .callout.warn { border-left-color: var(--amber); background: var(--amber-soft); }
+    .callout.warn strong { color: var(--amber); }
+    .callout.red { border-left-color: var(--red); background: var(--red-soft); }
+    .callout.red strong { color: var(--red); }
+    .callout.blue { border-left-color: var(--blue); background: var(--blue-soft); }
+    .callout.blue strong { color: var(--blue); }
+    .grid-2, .grid-3 { display: grid; gap: 15px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card h3, .card h4 { margin-top: 0; }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+    .tag {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 3px 8px;
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .06em;
+    }
+    .tag.official { color: var(--green); background: var(--green-soft); }
+    .tag.production { color: var(--blue); background: var(--blue-soft); }
+    .tag.gate { color: var(--red); background: var(--red-soft); }
+    .architecture {
+      display: grid;
+      grid-template-columns: 1fr 70px 1fr;
+      align-items: stretch;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .arch-block { padding: 20px; border: 2px solid var(--line); border-radius: 14px; background: var(--panel); }
+    .arch-block.outer { border-color: var(--blue); }
+    .arch-block.inner { border-color: var(--accent); }
+    .arch-arrow { display: grid; place-items: center; color: var(--muted); font-size: 28px; font-weight: 900; }
+    .pipeline {
+      display: grid;
+      gap: 9px;
+      margin: 18px 0;
+    }
+    .pipe-step {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+    }
+    .pipe-step .num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 8px;
+      font-weight: 900;
+    }
+    .pipe-step b { display: block; }
+    .pipe-step small { color: var(--muted); }
+    .pipe-step .owner { color: var(--muted); font-size: 11px; font-weight: 800; }
+    .table-wrap { margin: 14px 0 22px; overflow-x: auto; border: 1px solid var(--line); border-radius: 11px; }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    th { color: var(--muted); background: var(--panel-2); font-size: 12px; }
+    td { font-size: 13px; }
+    pre {
+      position: relative;
+      min-width: 0;
+      max-width: 100%;
+      overflow: auto;
+      margin: 12px 0 20px;
+      padding: 20px;
+      color: var(--terminal-ink);
+      background: var(--terminal);
+      border-radius: 12px;
+      line-height: 1.6;
+      font-size: 12.5px;
+      tab-size: 2;
+    }
+    pre code { padding: 0; color: inherit; background: transparent; }
+    .card, details, .step { min-width: 0; }
+    .copy {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      padding: 5px 8px;
+      color: #dce8dc;
+      background: #293029;
+      border: 1px solid #4a584c;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .copy:hover { border-color: #e89a66; color: #fff; }
+    .step {
+      position: relative;
+      margin: 27px 0 36px;
+      padding-left: 44px;
+    }
+    .step::before {
+      content: attr(data-step);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--accent);
+      border-radius: 8px;
+      font-weight: 900;
+    }
+    .step::after {
+      content: "";
+      position: absolute;
+      top: 38px;
+      bottom: -28px;
+      left: 15px;
+      width: 1px;
+      background: var(--line);
+    }
+    .step:last-child::after { display: none; }
+    details {
+      margin: 12px 0;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+    }
+    summary { padding: 14px 16px; cursor: pointer; font-weight: 900; }
+    details > div { padding: 0 16px 17px; }
+    .router {
+      padding: 20px;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+    .router-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 13px 0; }
+    .router-controls label {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      cursor: pointer;
+    }
+    .route-result { min-height: 90px; padding: 15px; border-left: 5px solid var(--green); background: var(--green-soft); border-radius: 9px; }
+    .checklist { display: grid; gap: 8px; margin: 13px 0; }
+    .check {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--panel-2);
+    }
+    .check input { margin-top: 6px; accent-color: var(--green); }
+    .check.done span { color: var(--muted); text-decoration: line-through; }
+    .check-progress { height: 8px; overflow: hidden; background: var(--line); border-radius: 999px; }
+    .check-progress > div { width: 0; height: 100%; background: var(--green); transition: width .2s; }
+    .sop {
+      display: grid;
+      grid-template-columns: 96px 1fr 140px;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .sop:last-child { border-bottom: 0; }
+    .sop .phase { color: var(--accent-dark); font-weight: 900; }
+    .sop .proof { color: var(--green); font-size: 12px; font-weight: 900; text-align: right; }
+    .small { color: var(--muted); font-size: 12px; }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 60;
+      box-shadow: var(--shadow);
+    }
+    .overlay { display: none; }
+    footer { padding: 30px; color: var(--muted); background: var(--panel); border-top: 1px solid var(--line); text-align: center; font-size: 12px; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    @media (max-width: 980px) {
+      .app { display: block; }
+      .sidebar { display: none; position: fixed; inset: 0 auto 0 0; width: min(86vw, 310px); box-shadow: var(--shadow); }
+      .sidebar.open { display: block; }
+      .overlay.open {
+        display: block;
+        position: fixed;
+        z-index: 20;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: min(86vw, 310px);
+        background: rgba(0,0,0,.38);
+      }
+      .mobile-menu { display: block; }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .hero { padding: 52px 22px 42px; }
+      .grid-2, .grid-3, .architecture { grid-template-columns: minmax(0, 1fr); }
+      .arch-arrow { transform: rotate(90deg); min-height: 30px; }
+      .pipe-step { grid-template-columns: 36px 1fr; }
+      .pipe-step .owner { grid-column: 2; }
+      .router-controls { grid-template-columns: 1fr; }
+      .sop { grid-template-columns: 1fr; gap: 3px; }
+      .sop .proof { text-align: left; }
+      .step { padding-left: 39px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+    @media print {
+      :root {
+        --paper: #fff; --panel: #fff; --panel-2: #f5f5f5; --ink: #111;
+        --muted: #444; --line: #aaa; --accent: #8d3813; --accent-dark: #6d2a0d;
+      }
+      .app { display: block; }
+      .sidebar, .mobile-menu, .overlay, .copy, .no-print, .reading-progress { display: none !important; }
+      .hero { padding: 28px; color: #111; background: #fff; border: 2px solid #111; }
+      .hero-lead, .kicker { color: #333; }
+      .hero-facts span { border-color: #555; }
+      main { max-width: none; padding: 24px; }
+      section { break-inside: auto; }
+      .card, .arch-block { box-shadow: none; break-inside: avoid; }
+      pre { white-space: pre-wrap; word-break: break-word; }
+      details > div { display: block !important; }
+      a { color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
+  <div class="overlay" id="overlay"></div>
+  <button class="btn primary mobile-menu no-print" id="menuButton" aria-controls="sidebar" aria-expanded="false">目录</button>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="教程目录">
+      <div class="brand">
+        <div class="brand-mark">S</div>
+        <div><strong>Superpowers 增量开发</strong><small>Codex App 主线 · 离线教程</small></div>
+      </div>
+      <input class="search" id="search" type="search" placeholder="搜索章节…" aria-label="搜索教程章节">
+      <nav id="nav">
+        <div class="nav-group">先建立正确模型</div>
+        <a href="#start">01 结论与边界</a>
+        <a href="#map">02 双层流程模型</a>
+        <a href="#install">03 Codex 环境准备</a>
+        <a href="#router">04 变更路由器</a>
+        <div class="nav-group">贯穿案例</div>
+        <a href="#case">05 V1.1 标签功能</a>
+        <a href="#baseline">06 冻结 V1.0 基线</a>
+        <a href="#brainstorm">07 Brainstorming</a>
+        <a href="#worktree">08 隔离工作区</a>
+        <a href="#plan">09 Writing Plans</a>
+        <a href="#execute">10 SDD 执行</a>
+        <a href="#tdd">11 TDD 实战</a>
+        <a href="#review">12 审查与修复</a>
+        <a href="#debug">13 系统化调试</a>
+        <a href="#verify">14 完成前验证</a>
+        <a href="#finish">15 结束开发分支</a>
+        <div class="nav-group">生产保护层</div>
+        <a href="#release">16 灰度、监控、回滚</a>
+        <a href="#prompts">17 Prompt 工具箱</a>
+        <a href="#sop">18 一页式 SOP</a>
+        <a href="#antipatterns">19 反模式</a>
+        <a href="#sources">20 来源与版本</a>
+      </nav>
+      <div class="side-tools no-print">
+        <button class="btn" id="themeButton">深色</button>
+        <button class="btn" id="printButton">打印</button>
+        <button class="btn" id="expandButton">展开</button>
+        <button class="btn" id="resetButton">重置进度</button>
+      </div>
+      <p class="small" id="searchStatus" aria-live="polite"></p>
+    </aside>
+
+    <div class="content">
+      <header class="hero">
+        <div class="kicker">obra/superpowers · production incremental development</div>
+        <h1>已上线 MVP V1.0，怎样安全地开发 V1.1</h1>
+        <p class="hero-lead">这不是“让 AI 快点写代码”的教程。它把 Superpowers 的设计、隔离、计划、TDD、审查和验证，放进一条具有兼容、灰度、监控和回滚能力的生产增量链路。</p>
+        <div class="hero-facts">
+          <span>Codex App 主线</span>
+          <span>Claude Code 命令对照</span>
+          <span>单文件 · 完全离线</span>
+          <span>案例：任务标签 V1.1</span>
+          <span>校准版本：Superpowers 6.2.0</span>
+        </div>
+      </header>
+
+      <main>
+        <section id="start" data-title="结论与边界">
+          <span class="section-no">01 · START HERE</span>
+          <h2>先记住一句话</h2>
+          <p class="lead">Superpowers 管好“怎样可靠地开发”；线上产品还需要一层“怎样安全地发布”。两层都通过，才是可上线候选。</p>
+
+          <div class="callout red">
+            <strong>最重要的红线：</strong>“测试通过”“分支完成”“PR 已创建”都不等于生产上线获批。Superpowers 的 <code>finishing-a-development-branch</code> 终点是代码集成决策，不是灰度、监控和回滚完成。
+          </div>
+
+          <div class="grid-3">
+            <article class="card">
+              <span class="tag official">SUPERPOWERS 原生</span>
+              <h3>开发可信度</h3>
+              <p>需求先设计、隔离工作、细粒度计划、测试先行、逐任务审查、用新鲜证据声明完成。</p>
+            </article>
+            <article class="card">
+              <span class="tag production">生产工程补充</span>
+              <h3>发布可逆性</h3>
+              <p>向后兼容、expand/contract 迁移、功能开关、灰度、指标阈值和回滚演练。</p>
+            </article>
+            <article class="card">
+              <span class="tag gate">人工 GATE</span>
+              <h3>风险所有权</h3>
+              <p>合并、推送、部署、数据变更和删除必须由有权限的人做出明确决定，Agent 不代替业务负责人。</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="map" data-title="双层流程模型">
+          <span class="section-no">02 · OPERATING MODEL</span>
+          <h2>正确模型：内层开发循环 + 外层生产闭环</h2>
+          <div class="architecture">
+            <div class="arch-block inner">
+              <span class="tag official">内层 · Superpowers</span>
+              <h3>把变更做对</h3>
+              <ol>
+                <li><code>brainstorming</code>：理解与批准设计</li>
+                <li><code>using-git-worktrees</code>：隔离 + 绿色基线</li>
+                <li><code>writing-plans</code>：可执行的小任务</li>
+                <li><code>subagent-driven-development</code>：逐任务实现与审查</li>
+                <li><code>test-driven-development</code>：RED → GREEN → REFACTOR</li>
+                <li><code>verification-before-completion</code>：证据后置声明</li>
+                <li><code>finishing-a-development-branch</code>：集成选择</li>
+              </ol>
+            </div>
+            <div class="arch-arrow" aria-hidden="true">→</div>
+            <div class="arch-block outer">
+              <span class="tag production">外层 · 生产保护</span>
+              <h3>让改变可安全落地</h3>
+              <ol>
+                <li>冻结 V1.0 事实与回归基线</li>
+                <li>声明兼容、迁移、观测和回滚合同</li>
+                <li>合并后在准生产环境重验</li>
+                <li>先迁移再开功能，按比例灰度</li>
+                <li>用指标阈值决定继续、暂停或回滚</li>
+                <li>确认稳定后再做 contract 清理</li>
+              </ol>
+            </div>
+          </div>
+          <div class="callout blue">
+            <strong>来源边界：</strong>左侧技能名与纪律来自 Superpowers 6.2.0；右侧是本教程针对已上线系统补充的通用生产工程做法。不要把右侧描述成官方 Superpowers 自带的部署系统。
+          </div>
+        </section>
+
+        <section id="install" data-title="Codex 环境准备">
+          <span class="section-no">03 · CODEX SETUP</span>
+          <h2>先让技能真正可用</h2>
+          <p class="lead">Superpowers 会自动匹配相关技能，但“自动”不代表可以忽略环境检查。以下安装动作本身需要联网；安装完成后，本教程可完全离线阅读。</p>
+
+          <div class="grid-2">
+            <article class="card">
+              <span class="tag official">CODEX APP</span>
+              <h3>推荐主线</h3>
+              <ol>
+                <li>打开 Codex 侧边栏的 Plugins。</li>
+                <li>在 Coding 分类找到 Superpowers 并安装。</li>
+                <li>重启或新开任务，让技能清单刷新。</li>
+                <li>确认能看到 <code>brainstorming</code>、<code>writing-plans</code> 等技能。</li>
+              </ol>
+            </article>
+            <article class="card">
+              <span class="tag">CLAUDE CODE 对照</span>
+              <h3>插件市场安装</h3>
+              <pre><code>/plugin install superpowers@claude-plugins-official</code></pre>
+              <p class="small">也可使用 Superpowers 自有 marketplace；团队应固定一种安装来源，避免不同机器技能版本漂移。</p>
+            </article>
+          </div>
+
+          <h3>Codex 多智能体开关</h3>
+          <p><code>subagent-driven-development</code> 需要 Codex 的多智能体能力。在 <code>~/.codex/config.toml</code> 中配置：</p>
+          <pre><code>[features]
+multi_agent = true</code></pre>
+          <p>保存后重新启动 Codex。如果当前宿主没有提供子智能体工具，就改用 <code>executing-plans</code>；不要假装已经做了独立审查。</p>
+
+          <div class="callout warn">
+            <strong>Codex App 特例：</strong>如果任务已经位于宿主管理的 worktree，Superpowers 应检测并复用它。如果是 detached HEAD，开发仍可进行，但结束时通常要使用 App 的 “Create branch” 或 “Hand off to local”；不要强行再套一层手工 worktree。
+          </div>
+        </section>
+
+        <section id="router" data-title="变更路由器">
+          <span class="section-no">04 · CHANGE ROUTER</span>
+          <h2>先判断这次属于哪条路线</h2>
+          <p class="lead">选择变更类型，页面会给出应当优先触发的 Superpowers 流程。这个选择不改变生产 Gate。</p>
+          <div class="router no-print">
+            <div class="router-controls">
+              <label><input type="radio" name="changeType" value="feature" checked> <span><b>功能增量</b><br><small>新增用户可见能力</small></span></label>
+              <label><input type="radio" name="changeType" value="bug"> <span><b>线上 Bug</b><br><small>已有行为不符合预期</small></span></label>
+              <label><input type="radio" name="changeType" value="refactor"> <span><b>重构/升级</b><br><small>行为原则上不变</small></span></label>
+            </div>
+            <div class="route-result" id="routeResult" aria-live="polite"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>类型</th><th>第一优先技能</th><th>随后路线</th><th>必须新增的生产证据</th></tr></thead>
+              <tbody>
+                <tr><td>功能增量</td><td><code>brainstorming</code></td><td>设计 → worktree → plan → TDD → review</td><td>旧客户端兼容、功能开关、灰度指标</td></tr>
+                <tr><td>线上 Bug</td><td><code>systematic-debugging</code></td><td>根因 → 失败测试 → 单一修复 → 验证</td><td>原始症状复现、影响面、热修回滚</td></tr>
+                <tr><td>重构/升级</td><td><code>brainstorming</code></td><td>行为合同 → worktree → plan → TDD</td><td>前后行为等价、性能与包体对比</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="case" data-title="V1.1 标签功能">
+          <span class="section-no">05 · RUNNING CASE</span>
+          <h2>贯穿案例：给任务管理 MVP 增加标签</h2>
+          <p class="lead">示例技术栈为 React + Node.js + PostgreSQL。你的项目可替换命令和文件名，但 Gate 的语义不变。</p>
+
+          <div class="grid-2">
+            <article class="card">
+              <span class="tag">V1.0 已上线事实</span>
+              <ul>
+                <li>任务具有标题、状态、负责人。</li>
+                <li>Web 与旧版移动客户端共同调用 <code>GET /tasks</code>。</li>
+                <li>数据库中已有真实用户数据。</li>
+                <li>当前版本标签为 <code>v1.0.0</code>，错误率 0.3%。</li>
+              </ul>
+            </article>
+            <article class="card">
+              <span class="tag">V1.1 最小增量</span>
+              <ul>
+                <li>任务最多绑定 5 个标签。</li>
+                <li>创建、重命名、绑定、解绑。</li>
+                <li>默认关闭，通过功能开关逐步开放。</li>
+                <li>旧客户端忽略新增字段仍能正常工作。</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3>明确不做</h3>
+          <p>标签层级、自动化规则、跨空间标签、复杂搜索、标签统计均不属于本次 V1.1。YAGNI 不是少做质量，而是拒绝尚未被需求证明的功能。</p>
+        </section>
+
+        <section id="baseline" data-title="冻结 V1.0 基线">
+          <span class="section-no">06 · PRODUCTION BASELINE</span>
+          <h2>第一步不是写代码，是冻结 V1.0 事实</h2>
+          <p class="lead">如果不知道当前生产版本“本来就是什么状态”，后面的失败无法归因：究竟是新改坏的，还是基线已坏。</p>
+
+          <div class="step" data-step="1">
+            <h3>确认代码与生产对应关系</h3>
+            <pre><code>git status --short
+git branch --show-current
+git tag --points-at HEAD
+git log -1 --oneline</code></pre>
+            <p>若生产并非从当前 HEAD 发布，先找出真实 SHA。不要用“main 大概就是线上”替代证据。</p>
+          </div>
+          <div class="step" data-step="2">
+            <h3>跑完整绿色基线</h3>
+            <pre><code>npm ci
+npm test
+npm run typecheck
+npm run lint
+npm run build</code></pre>
+            <p>记录命令、时间、退出码、测试数量和已有警告。基线失败时，先决定调查还是明确接受，不能默默带病开始。</p>
+          </div>
+          <div class="step" data-step="3">
+            <h3>冻结生产合同</h3>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>合同</th><th>V1.0 事实</th><th>V1.1 约束</th></tr></thead>
+                <tbody>
+                  <tr><td>API</td><td><code>GET /tasks</code> 返回既有字段</td><td>只能新增可忽略字段，不删除/改义</td></tr>
+                  <tr><td>数据</td><td>所有任务都没有标签记录</td><td>迁移后旧行仍合法，空标签等价于旧行为</td></tr>
+                  <tr><td>客户端</td><td>存在尚未强制升级的旧版本</td><td>旧客户端必须继续读取与更新任务</td></tr>
+                  <tr><td>性能</td><td>P95 为 180ms</td><td>灰度阶段 P95 不高于 220ms</td></tr>
+                  <tr><td>业务</td><td>错误率 0.3%</td><td>标签相关错误率须低于 1%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <details>
+            <summary>可复制：让 Codex 做只读基线审计</summary>
+            <div>
+              <pre><code>这是一个已经上线的 MVP V1.0。现在只做只读审计，不修改文件、不创建分支、不安装依赖。
+
+请确认：
+1. 当前 Git 分支、HEAD、工作区状态及与生产版本的对应证据；
+2. 项目的测试、类型检查、Lint、构建命令；
+3. 公开 API、数据库迁移、客户端兼容和运行时配置的位置；
+4. 现有功能开关、监控和回滚机制；
+5. 任何会阻止安全增量开发的基线问题。
+
+输出“已确认事实 / 未确认事实 / 风险 / 建议下一步”。不推测缺失信息。</code></pre>
+            </div>
+          </details>
+        </section>
+
+        <section id="brainstorm" data-title="Brainstorming">
+          <span class="section-no">07 · DESIGN BEFORE CODE</span>
+          <h2>用 brainstorming 把“想加标签”变成可批准设计</h2>
+          <p class="lead">Superpowers 要求任何创意性变更先做设计，即使它看起来很小。对已有产品，这一步的重点不是发散，而是识别旧行为和新行为的接缝。</p>
+
+          <div class="pipeline">
+            <div class="pipe-step"><div class="num">1</div><div><b>探索上下文</b><small>先看代码、文档、近期提交和线上合同</small></div><span class="owner">Agent</span></div>
+            <div class="pipe-step"><div class="num">2</div><div><b>一次只问一个问题</b><small>目的、边界、成功标准、兼容限制</small></div><span class="owner">协作</span></div>
+            <div class="pipe-step"><div class="num">3</div><div><b>给 2–3 种方案</b><small>说明取舍并给出推荐，不把决策偷偷塞给用户</small></div><span class="owner">Agent</span></div>
+            <div class="pipe-step"><div class="num">4</div><div><b>分段批准设计</b><small>架构、组件、数据流、错误处理、测试</small></div><span class="owner">人工 Gate</span></div>
+            <div class="pipe-step"><div class="num">5</div><div><b>写入设计文档</b><small><code>docs/superpowers/specs/YYYY-MM-DD-topic-design.md</code></small></div><span class="owner">Git 记录</span></div>
+          </div>
+
+          <h3>示例中的三种设计方案</h3>
+          <div class="grid-3">
+            <article class="card">
+              <h4>A. JSON 塞进 tasks</h4>
+              <p>改动小，但查询、约束和并发更新变难；数据增长后容易形成债务。</p>
+            </article>
+            <article class="card">
+              <h4>B. 标签表 + 关联表</h4>
+              <p><b>推荐。</b>模型清晰、可约束、可查询；通过 additive migration 保持回滚空间。</p>
+            </article>
+            <article class="card">
+              <h4>C. 仅前端本地标签</h4>
+              <p>无需服务端改动，但无法跨设备同步，不满足真实用户目标。</p>
+            </article>
+          </div>
+
+          <div class="callout">
+            <strong>给设计文档增加生产附录：</strong>兼容矩阵、迁移顺序、功能开关、观测指标、回滚路径、明确不做。它们不是替代 Superpowers 设计，而是线上存量系统必须补充的约束。
+          </div>
+
+          <details>
+            <summary>可复制：触发功能增量 brainstorming</summary>
+            <div>
+              <pre><code>我们要为已经上线的任务管理 MVP V1.0 增加“任务标签”。
+
+请严格使用 Superpowers brainstorming。先只读检查现有代码和生产合同，再一次只问我一个问题。
+设计必须覆盖：
+- 旧客户端与既有 API 向后兼容；
+- 真实数据的 expand/contract 迁移；
+- 功能开关、灰度、监控与回滚；
+- 最多 5 个标签及并发更新；
+- 本次明确不做的范围。
+
+给出 2–3 个方案与推荐。未经我批准设计，不写实现代码。</code></pre>
+            </div>
+          </details>
+        </section>
+
+        <section id="worktree" data-title="隔离工作区">
+          <span class="section-no">08 · ISOLATED WORKSPACE</span>
+          <h2>复用宿主隔离，必要时才创建 worktree</h2>
+          <p class="lead">Superpowers 6.2.0 的顺序是：先检测已有隔离，再用平台原生工具，最后才回退到手工 <code>git worktree</code>。不要与 Codex App 的工作区管理打架。</p>
+
+          <div class="grid-2">
+            <article class="card">
+              <span class="tag official">检测</span>
+              <pre><code>git rev-parse --git-dir
+git rev-parse --git-common-dir
+git branch --show-current
+git rev-parse --show-superproject-working-tree</code></pre>
+              <p><code>git-dir != git-common-dir</code> 且不是 submodule，说明已在 linked worktree。</p>
+            </article>
+            <article class="card">
+              <span class="tag gate">禁止直接假设</span>
+              <ul>
+                <li>不要凭目录名判断是否隔离。</li>
+                <li>不要在 main/master 上直接实现，除非用户明确同意。</li>
+                <li>不要跳过绿色基线。</li>
+                <li>不要在宿主管理 worktree 内再创建“幽灵 worktree”。</li>
+              </ul>
+            </article>
+          </div>
+
+          <h3>没有原生工具时的 Git 回退</h3>
+          <pre><code># 先保证 .worktrees/ 被忽略
+git check-ignore .worktrees
+
+# 若未被忽略：先把 .worktrees/ 加入 .gitignore 并提交
+# 然后创建隔离分支
+git worktree add .worktrees/feature-task-labels -b feature/task-labels
+
+Set-Location .worktrees/feature-task-labels
+npm ci
+npm test</code></pre>
+          <div class="callout warn">
+            <strong>基线失败：</strong>报告具体失败并询问是先调查还是在已知失败下继续。后者必须把“已知基线失败”写入计划，避免后续把它误判为本次回归。
+          </div>
+        </section>
+
+        <section id="plan" data-title="Writing Plans">
+          <span class="section-no">09 · PLAN THE CHANGE</span>
+          <h2>让 writing-plans 把设计拆成可独立审查的任务</h2>
+          <p class="lead">计划不是待办标题集合。每个任务必须写明准确文件、接口、测试、期望失败、最小实现、验证命令和提交边界。</p>
+
+          <h3>本案例的任务切片</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>任务</th><th>独立交付物</th><th>核心 RED</th><th>生产约束</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>标签领域规则与兼容合同</td><td>第 6 个标签被拒绝；旧任务仍合法</td><td>不改变既有任务字段语义</td></tr>
+                <tr><td>2</td><td>additive schema migration</td><td>空库、V1.0 快照都能升级</td><td>旧服务面对新库仍可运行</td></tr>
+                <tr><td>3</td><td>服务/API</td><td>并发绑定不丢失；未知标签报错</td><td>新增字段可被旧客户端忽略</td></tr>
+                <tr><td>4</td><td>前端 UI + feature flag</td><td>关闭时 DOM 与 V1.0 等价</td><td>默认关闭，未授权用户不可见</td></tr>
+                <tr><td>5</td><td>发布演练与观测</td><td>开关切换、回滚脚本和仪表盘验收</td><td>达到阈值才扩大灰度</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>一个合格任务的最小结构</h3>
+          <pre><code>### Task 3: 标签绑定 API
+
+**Files**
+- Modify: `src/tasks/task-service.ts`
+- Create: `src/tasks/tag-service.ts`
+- Test: `tests/tasks/tag-service.test.ts`
+
+**Interfaces**
+- Consumes: `TaskRepository`, `TagRepository`
+- Produces: `assignTag(taskId, tagId, actorId): Promise&lt;TaskTag[]&gt;`
+
+- [ ] 写“第 6 个标签被拒绝”的失败测试
+- [ ] 运行该测试，确认因功能缺失而 FAIL
+- [ ] 写最小实现
+- [ ] 运行目标测试和 tasks 回归套件
+- [ ] 提交 `feat(tags): enforce five-tag limit`</code></pre>
+
+          <div class="callout green">
+            <strong>计划自审：</strong>逐条核对 spec 覆盖；搜索 TBD/TODO/“适当处理错误”等占位语；检查跨任务类型和函数名一致。缺少代码或准确验证命令的“计划”只是愿望清单。
+          </div>
+        </section>
+
+        <section id="execute" data-title="SDD 执行">
+          <span class="section-no">10 · EXECUTION</span>
+          <h2>优先用 Subagent-Driven Development</h2>
+          <p class="lead">每个任务交给新实现者，任务完成后同时取得“规格符合度”和“代码质量”两项结论，整分支结束前再做一次全局审查。</p>
+
+          <div class="pipeline">
+            <div class="pipe-step"><div class="num">1</div><div><b>读取计划并做 pre-flight</b><small>发现计划冲突先停，不要让实现者猜</small></div><span class="owner">Controller</span></div>
+            <div class="pipe-step"><div class="num">2</div><div><b>为 Task N 生成精确 brief</b><small>只给本任务、接口、全局约束和必要上下文</small></div><span class="owner">Controller</span></div>
+            <div class="pipe-step"><div class="num">3</div><div><b>实现者按 TDD 开发、自审、提交</b><small>实现任务不能并行，避免写冲突</small></div><span class="owner">Implementer</span></div>
+            <div class="pipe-step"><div class="num">4</div><div><b>任务审查</b><small>spec verdict + quality verdict，Important 未关闭不得前进</small></div><span class="owner">Reviewer</span></div>
+            <div class="pipe-step"><div class="num">5</div><div><b>修复与 scoped re-review</b><small>修复后只复审相关 finding 和新破坏</small></div><span class="owner">Loop</span></div>
+            <div class="pipe-step"><div class="num">6</div><div><b>整分支 final review</b><small>审查完整 merge-base..HEAD，而非最后一个 commit</small></div><span class="owner">Reviewer</span></div>
+          </div>
+
+          <div class="callout blue">
+            <strong>防止上下文压缩后重复开发：</strong>Superpowers 6.2.0 的 SDD 使用每个 plan 独立的 <code>.superpowers/sdd/&lt;plan-name&gt;/progress.md</code> 账本。恢复时以账本和 Git 历史为准，不以 Agent 的模糊记忆为准。
+          </div>
+
+          <h3>什么时候改用 executing-plans</h3>
+          <p>宿主没有子智能体能力，或你选择在另一个任务中按批次执行计划时使用。它仍要求先检查隔离工作区、批判性审阅计划、创建待办并逐步验证；只是没有独立实现者和逐任务独立 reviewer。</p>
+        </section>
+
+        <section id="tdd" data-title="TDD 实战">
+          <span class="section-no">11 · RED GREEN REFACTOR</span>
+          <h2>TDD 的关键证据是“亲眼看到正确的失败”</h2>
+          <p class="lead">测试先写不是形式主义。它证明测试能捕获缺失行为，而不是为已经写好的实现补一层装饰。</p>
+
+          <div class="grid-3">
+            <article class="card"><span class="tag gate">RED</span><h3>写一个行为</h3><p>一次只表达一个可观察行为。运行后必须失败，而且因为功能缺失，不是拼写或环境错误。</p></article>
+            <article class="card"><span class="tag official">GREEN</span><h3>最小实现</h3><p>只写让当前测试通过的代码，不顺手增加导出、搜索、颜色规则等未被要求的能力。</p></article>
+            <article class="card"><span class="tag production">REFACTOR</span><h3>保持全绿</h3><p>绿灯后才清理重复和命名。每次重构都重跑覆盖范围和旧行为回归。</p></article>
+          </div>
+
+          <h3>RED：第 6 个标签必须失败</h3>
+          <pre><code>it('rejects a sixth tag without changing existing assignments', async () =&gt; {
+  const task = await givenTaskWithTags(5);
+  const before = await repo.listTags(task.id);
+
+  await expect(service.assignTag(task.id, 'tag-6', 'user-1'))
+    .rejects.toMatchObject({ code: 'TASK_TAG_LIMIT' });
+
+  await expect(repo.listTags(task.id)).resolves.toEqual(before);
+});</code></pre>
+          <pre><code>npm test -- tests/tasks/tag-service.test.ts
+# 期望：FAIL，原因是 assignTag 尚未实现限制
+# 不接受：模块找不到、数据库没启动、测试自己语法错误</code></pre>
+
+          <h3>GREEN：只实现上限与原子性</h3>
+          <pre><code>async assignTag(taskId: string, tagId: string, actorId: string) {
+  return this.db.transaction(async (tx) =&gt; {
+    const current = await tx.taskTags.lockAndList(taskId);
+    if (current.length &gt;= 5) {
+      throw new DomainError('TASK_TAG_LIMIT');
+    }
+    await tx.taskTags.insert({ taskId, tagId, actorId });
+    return tx.taskTags.list(taskId);
+  });
+}</code></pre>
+
+          <div class="callout warn">
+            <strong>已有代码没有测试怎么办：</strong>先为即将接触的旧行为补 characterization test（特征测试），确认它描述当前真实行为；再为新增行为进入 RED。不要借机重写整个旧模块。
+          </div>
+        </section>
+
+        <section id="review" data-title="审查与修复">
+          <span class="section-no">12 · REVIEW LOOP</span>
+          <h2>审查不是一句“看起来不错”</h2>
+          <p class="lead">每个任务至少需要两个明确结论：是否忠实实现计划，代码本身是否可靠。实现者自审不能替代独立审查。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>严重级别</th><th>动作</th><th>能否进入下一任务</th></tr></thead>
+              <tbody>
+                <tr><td>Critical</td><td>立即修复并复审</td><td>不能</td></tr>
+                <tr><td>Important</td><td>修复并做 scoped re-review</td><td>不能</td></tr>
+                <tr><td>Minor</td><td>记录到账本，最终整分支审查再裁决</td><td>可以，但不能静默丢弃</td></tr>
+                <tr><td>与已批准计划冲突</td><td>把 finding 与计划原文交给用户决定哪个有效</td><td>暂停</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>审查输入必须是完整范围</h3>
+          <pre><code>BASE_SHA=&lt;任务开始前记录的 SHA&gt;
+HEAD_SHA=$(git rev-parse HEAD)
+
+git log --oneline $BASE_SHA..$HEAD_SHA
+git diff --stat $BASE_SHA..$HEAD_SHA
+git diff -U10 $BASE_SHA..$HEAD_SHA</code></pre>
+          <p>不能用 <code>HEAD~1</code> 代替任务基线，因为一个任务可能包含多个提交；这样会让 reviewer 漏掉前面的改动。</p>
+
+          <details>
+            <summary>收到评审意见时，怎样避免盲目照改</summary>
+            <div>
+              <ol>
+                <li>完整阅读，不先表态。</li>
+                <li>用自己的话复述技术要求。</li>
+                <li>对照当前代码、兼容合同和测试验证。</li>
+                <li>正确的逐项修复并逐项测试；错误的用证据反驳。</li>
+                <li>如果与用户批准的架构冲突，停止并让用户裁决。</li>
+              </ol>
+            </div>
+          </details>
+        </section>
+
+        <section id="debug" data-title="系统化调试">
+          <span class="section-no">13 · WHEN THINGS BREAK</span>
+          <h2>线上 Bug 路线：先根因，后修复</h2>
+          <p class="lead"><code>systematic-debugging</code> 的铁律是：没有完成根因调查，不提出修复。时间紧更需要证据，而不是更快地猜。</p>
+
+          <div class="grid-2">
+            <article class="card"><h3>Phase 1 · 根因调查</h3><p>完整错误、稳定复现、近期变更、多组件边界证据、从坏值向上追踪来源。</p></article>
+            <article class="card"><h3>Phase 2 · 模式比较</h3><p>找同库工作的类似实现，完整阅读参考，列出每一个差异和依赖假设。</p></article>
+            <article class="card"><h3>Phase 3 · 单一假设</h3><p>写下“我认为 X 是根因，因为 Y”，用最小变化一次只测试一个变量。</p></article>
+            <article class="card"><h3>Phase 4 · TDD 修复</h3><p>先写最小复现失败测试，只修根因，再做新鲜全量验证。</p></article>
+          </div>
+
+          <div class="callout red">
+            <strong>三次修复都失败：</strong>停止叠加第 4 个 patch，讨论架构。连续失败通常说明共享状态、耦合或基础假设有问题。
+          </div>
+
+          <pre><code>生产现象：5% 灰度用户偶发丢失一个标签。
+
+不要先改代码。请使用 systematic-debugging：
+1. 给出稳定复现或需要补充的观测；
+2. 追踪请求 → service → transaction → database 的数据流；
+3. 对比同仓库中正确的并发写入模式；
+4. 一次只提出并验证一个根因假设；
+5. 确认根因后，先写失败回归测试，再实施单一修复。
+
+输出事实、假设、证据与下一次最小实验。</code></pre>
+        </section>
+
+        <section id="verify" data-title="完成前验证">
+          <span class="section-no">14 · EVIDENCE BEFORE CLAIMS</span>
+          <h2>“完成”是一项需要证据支持的声明</h2>
+          <p class="lead"><code>verification-before-completion</code> 要求在当前状态上重新运行能证明该声明的完整命令，读取退出码和失败数量，然后才能下结论。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>要声明什么</th><th>需要什么新鲜证据</th><th>不能替代它的东西</th></tr></thead>
+              <tbody>
+                <tr><td>目标测试通过</td><td>目标测试命令，0 failures</td><td>“实现者说通过了”</td></tr>
+                <tr><td>没有回归</td><td>完整回归套件，退出码 0</td><td>只有新增测试通过</td></tr>
+                <tr><td>构建成功</td><td>生产构建命令，退出码 0</td><td>Lint 或类型检查通过</td></tr>
+                <tr><td>兼容旧客户端</td><td>契约测试/真实旧版本回放</td><td>代码里字段是 optional</td></tr>
+                <tr><td>迁移可用</td><td>V1.0 数据快照升级演练</td><td>空数据库迁移成功</td></tr>
+                <tr><td>可回滚</td><td>禁用开关 + 旧二进制连接新库演练</td><td>有一份回滚文档</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <pre><code>npm test
+npm run typecheck
+npm run lint
+npm run build
+npm run test:contract
+npm run test:migration
+npm run test:e2e -- --project=chromium</code></pre>
+          <div class="callout green">
+            <strong>合格报告示例：</strong>“2026-07-28 在 HEAD abc1234 上运行 <code>npm test</code>，186/186 通过；<code>npm run build</code> 退出码 0。旧客户端契约测试 14/14 通过。尚未执行准生产灰度，因此当前状态是‘开发验证通过’，不是‘已上线’。”
+          </div>
+        </section>
+
+        <section id="finish" data-title="结束开发分支">
+          <span class="section-no">15 · FINISH THE BRANCH</span>
+          <h2>分支结束必须由用户选择</h2>
+          <p class="lead">完整测试全绿后，<code>finishing-a-development-branch</code> 检测当前 Git 环境、确认基分支，再让用户决定如何集成。</p>
+
+          <div class="grid-3">
+            <article class="card"><h3>1. 本地合并</h3><p>合并回确认过的基分支，并在合并结果上再次运行完整测试。通过后才清理 Superpowers 自己创建的 worktree。</p></article>
+            <article class="card"><h3>2. Push + PR</h3><p>创建远端分支和 PR，保留 worktree 处理评审反馈。不能因为 PR 建好就提前清理。</p></article>
+            <article class="card"><h3>3. 保持原样</h3><p>保留分支与工作区，由用户稍后处理。报告准确路径和分支名。</p></article>
+          </div>
+
+          <div class="callout red">
+            <strong>丢弃不在标准菜单中：</strong>只有用户主动要求丢弃时，才列出将永久删除的分支、提交和 worktree，并要求输入精确的 <code>discard</code> 确认。拒绝 push 时也不能擅自 force-push。
+          </div>
+
+          <h3>Codex App detached HEAD</h3>
+          <p>此时不能本地 merge。完成提交和验证后，使用 App 的 “Create branch” 建立分支，或 “Hand off to local” 转交本地检出；教程中所有 merge/push/PR 均仍是用户 Gate。</p>
+        </section>
+
+        <section id="release" data-title="灰度监控回滚">
+          <span class="section-no">16 · PRODUCTION SAFETY LAYER</span>
+          <h2>合并以后，才进入真正的生产发布流程</h2>
+          <p class="lead">这一节是生产工程补充，不是 Superpowers 原生技能。推荐 expand → deploy dark → canary → observe → expand → contract。</p>
+
+          <div class="pipeline">
+            <div class="pipe-step"><div class="num">1</div><div><b>Expand schema</b><small>新增表/列/索引，不删除旧结构；旧服务仍能运行</small></div><span class="owner">可回滚</span></div>
+            <div class="pipe-step"><div class="num">2</div><div><b>Deploy dark</b><small>部署代码但保持 <code>task_labels=false</code></small></div><span class="owner">不可见</span></div>
+            <div class="pipe-step"><div class="num">3</div><div><b>内部/1%/5% 灰度</b><small>每一档都有最短观察窗和自动停止阈值</small></div><span class="owner">受控</span></div>
+            <div class="pipe-step"><div class="num">4</div><div><b>25% → 100%</b><small>指标与用户反馈稳定才扩大</small></div><span class="owner">证据</span></div>
+            <div class="pipe-step"><div class="num">5</div><div><b>Contract</b><small>跨越回滚窗口后，另开变更清理旧结构</small></div><span class="owner">后续任务</span></div>
+          </div>
+
+          <h3>灰度 Gate 示例</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>指标</th><th>继续扩大</th><th>暂停调查</th><th>立即回滚</th></tr></thead>
+              <tbody>
+                <tr><td>标签 API 错误率</td><td>&lt; 0.5%</td><td>0.5%–1%</td><td>&gt; 1%</td></tr>
+                <tr><td>GET /tasks P95</td><td>&lt; 200ms</td><td>200–220ms</td><td>&gt; 220ms</td></tr>
+                <tr><td>数据一致性</td><td>0 异常</td><td>仅可解释延迟</td><td>丢失/重复/越权</td></tr>
+                <tr><td>旧客户端</td><td>契约全绿</td><td>非阻断警告</td><td>崩溃或写入失败</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>回滚顺序</h3>
+          <ol>
+            <li>关闭 <code>task_labels</code>，先停止用户继续进入新路径。</li>
+            <li>确认旧路径恢复，观察错误率和延迟。</li>
+            <li>如代码本身影响旧路径，回滚到上一稳定二进制。</li>
+            <li>保留 additive schema 和已写数据，除非有经过验证的数据回退方案。</li>
+            <li>建立事故记录，用 <code>systematic-debugging</code> 找根因；不要在生产上连续猜修。</li>
+          </ol>
+          <div class="callout warn">
+            <strong>为什么不立刻 drop 新表：</strong>代码回滚与数据破坏不是同一件事。保留兼容的新结构通常比紧急逆向迁移安全；删除属于后续 contract 变更，需要单独批准。
+          </div>
+        </section>
+
+        <section id="prompts" data-title="Prompt 工具箱">
+          <span class="section-no">17 · COPYABLE PROMPTS</span>
+          <h2>六段可直接复用的 Codex Prompt</h2>
+          <p class="lead">替换方括号中的内容。Prompt 只负责表达 WHAT 和约束；具体 HOW 仍由对应 Superpowers 技能控制。</p>
+
+          <details open>
+            <summary>Prompt 1：设计增量功能</summary>
+            <div><pre><code>我们要在已上线的 [产品] V1.0 上增加 [功能]。
+请使用 Superpowers brainstorming。先只读检查项目状态，再一次只问一个问题。
+
+设计必须覆盖：
+- V1.0 现有用户行为和 API/数据合同；
+- 兼容矩阵；
+- 迁移、功能开关、监控、灰度和回滚；
+- 明确不做；
+- 可验证的成功标准。
+
+给 2–3 个方案与推荐。未经我批准，不进入实现。</code></pre></div>
+          </details>
+
+          <details>
+            <summary>Prompt 2：创建实施计划</summary>
+            <div><pre><code>设计已批准，路径为 [spec path]。
+请使用 Superpowers writing-plans 创建实施计划。
+
+要求：
+- 每个任务有独立、可测试的交付物；
+- 准确列出文件、接口和前后任务依赖；
+- 每个行为按 RED → 验证 RED → GREEN → 验证 GREEN → 提交拆分；
+- 写出实际测试代码与命令，不用 TODO/TBD；
+- 把兼容、迁移、开关、观测、回滚写入 Global Constraints；
+- 最后逐条自审 spec 覆盖、占位符和类型一致性。</code></pre></div>
+          </details>
+
+          <details>
+            <summary>Prompt 3：执行已批准计划</summary>
+            <div><pre><code>执行 [plan path]。使用 Superpowers subagent-driven-development。
+
+先确认当前是否已经处于 Codex App 管理的隔离工作区；不要强行创建嵌套 worktree。
+逐任务执行，不在任务之间重复询问我。每个任务必须：
+- 由实现者按 TDD 实现并自审；
+- 获得 spec compliance 和 code quality 两项审查结论；
+- 修复 Critical/Important 并 scoped re-review；
+- 把进度、提交和 deferred minor 写入该 plan 的 SDD ledger。
+
+只在真实阻断、计划冲突、权限/凭证、不可逆操作或合并/推送/部署 Gate 暂停。</code></pre></div>
+          </details>
+
+          <details>
+            <summary>Prompt 4：调查线上 Bug</summary>
+            <div><pre><code>线上出现：[可观察症状]。
+请使用 Superpowers systematic-debugging。现在不修改代码。
+
+先完成根因调查：错误全文、稳定复现、近期变更、跨组件数据流证据。
+然后找同仓库工作的相似模式，提出一个可证伪的单一假设和最小实验。
+确认根因后，再用 TDD 写失败回归测试、实施单一修复并验证。
+如果已经有 3 次失败修复，停止并讨论架构。</code></pre></div>
+          </details>
+
+          <details>
+            <summary>Prompt 5：完成声明前验证</summary>
+            <div><pre><code>请使用 verification-before-completion。
+对当前 HEAD 重新运行能够证明以下声明的完整命令：
+- 新功能测试通过；
+- V1.0 回归无破坏；
+- 类型检查、Lint、生产构建通过；
+- 旧客户端契约通过；
+- V1.0 数据快照迁移通过；
+- 功能关闭时行为等价于 V1.0。
+
+报告命令、退出码、通过/失败数量和未执行项。
+未获得证据的事项必须标记“未验证”，不要使用“应该没问题”。</code></pre></div>
+          </details>
+
+          <details>
+            <summary>Prompt 6：发布 Gate 评审</summary>
+            <div><pre><code>代码开发和分支验证已完成。现在只做发布就绪评审，不执行部署。
+
+检查：
+1. additive migration 是否已在 V1.0 数据快照演练；
+2. feature flag 是否默认关闭并可紧急关闭；
+3. 旧客户端与旧服务兼容是否有证据；
+4. 1% / 5% / 25% / 100% 灰度阈值和观察窗；
+5. 仪表盘、告警、负责人和回滚步骤；
+6. 哪些动作不可逆、需要谁批准。
+
+输出 READY / NOT READY，以及每项证据。不要把测试通过等同于上线批准。</code></pre></div>
+          </details>
+        </section>
+
+        <section id="sop" data-title="一页式 SOP">
+          <span class="section-no">18 · FIELD CHECKLIST</span>
+          <h2>一页式执行清单</h2>
+          <p class="lead">勾选状态会保存在本机浏览器的 localStorage 中，不会上传。</p>
+          <div class="check-progress no-print"><div id="checkBar"></div></div>
+          <p class="small no-print" id="checkText">0 / 0 完成</p>
+
+          <div class="checklist" id="checklist">
+            <label class="check"><input type="checkbox" data-id="c1"><span>确认生产 V1.0 对应的 Git SHA、配置和数据库版本。</span></label>
+            <label class="check"><input type="checkbox" data-id="c2"><span>在未修改代码前运行完整基线并记录已有失败。</span></label>
+            <label class="check"><input type="checkbox" data-id="c3"><span>使用 brainstorming，设计已分段批准并写入 spec。</span></label>
+            <label class="check"><input type="checkbox" data-id="c4"><span>spec 包含兼容矩阵、迁移、开关、监控、灰度和回滚。</span></label>
+            <label class="check"><input type="checkbox" data-id="c5"><span>确认已有隔离或创建安全 worktree，并重新跑绿色基线。</span></label>
+            <label class="check"><input type="checkbox" data-id="c6"><span>writing-plans 计划无占位符，任务均有文件、接口和 RED/GREEN 证据。</span></label>
+            <label class="check"><input type="checkbox" data-id="c7"><span>每个实现任务都执行 TDD，并看到测试因正确原因失败。</span></label>
+            <label class="check"><input type="checkbox" data-id="c8"><span>每个任务都有 spec compliance 与 code quality 结论。</span></label>
+            <label class="check"><input type="checkbox" data-id="c9"><span>Critical/Important 已修复并复审；Minor 有明确账本记录。</span></label>
+            <label class="check"><input type="checkbox" data-id="c10"><span>当前 HEAD 的完整测试、类型、Lint、构建和兼容证据为新鲜结果。</span></label>
+            <label class="check"><input type="checkbox" data-id="c11"><span>用户已明确选择 merge / PR / keep；未擅自 push、force-push 或清理。</span></label>
+            <label class="check"><input type="checkbox" data-id="c12"><span>准生产迁移、开关、灰度指标、告警和回滚演练全部有负责人。</span></label>
+            <label class="check"><input type="checkbox" data-id="c13"><span>灰度指标达到阈值后才扩大；任何回滚条件都能立即停止扩量。</span></label>
+            <label class="check"><input type="checkbox" data-id="c14"><span>稳定窗口结束后，contract 清理作为独立变更重新走流程。</span></label>
+          </div>
+
+          <div class="card">
+            <div class="sop"><div class="phase">理解</div><div>生产基线 → brainstorming → 设计批准</div><div class="proof">证据：spec</div></div>
+            <div class="sop"><div class="phase">隔离</div><div>检测宿主 → worktree → 绿色基线</div><div class="proof">证据：路径 + 测试</div></div>
+            <div class="sop"><div class="phase">计划</div><div>writing-plans → 任务/接口/TDD/提交</div><div class="proof">证据：plan</div></div>
+            <div class="sop"><div class="phase">实现</div><div>SDD → TDD → 每任务双结论审查</div><div class="proof">证据：ledger + commits</div></div>
+            <div class="sop"><div class="phase">验证</div><div>整分支 review → 新鲜全量命令</div><div class="proof">证据：退出码</div></div>
+            <div class="sop"><div class="phase">集成</div><div>用户选择 merge / PR / keep</div><div class="proof">证据：明确选择</div></div>
+            <div class="sop"><div class="phase">发布</div><div>expand → dark → canary → observe → contract</div><div class="proof">证据：指标 + 演练</div></div>
+          </div>
+        </section>
+
+        <section id="antipatterns" data-title="反模式">
+          <span class="section-no">19 · FAILURE MODES</span>
+          <h2>最常见的十个错误</h2>
+          <div class="grid-2">
+            <article class="card"><h4>1. “改动很小，不用设计”</h4><p>小改动最容易隐藏兼容假设。设计可以短，但必须批准。</p></article>
+            <article class="card"><h4>2. 在 main 上直接改</h4><p>污染稳定分支，使回退和评审边界变模糊。</p></article>
+            <article class="card"><h4>3. 测试写在实现之后</h4><p>测试直接通过，无法证明它能捕获缺失行为。</p></article>
+            <article class="card"><h4>4. 只跑新增测试</h4><p>证明了新功能，不证明 V1.0 没被破坏。</p></article>
+            <article class="card"><h4>5. 把空库迁移当真实迁移</h4><p>真实风险在旧数据、异常值、索引锁和长事务。</p></article>
+            <article class="card"><h4>6. reviewer 只看最后一个 commit</h4><p>多提交任务的早期改动会被静默漏审。</p></article>
+            <article class="card"><h4>7. Agent 报告成功就相信</h4><p>必须看 diff，并在当前 HEAD 上独立运行验证命令。</p></article>
+            <article class="card"><h4>8. PR 建好就清理 worktree</h4><p>PR 反馈仍需要原隔离环境继续修复和复验。</p></article>
+            <article class="card"><h4>9. schema 与代码同一按钮硬切</h4><p>失去旧服务兼容和低风险回滚能力。</p></article>
+            <article class="card"><h4>10. “测试绿了，可以上线”</h4><p>测试环境没有生产流量、真实配置、旧客户端和回滚压力。</p></article>
+          </div>
+        </section>
+
+        <section id="sources" data-title="来源与版本">
+          <span class="section-no">20 · SOURCES</span>
+          <h2>版本、来源与适用边界</h2>
+          <div class="callout blue">
+            <strong>校准日期：</strong>2026-07-28。本教程对照本机 Codex 插件缓存中的 Superpowers 6.2.0 技能文件，并核对 obra/superpowers 官方仓库。未来版本可能调整技能文件路径、菜单或审查循环，实际使用时应优先读取当前安装版本的 <code>SKILL.md</code>。
+          </div>
+          <ul>
+            <li><a href="https://github.com/obra/superpowers" rel="noopener noreferrer">obra/superpowers 官方仓库</a>（外部链接，打开需联网）</li>
+            <li>核心技能：<code>using-superpowers</code>、<code>brainstorming</code>、<code>using-git-worktrees</code>、<code>writing-plans</code>、<code>subagent-driven-development</code>、<code>executing-plans</code>、<code>test-driven-development</code>、<code>systematic-debugging</code>、<code>requesting-code-review</code>、<code>receiving-code-review</code>、<code>verification-before-completion</code>、<code>finishing-a-development-branch</code>。</li>
+            <li>“生产保护层”中的 feature flag、expand/contract、灰度指标和回滚演练是本教程的增量开发补充，不属于对 Superpowers 官方内置发布能力的声明。</li>
+          </ul>
+          <p class="small">许可与品牌归属以官方仓库为准。本教程不内嵌官方图片、在线字体、远程脚本或第三方模块。</p>
+        </section>
+      </main>
+
+      <footer>
+        Superpowers 已上线 MVP 增量开发实战 · 单文件离线版 · Codex App 主线<br>
+        教程生成日期：2026-07-28
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const root = document.documentElement;
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      const menuButton = document.getElementById("menuButton");
+      const themeButton = document.getElementById("themeButton");
+      const printButton = document.getElementById("printButton");
+      const expandButton = document.getElementById("expandButton");
+      const resetButton = document.getElementById("resetButton");
+      const search = document.getElementById("search");
+      const searchStatus = document.getElementById("searchStatus");
+      const readingProgress = document.getElementById("readingProgress");
+      const sections = [...document.querySelectorAll("main section")];
+      const navLinks = [...document.querySelectorAll("nav a")];
+      const details = [...document.querySelectorAll("details")];
+      const routeResult = document.getElementById("routeResult");
+      const checklist = document.getElementById("checklist");
+      const checks = [...checklist.querySelectorAll('input[type="checkbox"]')];
+      const checkBar = document.getElementById("checkBar");
+      const checkText = document.getElementById("checkText");
+      const store = {
+        theme: "superpowers-tutorial-theme",
+        checks: "superpowers-tutorial-checks"
+      };
+
+      function closeMenu() {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("open");
+        menuButton.setAttribute("aria-expanded", "false");
+      }
+
+      menuButton.addEventListener("click", () => {
+        const open = !sidebar.classList.contains("open");
+        sidebar.classList.toggle("open", open);
+        overlay.classList.toggle("open", open);
+        menuButton.setAttribute("aria-expanded", String(open));
+      });
+      overlay.addEventListener("click", closeMenu);
+      navLinks.forEach(link => link.addEventListener("click", closeMenu));
+
+      function setTheme(theme) {
+        root.dataset.theme = theme;
+        themeButton.textContent = theme === "dark" ? "浅色" : "深色";
+        try { localStorage.setItem(store.theme, theme); } catch (_) {}
+      }
+      let savedTheme = "";
+      try { savedTheme = localStorage.getItem(store.theme) || ""; } catch (_) {}
+      setTheme(savedTheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+      themeButton.addEventListener("click", () => setTheme(root.dataset.theme === "dark" ? "light" : "dark"));
+      printButton.addEventListener("click", () => window.print());
+
+      expandButton.addEventListener("click", () => {
+        const shouldOpen = details.some(item => !item.open);
+        details.forEach(item => { item.open = shouldOpen; });
+        expandButton.textContent = shouldOpen ? "收起" : "展开";
+      });
+
+      document.querySelectorAll("pre").forEach(pre => {
+        const button = document.createElement("button");
+        button.className = "copy no-print";
+        button.type = "button";
+        button.textContent = "复制";
+        button.setAttribute("aria-label", "复制代码块");
+        button.addEventListener("click", async () => {
+          const text = pre.querySelector("code")?.innerText || pre.innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (_) {
+            const area = document.createElement("textarea");
+            area.value = text;
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+          }
+          button.textContent = "已复制";
+          setTimeout(() => { button.textContent = "复制"; }, 1200);
+        });
+        pre.appendChild(button);
+      });
+
+      function normalize(value) {
+        return value.toLowerCase().replace(/\s+/g, "");
+      }
+      search.addEventListener("input", () => {
+        const query = normalize(search.value);
+        let visible = 0;
+        sections.forEach(section => {
+          const show = !query || normalize(section.textContent).includes(query);
+          section.classList.toggle("search-hidden", !show);
+          const link = navLinks.find(item => item.getAttribute("href") === "#" + section.id);
+          if (link) link.classList.toggle("hidden", !show);
+          if (show) visible++;
+        });
+        searchStatus.textContent = query ? `找到 ${visible} 个章节` : "";
+      });
+
+      function updateRoute() {
+        const type = document.querySelector('input[name="changeType"]:checked').value;
+        const routes = {
+          feature: "<b>功能增量路线：</b> brainstorming → 批准 spec → 隔离 worktree → writing-plans → SDD/TDD → task review → full verification → finish branch。生产侧另加 feature flag、灰度和回滚。",
+          bug: "<b>线上 Bug 路线：</b> systematic-debugging → 根因证据 → 失败回归测试 → 单一修复 → verification-before-completion。紧急不等于可以跳过根因。",
+          refactor: "<b>重构/升级路线：</b> brainstorming 固定行为合同 → 隔离基线 → writing-plans → TDD 保护既有行为 → 性能/包体/兼容对比 → review 与验证。"
+        };
+        routeResult.innerHTML = routes[type];
+      }
+      document.querySelectorAll('input[name="changeType"]').forEach(input => input.addEventListener("change", updateRoute));
+      updateRoute();
+
+      function loadChecks() {
+        let values = {};
+        try { values = JSON.parse(localStorage.getItem(store.checks) || "{}"); } catch (_) {}
+        checks.forEach(check => { check.checked = Boolean(values[check.dataset.id]); });
+        updateChecks(false);
+      }
+      function updateChecks(save = true) {
+        const values = {};
+        let count = 0;
+        checks.forEach(check => {
+          values[check.dataset.id] = check.checked;
+          check.closest(".check").classList.toggle("done", check.checked);
+          if (check.checked) count++;
+        });
+        const percent = checks.length ? Math.round(count / checks.length * 100) : 0;
+        checkBar.style.width = percent + "%";
+        checkText.textContent = `${count} / ${checks.length} 完成（${percent}%）`;
+        if (save) {
+          try { localStorage.setItem(store.checks, JSON.stringify(values)); } catch (_) {}
+        }
+      }
+      checks.forEach(check => check.addEventListener("change", () => updateChecks(true)));
+      resetButton.addEventListener("click", () => {
+        checks.forEach(check => { check.checked = false; });
+        updateChecks(true);
+        search.value = "";
+        search.dispatchEvent(new Event("input"));
+      });
+      loadChecks();
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach(link => link.classList.toggle("active", link.getAttribute("href") === "#" + entry.target.id));
+        });
+      }, { rootMargin: "-20% 0px -68% 0px", threshold: 0 });
+      sections.forEach(section => observer.observe(section));
+
+      function updateReadingProgress() {
+        const total = document.documentElement.scrollHeight - innerHeight;
+        const ratio = total > 0 ? scrollY / total : 0;
+        readingProgress.style.width = Math.max(0, Math.min(100, ratio * 100)) + "%";
+      }
+      addEventListener("scroll", updateReadingProgress, { passive: true });
+      addEventListener("resize", updateReadingProgress);
+      updateReadingProgress();
+    })();
+  </script>
+</body>
+</html>

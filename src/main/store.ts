@@ -1,7 +1,12 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import type { AppData, IpcResult } from '../shared/types'
-import { APP_DATA_FILENAME, VIEW_ALL_CARDS, VIEW_UNCATEGORIZED } from '../shared/constants'
+import {
+  APP_DATA_FILENAME,
+  VIEW_ALL_CARDS,
+  VIEW_FAVORITES,
+  VIEW_UNCATEGORIZED,
+} from '../shared/constants'
 
 export type SaveResult =
   | { success: true }
@@ -13,11 +18,12 @@ export function getDataPath(userDataPath: string): string {
 
 export function emptyAppData(): AppData {
   return {
-    version: 2,
+    version: 3,
     cards: [],
     categories: [],
     viewOrders: [
       { viewType: VIEW_ALL_CARDS, cardIds: [] },
+      { viewType: VIEW_FAVORITES, cardIds: [] },
       { viewType: VIEW_UNCATEGORIZED, cardIds: [] },
     ],
   }
@@ -32,7 +38,7 @@ export function loadAppData(userDataPath: string): IpcResult<AppData> {
     const raw = fs.readFileSync(filePath, 'utf-8')
     const parsed = JSON.parse(raw) as any
     if (
-      (parsed.version !== 1 && parsed.version !== 2) ||
+      (parsed.version !== 1 && parsed.version !== 2 && parsed.version !== 3) ||
       !Array.isArray(parsed.cards) ||
       !Array.isArray(parsed.categories)
     ) {
@@ -47,25 +53,55 @@ export function loadAppData(userDataPath: string): IpcResult<AppData> {
     ) {
       return { success: false, error: 'corrupted' }
     }
-    const data: AppData = parsed.version === 1
-      ? {
-          ...parsed,
-          version: 2,
-          cards: parsed.cards.map((card: any) => {
+    const cards = parsed.cards.map((card: any) => {
+      const fileReference = parsed.version === 1
+        ? (() => {
             const { absolutePath, ...fileMetadata } = card.fileReference
             return {
-              ...card,
-              fileReference: {
-                ...fileMetadata,
-                relativePath: path
-                  .relative(userDataPath, absolutePath)
-                  .replace(/\\/g, '/')
-                  .normalize('NFC'),
-              },
+              ...fileMetadata,
+              relativePath: path
+                .relative(userDataPath, absolutePath)
+                .replace(/\\/g, '/')
+                .normalize('NFC'),
             }
-          }),
-        }
-      : parsed
+          })()
+        : card.fileReference
+
+      return {
+        ...card,
+        fileReference,
+        isFavorite: parsed.version === 3 && card.isFavorite === true,
+      }
+    })
+
+    const favoriteCardIds = new Set(
+      cards.filter((card: any) => card.isFavorite).map((card: any) => card.id)
+    )
+    const existingViewOrders = Array.isArray(parsed.viewOrders) ? parsed.viewOrders : []
+    const favoriteViewOrder = existingViewOrders.find(
+      (viewOrder: any) => viewOrder.viewType === VIEW_FAVORITES
+    )
+    const orderedFavoriteIds = Array.isArray(favoriteViewOrder?.cardIds)
+      ? favoriteViewOrder.cardIds.filter((id: string) => favoriteCardIds.has(id))
+      : []
+    const missingFavoriteIds = cards
+      .filter((card: any) => card.isFavorite && !orderedFavoriteIds.includes(card.id))
+      .map((card: any) => card.id)
+
+    const data: AppData = {
+      ...parsed,
+      version: 3,
+      cards,
+      viewOrders: [
+        ...existingViewOrders.filter(
+          (viewOrder: any) => viewOrder.viewType !== VIEW_FAVORITES
+        ),
+        {
+          viewType: VIEW_FAVORITES,
+          cardIds: [...orderedFavoriteIds, ...missingFavoriteIds],
+        },
+      ],
+    }
     return { success: true, data }
   } catch (e) {
     return { success: false, error: 'corrupted' }

@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="n8n 适用场景、工作流原理与从入门到生产的中文实战教程。单文件、离线可读。">
+  <title>n8n 自动化工程手册｜场景、工作流与全面实战</title>
+  <style>
+    :root{--bg:#11130f;--panel:#181b16;--panel2:#20241d;--ink:#f0f2e9;--muted:#9da693;--line:#343a30;--lime:#b6f542;--orange:#ff6d3a;--blue:#70c9ff;--yellow:#ffd369;--red:#ff7676;--shadow:0 18px 50px #0008;--radius:18px;--mono:"Cascadia Code","SFMono-Regular",Consolas,monospace;--sans:"Microsoft YaHei UI","Noto Sans SC",sans-serif;--serif:Georgia,"Noto Serif SC",serif}
+    html[data-theme="light"]{--bg:#f3f0e7;--panel:#fffdf5;--panel2:#ebe8dd;--ink:#20241d;--muted:#68705f;--line:#cfd3c6;--lime:#548f00;--orange:#d54818;--blue:#0877a9;--yellow:#a66a00;--red:#bd3030;--shadow:0 18px 50px #595f5018}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:82px}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.72}body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(#0000 31px,color-mix(in srgb,var(--line) 32%,transparent) 32px),linear-gradient(90deg,#0000 31px,color-mix(in srgb,var(--line) 24%,transparent) 32px);background-size:32px 32px;mask-image:linear-gradient(to bottom,#0008,transparent 55%);z-index:-1}a{color:var(--blue)}a:hover{color:var(--lime)}button,input{font:inherit}.skip{position:fixed;left:12px;top:-60px;background:var(--lime);color:#111;padding:10px 14px;z-index:99}.skip:focus{top:12px}.topbar{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px)}.topin{max-width:1480px;margin:auto;display:flex;align-items:center;gap:14px;padding:12px 22px}.brand{font:800 18px var(--mono);letter-spacing:-1px;color:var(--ink);text-decoration:none}.brand b{color:var(--orange)}.search{flex:1;max-width:560px;position:relative}.search input{width:100%;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:9px 40px 9px 16px;outline:none}.search input:focus{border-color:var(--lime);box-shadow:0 0 0 3px color-mix(in srgb,var(--lime) 20%,transparent)}.kbd{position:absolute;right:11px;top:9px;color:var(--muted);font:12px var(--mono)}.iconbtn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 12px;cursor:pointer}.progress{height:3px;background:var(--line)}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--orange),var(--lime))}.layout{max-width:1480px;margin:auto;display:grid;grid-template-columns:260px minmax(0,900px) 230px;gap:34px;padding:30px 22px 90px}.toc,.rail{position:sticky;top:86px;align-self:start;max-height:calc(100vh - 110px);overflow:auto}.toc h2,.rail h2{font:700 12px var(--mono);color:var(--muted);letter-spacing:.14em;text-transform:uppercase}.toc a{display:block;color:var(--muted);text-decoration:none;border-left:2px solid var(--line);padding:6px 11px;font-size:14px}.toc a:hover,.toc a.active{color:var(--ink);border-color:var(--lime);background:linear-gradient(90deg,color-mix(in srgb,var(--lime) 12%,transparent),transparent)}.rail .stat{border-top:1px solid var(--line);padding:12px 0}.stat b{display:block;font:700 25px var(--serif);color:var(--lime)}.stat span{font-size:12px;color:var(--muted)}main{min-width:0}.hero{padding:62px 0 36px;position:relative}.eyebrow{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font:12px var(--mono);color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 16px var(--lime)}h1{font:800 clamp(44px,7vw,88px)/.93 var(--serif);letter-spacing:-.055em;margin:24px 0 20px;max-width:840px}h1 em{font-style:normal;color:var(--orange)}.lead{font-size:20px;color:var(--muted);max-width:720px}.hero-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px}.hero-card{padding:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 85%,transparent);border-radius:var(--radius)}.hero-card b{display:block;color:var(--lime);font:14px var(--mono);margin-bottom:6px}.hero-card span{font-size:14px;color:var(--muted)}section{padding:44px 0;border-top:1px solid var(--line)}.sectag{font:12px var(--mono);color:var(--orange);letter-spacing:.12em}h2{font:800 clamp(29px,4vw,46px)/1.08 var(--serif);letter-spacing:-.035em;margin:8px 0 18px}h3{font:700 23px/1.3 var(--serif);margin:30px 0 12px}h4{margin:20px 0 8px}.muted{color:var(--muted)}.callout{border-left:4px solid var(--lime);padding:15px 18px;background:color-mix(in srgb,var(--lime) 8%,var(--panel));margin:20px 0;border-radius:0 12px 12px 0}.callout.warn{border-color:var(--yellow);background:color-mix(in srgb,var(--yellow) 8%,var(--panel))}.callout.danger{border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--panel))}.callout strong{color:var(--ink)}.grid2,.grid3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{border:1px solid var(--line);background:var(--panel);border-radius:var(--radius);padding:20px;min-width:0}.card h3{margin-top:0}.good{color:var(--lime)}.bad{color:var(--red)}.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 9px;margin:2px;font:12px var(--mono);color:var(--muted)}.score{display:flex;gap:5px;margin:11px 0}.score i{height:6px;flex:1;border-radius:4px;background:var(--line)}.score i.on{background:var(--lime)}table{width:100%;border-collapse:collapse;font-size:14px;margin:18px 0;background:var(--panel)}th,td{padding:12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{font:700 12px var(--mono);color:var(--lime);background:var(--panel2)}.flow{display:flex;align-items:stretch;gap:8px;overflow:auto;padding:18px 0}.node{flex:0 0 150px;border:1px solid var(--line);border-top:4px solid var(--orange);border-radius:12px;background:var(--panel);padding:12px}.node.trigger{border-top-color:var(--lime)}.node.control{border-top-color:var(--yellow)}.node.output{border-top-color:var(--blue)}.node b{display:block;font:13px var(--mono)}.node small{color:var(--muted)}.arrow{align-self:center;color:var(--muted);font-size:24px}.codebox{position:relative;margin:16px 0}.codebox pre{overflow:auto;margin:0;border:1px solid var(--line);border-radius:14px;background:#0b0d0a;color:#d8e0d0;padding:20px 18px;font:13px/1.65 var(--mono);tab-size:2}.copy{position:absolute;right:9px;top:9px;border:1px solid #394036;background:#191d17;color:#cdd6c6;border-radius:8px;padding:5px 9px;cursor:pointer;font:12px var(--mono)}code{font-family:var(--mono);color:var(--lime);word-break:break-word}.steps{counter-reset:step}.step{display:grid;grid-template-columns:50px 1fr;gap:14px;margin:22px 0}.step:before{counter-increment:step;content:counter(step,decimal-leading-zero);width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:var(--orange);color:#fff;font:700 14px var(--mono)}.step h3{margin:4px 0 8px}.lab{border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:24px 0;background:var(--panel)}.labhead{display:flex;gap:14px;align-items:center;padding:20px;background:var(--panel2);border-bottom:1px solid var(--line)}.labno{font:800 30px var(--serif);color:var(--orange)}.labhead h3{margin:0}.labbody{padding:6px 22px 24px}.checks{list-style:none;padding:0}.checks li{padding:7px 0 7px 30px;position:relative}.checks li:before{content:"✓";position:absolute;left:0;color:var(--lime);font-weight:bold}.accordion{border-top:1px solid var(--line)}.accordion button{width:100%;display:flex;justify-content:space-between;text-align:left;border:0;background:transparent;color:var(--ink);padding:16px 0;cursor:pointer;font-weight:700}.accordion .answer{display:none;padding:0 0 18px;color:var(--muted)}.accordion.open .answer{display:block}.accordion.open button span{transform:rotate(45deg)}.formula{font:700 18px var(--mono);padding:18px;border:1px dashed var(--lime);background:color-mix(in srgb,var(--lime) 7%,transparent);border-radius:12px;text-align:center}.checklist label{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--line);cursor:pointer}.checklist input{accent-color:var(--lime);margin-top:6px}.checklist label:has(input:checked){color:var(--muted);text-decoration:line-through}.source{font-size:13px;color:var(--muted);word-break:break-all}.source a{color:var(--muted)}.search-hit{outline:2px solid var(--yellow);outline-offset:3px}.empty{display:none;padding:30px;border:1px dashed var(--line);text-align:center;color:var(--muted)}footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:13px}.mobiletoc{display:none}.printonly{display:none}@media(max-width:1150px){.layout{grid-template-columns:220px minmax(0,1fr)}.rail{display:none}}@media(max-width:800px){.layout{display:block;padding:20px 16px 60px}.toc{display:none}.mobiletoc{display:inline-block}.hero{padding-top:38px}.hero-grid,.grid2,.grid3{grid-template-columns:1fr}.topin{gap:8px;padding:10px 12px}.topin>.iconbtn:last-child{display:none}.brand{font-size:13px;white-space:nowrap}.search{min-width:0}.kbd{display:none}.search input{min-width:0;padding:8px 10px}h1{font-size:46px;overflow-wrap:anywhere}h1 em{display:block}.flow{padding-bottom:12px}}@media print{.topbar,.toc,.rail,.copy,.mobiletoc{display:none!important}.layout{display:block;max-width:none;padding:0}.printonly{display:block}.hero{padding-top:10px}body{background:#fff;color:#111;font-size:11pt}section{break-inside:auto}.card,.lab,.callout,pre{break-inside:avoid;box-shadow:none}a{color:#111;text-decoration:none}.progress{display:none}}
+  </style>
+  <style>
+    @media(max-width:800px){
+      body{overflow-x:hidden}
+      .layout{width:100%}
+      .topin{width:100%}
+      .topin>.iconbtn:last-child,.brand{display:none}
+      table{display:block;max-width:100%;overflow-x:auto}
+    }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="topbar"><div class="topin">
+  <button class="iconbtn mobiletoc" id="menuBtn" aria-label="打开目录">☰</button>
+  <a class="brand" href="#top">n8n::<b>FIELD_GUIDE</b></a>
+  <div class="search"><input id="search" type="search" placeholder="搜索节点、表达式、部署……" aria-label="全文搜索"><span class="kbd">Ctrl K</span></div>
+  <button class="iconbtn" id="themeBtn" aria-label="切换主题">◐</button>
+  <button class="iconbtn" onclick="window.print()" aria-label="打印教程">打印</button>
+</div><div class="progress"><i id="progress"></i></div></header>
+<div class="layout" id="top">
+<nav class="toc" id="toc" aria-label="章节目录">
+  <h2>路线图</h2>
+  <a href="#readme">使用说明</a><a href="#decision">01 适用场景</a><a href="#model">02 心智模型</a><a href="#setup">03 安装启动</a><a href="#building">04 搭建方法</a><a href="#data">05 数据与表达式</a><a href="#nodes">06 节点速查</a><a href="#labs">07 全面实战</a><a href="#reliability">08 可靠性</a><a href="#deploy">09 生产部署</a><a href="#security">10 安全治理</a><a href="#debug">11 排障手册</a><a href="#checklist">12 上线清单</a><a href="#sources">官方来源</a>
+</nav>
+<main id="main">
+<article class="hero" id="readme" data-search="入门 使用说明">
+  <span class="eyebrow"><i class="dot"></i> OFFLINE EDITION · 2026-08-01</span>
+  <h1>把重复工作<br>变成可观察的<em>流水线</em></h1>
+  <p class="lead">一份面向 OPC 与技术型业务操作者的 n8n 中文工程手册：先判断值不值得自动化，再从数据流、节点与表达式一路做到可恢复、可维护的生产工作流。</p>
+  <div class="hero-grid"><div class="hero-card"><b>阅读路线 A · 新手</b><span>按 01 → 07 顺序，完成所有实验。</span></div><div class="hero-card"><b>阅读路线 B · 已上手</b><span>直接查节点、错误处理和部署章节。</span></div><div class="hero-card"><b>页面能力</b><span>全文搜索、复制代码、深浅主题、打印 PDF；全部离线运行。</span></div></div>
+</article>
+<div class="callout warn"><strong>版本提示：</strong>本教程按 n8n 2.x 时代的官方文档与主仓库整理。n8n 更新频繁，节点参数和界面文字可能变化；生产升级前务必阅读对应版本 Release Notes。页面不加载任何在线依赖，文末链接仅用于主动查证。</div>
+
+<section id="decision" data-search="适用场景 选型 边界">
+  <span class="sectag">01 / DECISION</span><h2>先判断：n8n 是不是正确工具</h2>
+  <p>n8n 最擅长的不是“替人点鼠标”，而是把有 API、Webhook、数据库或结构化文件的系统串成一条可观察的数据流水线。它处在 SaaS 集成平台与手写后端代码之间。</p>
+  <div class="grid2">
+    <div class="card"><h3 class="good">很适合</h3><ul class="checks"><li>多个系统之间同步、清洗和路由数据</li><li>定时汇总日报、对账、线索分发</li><li>Webhook 驱动的事件处理</li><li>AI 模型调用前后的检索、加工与审核</li><li>需要自托管、控制数据位置的自动化</li><li>原型验证后仍需保留可视化运维入口</li></ul></div>
+    <div class="card"><h3 class="bad">谨慎或不适合</h3><ul><li>毫秒级实时、高吞吐核心交易链路</li><li>复杂长事务且要求强一致回滚</li><li>只能靠脆弱网页点击、没有稳定接口</li><li>大量 CPU/内存密集型计算或媒体渲染</li><li>逻辑规模已像大型软件系统，却没有工程治理</li><li>把 n8n 白标后直接向客户收费——需先核对许可</li></ul></div>
+  </div>
+  <h3>OPC 场景地图</h3>
+  <table><thead><tr><th>场景</th><th>典型流程</th><th>价值</th><th>风险点</th></tr></thead><tbody>
+    <tr><td>内容生产</td><td>选题库 → 素材抓取 → 草稿 → 人审 → 分发</td><td>高频、跨工具</td><td>事实核验与平台规则</td></tr>
+    <tr><td>销售线索</td><td>表单 → 去重 → 评分 → CRM → 跟进提醒</td><td>响应速度</td><td>隐私、重复触达</td></tr>
+    <tr><td>客户交付</td><td>订单 → 建项目 → 建目录 → 通知 → 归档</td><td>减少漏项</td><td>幂等与权限</td></tr>
+    <tr><td>经营分析</td><td>多源取数 → 统一口径 → 汇总 → 报告</td><td>固定节奏</td><td>数据延迟与口径漂移</td></tr>
+    <tr><td>运维监控</td><td>定时检查 → 阈值判断 → 告警 → 升级</td><td>可观测</td><td>告警风暴</td></tr>
+  </tbody></table>
+  <div class="formula">自动化优先级 = 频率 × 单次耗时 × 标准化程度 × 错误成本 ÷ 维护成本</div>
+  <p class="muted">经验法则：每月只做一次、规则还在快速变化的工作，先写清 SOP；稳定重复后再自动化。</p>
+</section>
+
+<section id="model" data-search="心智模型 workflow execution item json binary trigger">
+  <span class="sectag">02 / MENTAL MODEL</span><h2>工作流到底在运行什么</h2>
+  <p>一个工作流是节点与连接组成的有向图。触发节点创建一次 <strong>execution（执行）</strong>；数据以一个或多个 <strong>item（条目）</strong>向后流动。每个 item 通常包含 <code>json</code>，也可包含 <code>binary</code>。</p>
+  <div class="flow" aria-label="工作流数据流"><div class="node trigger"><b>TRIGGER</b><small>何时开始</small></div><span class="arrow">→</span><div class="node"><b>INPUT ITEMS</b><small>接收数据</small></div><span class="arrow">→</span><div class="node control"><b>LOGIC</b><small>转换与分支</small></div><span class="arrow">→</span><div class="node output"><b>SIDE EFFECT</b><small>写入或通知</small></div></div>
+  <div class="grid3"><div class="card"><h3>Workflow</h3><p>定义“怎么做”。n8n 2.x 保存并发布（Publish）后由生产触发器驱动，也可手动测试。</p></div><div class="card"><h3>Execution</h3><p>一次具体运行，包含状态、开始时间、每个节点的输入输出与错误。</p></div><div class="card"><h3>Item</h3><p>最小数据单位。多数节点会对输入 items 逐条或批量处理。</p></div></div>
+  <div class="codebox"><button class="copy">复制</button><pre><code>// 一个节点收到的 2 个 items（概念示意）
+[
+  { "json": { "leadId": "L-1001", "email": "a@example.com", "score": 82 } },
+  { "json": { "leadId": "L-1002", "email": "b@example.com", "score": 46 } }
+]</code></pre></div>
+  <div class="callout"><strong>最重要的调试动作：</strong>每添加一个节点就执行到此处，打开 OUTPUT 面板确认“条目数量、字段名、字段类型”都符合预期，再继续连接下一个节点。</div>
+  <div class="callout warn"><strong>Item linking：</strong>n8n 会记录输出 item 来自哪个输入 item，让后续节点能引用更早节点的对应数据。Code 节点若自行新增、合并或重排 items，复杂场景需正确设置 <code>pairedItem</code>，否则会出现无法确定配对数据的映射错误。</div>
+</section>
+
+<section id="setup" data-search="安装 Docker npx localhost 5678 持久化">
+  <span class="sectag">03 / BOOT</span><h2>15 分钟启动本地 n8n</h2>
+  <p>学习阶段可用 npx 或 Docker。Docker 更接近后续部署方式，且通过 volume 保存工作流、凭据和设置。</p>
+  <h3>方案 A：Docker（推荐学习路径）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre><code>docker volume create n8n_data
+docker run -it --rm --name n8n \
+  -p 5678:5678 \
+  -v n8n_data:/home/node/.n8n \
+  docker.n8n.io/n8nio/n8n</code></pre></div>
+  <p>PowerShell 可把反斜杠续行改为一整行，或使用反引号。启动后访问 <code>http://localhost:5678</code>，按界面创建 owner 账号。</p>
+  <h3>方案 B：npx（快速体验）</h3>
+  <div class="codebox"><button class="copy">复制</button><pre><code>npx n8n</code></pre></div>
+  <div class="callout danger"><strong>不要把裸露的 5678 端口直接暴露到公网。</strong>公开部署需要 HTTPS、反向代理、强认证、正确的 Webhook URL 和备份。生产方案见第 09 章。</div>
+  <h3>第一次进入后认识 5 个区域</h3>
+  <div class="grid2"><div class="card"><b>Canvas</b><p class="muted">拖放节点、连线与查看分支。</p></div><div class="card"><b>Node panel</b><p class="muted">配置参数、凭据、输入输出。</p></div><div class="card"><b>Executions</b><p class="muted">查历史运行、错误与每步数据。</p></div><div class="card"><b>Credentials</b><p class="muted">集中保管系统连接信息，避免硬编码。</p></div></div>
+</section>
+
+<section id="building" data-search="工作流设计 命名 画布 SOP">
+  <span class="sectag">04 / BUILD METHOD</span><h2>把 SOP 翻译成工作流</h2>
+  <div class="steps">
+    <div class="step"><div><h3>先写契约</h3><p>写清触发条件、输入样例、成功输出、失败动作与数据负责人。没有样例数据就先别画节点。</p></div></div>
+    <div class="step"><div><h3>按四段式切开</h3><p><strong>触发 → 获取/校验 → 决策/转换 → 副作用</strong>。把通知、写库、发邮件等不可逆动作放在末端。</p></div></div>
+    <div class="step"><div><h3>用真实样例逐段测试</h3><p>成功、空值、重复、超时、权限失败各准备一条样例；需要时固定（pin）测试数据，但上线前确认不会误用。</p></div></div>
+    <div class="step"><div><h3>添加防护栏</h3><p>去重键、批次大小、重试上限、超时、错误出口、告警和人工复核点。</p></div></div>
+    <div class="step"><div><h3>再发布</h3><p>先用测试 Webhook 与手动执行，确认副作用目标是沙箱；发布前清掉调试地址和临时凭据。n8n 2.x 使用 Publish/Unpublish 模型。</p></div></div>
+  </div>
+  <h3>可维护命名</h3>
+  <table><thead><tr><th>对象</th><th>推荐</th><th>避免</th></tr></thead><tbody><tr><td>工作流</td><td><code>[域] 触发 → 结果 | 环境</code><br>[Sales] Lead webhook → CRM | PROD</td><td>My workflow 12</td></tr><tr><td>节点</td><td>动词 + 对象 + 条件<br>Normalize lead / Reject missing email</td><td>HTTP Request1</td></tr><tr><td>字段</td><td>稳定、语义化、统一大小写</td><td>data2、temp_final</td></tr></tbody></table>
+</section>
+
+<section id="data" data-search="表达式 item json $json $node 日期 luxon 数据映射">
+  <span class="sectag">05 / DATA</span><h2>数据映射与表达式</h2>
+  <p>参数可用固定值，也可切换为 Expression。表达式用双花括号求值；最常用入口是当前 item 的 <code>$json</code>。</p>
+  <table><thead><tr><th>目的</th><th>表达式示例</th></tr></thead><tbody>
+    <tr><td>当前字段</td><td><code>{{ $json.email }}</code></td></tr><tr><td>嵌套字段</td><td><code>{{ $json.customer?.company ?? '个人' }}</code></td></tr><tr><td>拼接文本</td><td><code>{{ 'LEAD-' + $json.id }}</code></td></tr><tr><td>转为数字</td><td><code>{{ Number($json.amount) }}</code></td></tr><tr><td>读取指定节点</td><td><code>{{ $('Normalize lead').item.json.email }}</code></td></tr><tr><td>当前时间</td><td><code>{{ $now.toISO() }}</code></td></tr><tr><td>环境变量</td><td><code>{{ $env.MY_VARIABLE }}</code>（可用性受实例配置限制）</td></tr>
+  </tbody></table>
+  <div class="callout warn"><strong>表达式陷阱：</strong>字符串 <code>"0"</code>、数字 <code>0</code>、布尔值 <code>false</code> 和空值不是一回事。进入 IF/Switch 前，先在 Edit Fields 或 Code 节点统一类型。</div>
+  <h3>Code 节点：只放真正需要代码的转换</h3>
+  <div class="codebox"><button class="copy">复制</button><pre><code>// Run Once for All Items
+return items.map(item => {
+  const email = String(item.json.email ?? '').trim().toLowerCase();
+  const amount = Number(item.json.amount ?? 0);
+  return {
+    json: {
+      ...item.json,
+      email,
+      amount,
+      isQualified: email.includes('@') && amount >= 1000
+    }
+  };
+});</code></pre></div>
+  <p class="muted">优先使用 Edit Fields、IF、Switch 等声明式节点；Code 用于复杂转换。越多代码，越需要测试、评审和版本控制。</p>
+</section>
+
+<section id="nodes" data-search="节点 trigger webhook schedule http request edit fields if switch merge loop code execute workflow wait">
+  <span class="sectag">06 / NODE KIT</span><h2>高频节点工具箱</h2>
+  <div class="grid2">
+    <div class="card"><h3>启动</h3><p><span class="chip">Manual Trigger</span><span class="chip">Schedule Trigger</span><span class="chip">Webhook</span><span class="chip">Form Trigger</span></p><p class="muted">决定“谁、在何时、携带什么数据”启动。</p></div>
+    <div class="card"><h3>连接</h3><p><span class="chip">HTTP Request</span><span class="chip">数据库节点</span><span class="chip">应用节点</span></p><p class="muted">没有专用节点时，只要服务有 API，HTTP Request 往往足够。</p></div>
+    <div class="card"><h3>整形</h3><p><span class="chip">Edit Fields</span><span class="chip">Code</span><span class="chip">Convert to File</span></p><p class="muted">先统一字段和类型，降低后续节点耦合。</p></div>
+    <div class="card"><h3>控制</h3><p><span class="chip">IF</span><span class="chip">Switch</span><span class="chip">Merge</span><span class="chip">Loop Over Items</span><span class="chip">Wait</span></p><p class="muted">分支、合并、限批和暂停；循环前先确认节点是否已自动逐 item 处理。</p></div>
+    <div class="card"><h3>模块化</h3><p><span class="chip">Execute Sub-workflow</span><span class="chip">Execute Workflow Trigger</span></p><p class="muted">把鉴权、通知、规范化等稳定能力封成带输入输出契约的子工作流。</p></div>
+    <div class="card"><h3>失败处理</h3><p><span class="chip">Error Trigger</span><span class="chip">Stop And Error</span></p><p class="muted">业务不满足也应主动失败；集中错误工作流负责告警和上下文。</p></div>
+  </div>
+  <h3>HTTP Request 的生产级检查</h3>
+  <ul class="checks"><li>认证放 Credentials，不写死在 URL、Header 或代码</li><li>设置合理 timeout；只对可安全重试的请求启用重试</li><li>处理 429 的 Retry-After 和 API 限速</li><li>分页时设置明确终止条件，并限制最大页数</li><li>记录业务 ID、状态码和响应摘要，不把密钥写入日志</li></ul>
+</section>
+
+<section id="labs" data-search="实战 教程 webhook curl 定时 线索 子工作流 错误">
+  <span class="sectag">07 / LABS</span><h2>五个递进实战</h2>
+  <div class="lab"><div class="labhead"><span class="labno">01</span><div><h3>第一条数据流水线</h3><span class="muted">Manual Trigger → Edit Fields → Code → IF</span></div></div><div class="labbody">
+    <h4>目标</h4><p>构造订单样例、计算含税金额，并分成高价值与普通订单。</p>
+    <ol><li>新建工作流，加入 Manual Trigger。</li><li>加入 Edit Fields，创建 <code>orderId=O-1001</code>、<code>amount=1200</code>、<code>taxRate=0.06</code>。</li><li>加入 Code，选择 Run Once for Each Item，返回以下对象。</li></ol>
+    <div class="codebox"><button class="copy">复制</button><pre><code>const amount = Number($json.amount);
+const total = Math.round(amount * (1 + Number($json.taxRate)) * 100) / 100;
+return { json: { ...$json, total, processedAt: new Date().toISOString() } };</code></pre></div>
+    <p>连接 IF：条件 <code>{{ $json.total }}</code> 大于等于 <code>1000</code>。执行后确认 true 分支有 1 item。</p>
+    <div class="callout"><strong>通过标准：</strong>字段类型是 Number；total 为 1272；节点名称已改成业务动作，而不是默认编号。</div>
+  </div></div>
+  <div class="lab"><div class="labhead"><span class="labno">02</span><div><h3>Webhook 线索接入与校验</h3><span class="muted">Webhook → Normalize → IF → Respond to Webhook</span></div></div><div class="labbody">
+    <p>创建 POST Webhook，Path 设为 <code>lead-intake</code>。开发时先点击 Listen for test event，再用本机终端发送：</p>
+    <div class="codebox"><button class="copy">复制</button><pre><code>curl -X POST "http://localhost:5678/webhook-test/lead-intake" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\" YIGE@example.com \",\"source\":\"landing-page\",\"budget\":5000}"</code></pre></div>
+    <p>注意测试 URL 通常含 <code>/webhook-test/</code>，工作流发布后生产 URL 使用 <code>/webhook/</code>。用 Edit Fields/Code 统一 email、budget 类型；IF 校验 email 非空且含 @。成功返回 202 与业务 ID，失败返回 400 和可读错误。官方 Webhook 默认最大 payload 为 16 MB，自托管虽可调整，入口仍应主动限制大小。</p>
+    <div class="callout warn"><strong>安全升级：</strong>公网 Webhook 应验证签名或共享密钥、限制 body 大小、校验 Content-Type，并对重复事件使用上游 event ID 做幂等。</div>
+  </div></div>
+  <div class="lab"><div class="labhead"><span class="labno">03</span><div><h3>定时批处理与限流</h3><span class="muted">Schedule → Fetch → Loop Over Items → Write → Summary</span></div></div><div class="labbody">
+    <ol><li>Schedule Trigger 每工作日 09:00 运行，确认实例时区。</li><li>从表格、数据库或 API 获取待处理记录；测试阶段限制 10 条。</li><li>Loop Over Items 设置批次大小，例如 20；循环内执行写入或 API 请求。</li><li>在写入前生成稳定幂等键，如 <code>source + ':' + recordId</code>。</li><li>结束出口汇总成功、跳过和失败数量，再发送一条摘要。</li></ol>
+    <p class="muted">不要为了“逐条处理”无条件加 Loop；很多节点本身就会处理所有输入 items。Loop 主要用于批次控制、限速或明确的分页迭代。</p>
+  </div></div>
+  <div class="lab"><div class="labhead"><span class="labno">04</span><div><h3>集中错误工作流</h3><span class="muted">Error Trigger → Redact → Notify → Persist incident</span></div></div><div class="labbody">
+    <ol><li>新建 <code>[Ops] Workflow error handler | PROD</code>。</li><li>以 Error Trigger 开始，提取工作流名、执行 ID、节点名、错误消息和执行链接。</li><li>先删除 token、authorization、password 等敏感字段。</li><li>通知到你的告警渠道，并写入事件表。</li><li>在业务工作流 Settings 中把该工作流设为 Error workflow。</li></ol>
+    <div class="callout"><strong>告警必须可行动：</strong>包含“哪里失败、影响什么、是否会自动重试、谁负责、从哪里重跑”，而不只是“出错了”。注意 Error Trigger 只响应自动执行失败；手动执行失败不会触发它，错误工作流本身无需发布。</div>
+  </div></div>
+  <div class="lab"><div class="labhead"><span class="labno">05</span><div><h3>把规范化逻辑封装成子工作流</h3><span class="muted">Execute Workflow Trigger → Validate → Normalize → Return</span></div></div><div class="labbody">
+    <p>把多个流程共用的“线索规范化”抽出：定义输入字段 <code>email/source/budget</code>，输出固定 schema，并用 Stop And Error 拒绝缺失 email 的输入。父流程通过 Execute Sub-workflow 调用。</p>
+    <table><thead><tr><th>契约</th><th>内容</th></tr></thead><tbody><tr><td>输入</td><td>email:string, source:string?, budget:number?</td></tr><tr><td>输出</td><td>emailNormalized, sourceNormalized, budget, qualified</td></tr><tr><td>失败</td><td>VALIDATION_EMAIL_MISSING / VALIDATION_BUDGET_INVALID</td></tr></tbody></table>
+    <p class="muted">子工作流不是“让画布更漂亮”，而是稳定边界：调用方只依赖输入输出，不依赖内部节点。</p>
+  </div></div>
+</section>
+
+<section id="reliability" data-search="可靠性 幂等 重试 超时 错误 人工复核 可观测">
+  <span class="sectag">08 / RELIABILITY</span><h2>从“能跑”到“值得托付”</h2>
+  <table><thead><tr><th>风险</th><th>设计手段</th><th>验证方式</th></tr></thead><tbody>
+    <tr><td>重复触发</td><td>事件 ID / 业务主键做幂等；写入使用 upsert</td><td>同一 payload 连发两次，只产生一个结果</td></tr><tr><td>临时故障</td><td>超时 + 有上限的指数退避；尊重 429</td><td>模拟一次 500 后恢复</td></tr><tr><td>永久故障</td><td>明确失败、进入死信/待处理队列、告警</td><td>错误凭据不会无限重试</td></tr><tr><td>部分成功</td><td>逐项记录状态；副作用拆分；提供补偿动作</td><td>第 6/10 项失败后可只补跑失败项</td></tr><tr><td>数据漂移</td><td>入口 schema 校验、默认值、版本字段</td><td>缺字段与类型变化能被识别</td></tr><tr><td>误操作</td><td>预览模式、审批门、沙箱凭据、最小权限</td><td>测试执行不会触达真实客户</td></tr>
+  </tbody></table>
+  <h3>重试前先问：这个动作安全吗？</h3><p>GET 通常可安全重试；创建订单、扣款、发消息未必。对有副作用的 POST，优先使用服务提供的幂等键；否则先查询状态或在自己的状态表中登记。</p>
+  <div class="grid2"><div class="card"><h3>业务日志</h3><p>executionId、workflowVersion、businessKey、输入摘要、结果状态、耗时。避免保存明文密钥和不必要的个人信息。</p></div><div class="card"><h3>运营指标</h3><p>成功率、P95 耗时、积压量、重试率、人工接管量、每次执行成本。</p></div></div>
+</section>
+
+<section id="deploy" data-search="部署 docker compose postgres encryption key timezone webhook url reverse proxy queue mode workers backup">
+  <span class="sectag">09 / DEPLOY</span><h2>自托管：从单机到生产</h2>
+  <h3>单机 Docker Compose 基线</h3>
+  <div class="codebox"><button class="copy">复制</button><pre><code>services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:2.30.5
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5678:5678"
+    environment:
+      - TZ=Asia/Shanghai
+      - GENERIC_TIMEZONE=Asia/Shanghai
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=automation.example.com
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://automation.example.com/
+      - N8N_PROXY_HOPS=1
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:</code></pre></div>
+  <p>示例固定为制作日查得的 <code>2.30.5</code>；部署时应换成你已验证的具体版本号，不使用浮动的 <code>latest</code> 或 <code>next</code>。把固定、随机且足够长的 <code>N8N_ENCRYPTION_KEY</code> 放入服务器秘密管理或受权限保护的 <code>.env</code>，不要提交仓库。<code>N8N_PROXY_HOPS</code> 必须与真实反向代理层数匹配。</p>
+  <h3>架构升级路径</h3>
+  <div class="flow"><div class="node trigger"><b>REVERSE PROXY</b><small>TLS / 限流</small></div><span class="arrow">→</span><div class="node"><b>n8n MAIN</b><small>UI / Webhook</small></div><span class="arrow">→</span><div class="node control"><b>POSTGRES</b><small>元数据</small></div><span class="arrow">+</span><div class="node output"><b>BACKUP</b><small>异地恢复</small></div></div>
+  <p>团队规模、执行量和可用性要求上升后，再评估 Postgres、queue mode、Redis 与 worker。队列模式把执行交给 worker，适合水平扩展，但增加组件、监控与恢复复杂度；不要为未来的假想规模过早引入。</p>
+  <div class="grid2"><div class="card"><h3>必须备份</h3><ul><li>数据库或 <code>.n8n</code> 持久卷</li><li>加密密钥（与数据分开保管）</li><li>工作流导出与外部配置</li><li>凭据依赖清单及恢复文档</li></ul></div><div class="card"><h3>必须演练</h3><ul><li>在隔离环境恢复</li><li>重新连接 Webhook 与反向代理</li><li>验证凭据可以解密</li><li>抽样运行关键工作流</li></ul></div></div>
+  <div class="callout danger"><strong>只“有备份文件”不等于可恢复。</strong>丢失原来的 encryption key，备份中的凭据可能无法解密；恢复演练才是验证。</div>
+  <h3>执行历史与容量</h3>
+  <p>默认清理旧执行，但数据库仍可能快速增长。按审计需要配置成功/失败/手动执行的保存策略；官方默认年龄阈值为 336 小时（14 天），数量阈值为 10,000，实际值以部署版本配置为准。关键业务证据不要只依赖 n8n 的 Executions 页面。</p>
+  <div class="codebox"><button class="copy">复制</button><pre><code># CLI 备份示例：先在隔离路径验证输出
+n8n export:entities --outputDir=/backup/entities
+n8n export:workflow --backup --output=/backup/workflows
+n8n export:credentials --backup --output=/backup/credentials</code></pre></div>
+  <p class="muted">不要随意使用 <code>--decrypted</code>：它会导出明文凭据。导入前还要检查 ID 冲突，避免覆盖现有实体。</p>
+  <h3>什么时候进入 Queue mode</h3>
+  <table><thead><tr><th>组件</th><th>职责</th><th>关键约束</th></tr></thead><tbody><tr><td>Main</td><td>编辑器、触发与创建执行</td><td>与所有进程共享 encryption key</td></tr><tr><td>Redis</td><td>保存待执行 ID</td><td>不是业务数据的最终存储</td></tr><tr><td>Worker</td><td>从数据库读取并执行工作流</td><td>官方默认并发 10；结合数据库连接池调节</td></tr><tr><td>Postgres</td><td>工作流、凭据和执行状态</td><td>Queue mode 推荐 Postgres 13+，不推荐 SQLite</td></tr><tr><td>Webhook processor</td><td>可选的入口水平扩展</td><td>生产 Webhook 可分流，测试 Webhook 留在 main</td></tr></tbody></table>
+  <p class="muted">Queue mode 不支持 filesystem 二进制存储；需要持久化二进制时按当前版本选择数据库或受支持的外部存储。多 main 高可用和某些外部存储能力属于 Enterprise 功能。</p>
+</section>
+
+<section id="security" data-search="安全 凭据 密钥 RBAC 许可 license 隐私 社区节点">
+  <span class="sectag">10 / GOVERNANCE</span><h2>安全、隐私与许可边界</h2>
+  <ul class="checks"><li>凭据使用专用 Credentials；工作流 JSON、代码和日志中不出现密钥</li><li>每个系统创建自动化专用账号，并按读写范围最小授权</li><li>公网入口启用 HTTPS、鉴权/签名、限流、输入校验和 body 大小限制</li><li>限制可安装的 community nodes；安装前审查来源、权限和维护状态</li><li>用 <code>NODES_EXCLUDE</code> 阻止不需要的高风险节点，例如命令执行与本地文件读写</li><li>定期运行 <code>n8n audit</code> 检查凭据、数据库、文件系统、节点和实例风险</li><li>按数据分类设置执行数据保留时间，减少不必要的个人信息</li><li>生产与测试使用不同实例或至少不同凭据、目标和标识</li><li>定期升级 n8n 与镜像；先在预生产回放代表性工作流</li></ul>
+  <h3>“源码可见”不等于 OSI 开源</h3>
+  <p>n8n 主仓库采用 Sustainable Use License 与 Enterprise License。内部业务使用、个人/非商业使用通常在许可范围内；把 n8n 白标收费、托管后向客户收费，或产品价值主要来自 n8n 功能时可能需要商业协议。官方 FAQ 还特别区分终端用户提交自己的第三方凭据与使用服务方公司凭据的产品后端场景。具体项目应阅读当前许可并向 n8n 确认，本教程不构成法律意见。</p>
+</section>
+
+<section id="debug" data-search="排障 FAQ webhook 不触发 时区 数据为空 oauth 反向代理">
+  <span class="sectag">11 / DEBUG</span><h2>故障排查顺序</h2>
+  <p class="muted">从输入向输出逐节点查，不要一上来重启所有组件。</p>
+  <div class="accordion"><button>Webhook 为什么没触发？<span>＋</span></button><div class="answer">确认测试/生产 URL 是否混用；测试监听是否仍在等待；生产工作流是否已发布；反向代理是否转发路径和协议；上游能否访问公网域名；签名/认证是否通过。检查 executions 中是否已有失败记录。</div></div>
+  <div class="accordion"><button>Schedule 时间为什么偏了？<span>＋</span></button><div class="answer">依次检查实例时区、工作流时区、容器 TZ/GENERIC_TIMEZONE 与夏令时。用一次临近时间的小测试验证，不要只靠心算。</div></div>
+  <div class="accordion"><button>节点显示成功，后面却没有数据？<span>＋</span></button><div class="answer">看输出 item 数量是否为 0；IF/Switch 是否走了另一分支；字段路径和大小写是否正确；Merge 模式是否要求两边都有匹配数据。固定上游样例逐段执行。</div></div>
+  <div class="accordion"><button>表达式有值，运行时却是 undefined？<span>＋</span></button><div class="answer">编辑器预览所用 item 可能与实际配对不同。确认当前 item、目标节点是否在同一执行路径、是否有多 items，以及字段是否只在部分分支存在。使用可选链和明确默认值，但别用默认值掩盖必填数据缺失。</div></div>
+  <div class="accordion"><button>升级后工作流行为变化？<span>＋</span></button><div class="answer">固定镜像版本；阅读从当前版到目标版的 breaking changes；备份；在预生产导入并回放成功、空值、失败三类样例；确认节点版本和凭据兼容后再切换。</div></div>
+  <div class="accordion"><button>执行越来越慢或积压？<span>＋</span></button><div class="answer">先定位慢节点和外部 API；观察 item 数、批次、响应体大小和重试；减少大 binary 在内存中传递；优化数据库查询。只有确认瓶颈是执行并发后，再考虑 queue mode/worker 扩容。</div></div>
+</section>
+
+<section id="checklist" data-search="上线 检查清单 验收">
+  <span class="sectag">12 / SHIP</span><h2>上线前 24 项检查</h2>
+  <div class="grid2 checklist" id="checklistBox"><div class="card">
+    <h3>逻辑与数据</h3>
+    <label><input type="checkbox">触发条件与输入 schema 已记录</label><label><input type="checkbox">成功、空值、重复、超时样例已测试</label><label><input type="checkbox">字段类型在入口处统一</label><label><input type="checkbox">循环和分页有硬性终止条件</label><label><input type="checkbox">副作用动作具备幂等或防重复</label><label><input type="checkbox">不可恢复失败有人工出口</label>
+    <h3>安全</h3>
+    <label><input type="checkbox">密钥只存在 Credentials/秘密管理</label><label><input type="checkbox">账号遵循最小权限</label><label><input type="checkbox">Webhook 有鉴权、校验和限流</label><label><input type="checkbox">日志已排除敏感字段</label><label><input type="checkbox">测试与生产凭据已分离</label><label><input type="checkbox">许可场景已核对</label>
+  </div><div class="card">
+    <h3>可靠性</h3>
+    <label><input type="checkbox">超时与重试上限已设置</label><label><input type="checkbox">429 和临时 5xx 有处理策略</label><label><input type="checkbox">错误工作流已绑定并实测</label><label><input type="checkbox">告警包含业务 ID 与执行链接</label><label><input type="checkbox">工作流和节点名称可读</label><label><input type="checkbox">负责人、SLA 和处置方式已明确</label>
+    <h3>部署与恢复</h3>
+    <label><input type="checkbox">版本已固定并记录</label><label><input type="checkbox">实例/工作流时区已验证</label><label><input type="checkbox">数据与 encryption key 已分别备份</label><label><input type="checkbox">隔离环境恢复演练通过</label><label><input type="checkbox">执行数据保留策略已设置</label><label><input type="checkbox">回滚与停用开关已准备</label>
+  </div></div>
+  <p class="muted" id="checkProgress">完成 0 / 24</p>
+</section>
+
+<section id="sources" data-search="来源 官方文档 GitHub">
+  <span class="sectag">SOURCES</span><h2>官方来源与继续学习</h2>
+  <p>以下链接是本教程的事实依据和版本更新入口。页面不会自动请求它们；只有你主动点击时才联网。</p>
+  <ol class="source">
+    <li><a href="https://docs.n8n.io/" target="_blank" rel="noopener">n8n 官方文档首页</a></li>
+    <li><a href="https://github.com/n8n-io/n8n" target="_blank" rel="noopener">n8n 官方 GitHub 主仓库与 Quick Start</a></li>
+    <li><a href="https://docs.n8n.io/hosting/installation/docker/" target="_blank" rel="noopener">Docker 安装</a></li>
+    <li><a href="https://docs.n8n.io/data/data-structure/" target="_blank" rel="noopener">数据结构</a></li>
+    <li><a href="https://docs.n8n.io/code/builtin/overview/" target="_blank" rel="noopener">表达式与内置变量</a></li>
+    <li><a href="https://docs.n8n.io/data/data-mapping/data-item-linking/" target="_blank" rel="noopener">Item linking</a></li>
+    <li><a href="https://docs.n8n.io/flow-logic/error-handling/" target="_blank" rel="noopener">错误处理</a></li>
+    <li><a href="https://docs.n8n.io/flow-logic/subworkflows/" target="_blank" rel="noopener">子工作流</a></li>
+    <li><a href="https://docs.n8n.io/hosting/scaling/queue-mode/" target="_blank" rel="noopener">Queue mode 扩展</a></li>
+    <li><a href="https://docs.n8n.io/hosting/configuration/environment-variables/" target="_blank" rel="noopener">环境变量配置</a></li>
+    <li><a href="https://docs.n8n.io/hosting/scaling/execution-data/" target="_blank" rel="noopener">执行数据与清理</a></li>
+    <li><a href="https://docs.n8n.io/hosting/securing/security-audit/" target="_blank" rel="noopener">安全审计</a></li>
+    <li><a href="https://docs.n8n.io/privacy-and-security/sustainable-use-license/" target="_blank" rel="noopener">Sustainable Use License 说明</a></li>
+    <li><a href="https://github.com/n8n-io/n8n/releases" target="_blank" rel="noopener">版本发布记录</a></li>
+  </ol>
+  <div class="callout"><strong>下一步建议：</strong>先完成 Lab 01 和 Lab 02；然后选一个你每周至少重复两次、规则稳定、可通过 API 完成的真实任务，用第 04 章的方法做成最小工作流。</div>
+</section>
+<div class="empty" id="empty">没有匹配内容。试试“Webhook”“表达式”“部署”或“错误”。</div>
+<footer>n8n 自动化工程手册 · 单文件离线版 · 内容依据官方一手资料整理 · 2026-08-01</footer>
+</main>
+<aside class="rail"><h2>手册状态</h2><div class="stat"><b>12</b><span>核心章节</span></div><div class="stat"><b>05</b><span>递进实验</span></div><div class="stat"><b>24</b><span>上线检查</span></div><div class="stat"><b>0 KB</b><span id="netstat">在线依赖</span></div><h2>核心原则</h2><p class="muted">入口校验<br>稳定契约<br>幂等副作用<br>失败可恢复<br>秘密不落盘</p></aside>
+</div>
+<script>
+(() => {
+  const root=document.documentElement, themeBtn=document.getElementById('themeBtn');
+  const saved=localStorage.getItem('n8n-guide-theme'); if(saved) root.dataset.theme=saved;
+  themeBtn.addEventListener('click',()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('n8n-guide-theme',root.dataset.theme)});
+  const bar=document.getElementById('progress');
+  const updateProgress=()=>{const h=document.documentElement;const max=h.scrollHeight-h.clientHeight;bar.style.width=(max?100*h.scrollTop/max:0)+'%'};addEventListener('scroll',updateProgress,{passive:true});updateProgress();
+  document.querySelectorAll('.copy').forEach(btn=>btn.addEventListener('click',async()=>{const text=btn.nextElementSibling.innerText;try{await navigator.clipboard.writeText(text)}catch(e){const r=document.createRange();r.selectNodeContents(btn.nextElementSibling);const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');s.removeAllRanges()}btn.textContent='已复制';setTimeout(()=>btn.textContent='复制',1200)}));
+  document.querySelectorAll('.accordion button').forEach(btn=>btn.addEventListener('click',()=>btn.parentElement.classList.toggle('open')));
+  const links=[...document.querySelectorAll('.toc a')], sections=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-20% 0px -68%'});sections.forEach(s=>obs.observe(s));
+  const search=document.getElementById('search'), empty=document.getElementById('empty');
+  function runSearch(){const q=search.value.trim().toLowerCase();let count=0;document.querySelectorAll('main section').forEach(s=>{s.classList.remove('search-hit');if(!q){s.hidden=false;count++;return}const hit=(s.innerText+' '+(s.dataset.search||'')).toLowerCase().includes(q);s.hidden=!hit;if(hit){count++;s.classList.add('search-hit')}});empty.style.display=count?'none':'block'}
+  search.addEventListener('input',runSearch);addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();search.focus()}if(e.key==='Escape'&&document.activeElement===search){search.value='';runSearch();search.blur()}});
+  const boxes=[...document.querySelectorAll('#checklistBox input')], label=document.getElementById('checkProgress');
+  const state=JSON.parse(localStorage.getItem('n8n-guide-checks')||'[]');boxes.forEach((b,i)=>b.checked=!!state[i]);
+  const updateChecks=()=>{const now=boxes.map(b=>b.checked),n=now.filter(Boolean).length;label.textContent=`完成 ${n} / ${boxes.length}`;localStorage.setItem('n8n-guide-checks',JSON.stringify(now))};boxes.forEach(b=>b.addEventListener('change',updateChecks));updateChecks();
+  const toc=document.getElementById('toc'), menu=document.getElementById('menuBtn');menu.addEventListener('click',()=>{const open=toc.style.display==='block';toc.style.cssText=open?'':'display:block;position:fixed;inset:58px 12px auto 12px;max-height:75vh;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;z-index:30';});toc.addEventListener('click',()=>{if(innerWidth<=800)toc.style.cssText=''});
+})();
+</script>
+</body>
+</html>

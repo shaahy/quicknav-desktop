@@ -12,11 +12,12 @@ import type { Card, Category, ViewType } from '../../src/shared/types'
 
 const mockStateRef = vi.hoisted(() => ({
   data: {
-    version: 2 as const,
+    version: 3 as const,
     cards: [] as any[],
     categories: [] as any[],
     viewOrders: [
       { viewType: 'allCards', cardIds: [] as string[] },
+      { viewType: 'favorites', cardIds: [] as string[] },
       { viewType: 'uncategorized', cardIds: [] as string[] },
     ],
   },
@@ -29,6 +30,7 @@ const mockStateRef = vi.hoisted(() => ({
 
 const mockVisibleCards = vi.hoisted(() => ({ current: [] as Card[] }))
 const mockCategories = vi.hoisted(() => ({ current: [] as Category[] }))
+const mockSetFavorite = vi.hoisted(() => vi.fn())
 
 // ── Hook mocks ──
 
@@ -43,6 +45,7 @@ vi.mock('../../src/renderer/hooks/useCards', () => ({
     addCard: vi.fn(),
     addCardsBatch: vi.fn(),
     updateCard: vi.fn(),
+    setFavorite: mockSetFavorite,
     deleteCard: vi.fn(),
     repairFile: vi.fn(),
     findDuplicateByPath: vi.fn(),
@@ -88,6 +91,7 @@ function makeCard(id: string, name: string): Card {
       mtimeMs: 1234567890,
     },
     categoryIds: ['cat-1'],
+    isFavorite: false,
     createdAt: '2024-01-01T00:00:00.000Z',
     updatedAt: '2024-01-01T00:00:00.000Z',
   }
@@ -110,13 +114,16 @@ describe('AppShell', () => {
   beforeEach(() => {
     retryLoad = vi.fn()
     quitApp = vi.fn()
+    mockSetFavorite.mockReset()
+    mockSetFavorite.mockResolvedValue(true)
     // Reset shared mutable state
     mockStateRef.data = {
-      version: 2,
+      version: 3,
       cards: [],
       categories: [],
       viewOrders: [
         { viewType: 'allCards', cardIds: [] },
+        { viewType: 'favorites', cardIds: [] },
         { viewType: 'uncategorized', cardIds: [] },
       ],
     }
@@ -233,6 +240,81 @@ describe('AppShell', () => {
     expect(labels).toEqual(['新建卡片', '整理排序', '扫描'])
   })
 
+  it('always shows 我的收藏 between 全部卡片 and user categories', () => {
+    mockCategories.current = [makeCategory('cat-1', '工作', 0)]
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    const navLabels = Array.from(
+      document.querySelectorAll('.qc-category-item__name')
+    ).map(element => element.textContent)
+    expect(navLabels.slice(0, 3)).toEqual(['全部卡片', '我的收藏', '工作'])
+  })
+
+  it('shows the favorites empty state with a route back to all cards', () => {
+    mockStateRef.currentView = 'favorites'
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+
+    expect(screen.getByText('还没有收藏卡片')).toBeInTheDocument()
+    expect(
+      screen.getByText('点击卡片右下角的桃心，把常用卡片集中到这里。')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: '查看全部卡片' })
+    ).toBeInTheDocument()
+  })
+
+  it('favorites a card from its bottom-right star without opening the file', async () => {
+    const card = makeCard('card-1', '文档一')
+    mockStateRef.data.cards = [card]
+    mockStateRef.data.viewOrders = [
+      { viewType: 'allCards', cardIds: ['card-1'] },
+      { viewType: 'favorites', cardIds: [] },
+      { viewType: 'uncategorized', cardIds: [] },
+    ]
+    mockVisibleCards.current = [card]
+    const openFile = vi.spyOn(window.electronAPI, 'openFile')
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+    fireEvent.click(screen.getByRole('button', { name: '收藏：文档一' }))
+
+    await waitFor(() => {
+      expect(mockSetFavorite).toHaveBeenCalledWith('card-1', true)
+    })
+    expect(openFile).not.toHaveBeenCalled()
+    expect(await screen.findByText('已收藏')).toBeInTheDocument()
+  })
+
+  it('offers a text favorite action in the card menu', async () => {
+    const card = makeCard('card-1', '文档一')
+    mockStateRef.data.cards = [card]
+    mockStateRef.data.viewOrders = [
+      { viewType: 'allCards', cardIds: ['card-1'] },
+      { viewType: 'favorites', cardIds: [] },
+      { viewType: 'uncategorized', cardIds: [] },
+    ]
+    mockVisibleCards.current = [card]
+
+    render(
+      <AppShell loadingState="ready" retryLoad={retryLoad} quitApp={quitApp} />
+    )
+    fireEvent.click(
+      screen.getByRole('button', { name: '更多操作：文档一' })
+    )
+    fireEvent.click(await screen.findByRole('menuitem', { name: '收藏' }))
+
+    await waitFor(() => {
+      expect(mockSetFavorite).toHaveBeenCalledWith('card-1', true)
+    })
+  })
+
   // ── Test 5: ready + has cards shows file card grid with correct count ──
   it('shows card grid with correct number of cards when ready and has cards', () => {
     const cards = [
@@ -286,7 +368,7 @@ describe('AppShell', () => {
   it('shows the file-selection error without opening the card form', async () => {
     vi.spyOn(window.electronAPI, 'selectFile').mockResolvedValue({
       canceled: false,
-      error: '所选文件与工具不在同一磁盘，无法创建相对路径',
+      error: '无法访问所选文件',
     })
 
     render(
@@ -295,7 +377,7 @@ describe('AppShell', () => {
     fireEvent.click(screen.getAllByText('新建卡片')[0])
 
     expect(
-      await screen.findByText('所选文件与工具不在同一磁盘，无法创建相对路径'),
+      await screen.findByText('无法访问所选文件'),
     ).toBeInTheDocument()
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })

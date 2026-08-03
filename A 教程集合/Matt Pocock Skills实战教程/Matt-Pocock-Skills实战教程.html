@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Matt Pocock Skills 中文实战教程：安装范围、与 gstack 和 Superpowers 的冲突分析、采用建议、对照实战与 22 项技能速查。">
+  <title>Matt Pocock Skills 实战教程</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f7f5ef;
+      --surface: #fffefb;
+      --ink: #18202a;
+      --muted: #66717d;
+      --line: #d9d8d1;
+      --line-strong: #b9bab5;
+      --blue: #1768ac;
+      --blue-soft: #e8f2fa;
+      --green: #247a52;
+      --green-soft: #e8f4ed;
+      --amber: #9a5a08;
+      --amber-soft: #fff2dc;
+      --red: #a33a2b;
+      --red-soft: #fbe9e5;
+      --radius: 10px;
+      --page: 1180px;
+      --shadow: 0 1px 0 rgba(24,32,42,.06);
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 78px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.72; }
+    a { color: var(--blue); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    button, input, select { font: inherit; }
+    button, a, summary, input, select { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid #78b9e8; outline-offset: 3px; }
+    code { font-family: var(--mono); font-size: .92em; background: #ecebe6; padding: .1em .34em; border-radius: 4px; overflow-wrap: anywhere; }
+    pre { margin: 0; padding: 14px 16px; border: 1px solid var(--line); background: #202832; color: #f2f5f7; border-radius: 8px; overflow-x: auto; line-height: 1.55; }
+    pre code { background: transparent; padding: 0; color: inherit; }
+    .skip-link { position: fixed; left: 12px; top: -100px; z-index: 100; padding: 10px 14px; background: var(--ink); color: white; }
+    .skip-link:focus { top: 12px; }
+    .wrap { width: min(var(--page), calc(100% - 40px)); margin-inline: auto; }
+    .topbar { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgba(247,245,239,.96); backdrop-filter: blur(10px); }
+    .nav { min-height: 64px; display: flex; align-items: center; gap: 20px; }
+    .brand { flex: 0 0 auto; color: var(--ink); font-weight: 750; text-decoration: none; letter-spacing: -.02em; }
+    .brand small { display: block; color: var(--muted); font-weight: 500; letter-spacing: .04em; font-size: 11px; text-transform: uppercase; }
+    .nav-links { display: flex; gap: 6px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a { flex: 0 0 auto; padding: 8px 10px; border-radius: 6px; color: var(--muted); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover { background: var(--surface); color: var(--ink); }
+    header.hero { padding: 72px 0 44px; border-bottom: 1px solid var(--line); }
+    .eyebrow { margin: 0 0 12px; color: var(--blue); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 900px; font-size: clamp(36px, 6vw, 72px); line-height: 1.05; letter-spacing: -.055em; font-weight: 780; }
+    .lede { max-width: 790px; margin: 24px 0 0; color: #3f4954; font-size: clamp(18px, 2.2vw, 23px); line-height: 1.6; }
+    .verdict { margin-top: 30px; max-width: 940px; display: grid; grid-template-columns: 9px 1fr; border: 1px solid var(--line-strong); background: var(--surface); box-shadow: var(--shadow); }
+    .verdict::before { content: ""; background: var(--blue); }
+    .verdict-content { padding: 18px 22px; }
+    .verdict strong { display: block; margin-bottom: 4px; font-size: 18px; }
+    .stats { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .stat { min-width: 125px; padding: 11px 14px; border: 1px solid var(--line); background: transparent; }
+    .stat b { display: block; font-size: 24px; line-height: 1.2; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    main { padding-bottom: 76px; }
+    section { padding: 64px 0; border-bottom: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 26px; align-items: start; margin-bottom: 30px; }
+    .section-no { color: var(--muted); font-family: var(--mono); font-size: 13px; letter-spacing: .08em; }
+    h2 { margin: 0; font-size: clamp(28px, 4vw, 46px); line-height: 1.15; letter-spacing: -.035em; }
+    .section-intro { max-width: 760px; margin: 12px 0 0; color: var(--muted); font-size: 17px; }
+    h3 { margin: 0 0 10px; font-size: 21px; line-height: 1.3; }
+    h4 { margin: 0 0 6px; font-size: 16px; }
+    p { margin: 0 0 14px; }
+    ul, ol { margin-top: 8px; padding-left: 22px; }
+    .note { padding: 14px 16px; border-left: 4px solid var(--amber); background: var(--amber-soft); }
+    .note strong { color: #704004; }
+    .install-layers { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line-strong); background: var(--surface); }
+    .layer { position: relative; min-height: 230px; padding: 24px; border-right: 1px solid var(--line); }
+    .layer:last-child { border-right: 0; }
+    .layer-index { color: var(--blue); font-family: var(--mono); font-weight: 700; }
+    .layer p { color: var(--muted); }
+    .layer .answer { display: inline-block; margin-top: 10px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .position-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--line-strong); background: var(--line-strong); }
+    .position-card { min-height: 260px; padding: 24px; background: var(--surface); }
+    .position-card .system { font-family: var(--mono); color: var(--blue); font-size: 13px; }
+    .position-card ul { color: #424d57; }
+    .position-card .best { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-weight: 650; }
+    .risk-table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line-strong); }
+    .risk-table th, .risk-table td { padding: 14px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .risk-table th { background: #ecebe6; font-size: 13px; color: #3e4852; }
+    .risk-table tr:last-child td { border-bottom: 0; }
+    .pill { display: inline-flex; align-items: center; min-height: 25px; padding: 2px 8px; border: 1px solid currentColor; border-radius: 999px; font-size: 12px; font-weight: 750; white-space: nowrap; }
+    .pill.high { color: var(--red); background: var(--red-soft); }
+    .pill.medium { color: var(--amber); background: var(--amber-soft); }
+    .pill.low { color: var(--green); background: var(--green-soft); }
+    .adoption { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .adoption article { padding: 22px; border: 1px solid var(--line); background: var(--surface); }
+    .adoption article:nth-child(1) { border-top: 5px solid var(--green); }
+    .adoption article:nth-child(2) { border-top: 5px solid var(--amber); }
+    .adoption article:nth-child(3) { border-top: 5px solid var(--red); }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+    .tag-list code { border: 1px solid var(--line); background: #f1f0eb; }
+    .lab-intro { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(250px, .8fr); gap: 24px; margin-bottom: 28px; }
+    .case { padding: 20px; background: var(--ink); color: #f4f4ef; }
+    .case small { color: #b9c3cc; text-transform: uppercase; letter-spacing: .1em; }
+    .case h3 { margin-top: 8px; }
+    .route-rule { padding: 20px; border: 1px solid var(--line-strong); background: var(--surface); }
+    .flow { display: grid; gap: 10px; }
+    .flow-row { display: grid; grid-template-columns: 100px repeat(3, minmax(0, 1fr)) 44px; align-items: stretch; border: 1px solid var(--line); background: var(--surface); }
+    .flow-stage, .flow-choice, .flow-pick { padding: 14px; border-right: 1px solid var(--line); }
+    .flow-stage { font-weight: 750; background: #efeee9; }
+    .flow-choice { color: #4a5560; font-size: 14px; }
+    .flow-choice strong { display: block; color: var(--ink); font-family: var(--mono); font-size: 12px; }
+    .flow-pick { display: grid; place-items: center; border-right: 0; color: var(--green); font-weight: 850; font-size: 20px; }
+    .cheat-toolbar { position: sticky; top: 64px; z-index: 10; display: grid; grid-template-columns: 1.5fr repeat(3, minmax(130px, .65fr)); gap: 10px; padding: 14px; border: 1px solid var(--line-strong); background: rgba(255,254,251,.97); backdrop-filter: blur(8px); }
+    .field { display: grid; gap: 5px; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .field input, .field select { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 5px; background: white; color: var(--ink); }
+    .result-line { display: flex; justify-content: space-between; align-items: center; margin: 16px 0 10px; color: var(--muted); }
+    .result-line strong { color: var(--ink); }
+    .skill-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .skill { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+    .skill[open] { border-color: #9bbdd7; }
+    .skill summary { min-height: 132px; padding: 18px 44px 18px 18px; cursor: pointer; list-style: none; position: relative; }
+    .skill summary::-webkit-details-marker { display: none; }
+    .skill summary::after { content: "+"; position: absolute; right: 18px; top: 18px; color: var(--blue); font: 24px/1 var(--mono); }
+    .skill[open] summary::after { content: "−"; }
+    .skill-top { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin-bottom: 10px; }
+    .skill-name { margin-right: auto; font-family: var(--mono); font-size: 17px; font-weight: 750; overflow-wrap: anywhere; }
+    .micro { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 7px; border-radius: 4px; background: #efeee9; color: #53606b; font-size: 11px; font-weight: 700; }
+    .skill-purpose { color: #3e4852; }
+    .skill-body { padding: 0 18px 18px; border-top: 1px solid var(--line); }
+    .skill-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    .skill-facts > div { padding: 12px; background: #f2f1ec; }
+    .skill-facts ul { margin-bottom: 0; font-size: 14px; }
+    .callout { margin: 14px 0; padding: 12px 14px; border-left: 3px solid var(--blue); background: var(--blue-soft); }
+    .prompt { position: relative; padding: 14px 100px 14px 14px; border: 1px solid var(--line); background: #202832; color: #f6f7f8; border-radius: 7px; font-family: var(--mono); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .copy { position: absolute; top: 9px; right: 9px; min-height: 34px; padding: 6px 10px; border: 1px solid #687481; border-radius: 4px; background: #303b47; color: white; cursor: pointer; }
+    .copy:hover { background: #3b4855; }
+    .skill-source { margin-top: 12px; font-size: 13px; }
+    .empty { grid-column: 1 / -1; padding: 40px; text-align: center; border: 1px dashed var(--line-strong); color: var(--muted); }
+    .rules { counter-reset: rules; display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid var(--line-strong); background: var(--line-strong); gap: 1px; }
+    .rule { min-height: 170px; padding: 22px; background: var(--surface); }
+    .rule::before { counter-increment: rules; content: "0" counter(rules); display: block; margin-bottom: 16px; color: var(--blue); font-family: var(--mono); font-size: 12px; }
+    footer { padding: 38px 0 60px; color: var(--muted); font-size: 14px; }
+    .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .footer-grid p { max-width: 650px; }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 40; padding: 10px 14px; background: var(--ink); color: white; border-radius: 6px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .18s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 900px) {
+      .section-head { grid-template-columns: 110px minmax(0, 1fr); }
+      .install-layers, .position-grid, .adoption { grid-template-columns: 1fr; }
+      .layer { min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .layer:last-child { border-bottom: 0; }
+      .position-card { min-height: 0; }
+      .cheat-toolbar { grid-template-columns: 1fr 1fr; }
+      .skill-grid { grid-template-columns: 1fr; }
+      .flow-row { grid-template-columns: 90px 1fr 38px; }
+      .flow-choice { grid-column: 2; border-top: 1px solid var(--line); }
+      .flow-choice:nth-of-type(1) { border-top: 0; }
+      .flow-pick { grid-column: 3; grid-row: 1 / span 3; }
+      .lab-intro { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .wrap { width: min(100% - 24px, var(--page)); }
+      .topbar { position: static; }
+      .nav { display: block; padding: 12px 0; }
+      .brand { display: block; margin-bottom: 10px; }
+      .nav-links { margin: 0; }
+      header.hero { padding: 44px 0 34px; }
+      section { padding: 48px 0; }
+      .section-head { display: block; }
+      .section-no { display: block; margin-bottom: 8px; }
+      .cheat-toolbar { position: static; grid-template-columns: 1fr; }
+      .risk-table, .risk-table tbody, .risk-table tr, .risk-table td { display: block; width: 100%; }
+      .risk-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+      .risk-table tr { padding: 14px; border-bottom: 1px solid var(--line-strong); }
+      .risk-table td { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 6px 0; border: 0; }
+      .risk-table td::before { content: attr(data-label); color: var(--muted); font-size: 12px; font-weight: 700; }
+      .rules, .footer-grid { grid-template-columns: 1fr; }
+      .flow-row { grid-template-columns: 76px 1fr 34px; }
+      .flow-stage, .flow-choice { padding: 11px; }
+      .skill-facts { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 375px) {
+      .wrap { width: calc(100% - 20px); }
+      h1 { font-size: 35px; }
+      .stats { display: grid; grid-template-columns: 1fr 1fr; }
+      .stat { min-width: 0; }
+      .flow-row { display: block; position: relative; padding-right: 38px; }
+      .flow-stage, .flow-choice { border-right: 0; }
+      .flow-pick { position: absolute; right: 0; top: 0; bottom: 0; width: 38px; border-left: 1px solid var(--line); }
+      .prompt { padding-right: 14px; padding-top: 52px; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { color-scheme: dark; --paper: #171b20; --surface: #20262c; --ink: #edf1f4; --muted: #aab3bc; --line: #394149; --line-strong: #53606b; --blue: #77baf0; --blue-soft: #22384b; --green: #72c99d; --green-soft: #203a2d; --amber: #e6b25d; --amber-soft: #3e321f; --red: #f09789; --red-soft: #462b28; }
+      code, .micro, .tag-list code, .flow-stage, .risk-table th { background: #2a3138; }
+      .field input, .field select { background: #171b20; color: var(--ink); }
+      .skill-facts > div { background: #282f36; }
+      .cheat-toolbar { background: rgba(32,38,44,.97); }
+      .topbar { background: rgba(23,27,32,.96); }
+    }
+    @media print {
+      .topbar, .cheat-toolbar, .copy, .toast { display: none !important; }
+      body { background: white; color: black; }
+      .wrap { width: 100%; }
+      section { break-inside: avoid; }
+      .skill { break-inside: avoid; }
+      .skill > * { display: block !important; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="topbar">
+    <nav class="nav wrap" aria-label="教程目录">
+      <a class="brand" href="#top">Matt Pocock Skills<small>采用与实战手册 · 2026-07-20</small></a>
+      <div class="nav-links">
+        <a href="#install">安装</a><a href="#conflicts">冲突</a><a href="#adoption">采用</a><a href="#lab">实战</a><a href="#cheatsheet">22 项速查</a><a href="#sources">来源</a>
+      </div>
+    </nav>
+  </div>
+
+  <header class="hero" id="top">
+    <div class="wrap">
+      <p class="eyebrow">Decision-first field guide</p>
+      <h1>先决定谁掌舵，<br>再安装技能。</h1>
+      <p class="lede">这不是 README 的中文翻译，而是一份采用决策手册：解释安装范围，找出 Matt Pocock Skills 与现有 gstack、Superpowers 的真实冲突，再给出可执行的最小试用路线。</p>
+      <div class="verdict">
+        <div class="verdict-content">
+          <strong>一句话结论</strong>
+          技能本体可以用户级安装后跨项目复用，但 <code>setup-matt-pocock-skills</code> 是每仓库配置；当前环境不建议一次启用整套，尤其不要让两套同阶段编排器同时自动触发。
+        </div>
+      </div>
+      <div class="stats" aria-label="技能统计">
+        <div class="stat"><b id="stat-total">22</b><span>公开技能</span></div>
+        <div class="stat"><b id="stat-engineering">17</b><span>Engineering</span></div>
+        <div class="stat"><b id="stat-productivity">5</b><span>Productivity</span></div>
+        <div class="stat"><b id="stat-user">13</b><span>用户主动调用</span></div>
+        <div class="stat"><b id="stat-model">9</b><span>模型可调用</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="content">
+    <section id="install">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">01 / INSTALL</span><div><h2>是不是每个项目都要安装一次？</h2><p class="section-intro">把“下载技能”“让 Codex 看见技能”“为当前仓库配置技能”拆开，答案就清楚了。</p></div></div>
+        <div class="install-layers">
+          <article class="layer"><span class="layer-index">L1</span><h3>技能本体</h3><p>通过 skills.sh 复制到项目时，项目各有一份；若安装器选择 Codex 用户级目录，则可以跨项目共用。</p><span class="answer">不一定每项目重复下载</span></article>
+          <article class="layer"><span class="layer-index">L2</span><h3>Agent 可见范围</h3><p>项目级安装便于定制与版本固定；用户级安装便于统一更新，但会让更多项目看到模型调用型技能。</p><span class="answer">作用域是关键选择</span></article>
+          <article class="layer"><span class="layer-index">L3</span><h3>仓库配置</h3><p><code>/setup-matt-pocock-skills</code> 会配置 Tracker、Triage 标签和领域文档布局，官方要求首次使用工程流前按仓库运行。</p><span class="answer">每仓库一次</span></article>
+        </div>
+        <div class="note" style="margin-top:16px"><strong>当前建议：</strong>先不安装。若试用，优先在一个隔离项目中只选 3–4 个独有价值技能；不要先把 9 个模型调用型技能全部放进用户级作用域。</div>
+      </div>
+    </section>
+
+    <section id="positioning">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">02 / POSITION</span><div><h2>三套体系解决的不是同一个问题</h2><p class="section-intro">重叠来自“都能完成开发”，区别来自它们如何组织决策、执行和交付。</p></div></div>
+        <div class="position-grid">
+          <article class="position-card"><span class="system">mattpocock/skills</span><h3>可组合的工程纪律</h3><ul><li>以 grilling、领域语言和深模块设计为底层词汇。</li><li>围绕 Tracker 组织 Spec、Tickets、实现与审查。</li><li>用户编排器与模型纪律拆分清晰。</li></ul><p class="best">最强项：领域建模、纵向切片、双轴审查。</p></article>
+          <article class="position-card"><span class="system">gstack</span><h3>端到端工程与交付工具箱</h3><ul><li>覆盖规划、设计、QA、审查、发布、部署与监控。</li><li>带浏览器、设计、报告和发布能力。</li><li>更像完整工作台而非一条开发方法。</li></ul><p class="best">最强项：从计划到发布的完整闭环。</p></article>
+          <article class="position-card"><span class="system">superpowers</span><h3>强制过程门禁</h3><ul><li>创作前 brainstorming、编码前计划、实现时 TDD。</li><li>强调工作树隔离、验证证据和阶段确认。</li><li>通过硬门禁降低代理跳步概率。</li></ul><p class="best">最强项：用强规则保证过程纪律。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="conflicts">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">03 / CONFLICTS</span><div><h2>冲突不是报错，而是流程失去唯一指挥</h2><p class="section-intro">大多数技能不会发生文件名级覆盖。真正的风险是同一阶段出现两个“必须先做 X”的编排器。</p></div></div>
+        <table class="risk-table">
+          <thead><tr><th>冲突类型</th><th>典型组合</th><th>用户看到的后果</th><th>风险</th><th>解决规则</th></tr></thead>
+          <tbody>
+            <tr><td data-label="类型">自动触发竞争</td><td data-label="组合"><code>tdd</code> vs Superpowers TDD</td><td data-label="后果">重复确认 seam、重复执行红绿循环，代理不知道谁的完成标准优先。</td><td data-label="风险"><span class="pill high">高</span></td><td data-label="规则">同一阶段只保留一个模型可调用技能。</td></tr>
+            <tr><td data-label="类型">硬门禁叠加</td><td data-label="组合"><code>grilling</code> vs <code>brainstorming</code></td><td data-label="后果">一轮需求可能经历两次访谈、两份设计说明和多次确认。</td><td data-label="风险"><span class="pill high">高</span></td><td data-label="规则">需求澄清入口三选一。</td></tr>
+            <tr><td data-label="类型">编排嵌套</td><td data-label="组合"><code>implement</code> + executing-plans + gstack ship</td><td data-label="后果">实现、测试、审查与提交被重复编排，链路变长且难以恢复。</td><td data-label="风险"><span class="pill high">高</span></td><td data-label="规则">一个任务只允许一个实现编排器。</td></tr>
+            <tr><td data-label="类型">产物双轨</td><td data-label="组合"><code>CONTEXT.md</code>、ADR、Spec、gstack artifacts</td><td data-label="后果">同一决策写进多个位置，之后互相矛盾，代理无法判断谁是事实源。</td><td data-label="风险"><span class="pill medium">中</span></td><td data-label="规则">预先指定唯一主 PRD、词汇表和决策记录位置。</td></tr>
+            <tr><td data-label="类型">审查重复</td><td data-label="组合"><code>code-review</code> vs gstack review vs requesting-code-review</td><td data-label="后果">相同 diff 被多次审查，基线和严重度口径可能不同。</td><td data-label="风险"><span class="pill high">高</span></td><td data-label="规则">固定一个审查器，并写清 fixed point 与 Spec 来源。</td></tr>
+            <tr><td data-label="类型">Git 收尾冲突</td><td data-label="组合"><code>implement</code>、worktree、ship</td><td data-label="后果">重复 Commit、不同分支策略或在未确认时完成 merge/rebase。</td><td data-label="风险"><span class="pill medium">中</span></td><td data-label="规则">只有一个技能拥有提交与交付权限。</td></tr>
+            <tr><td data-label="类型">上下文膨胀</td><td data-label="组合">多个模型调用型长 Skill</td><td data-label="后果">每轮任务携带更多触发说明，注意力被流程规则分散。</td><td data-label="风险"><span class="pill medium">中</span></td><td data-label="规则">用户级作用域只放高频且不冲突的模型技能。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="adoption">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">04 / ADOPTION</span><div><h2>采用建议：先拿独有价值，不接管整条流水线</h2><p class="section-intro">这是结合当前已安装 gstack 与 Superpowers 得出的教程判断，不是官方评级。</p></div></div>
+        <div class="adoption">
+          <article><h3>建议先试</h3><p>差异化明显、不会自动接管完整交付流程。</p><div class="tag-list"><code>prototype</code><code>domain-modeling</code><code>codebase-design</code><code>teach</code></div></article>
+          <article><h3>按需启用</h3><p>有明确场景时价值高，但需要人工指定边界或外部能力。</p><div class="tag-list"><code>triage</code><code>improve-codebase-architecture</code><code>research</code><code>handoff</code><code>resolving-merge-conflicts</code><code>writing-great-skills</code></div></article>
+          <article><h3>暂缓自动启用</h3><p>与现有体系处在相同控制层，最容易发生双重门禁或重复执行。</p><div class="tag-list"><code>grilling</code><code>tdd</code><code>diagnosing-bugs</code><code>code-review</code><code>implement</code><code>to-spec</code></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">05 / FIELD LAB</span><div><h2>同一个需求，三套体系怎么走</h2><p class="section-intro">案例不是让三套全跑一遍，而是用同一问题看清每一阶段谁应该拥有控制权。</p></div></div>
+        <div class="lab-intro">
+          <div class="case"><small>Scenario</small><h3>给现有 SaaS 增加“团队邀请”功能</h3><p>管理员通过邮件邀请成员；邀请有有效期、可撤销、不可重复接受；需要邮件、权限、状态和审计记录。</p></div>
+          <div class="route-rule"><h3>推荐混合原则</h3><p>允许不同阶段选不同体系，但每个阶段只选一个主技能。上一阶段的产物成为下一阶段唯一输入，不嵌套另一个同类编排器。</p></div>
+        </div>
+        <div class="flow" aria-label="三体系工作流对照">
+          <div class="flow-row"><div class="flow-stage">澄清</div><div class="flow-choice"><strong>Matt</strong>grill-with-docs + domain-modeling</div><div class="flow-choice"><strong>gstack</strong>office-hours / spec 前置讨论</div><div class="flow-choice"><strong>Superpowers</strong>brainstorming</div><div class="flow-pick" title="三选一">1</div></div>
+          <div class="flow-row"><div class="flow-stage">规格</div><div class="flow-choice"><strong>Matt</strong>to-spec，发布到 Tracker</div><div class="flow-choice"><strong>gstack</strong>spec，锁定工程交付规格</div><div class="flow-choice"><strong>Superpowers</strong>writing-plans 前的设计 Spec</div><div class="flow-pick" title="三选一">1</div></div>
+          <div class="flow-row"><div class="flow-stage">拆解</div><div class="flow-choice"><strong>Matt</strong>to-tickets，纵向切片与阻塞边</div><div class="flow-choice"><strong>gstack</strong>计划评审与任务路由</div><div class="flow-choice"><strong>Superpowers</strong>writing-plans，细粒度执行步骤</div><div class="flow-pick" title="三选一">1</div></div>
+          <div class="flow-row"><div class="flow-stage">实现</div><div class="flow-choice"><strong>Matt</strong>implement 内部驱动 tdd</div><div class="flow-choice"><strong>gstack</strong>按既定计划执行并接 QA</div><div class="flow-choice"><strong>Superpowers</strong>executing-plans / subagent-driven</div><div class="flow-pick" title="三选一">1</div></div>
+          <div class="flow-row"><div class="flow-stage">审查</div><div class="flow-choice"><strong>Matt</strong>code-review：Standards + Spec</div><div class="flow-choice"><strong>gstack</strong>review：合入前审查</div><div class="flow-choice"><strong>Superpowers</strong>requesting-code-review</div><div class="flow-pick" title="三选一">1</div></div>
+          <div class="flow-row"><div class="flow-stage">交付</div><div class="flow-choice"><strong>Matt</strong>implement 提交到当前分支</div><div class="flow-choice"><strong>gstack</strong>ship / land-and-deploy</div><div class="flow-choice"><strong>Superpowers</strong>finishing-development-branch</div><div class="flow-pick" title="推荐 gstack">✓</div></div>
+        </div>
+        <div class="note" style="margin-top:18px"><strong>对当前环境的推荐路线：</strong>需求与计划继续使用你已熟悉的主流程；只把 <code>domain-modeling</code> 或 <code>codebase-design</code> 当作词汇层试用；代码审查与交付继续由 gstack 统一收尾。</div>
+      </div>
+    </section>
+
+    <section id="cheatsheet">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">06 / CHEATSHEET</span><div><h2>全部 22 个技能速查</h2><p class="section-intro">搜索用途、产物或重叠技能；展开卡片查看输入、输出、可直接改写的调用示例和官方来源。</p></div></div>
+        <div class="cheat-toolbar" role="search" aria-label="筛选技能">
+          <div class="field"><label for="query">搜索</label><input id="query" type="search" placeholder="例如：测试、ADR、Issue、原型…" autocomplete="off"></div>
+          <div class="field"><label for="category">类别</label><select id="category"><option value="all">全部类别</option><option value="engineering">Engineering</option><option value="productivity">Productivity</option></select></div>
+          <div class="field"><label for="invocation">调用方式</label><select id="invocation"><option value="all">全部方式</option><option value="user">用户主动调用</option><option value="model">模型可调用</option></select></div>
+          <div class="field"><label for="conflict">冲突等级</label><select id="conflict"><option value="all">全部等级</option><option value="high">高</option><option value="medium">中</option><option value="low">低</option></select></div>
+        </div>
+        <div class="result-line"><span>匹配 <strong id="result-count">22</strong> 项</span><button id="reset" type="button" class="copy" style="position:static;color:var(--ink);background:transparent;border-color:var(--line-strong)">清除筛选</button></div>
+        <div id="skill-grid" class="skill-grid"></div>
+        <noscript><p class="note">浏览器禁用了 JavaScript，交互式卡片无法渲染。完整 22 项清单仍保存在同目录的“内容核验清单.md”。</p></noscript>
+      </div>
+    </section>
+
+    <section id="rules">
+      <div class="wrap">
+        <div class="section-head"><span class="section-no">07 / OPERATING RULES</span><div><h2>让三套体系和平共存的 6 条规则</h2><p class="section-intro">关键不是记住所有 Skill，而是为每个控制层指定唯一责任人。</p></div></div>
+        <div class="rules">
+          <article class="rule"><h3>每阶段唯一主流程</h3><p>澄清、规格、实现、测试、审查、交付，每一阶段只能有一个编排器拥有“下一步怎么走”的决定权。</p></article>
+          <article class="rule"><h3>事实源只有一份</h3><p>主 PRD、领域词汇表、ADR 和交付计划分别指定唯一位置；其他页面只引用，不复制改写。</p></article>
+          <article class="rule"><h3>显式调用优先</h3><p>试用期先安装用户调用型技能。模型调用型技能只有在没有同类触发器时才放进用户级作用域。</p></article>
+          <article class="rule"><h3>编排器不调用编排器</h3><p>不要用 Matt <code>implement</code> 再套 Superpowers executing-plans，也不要让两者最后都调用审查和提交。</p></article>
+          <article class="rule"><h3>写权限只给一个收尾器</h3><p>Issue 状态、Commit、Merge、Deploy 都属于外部状态变化；每次任务明确谁能写，其他技能只报告。</p></article>
+          <article class="rule"><h3>先做一个试验仓库</h3><p>记录触发次数、重复步骤、产物位置和真实收益，再决定是否扩展到用户级安装。</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="sources">
+    <div class="wrap footer-grid">
+      <div><h3>来源与边界</h3><p>技能事实来自 <a href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">mattpocock/skills 官方仓库</a>及 22 个公开 <code>SKILL.md</code>，核验日期 2026-07-20。冲突评级和采用建议是基于当前本机技能环境的教程判断。</p></div>
+      <div><h3>版本提示</h3><p>仓库会持续更新。安装前应重新核验 README、frontmatter 与 setup 行为。本教程未安装、运行或修改任何 Matt Pocock Skill。</p><p><a href="#top">返回顶部 ↑</a></p></div>
+    </div>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    // Offline constraint: no CDN scripts or fonts. Native layout and ResizeObserver are used instead of external Pretext.
+    const skills = [
+      {id:"ask-matt",name:"ask-matt",category:"engineering",invocation:"user",purpose:"按当前处境推荐 Matt 技能或完整流程，是这套技能集的人工入口路由器。",whenToUse:"你已安装多项 Matt Skills，但不确定该从哪条流程开始时。",inputs:["当前问题或目标","代码库是否存在","任务规模与当前阶段"],outputs:["推荐技能或主流程","何时分支到原型、研究或交接"],example:"/ask-matt 我有一个现有代码库，想开发跨团队权限功能，应该走哪条流程？",overlaps:["gstack 路由器","Superpowers 自动技能路由"],conflictLevel:"medium",recommendation:"按需启用；只有安装较完整的 Matt 技能集时才有足够路由价值。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/ask-matt/SKILL.md"},
+      {id:"grill-with-docs",name:"grill-with-docs",category:"engineering",invocation:"user",purpose:"用连续单问题访谈澄清方案，同时通过领域建模更新 CONTEXT.md 与必要 ADR。",whenToUse:"已有代码库，需要把模糊想法变成共享理解，并留下长期文档痕迹时。",inputs:["待澄清的计划或设计","现有 CONTEXT.md 与 ADR","代码库事实"],outputs:["已澄清决策","更新后的领域词汇","满足条件的 ADR"],example:"/grill-with-docs 围绕团队邀请功能逐项追问，并同步领域词汇与关键决策。",overlaps:["superpowers:brainstorming","gstack office-hours/spec"],conflictLevel:"high",recommendation:"与 brainstorming、office-hours 三选一作为澄清入口。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md"},
+      {id:"triage",name:"triage",category:"engineering",invocation:"user",purpose:"将外部 Issue 或 PR 经过分类、验证、追问和状态转换，变成可执行 Agent Brief。",whenToUse:"维护者需要处理积压 Bug、外部功能请求或外部 PR 时；不用于 to-tickets 自己生成的 Ticket。",inputs:["Issue/PR 全文与评论","代码库与历史决策","Tracker 标签映射"],outputs:["分类与状态标签","验证结论","Agent Brief 或 needs-info 说明"],example:"/triage 显示所有需要我关注的 Issue，按最旧优先，并标出下一步建议。",overlaps:["gstack landing-report/review","平台原生 Issue 工作流"],conflictLevel:"medium",recommendation:"有真实外部请求队列再启用，避免与另一套自动分诊重复写标签。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/triage/SKILL.md"},
+      {id:"improve-codebase-architecture",name:"improve-codebase-architecture",category:"engineering",invocation:"user",purpose:"寻找可把浅模块变深的架构机会，以可视化 HTML 展示，再访谈选中的候选。",whenToUse:"代码修改热点分散、测试 seam 差或理解一个概念需要跨很多模块时。",inputs:["近期提交热点","CONTEXT.md 与 ADR","代码库结构"],outputs:["自包含架构报告","候选优先级","选中候选的深入决策"],example:"/improve-codebase-architecture 聚焦最近频繁改动的 billing 区域，找出最值得加深的模块。",overlaps:["gstack plan-eng-review","gstack health"],conflictLevel:"medium",recommendation:"建议试用；作为候选发现工具，不与正式架构评审同时运行。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/improve-codebase-architecture/SKILL.md"},
+      {id:"setup-matt-pocock-skills",name:"setup-matt-pocock-skills",category:"engineering",invocation:"user",purpose:"为当前仓库配置 Issue Tracker、Triage 标签和领域文档布局。",whenToUse:"首次在一个仓库使用其他 Matt 工程技能之前，或切换 Tracker/文档布局时。",inputs:["git remote 与仓库结构","现有 AGENTS.md/CLAUDE.md","Tracker 与标签偏好"],outputs:["docs/agents/issue-tracker.md","可选 triage-labels.md","domain.md 与 Agent skills 配置块"],example:"/setup-matt-pocock-skills 先扫描现有配置，展示拟写入内容，等我确认后再修改。",overlaps:["gstack skill routing","现有 AGENTS.md/CLAUDE.md 规则"],conflictLevel:"high",recommendation:"工程流必需，但按仓库执行；写入前核对现有规则与事实源。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/SKILL.md"},
+      {id:"to-spec",name:"to-spec",category:"engineering",invocation:"user",purpose:"把当前对话和代码库理解直接综合为 Spec/PRD，并发布到已配置 Tracker，不重新访谈。",whenToUse:"关键问题已经讨论清楚，需要把现有上下文固化为可交付规格时。",inputs:["当前对话","代码库与领域词汇","测试 seam 决策"],outputs:["问题、方案、用户故事、实现/测试决策与范围","ready-for-agent Spec Issue"],example:"/to-spec 把我们已确认的团队邀请决策整理成 Spec，不再补充访谈。",overlaps:["gstack spec","superpowers:writing-plans 前置 Spec"],conflictLevel:"high",recommendation:"已有统一主 PRD/Spec 流程时暂缓，防止出现平行事实源。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/to-spec/SKILL.md"},
+      {id:"to-tickets",name:"to-tickets",category:"engineering",invocation:"user",purpose:"把 Spec 或计划拆成单会话可完成的纵向 tracer-bullet Tickets，并声明阻塞边。",whenToUse:"工作超过一个实现会话，需要在 Tracker 中表达并行前沿与依赖时。",inputs:["Spec、计划或当前对话","代码库结构","Tracker 配置"],outputs:["逐 Ticket 的端到端交付行为","验收标准","原生或文本阻塞关系"],example:"/to-tickets 将团队邀请 Spec 拆成可单独演示的纵向切片，并标注阻塞关系。",overlaps:["gstack 任务拆解","superpowers:writing-plans"],conflictLevel:"high",recommendation:"只在决定采用 Tracker 驱动交付时启用；不要再生成第二套执行计划。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md"},
+      {id:"implement",name:"implement",category:"engineering",invocation:"user",purpose:"按 Spec 或 Ticket 实现工作，优先内部驱动 tdd，结束时调用 code-review 并提交。",whenToUse:"输入已经是 agent-ready 的 Spec/Ticket，且你希望 Matt 流程接管整个实现阶段时。",inputs:["已确认 Spec 或 Tickets","预先约定的测试 seams","可运行的工程环境"],outputs:["实现与测试","双轴审查","当前分支 Commit"],example:"/implement 实现 Ticket 03，只处理其验收标准，并使用已确认的测试 seam。",overlaps:["superpowers:executing-plans","gstack review/ship"],conflictLevel:"high",recommendation:"当前环境暂缓；它是编排器，不要嵌套另一套实现、审查或提交流程。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/implement/SKILL.md"},
+      {id:"wayfinder",name:"wayfinder",category:"engineering",invocation:"user",purpose:"把超出单会话的巨大模糊工作画成决策地图，逐 Ticket 消除迷雾，不默认执行交付。",whenToUse:"目标很大、路线不可见、多个关键决策互相依赖且无法在一个会话内解决时。",inputs:["目标 destination","Issue Tracker","已知决策与未明确区域"],outputs:["Map Issue","研究/原型/访谈/任务型决策 Tickets","Decisions-so-far 指针"],example:"/wayfinder 为多租户权限重构建立决策地图，只规划到路线清晰，不开始实现。",overlaps:["gstack autoplan/plan-*","Superpowers 多阶段规划"],conflictLevel:"high",recommendation:"只用于真正的大型多会话项目；路线清晰后回到唯一 Spec 流程。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md"},
+      {id:"prototype",name:"prototype",category:"engineering",invocation:"model",purpose:"用明确标记为可丢弃的逻辑终端程序或多变体 UI，回答一个设计问题。",whenToUse:"状态模型难以纸面判断，或必须看到多个 UI 方向才能做决定时。",inputs:["一个清晰的问题","现有运行命令与路由约定","逻辑或 UI 分支选择"],outputs:["可运行 throwaway 原型","显式状态展示","验证结论与临时分支指针"],example:"使用 prototype 做三个团队邀请状态机方案，只回答“撤销与过期如何交互”。",overlaps:["gstack design-shotgun/design-html"],conflictLevel:"medium",recommendation:"建议试用；先限定一个问题，并确认逻辑或 UI 分支。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/prototype/SKILL.md"},
+      {id:"diagnosing-bugs",name:"diagnosing-bugs",category:"engineering",invocation:"model",purpose:"为困难 Bug 建立能捕捉精确症状的紧反馈回路，再最小化、排序假设、插桩、修复和复盘。",whenToUse:"Bug、失败、异常或性能退化无法一眼确定原因，尤其是偶发问题时。",inputs:["用户精确症状","可运行环境或捕获物","代码库与历史决策"],outputs:["一条 red-capable 命令","最小复现","回归测试","根因与架构复盘"],example:"使用 diagnosing-bugs 调查偶发重复邀请；先建立一条能稳定变红的命令，不要先猜原因。",overlaps:["superpowers:systematic-debugging","gstack investigate"],conflictLevel:"high",recommendation:"三选一。当前已有两套同类技能，不建议再开放自动触发。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md"},
+      {id:"research",name:"research",category:"engineering",invocation:"model",purpose:"让后台代理只查高信任一手来源，并把带逐项引用的发现保存为仓库 Markdown。",whenToUse:"决策依赖官方文档、源代码、标准或第一方 API，且阅读工作可以独立进行时。",inputs:["一个具体研究问题","可信来源范围","仓库研究文档惯例"],outputs:["单份带引用研究报告","可供主流程引用的事实"],example:"使用 research 核验 GitHub Issues 原生阻塞关系的 API 能力，只使用官方文档。",overlaps:["gstack scrape/browse","通用 Web research"],conflictLevel:"medium",recommendation:"按需启用；没有子代理时改为顺序研究，并保持一手来源要求。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/research/SKILL.md"},
+      {id:"tdd",name:"tdd",category:"engineering",invocation:"model",purpose:"在用户确认的 public seams 上，以一个失败测试、一个最小实现的纵向切片循环开发。",whenToUse:"用户要求 test-first、红绿循环、集成测试，或 implement 内部需要测试纪律时。",inputs:["已确认行为","预先同意的测试 seams","独立期望值"],outputs:["先红后绿的行为测试","最小实现","逐切片可验证进度"],example:"使用 tdd 在已确认的邀请接受 seam 上实现过期校验，先运行并看到失败。",overlaps:["superpowers:test-driven-development"],conflictLevel:"high",recommendation:"二选一；不要让两套 TDD 同时模型调用。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md"},
+      {id:"domain-modeling",name:"domain-modeling",category:"engineering",invocation:"model",purpose:"主动澄清、压力测试并即时记录领域语言；CONTEXT 只存词汇，难逆真实权衡才写 ADR。",whenToUse:"领域词模糊、同一词多义、代码与业务说法矛盾，或其他技能需要维护领域模型时。",inputs:["用户语言","现有 CONTEXT/CONTEXT-MAP","代码事实与场景"],outputs:["精确领域词汇","更新后的 CONTEXT.md","满足三条件的 ADR"],example:"使用 domain-modeling 区分 Invite、Membership 与 Pending Member，并用边界场景验证。",overlaps:["BMad 领域/决策文档","Superpowers brainstorming"],conflictLevel:"medium",recommendation:"长期代码库值得试用；先规定 CONTEXT 与主 PRD 的职责边界。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md"},
+      {id:"codebase-design",name:"codebase-design",category:"engineering",invocation:"model",purpose:"用深模块、接口、seam、adapter、leverage、locality 统一代码设计与可测试性语言。",whenToUse:"设计/改进模块接口、选择测试 seam、降低浅层转发或提高 AI 可导航性时。",inputs:["当前模块接口与调用者","变化点与测试需求","真实的 adapter 变化"],outputs:["更深模块的接口方向","明确 seam","基于 locality/leverage 的判断"],example:"使用 codebase-design 比较邀请发送模块的两个接口，执行 deletion test 并选择测试 seam。",overlaps:["gstack plan-eng-review"],conflictLevel:"medium",recommendation:"可作为词汇参考层使用，不要让它单独接管整个工程计划。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/codebase-design/SKILL.md"},
+      {id:"code-review",name:"code-review",category:"engineering",invocation:"model",purpose:"从固定基线对同一 diff 分别执行 Standards 与 Spec 两轴审查，并列报告而不混排。",whenToUse:"审查分支、PR、WIP 或指定固定点之后的变更时。",inputs:["固定基线 ref","非空 diff 与 commit 列表","Spec 来源与代码标准"],outputs:["Standards 报告","Spec 符合度报告","各轴发现统计"],example:"使用 code-review 审查 main...HEAD；Spec 来自 Issue #42，两个轴保持分离。",overlaps:["gstack review","superpowers:requesting-code-review"],conflictLevel:"high",recommendation:"三选一；该技能需要并行子代理，默认不要自动触发。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/code-review/SKILL.md"},
+      {id:"resolving-merge-conflicts",name:"resolving-merge-conflicts",category:"engineering",invocation:"model",purpose:"追溯冲突双方的一手意图，逐 hunk 保留兼容意图，验证并完成 merge/rebase。",whenToUse:"Git merge 或 rebase 已经处于冲突状态时。",inputs:["当前 Git 冲突状态","双方 commit/PR/Issue 意图","项目自动检查"],outputs:["已解决并暂存的冲突","通过的类型/测试/格式检查","完成的 merge 或 rebase"],example:"使用 resolving-merge-conflicts 处理当前 rebase；每个 hunk 先追溯双方 Issue，不引入新行为。",overlaps:["人工 Git 冲突流程","gstack ship"],conflictLevel:"medium",recommendation:"按需启用，但官方“永不 abort”立场需要人工监督与可逆性检查。",source:"https://github.com/mattpocock/skills/blob/main/skills/engineering/resolving-merge-conflicts/SKILL.md"},
+      {id:"grill-me",name:"grill-me",category:"productivity",invocation:"user",purpose:"在没有代码库的场景运行一次一个问题的持续访谈，不产生项目领域文档。",whenToUse:"需要压力测试非代码计划、设计或决策，且没有仓库上下文时。",inputs:["待澄清的想法或计划","用户每轮决策"],outputs:["完整决策树上的共同理解"],example:"/grill-me 逐项追问我的 AI 产品定价方案，给出推荐答案，但每次只问一个问题。",overlaps:["superpowers:brainstorming","gstack office-hours"],conflictLevel:"high",recommendation:"三选一；适合无代码库的临时方案讨论。",source:"https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md"},
+      {id:"handoff",name:"handoff",category:"productivity",invocation:"user",purpose:"把当前对话压缩成脱敏交接文档，引用已有产物，供全新会话继续。",whenToUse:"上下文接近上限、需要分支到原型/研究会话或换另一个 Agent 时。",inputs:["当前对话","下一会话目标","已有 Spec/ADR/Commit 等路径"],outputs:["操作系统临时目录中的 Handoff Markdown","建议技能列表"],example:"/handoff 下一会话只负责实现团队邀请 Ticket 02，并引用现有 Spec 和 ADR。",overlaps:["gstack context-save","Codex task handoff"],conflictLevel:"medium",recommendation:"按需使用；团队应统一交接格式与保存位置，避免多份上下文快照。",source:"https://github.com/mattpocock/skills/blob/main/skills/productivity/handoff/SKILL.md"},
+      {id:"teach",name:"teach",category:"productivity",invocation:"user",purpose:"把当前目录作为长期教学空间，以 Mission、Resources、Lesson 和学习记录逐步教学。",whenToUse:"用户希望跨多个会话真正学会一个概念或技能，而不是获得一次性回答时。",inputs:["学习 Mission","可信资源","已有学习记录与用户偏好"],outputs:["MISSION.md 与 RESOURCES.md","短篇 HTML lessons","reference、assets 与 learning-records"],example:"/teach 我想学会设计可靠的 Agent Skills，目标是能独立评审团队内部技能。",overlaps:["通用课程/文档生成"],conflictLevel:"low",recommendation:"独有价值高，建议在独立教学目录试用。",source:"https://github.com/mattpocock/skills/blob/main/skills/productivity/teach/SKILL.md"},
+      {id:"writing-great-skills",name:"writing-great-skills",category:"productivity",invocation:"user",purpose:"用可预测性、调用方式、信息层级、渐进披露、单一事实源等原则指导技能写作。",whenToUse:"创建、编辑或评审 Agent Skill 的结构与触发可靠性时。",inputs:["现有或拟写 Skill","目标调用方式","观察到的失败模式"],outputs:["结构与措辞改进建议","对 context/cognitive load 的取舍","拆分或删减决策"],example:"/writing-great-skills 评审这个 SKILL.md，重点检查触发描述、重复和过早完成风险。",overlaps:["superpowers:writing-skills","系统 skill-creator"],conflictLevel:"medium",recommendation:"作为参考资料按需启用；实际创建流程仍指定一个主 Skill。",source:"https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-great-skills/SKILL.md"},
+      {id:"grilling",name:"grilling",category:"productivity",invocation:"model",purpose:"沿决策树一次只问一个问题；环境能查到的事实先查，真正决策交给用户确认。",whenToUse:"用户要求被持续追问、压力测试想法，或其他 Matt 技能需要访谈原语时。",inputs:["计划、决策或想法","已查明的环境事实","用户逐项回答"],outputs:["逐分支解决的决策树","双方共同理解"],example:"使用 grilling 压力测试团队邀请方案；每次只问一个问题，并给出推荐答案。",overlaps:["superpowers:brainstorming"],conflictLevel:"high",recommendation:"不要与 brainstorming 同时模型触发；选定一个访谈原语。",source:"https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md"}
+    ];
+
+    const labels = {
+      category: { engineering: "Engineering", productivity: "Productivity" },
+      invocation: { user: "用户主动", model: "模型可调用" },
+      conflict: { high: "高冲突", medium: "中冲突", low: "低冲突" }
+    };
+
+    const grid = document.getElementById("skill-grid");
+    const query = document.getElementById("query");
+    const category = document.getElementById("category");
+    const invocation = document.getElementById("invocation");
+    const conflict = document.getElementById("conflict");
+    const count = document.getElementById("result-count");
+    const toast = document.getElementById("toast");
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[char]);
+    }
+
+    function renderList(items) {
+      return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+    }
+
+    function renderSkills(items) {
+      count.textContent = items.length;
+      if (!items.length) {
+        grid.innerHTML = `<div class="empty"><strong>没有匹配结果</strong><br>尝试清除某个筛选条件，或搜索技能名称。</div>`;
+        return;
+      }
+      grid.innerHTML = items.map(skill => `
+        <details class="skill" id="skill-${escapeHtml(skill.id)}">
+          <summary>
+            <div class="skill-top">
+              <span class="skill-name">${escapeHtml(skill.name)}</span>
+              <span class="micro">${labels.category[skill.category]}</span>
+              <span class="micro">${labels.invocation[skill.invocation]}</span>
+              <span class="pill ${skill.conflictLevel}">${labels.conflict[skill.conflictLevel]}</span>
+            </div>
+            <div class="skill-purpose">${escapeHtml(skill.purpose)}</div>
+          </summary>
+          <div class="skill-body">
+            <div class="callout"><strong>何时用：</strong>${escapeHtml(skill.whenToUse)}</div>
+            <div class="skill-facts">
+              <div><h4>需要什么</h4>${renderList(skill.inputs)}</div>
+              <div><h4>会产出什么</h4>${renderList(skill.outputs)}</div>
+            </div>
+            <h4>可直接改写的调用示例</h4>
+            <div class="prompt"><span>${escapeHtml(skill.example)}</span><button type="button" class="copy" data-copy="${escapeHtml(skill.example)}">复制</button></div>
+            <div class="callout"><strong>重叠：</strong>${escapeHtml(skill.overlaps.join("、"))}<br><strong>本教程建议：</strong>${escapeHtml(skill.recommendation)}</div>
+            <p class="skill-source"><a href="${escapeHtml(skill.source)}" target="_blank" rel="noreferrer">查看官方 SKILL.md ↗</a></p>
+          </div>
+        </details>`).join("");
+    }
+
+    function applyFilters() {
+      const term = query.value.trim().toLowerCase();
+      const filtered = skills.filter(skill => {
+        const haystack = [skill.name, skill.purpose, skill.whenToUse, skill.example, skill.recommendation, ...skill.inputs, ...skill.outputs, ...skill.overlaps].join(" ").toLowerCase();
+        return (!term || haystack.includes(term))
+          && (category.value === "all" || skill.category === category.value)
+          && (invocation.value === "all" || skill.invocation === invocation.value)
+          && (conflict.value === "all" || skill.conflictLevel === conflict.value);
+      });
+      renderSkills(filtered);
+    }
+
+    async function copyPrompt(text, button) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.setAttribute("readonly", "");
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      const original = button.textContent;
+      button.textContent = "已复制";
+      toast.classList.add("show");
+      window.setTimeout(() => { button.textContent = original; toast.classList.remove("show"); }, 1200);
+    }
+
+    [query, category, invocation, conflict].forEach(control => control.addEventListener("input", applyFilters));
+    document.getElementById("reset").addEventListener("click", () => {
+      query.value = ""; category.value = "all"; invocation.value = "all"; conflict.value = "all"; applyFilters(); query.focus();
+    });
+    grid.addEventListener("click", event => {
+      const button = event.target.closest("[data-copy]");
+      if (button) copyPrompt(button.dataset.copy, button);
+    });
+
+    document.getElementById("stat-total").textContent = skills.length;
+    document.getElementById("stat-engineering").textContent = skills.filter(s => s.category === "engineering").length;
+    document.getElementById("stat-productivity").textContent = skills.filter(s => s.category === "productivity").length;
+    document.getElementById("stat-user").textContent = skills.filter(s => s.invocation === "user").length;
+    document.getElementById("stat-model").textContent = skills.filter(s => s.invocation === "model").length;
+    renderSkills(skills);
+
+    new ResizeObserver(() => document.documentElement.style.setProperty("--viewport", `${window.innerWidth}px`)).observe(document.body);
+  </script>
+</body>
+</html>

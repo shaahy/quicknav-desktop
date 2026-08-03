@@ -31,7 +31,8 @@ describe('store', () => {
     data.cards.push({
       id: 'test-id', name: 'test', note: null,
       fileReference: { relativePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
-      categoryIds: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+      categoryIds: [], isFavorite: false,
+      createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     })
     const saveResult = saveAppData(tmpDir, data)
     expect(saveResult.success).toBe(true)
@@ -42,7 +43,7 @@ describe('store', () => {
     }
   })
 
-  it('loads version 1 absolute paths as version 2 relative paths', () => {
+  it('loads version 1 absolute paths as version 3 relative paths with favorites initialized', () => {
     fs.mkdirSync(tmpDir, { recursive: true })
     const absolutePath = path.resolve(tmpDir, '..', 'tutorials', 'guide.html')
     const legacyData = {
@@ -71,11 +72,155 @@ describe('store', () => {
 
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.version).toBe(2)
+      expect(result.data.version).toBe(3)
       expect(result.data.cards[0].fileReference.relativePath).toBe(
         path.relative(tmpDir, absolutePath).replace(/\\/g, '/'),
       )
       expect(result.data.cards[0].fileReference).not.toHaveProperty('absolutePath')
+      expect(result.data.cards[0].isFavorite).toBe(false)
+      expect(result.data.viewOrders).toContainEqual({
+        viewType: 'favorites',
+        cardIds: [],
+      })
+    }
+  })
+
+  it('keeps mixed relative and cross-drive absolute paths unchanged on round-trip', () => {
+    const data = emptyAppData()
+    const now = new Date().toISOString()
+    data.cards.push(
+      {
+        id: 'relative-card', name: 'relative', note: null,
+        fileReference: { relativePath: '../docs/relative.txt', fileName: 'relative', extension: 'txt', fileSize: 1, mtimeMs: 0 },
+        categoryIds: [], isFavorite: false, createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'absolute-card', name: 'absolute', note: null,
+        fileReference: { relativePath: 'C:/Users/MSI/Desktop/absolute.txt', fileName: 'absolute', extension: 'txt', fileSize: 1, mtimeMs: 0 },
+        categoryIds: [], isFavorite: false, createdAt: now, updatedAt: now,
+      },
+    )
+
+    expect(saveAppData(tmpDir, data).success).toBe(true)
+    const result = loadAppData(tmpDir)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.cards.map(card => card.fileReference.relativePath)).toEqual([
+        '../docs/relative.txt',
+        'C:/Users/MSI/Desktop/absolute.txt',
+      ])
+    }
+  })
+
+  it('loads version 2 data as version 3 without changing existing relationships or order', () => {
+    fs.mkdirSync(tmpDir, { recursive: true })
+    const legacyData = {
+      version: 2,
+      cards: [{
+        id: 'legacy-v2',
+        name: 'Legacy V2',
+        note: null,
+        fileReference: {
+          relativePath: '../guide.html',
+          fileName: 'guide',
+          extension: 'html',
+          fileSize: 100,
+          mtimeMs: 0,
+        },
+        categoryIds: ['cat-1'],
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      }],
+      categories: [{
+        id: 'cat-1',
+        name: '资料',
+        order: 0,
+        type: 'user',
+        createdAt: '2024-01-01T00:00:00.000Z',
+      }],
+      viewOrders: [
+        { viewType: 'allCards', cardIds: ['legacy-v2'] },
+        { viewType: 'category:cat-1', cardIds: ['legacy-v2'] },
+        { viewType: 'uncategorized', cardIds: [] },
+      ],
+    }
+    fs.writeFileSync(getDataPath(tmpDir), JSON.stringify(legacyData), 'utf-8')
+
+    const result = loadAppData(tmpDir)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.version).toBe(3)
+      expect(result.data.cards[0]).toMatchObject({
+        id: 'legacy-v2',
+        categoryIds: ['cat-1'],
+        isFavorite: false,
+      })
+      expect(result.data.viewOrders).toEqual([
+        { viewType: 'allCards', cardIds: ['legacy-v2'] },
+        { viewType: 'category:cat-1', cardIds: ['legacy-v2'] },
+        { viewType: 'uncategorized', cardIds: [] },
+        { viewType: 'favorites', cardIds: [] },
+      ])
+    }
+  })
+
+  it('reconciles version 3 favorite membership with favorite view order', () => {
+    fs.mkdirSync(tmpDir, { recursive: true })
+    const data = {
+      version: 3,
+      cards: [
+        {
+          id: 'favorite-a',
+          name: 'A',
+          note: null,
+          fileReference: { relativePath: 'a.txt', fileName: 'a', extension: 'txt', fileSize: 1, mtimeMs: 0 },
+          categoryIds: [],
+          isFavorite: true,
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'favorite-b',
+          name: 'B',
+          note: null,
+          fileReference: { relativePath: 'b.txt', fileName: 'b', extension: 'txt', fileSize: 1, mtimeMs: 0 },
+          categoryIds: [],
+          isFavorite: true,
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
+        {
+          id: 'plain',
+          name: 'Plain',
+          note: null,
+          fileReference: { relativePath: 'plain.txt', fileName: 'plain', extension: 'txt', fileSize: 1, mtimeMs: 0 },
+          categoryIds: [],
+          isFavorite: false,
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
+      ],
+      categories: [],
+      viewOrders: [
+        { viewType: 'allCards', cardIds: ['favorite-a', 'favorite-b', 'plain'] },
+        { viewType: 'favorites', cardIds: ['plain', 'favorite-b'] },
+        { viewType: 'uncategorized', cardIds: ['favorite-a', 'favorite-b', 'plain'] },
+      ],
+    }
+    fs.writeFileSync(getDataPath(tmpDir), JSON.stringify(data), 'utf-8')
+
+    const result = loadAppData(tmpDir)
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(
+        result.data.viewOrders.find(viewOrder => viewOrder.viewType === 'favorites')
+      ).toEqual({
+        viewType: 'favorites',
+        cardIds: ['favorite-b', 'favorite-a'],
+      })
     }
   })
 
@@ -153,6 +298,7 @@ describe('store', () => {
       note: null,
       fileReference: { relativePath: '/test.txt', fileName: 'test', extension: 'txt', fileSize: 100, mtimeMs: 0 },
       categoryIds: [],
+      isFavorite: false,
       createdAt: '2024-01-01T00:00:00.000Z',
       updatedAt: '2024-01-01T00:00:00.000Z',
     })
