@@ -98,9 +98,9 @@
 
 ## 运行环境
 
-本项目面向 Windows 10/11。首次在一台电脑上使用时，需要：
+本项目面向 Windows 10/11 和 macOS。首次在一台电脑上使用时，需要：
 
-- [Git for Windows](https://git-scm.com/download/win)，用于克隆和同步仓库；
+- [Git](https://git-scm.com/downloads)，用于克隆和同步仓库；
 - [Node.js](https://nodejs.org/)，推荐 Node.js 24；
 - 首次安装依赖和以后依赖更新时可访问 npm 软件源。
 
@@ -112,9 +112,9 @@
 24+
 ```
 
-当前已验证环境为 Node.js 24.15.0、npm 11.12.1。安装后可在 PowerShell 中确认：
+当前已验证的 Windows 环境为 Node.js 24.15.0、npm 11.12.1。macOS 启动流程仍需在真实 Mac 上完成最终验收。安装后可在 PowerShell 或 macOS 终端中确认：
 
-```powershell
+```shell
 git --version
 node --version
 npm --version
@@ -122,7 +122,7 @@ npm --version
 
 ## 首次安装与启动
 
-克隆仓库后，可以直接双击根目录的 `启动速查.bat`。BAT 会依次：
+克隆仓库后，Windows 可以双击 `启动速查.bat`，macOS 可以双击 `启动速查.command`。两个启动文件都会依次：
 
 1. 检查 `package.json` 和 `package-lock.json`；
 2. 检查 Node.js、npm 和 Node.js 版本；
@@ -134,21 +134,36 @@ npm --version
 
 命令行等价操作：
 
-```powershell
+```shell
 npm ci
 npm run dev
 ```
 
-只安装或更新依赖、不启动应用：
+### Windows 启动参数
 
 ```powershell
 .\启动速查.bat --setup-only
+.\启动速查.bat --check
+```
+
+### macOS 启动参数
+
+只安装或更新依赖、不启动应用：
+
+```shell
+./启动速查.command --setup-only
 ```
 
 只检查环境和依赖状态、不安装也不启动：
 
-```powershell
-.\启动速查.bat --check
+```shell
+./启动速查.command --check
+```
+
+仓库会记录 `.command` 的可执行权限。若 macOS 仍提示 `Permission denied`，在项目根目录执行一次：
+
+```shell
+chmod +x ./启动速查.command
 ```
 
 提交前运行：
@@ -181,6 +196,8 @@ git clone https://github.com/shaahy/quicknav-desktop.git
 
 ## 在另一台电脑使用
 
+### Windows
+
 1. 安装 Git for Windows 和 Node.js 24。
 2. 打开 PowerShell，克隆公开仓库。
 3. 进入仓库目录，双击 `启动速查.bat`，或在 PowerShell 中运行该 BAT。
@@ -191,7 +208,23 @@ cd quicknav-desktop
 .\启动速查.bat
 ```
 
+### macOS
+
+1. 安装 Git 和 Node.js 24。
+2. 打开终端并克隆公开仓库。
+3. 在 Finder 中打开 `quicknav-desktop` 文件夹，双击 `启动速查.command`；也可以直接在终端运行。
+
+```shell
+git clone https://github.com/shaahy/quicknav-desktop.git
+cd quicknav-desktop
+./启动速查.command
+```
+
+第一次运行会根据 Mac 的处理器架构安装对应依赖，不要从 Windows 电脑复制 `node_modules/`。若 macOS 显示安全确认，可在 Finder 中右键该文件并选择“打开”。
+
 由于教程路径相对于 `app-data.json`，请保持仓库内 `app-data.json` 和 `A 教程集合/` 的相对位置不变。
+
+当前38项仓库内资料可以随仓库同步；4项标为“本机/外部工作区资料”的卡片依赖原电脑路径，在同事的 Mac 上不会自动可用。
 
 `node_modules/` 不会上传 GitHub。每台电脑会根据同一个 `package-lock.json` 在本机生成依赖，因此不要在电脑之间复制 `node_modules/`。
 
@@ -217,15 +250,15 @@ git push
 
 不要在两台电脑上同时保留未推送修改。若 `git pull --ff-only` 提示分支已分叉，先停止操作并检查两边的提交，不要强制覆盖。
 
-拉取更新后可以直接双击 `启动速查.bat`。如果 `package-lock.json` 发生变化，BAT 会自动重新执行 `npm ci`。
+拉取更新后可以直接双击 Windows BAT 或 macOS `.command`。如果 `package-lock.json` 发生变化，启动文件会自动重新执行 `npm ci`。
 
 ## 故障排查
 
 ### 提示找不到 Node.js 或 npm
 
-安装 Node.js 24 后关闭并重新打开 PowerShell，再运行：
+安装 Node.js 24 后关闭并重新打开 PowerShell 或 macOS 终端，再运行：
 
-```powershell
+```shell
 node --version
 npm --version
 ```
@@ -242,18 +275,19 @@ npm --version
 
 确认进程已关闭且网络可以访问 npm 软件源，然后在项目根目录重试：
 
-```powershell
+```shell
 npm ci
-.\启动速查.bat
 ```
+
+安装成功后重新双击对应系统的启动文件。
 
 不要把其他电脑的 `node_modules/` 复制进来，也不要把它加入 Git。
 
-### BAT 窗口显示启动失败
+### 启动窗口显示失败
 
 保留窗口中的完整错误信息，并依次运行：
 
-```powershell
+```shell
 npm run lint
 npm test
 npm run build
@@ -263,7 +297,7 @@ npm run build
 
 ### 只想运行应用，不想安装开发环境
 
-源码仓库的 BAT 依赖 Node.js。完全不安装 Node.js 的电脑应使用后续发布到 GitHub Release 的便携版，而不是直接运行源码仓库。
+源码仓库的 BAT 和 `.command` 都依赖 Node.js。完全不安装 Node.js 的电脑应使用后续发布到 GitHub Release 的 Windows 便携版或 macOS 应用包，而不是直接运行源码仓库。
 
 ## 添加新教程
 
