@@ -233,10 +233,11 @@
       },
       "categoryIds": [
         "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
-        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5",
+        "38359d69-187f-437b-a7c2-bd71f353e96a"
       ],
       "createdAt": "2026-07-24T03:11:24.720Z",
-      "updatedAt": "2026-07-28T08:37:46.539Z",
+      "updatedAt": "2026-08-03T11:17:20.673Z",
       "isFavorite": false
     },
     {
@@ -768,6 +769,97 @@
       "isFavorite": false,
       "createdAt": "2026-08-03T03:17:40.130Z",
       "updatedAt": "2026-08-03T03:17:40.130Z"
+    },
+    {
+      "id": "5526f326-bb91-4f2f-8e95-5f50e3421d15",
+      "name": "三款 UI 设计对比与选型教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/三款UI设计技能对比与选型教程.html",
+        "fileName": "三款UI设计技能对比与选型教程",
+        "extension": "html",
+        "fileSize": 44104,
+        "mtimeMs": 1785750143249.9397
+      },
+      "categoryIds": [
+        "38359d69-187f-437b-a7c2-bd71f353e96a"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T11:16:20.449Z",
+      "updatedAt": "2026-08-03T11:17:57.368Z"
+    },
+    {
+      "id": "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
+      "name": "Ponytail × Codex 桌面端｜简明实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Ponytail实战教程.html",
+        "fileName": "Ponytail实战教程",
+        "extension": "html",
+        "fileSize": 41714,
+        "mtimeMs": 1785752297352.242
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T11:16:20.449Z",
+      "updatedAt": "2026-08-03T11:16:20.449Z"
+    },
+    {
+      "id": "5bda62ed-58e1-47d2-b44c-ce35bc86c27e",
+      "name": "Taste Skill  教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Taste Skill 项目教程.html",
+        "fileName": "Taste Skill 项目教程",
+        "extension": "html",
+        "fileSize": 44290,
+        "mtimeMs": 1785749150162.8564
+      },
+      "categoryIds": [
+        "38359d69-187f-437b-a7c2-bd71f353e96a"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T11:16:20.449Z",
+      "updatedAt": "2026-08-03T11:16:20.449Z"
+    },
+    {
+      "id": "d15da457-c138-4521-a6fa-e92aab40cce5",
+      "name": "UI UX Pro Max 教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/UI UX Pro Max 项目教程.html",
+        "fileName": "UI UX Pro Max 项目教程",
+        "extension": "html",
+        "fileSize": 47974,
+        "mtimeMs": 1785753545219.2627
+      },
+      "categoryIds": [
+        "38359d69-187f-437b-a7c2-bd71f353e96a"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-03T11:16:20.449Z",
+      "updatedAt": "2026-08-03T11:16:20.449Z"
+    },
+    {
+      "id": "b344a4c3-9a5c-477f-9889-abfcd95614f8",
+      "name": "Matt+UX+SP完整开发流程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html",
+        "fileName": "Matt-UIUX-Pro-Max-Superpowers工作流教程",
+        "extension": "html",
+        "fileSize": 76934,
+        "mtimeMs": 1785759168802.201
+      },
+      "categoryIds": [
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5",
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": true,
+      "createdAt": "2026-08-03T12:14:36.127Z",
+      "updatedAt": "2026-08-03T12:14:41.007Z"
     }
   ],
   "categories": [
@@ -793,30 +885,37 @@
       "createdAt": "2026-07-28T08:35:54.881Z"
     },
     {
+      "id": "38359d69-187f-437b-a7c2-bd71f353e96a",
+      "name": "UX设计",
+      "order": 3,
+      "type": "user",
+      "createdAt": "2026-08-03T11:14:53.504Z"
+    },
+    {
       "id": "58b460dc-76e8-49ec-960e-e412a7528992",
       "name": "增量开发",
-      "order": 3,
+      "order": 4,
       "type": "user",
       "createdAt": "2026-07-28T08:35:29.064Z"
     },
     {
       "id": "381d7232-65a8-4a56-9033-585d4b220ca2",
       "name": "bug修复",
-      "order": 4,
+      "order": 5,
       "type": "user",
       "createdAt": "2026-07-28T08:35:37.737Z"
     },
     {
       "id": "572e876b-8996-46da-b618-8d5380a94045",
       "name": "工作文档",
-      "order": 5,
+      "order": 6,
       "type": "user",
       "createdAt": "2026-07-24T03:04:28.023Z"
     },
     {
       "id": "6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "name": "其它",
-      "order": 6,
+      "order": 7,
       "type": "user",
       "createdAt": "2026-08-03T02:29:24.578Z"
     }
@@ -846,7 +945,9 @@
         "2b5b1804-5900-4767-8171-d18770af7213",
         "e28970b9-eaff-41ac-af51-850d3ac9a0a9",
         "c302d701-4f34-447c-8bd6-02a402d5c06c",
-        "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af"
+        "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
+        "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
       ]
     },
     {
@@ -893,7 +994,12 @@
         "c302d701-4f34-447c-8bd6-02a402d5c06c",
         "ce94ff41-1a17-4492-8629-71c130051b26",
         "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
-        "2ae7351f-76b0-4a3b-924c-42b48a19ac36"
+        "2ae7351f-76b0-4a3b-924c-42b48a19ac36",
+        "5526f326-bb91-4f2f-8e95-5f50e3421d15",
+        "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
+        "5bda62ed-58e1-47d2-b44c-ce35bc86c27e",
+        "d15da457-c138-4521-a6fa-e92aab40cce5",
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
       ]
     },
     {
@@ -952,7 +1058,8 @@
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
         "9d8dd7fa-7845-406a-9b07-18411732f569",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
-        "3d9b8764-178f-44ea-9ab0-7c7496d98d99"
+        "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
       ]
     },
     {
@@ -967,7 +1074,17 @@
       "cardIds": [
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
-        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35"
+        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+      ]
+    },
+    {
+      "viewType": "category:38359d69-187f-437b-a7c2-bd71f353e96a",
+      "cardIds": [
+        "5526f326-bb91-4f2f-8e95-5f50e3421d15",
+        "5bda62ed-58e1-47d2-b44c-ce35bc86c27e",
+        "d15da457-c138-4521-a6fa-e92aab40cce5",
+        "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0"
       ]
     }
   ]

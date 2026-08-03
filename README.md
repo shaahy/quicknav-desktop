@@ -14,9 +14,9 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **42 张卡片**、**7 个分类**；其中 **38 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **47 张卡片**、**8 个分类**；其中 **43 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
-### AI开发教程（22）
+### AI开发教程（24）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
@@ -40,6 +40,8 @@
 - [n8n 自动化工程手册](<A 教程集合/n8n-complete-guide.html>) · HTML
 - [Ollama 教程](<A 教程集合/ollama-guide.html>) · HTML
 - [Agent Skill 实战教程](<A 教程集合/Agent Skill实战教程/Agent Skill实战教程.html>) · HTML
+- [Ponytail × Codex 桌面端｜简明实战教程](<A 教程集合/Ponytail实战教程.html>) · HTML
+- [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
 
 ### 技能速查（9）
 
@@ -53,12 +55,20 @@
 - [OpenMontage｜技能速查 + 工作流程图](<A 教程集合/openmontage-skill-quicklook.html>) · HTML
 - [Agent Skills 技能速查](<A 教程集合/Agent Skills技能速查/Agent Skills 技能速查.html>) · HTML
 
-### 新产品开发（4）
+### 新产品开发（5）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
 - [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
 - [两种 BMAD 产品设计交付](<A 教程集合/两种BMAD产品设计交付.html>) · HTML
+- [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
+
+### UX设计（4）
+
+- [三款 UI 设计对比与选型教程](<A 教程集合/三款UI设计技能对比与选型教程.html>) · HTML
+- [Taste Skill  教程](<A 教程集合/Taste Skill 项目教程.html>) · HTML
+- [UI UX Pro Max 教程](<A 教程集合/UI UX Pro Max 项目教程.html>) · HTML
+- [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
 
 ### 增量开发（6）
 

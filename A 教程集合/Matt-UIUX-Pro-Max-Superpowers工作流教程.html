@@ -1,0 +1,1407 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Matt+UX+SP完整开发流程</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-2: #f1f5f9;
+      --text: #1e293b;
+      --muted: #64748b;
+      --line: #dbe3ec;
+      --primary: #334155;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --success: #166534;
+      --warning: #92400e;
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+      --focus: #2563eb;
+      --radius: 10px;
+      --shadow: 0 16px 40px rgba(15, 23, 42, .08);
+      --header-h: 72px;
+      --max: 1600px;
+      --sans: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 24px); }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.72;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+    :focus-visible { outline: 3px solid color-mix(in srgb, var(--focus) 72%, white); outline-offset: 3px; }
+
+    .skip-link {
+      position: fixed; left: 16px; top: 12px; z-index: 1000;
+      transform: translateY(-160%); padding: 10px 14px;
+      color: white; background: var(--accent); border-radius: 6px;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .progress { position: fixed; inset: 0 0 auto; height: 3px; z-index: 1001; background: transparent; }
+    .progress > span { display: block; width: 0; height: 100%; background: var(--accent); }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      min-height: var(--header-h); border-bottom: 1px solid var(--line);
+      background: rgba(248, 250, 252, .94); backdrop-filter: blur(16px);
+    }
+    .topbar-inner {
+      max-width: var(--max); min-height: var(--header-h); margin: 0 auto; padding: 10px 24px;
+      display: grid; grid-template-columns: minmax(280px, 1fr) minmax(260px, 520px) auto;
+      align-items: center; gap: 20px;
+    }
+    .brand { min-width: 0; min-height: 44px; display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+    .brand-mark {
+      width: 42px; height: 42px; flex: 0 0 auto; display: grid; place-items: center;
+      color: white; background: var(--primary); border-radius: 8px;
+    }
+    .brand-copy { min-width: 0; }
+    .brand-title { display: block; overflow: hidden; font-weight: 750; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+    .brand-sub { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+
+    .search-wrap { position: relative; }
+    .search-icon { position: absolute; left: 14px; top: 50%; width: 18px; height: 18px; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #search {
+      width: 100%; height: 44px; padding: 0 98px 0 42px;
+      color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(15,23,42,.03);
+    }
+    #search::placeholder { color: #8290a2; }
+    .search-meta { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 12px; }
+
+    .toolbar { display: flex; gap: 8px; }
+    .icon-button {
+      width: 44px; height: 44px; display: inline-grid; place-items: center;
+      color: var(--primary); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; cursor: pointer;
+      transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+    }
+    .icon-button:hover { background: var(--surface-2); border-color: #b9c6d5; }
+    .icon-button:active { transform: scale(.96); }
+    .icon-button svg { width: 20px; height: 20px; }
+    #menuButton { display: none; }
+
+    .page {
+      max-width: var(--max); margin: 0 auto; padding: 32px 24px 88px;
+      display: grid; grid-template-columns: 250px minmax(0, 820px) 220px; justify-content: center; gap: 40px;
+    }
+    .rail { min-width: 0; }
+    .rail-inner { position: sticky; top: calc(var(--header-h) + 24px); max-height: calc(100dvh - var(--header-h) - 48px); overflow: auto; }
+    .eyebrow { margin: 0 0 10px; color: var(--muted); font: 700 11px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+    .toc, .phase-list { margin: 0; padding: 0; list-style: none; }
+    .toc a, .phase-list a {
+      min-height: 44px; display: flex; align-items: center; margin: 2px 0; padding: 7px 10px; color: var(--muted); border-left: 2px solid transparent;
+      font-size: 13px; line-height: 1.4; text-decoration: none; border-radius: 0 6px 6px 0;
+    }
+    .toc a:hover, .phase-list a:hover { color: var(--text); background: var(--surface-2); }
+    .toc a.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 650; }
+    .toc .level-3 a { padding-left: 22px; font-size: 12px; }
+    .rail-note { margin-top: 22px; padding: 14px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
+    .rail-note strong { display: block; margin-bottom: 4px; color: var(--text); }
+
+    main { min-width: 0; }
+    .article-shell { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    #article { padding: clamp(26px, 5vw, 64px); }
+    #article > :first-child { margin-top: 0; }
+    #article h1, #article h2, #article h3, #article h4 { color: #0f172a; line-height: 1.28; letter-spacing: -.025em; }
+    #article h1 { max-width: 19ch; margin: 0 0 18px; font-size: clamp(34px, 5vw, 58px); font-weight: 800; }
+    #article h2 { margin: 64px 0 20px; padding-top: 8px; font-size: clamp(25px, 3vw, 34px); font-weight: 760; }
+    #article h3 { margin: 38px 0 14px; font-size: 21px; font-weight: 720; }
+    #article h4 { margin: 28px 0 10px; font-size: 17px; }
+    #article p { margin: 0 0 16px; }
+    #article > p:first-of-type { color: var(--muted); font-size: 18px; }
+    #article strong { color: #0f172a; }
+    #article hr { height: 1px; margin: 48px 0; background: var(--line); border: 0; }
+    #article blockquote { margin: 22px 0; padding: 14px 18px; color: #334155; background: #eff6ff; border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; }
+    #article blockquote p:last-child { margin-bottom: 0; }
+    #article ul, #article ol { margin: 0 0 20px; padding-left: 25px; }
+    #article li { margin: 7px 0; padding-left: 4px; }
+    #article li::marker { color: var(--accent); font-weight: 700; }
+    #article code { padding: .13em .36em; color: #9f1239; background: #fff1f2; border-radius: 4px; font: .88em/1.5 var(--mono); overflow-wrap: anywhere; }
+    .code-wrap { position: relative; margin: 18px 0 24px; }
+    #article pre { margin: 0; padding: 20px; overflow: auto; color: var(--code-text); background: var(--code-bg); border: 1px solid #1e293b; border-radius: 8px; font: 13px/1.65 var(--mono); tab-size: 2; }
+    #article pre code { padding: 0; color: inherit; background: transparent; border-radius: 0; font: inherit; overflow-wrap: normal; }
+    .copy-code {
+      position: absolute; top: 8px; right: 8px; min-width: 72px; height: 44px; padding: 0 12px;
+      color: #cbd5e1; background: #1e293b; border: 1px solid #334155; border-radius: 6px; cursor: pointer; font-size: 12px;
+    }
+    .copy-code:hover { color: white; background: #334155; }
+    .table-wrap { margin: 20px 0 28px; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+    #article table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    #article th, #article td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    #article th { color: #0f172a; background: var(--surface-2); font-weight: 700; }
+    #article tr:last-child td { border-bottom: 0; }
+    #article mark { padding: 1px 2px; color: #451a03; background: #fde68a; border-radius: 2px; }
+
+    .callout {
+      margin-bottom: 20px; padding: 18px 20px; display: grid; grid-template-columns: auto 1fr; gap: 12px;
+      color: #1e3a8a; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius);
+    }
+    .callout svg { width: 22px; height: 22px; margin-top: 2px; }
+    .callout strong { display: block; color: #172554; }
+    .callout p { margin: 4px 0 0; font-size: 14px; }
+
+    .phase-list a { position: relative; padding-left: 34px; }
+    .phase-list a::before {
+      content: attr(data-index); position: absolute; left: 7px; top: 12px;
+      width: 19px; height: 19px; display: grid; place-items: center;
+      color: var(--muted); background: var(--surface-2); border-radius: 50%; font: 700 10px/1 var(--mono);
+    }
+    .phase-list a.done { color: var(--success); }
+    .phase-list a.done::before { color: white; background: var(--success); }
+
+    .back-top {
+      position: fixed; right: 22px; bottom: 22px; z-index: 80;
+      width: 46px; height: 46px; display: grid; place-items: center;
+      color: white; background: var(--primary); border: 0; border-radius: 8px; box-shadow: var(--shadow); cursor: pointer;
+      opacity: 0; pointer-events: none; transform: translateY(10px); transition: .2s ease;
+    }
+    .back-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .back-top svg { width: 20px; }
+
+    .empty-search { display: none; margin: 18px 0; padding: 18px; color: var(--warning); background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; }
+    .empty-search.visible { display: block; }
+
+    @media (max-width: 1180px) {
+      .page { grid-template-columns: 220px minmax(0, 820px); gap: 28px; }
+      .right-rail { display: none; }
+    }
+    @media (max-width: 820px) {
+      :root { --header-h: 64px; }
+      .topbar-inner { min-height: var(--header-h); padding: 9px 16px; grid-template-columns: 1fr auto; gap: 10px; }
+      .brand-sub { display: none; }
+      .search-wrap { grid-column: 1 / -1; grid-row: 2; }
+      .topbar { padding-bottom: 10px; }
+      .toolbar .print-button { display: none; }
+      #menuButton { display: inline-grid; }
+      .page { display: block; padding: 20px 12px 70px; }
+      .left-rail {
+        position: fixed; inset: 0 auto 0 0; z-index: 200; width: min(86vw, 320px); padding: 24px;
+        background: var(--surface); box-shadow: 18px 0 42px rgba(15,23,42,.18);
+        transform: translateX(-105%); transition: transform .22s ease;
+      }
+      .left-rail.open { transform: translateX(0); }
+      .left-rail .rail-inner { position: static; max-height: calc(100dvh - 48px); }
+      .article-shell { border-radius: 8px; }
+      #article { padding: 28px 22px 46px; }
+      #article h1 { font-size: 34px; }
+      #article h2 { margin-top: 48px; }
+      .callout { margin: 0 0 16px; }
+    }
+    @media (max-width: 480px) {
+      .brand-title { font-size: 14px; }
+      .brand-mark { width: 38px; height: 38px; }
+      #article { padding: 24px 18px 40px; }
+      #article h1 { font-size: 30px; }
+      #article h2 { font-size: 25px; }
+      #article pre { padding: 18px 14px; font-size: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      .topbar, .left-rail, .right-rail, .back-top, .progress, .callout, .copy-code { display: none !important; }
+      body { background: white; color: black; font-size: 11pt; }
+      .page { display: block; max-width: none; padding: 0; }
+      .article-shell { border: 0; box-shadow: none; }
+      #article { padding: 0; }
+      #article h1 { max-width: none; font-size: 28pt; }
+      #article h2 { break-before: page; }
+      #article pre { white-space: pre-wrap; color: black; background: #f3f4f6; border-color: #d1d5db; }
+      a { color: black; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" aria-label="返回教程顶部">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M4 5h6v6H4zM14 5h6v6h-6zM4 15h6v4H4zM14 15h6v4h-6z"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-title">UI/UX 工作流教程</span>
+          <span class="brand-sub">MATT × UI UX PRO MAX × SUPERPOWERS</span>
+        </span>
+      </a>
+
+      <label class="search-wrap">
+        <span class="search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        </span>
+        <span class="sr-only" hidden>搜索教程</span>
+        <input id="search" type="search" placeholder="搜索技能、文件或 Gate…" autocomplete="off" aria-describedby="searchMeta">
+        <span id="searchMeta" class="search-meta">Ctrl K</span>
+      </label>
+
+      <div class="toolbar">
+        <button id="menuButton" class="icon-button" type="button" aria-label="打开目录" aria-controls="leftRail" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button class="icon-button print-button" type="button" aria-label="打印或保存为 PDF" title="打印或保存为 PDF" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+    <aside id="leftRail" class="rail left-rail" aria-label="文章目录">
+      <div class="rail-inner">
+        <p class="eyebrow">教程目录</p>
+        <nav><ol id="toc" class="toc"></ol></nav>
+        <div class="rail-note">
+          <strong>离线单文件</strong>
+          无在线字体、CDN、图片或外部模块。可直接双击打开。
+        </div>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <div class="callout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div><strong>推荐用法</strong><p>先读“先看结论”和“最小可执行版本”，再按当前项目阶段进入对应章节。</p></div>
+      </div>
+      <div class="article-shell">
+        <div id="emptySearch" class="empty-search" role="status">没有找到匹配内容，请尝试更短的关键词。</div>
+        <article id="article"></article>
+      </div>
+    </main>
+
+    <aside class="rail right-rail" aria-label="阶段导航">
+      <div class="rail-inner">
+        <p class="eyebrow">13 个阶段</p>
+        <nav><ol id="phaseList" class="phase-list"></ol></nav>
+        <div class="rail-note">
+          <strong>核心原则</strong>
+          规范先确认，原型再验证，Superpowers 最后实施。
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <button id="backTop" class="back-top" type="button" aria-label="返回顶部">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 15 6-6 6 6"/></svg>
+  </button>
+
+  <script id="markdownSource" type="text/plain"># Matt+UX+SP完整开发流程
+
+> 适用场景：使用 Matt Pocock Skills 完成产品定义和需求规格，使用 UI UX Pro Max 完成设计系统与可交互原型，再使用 Superpowers 进行生产实施。
+
+## 先看结论
+
+这套流程的所有操作都在 Codex 桌面端通过对话完成。每一步都由怡哥点名技能，Codex读取项目文件、完成任务、展示结果，并在规定的 Gate 停止等待确认。
+
+完整流程是：
+
+**准备检查 → 产品澄清 → 产品规格 → UI Brief → 视觉方向 → 设计系统 → UI Contract → 原型验证与受控迭代 → 基线冻结与交接 → 实施计划 → 隔离开发 → 三轴审查 → 最终验收**
+
+三个框架的分工：
+
+| 框架 | 主要职责 | 不应越界的事项 |
+|---|---|---|
+| Matt Pocock Skills | 澄清产品、建立领域语言、形成产品规格、制作抛弃式原型 | 不负责把原型直接变成生产代码 |
+| UI UX Pro Max `ui-ux-pro-max` | 研究产品类型、视觉方向、UX 规则、配色和字体建议 | 不替怡哥决定个人审美 |
+| UI UX Pro Max `design-system` | 建立三层 tokens、CSS 变量、组件规格、状态矩阵和设计到代码交接 | 不负责选择未经确认的品牌方向 |
+| UI UX Pro Max `ui-styling` | 根据 tokens 和组件规格制作响应式、可访问的原型与正式界面 | 不得绕过产品规格或直接把原型当生产代码 |
+| Superpowers | 实施计划、隔离开发、TDD、代码审查和完成验证 | 不得推翻已经确认的 UI/UX 契约重新设计 |
+
+这套流程能走通，依赖一条清晰的交付物链：
+
+| 上一阶段输出 | 下一阶段如何使用 |
+|---|---|
+| 领域语言与产品决策 | 约束产品规格的用词、范围和业务规则 |
+| 产品规格 | 决定页面、任务、状态和权限边界 |
+| UI Brief | 决定视觉探索要解决哪些界面问题 |
+| 视觉方向决策 | 决定设计系统的风格、密度和禁止项 |
+| MASTER、三层 tokens、CSS 变量、组件规格与状态矩阵 | 先形成项目级视觉实现权威，再供 UI Contract、原型和生产界面共同引用 |
+| UI/UX 契约 | 在原型之前定义页面结构、导航、交互与验收规则；不得复制或改写设计系统中的 token 定义 |
+| 原型评审记录与一致性报告 | 证明怡哥看过效果并验证正式规范；只有确认规范本身有问题时，才通过变更控制返回对应阶段 |
+| 原型与视觉基准 | 作为可选参考证据帮助理解意图，不属于生产级交付物 |
+| Implementation Plan | 成为生产开发的逐步执行合同 |
+| 实现证据 | 成为代码审查和视觉一致性审查的输入 |
+| 审查报告 | 成为怡哥最终验收和 Git 决策的输入 |
+
+如果某个阶段的输入缺失、互相冲突或尚未确认，Codex 必须停止，不得靠猜测把流程继续走下去。
+
+---
+
+## 一、统一的 Codex 桌面端操作方式
+
+每个阶段都遵循同一套对话模式。
+
+### 1. 打开正确的项目
+
+在 Codex 桌面端选择真正的项目根目录，再为当前阶段新建或继续一个任务。不要把多个产品项目混在同一个工作目录中。
+
+### 2. 在对话中点名技能
+
+对话必须明确写出技能名称，例如：
+
+> 请使用 Matt 的 `grill-with-docs` 技能处理当前阶段。
+
+或者：
+
+> 请同时使用 Matt 的 `prototype` UI 分支和 `ui-ux-pro-max` 技能制作原型。
+
+### 3. 明确输入文件
+
+不要只说“参考之前的文档”。要把文件路径逐项告诉 Codex，并要求它在执行前确认文件存在、版本正确、内容没有冲突。
+
+### 4. 明确输出文件
+
+每次对话都告诉 Codex需要创建或更新哪些文件。没有写入约定输出文件的结果，只能算聊天建议，不能作为后续阶段的正式输入。
+
+### 5. 明确停止 Gate
+
+每个阶段完成后，Codex只展示结果、自检报告和文件位置，然后停止。怡哥明确确认后，才能进入下一阶段。
+
+### 6. 让 Codex保留证据
+
+需要看界面的阶段必须保留截图；需要验证行为的阶段必须保留测试或检查结果；需要改变 Git 状态的阶段必须单独征求确认。
+
+---
+
+## 二、推荐的项目交付物目录
+
+以下路径是推荐合同。已有项目可以沿用自己的目录，但必须保持一一对应关系。
+
+| 路径 | 用途 | 主要产生阶段 |
+|---|---|---|
+| `CONTEXT.md` | 领域术语和共享语言 | 产品澄清 |
+| `docs/adr/*.md` | 长期有效的重要决策 | 产品澄清 |
+| `.scratch/<feature-slug>/00-readiness-report.md` | 技能、工程和输入准备检查 | 准备检查 |
+| `.scratch/<feature-slug>/01-product-decisions.md` | 本功能已确认问题和未决问题 | 产品澄清 |
+| `.scratch/<feature-slug>/spec.md` | 产品需求规格 | 产品规格 |
+| `.scratch/<feature-slug>/UI-BRIEF.md` | UI 设计任务和状态清单 | UI Brief |
+| `.scratch/<feature-slug>/visual-directions.md` | 视觉方向比较与选择记录 | 视觉方向 |
+| `design-system/<project-slug>/MASTER.md` | 全局设计系统 | 设计系统 |
+| `design-system/<project-slug>/pages/*.md` | 页面级覆盖规则 | 设计系统 |
+| `assets/design-tokens.json` | primitive、semantic、component 三层 tokens 的机器可读定义 | 设计系统 |
+| `assets/design-tokens.css` | 原型与生产界面共同消费的 CSS 变量 | 设计系统 |
+| `docs/ui-ux/<feature-slug>/component-specs.md` | 组件结构、变体、状态和可访问性规格 | 设计系统 |
+| `docs/ui-ux/<feature-slug>/state-matrix.md` | 页面状态与组件状态对应关系 | 设计系统 |
+| `docs/ui-ux/<feature-slug>/token-validation-report.md` | token 完整性与硬编码检查结果 | 设计系统与审查 |
+| `docs/ui-ux/<feature-slug>/UI-CONTRACT.md` | 页面结构、导航、交互、设计系统引用和验收规则 | UI Contract |
+| `.scratch/<feature-slug>/prototype-review.md` | 原型评审结论和修改历史 | 可交互原型 |
+| `.scratch/<feature-slug>/prototype-conformance-report.md` | 原型对设计系统和 UI Contract 的符合性结论 | 可交互原型 |
+| `.scratch/<feature-slug>/design-change-request.md` | 仅在规范本身需要修改时创建的受控变更记录 | 原型迭代 |
+| `docs/ui-ux/<feature-slug>/visual-baselines/*.png` | 可选的视觉参考截图 | 基线冻结与交接 |
+| `docs/ui-ux/<feature-slug>/design-baseline-record.md` | 冻结文件、版本、确认和变更历史 | 基线冻结与交接 |
+| `docs/ui-ux/<feature-slug>/handoff-manifest.md` | 交给 Superpowers 的输入清单与版本记录 | 基线冻结与交接 |
+| `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` | Implementation Plan | 实施计划 |
+| `.scratch/<feature-slug>/implementation-evidence.md` | 实现、测试和验证证据 | 隔离开发 |
+| `.scratch/<feature-slug>/review-report.md` | 规格审查、代码审查和视觉差异 | 三轴审查 |
+| `.scratch/<feature-slug>/acceptance-record.md` | 怡哥最终验收结论 | 最终验收 |
+
+这些文件不是越多越好。它们的价值在于：每个关键决定只有一个权威落点，下一阶段知道应该读取什么。
+
+---
+
+## 阶段 0：准备检查
+
+### 目标
+
+确认 Codex 打开的项目正确，所需技能可用，项目已有文档和并行工作没有被忽略。
+
+### 调用技能
+
+- Matt `setup-matt-pocock-skills`：仅在当前仓库尚未完成 Matt 工作流配置时使用。
+- `ui-ux-pro-max`：确认设计研究与推荐能力可用。
+- `design-system`：确认三层 token 与组件交接能力可用。
+- `ui-styling`：确认原型和界面实现能力可用。
+- Superpowers `using-superpowers`：确认后续可用技能和调用规则。
+
+### 必需输入
+
+| 输入 | 来源 | 检查重点 |
+|---|---|---|
+| 当前项目根目录 | Codex 桌面端工作区 | 是否是目标项目而不是公共父目录 |
+| 根目录代理说明 | `AGENTS.md` 等 | 是否存在确认 Gate、文件位置和 Git 约束 |
+| 已有领域文档 | `CONTEXT.md`、`docs/adr/` | 是否需要沿用既有术语与决策 |
+| 已有需求和设计文件 | 项目当前文档目录 | 是否存在同名功能或旧基线 |
+| 工作区状态 | Codex 只读检查 | 是否有并行任务或用户未提交改动 |
+
+### Codex 对话模板
+
+> 请执行当前功能的准备检查。读取根目录代理说明、现有领域文档、需求文档和设计文档，逐项确认 Matt、`ui-ux-pro-max`、`design-system`、`ui-styling` 与 Superpowers 所需技能是否可用。现在只做只读检查，不安装、不覆盖、不提交。请把发现写入 `.scratch/<feature-slug>/00-readiness-report.md`，列出每个技能的实际入口、可复用资源、缺失项、冲突和建议处理方式，然后停止等待我确认。缺少 `design-system` 或 `ui-styling` 时必须明确报告并征求安装或更新授权，不得用单体技能静默替代。
+
+### 输出文件
+
+| 输出文件 | 必须包含 |
+|---|---|
+| `.scratch/<feature-slug>/00-readiness-report.md` | 项目身份、各技能实际入口、技能可用性、现有权威文件、并行改动、缺失项、阻塞项 |
+
+### 进入下一阶段前的合理性检查
+
+- 报告必须确认目标项目身份。
+- 已有文档必须区分“当前权威”与“历史材料”。
+- 缺失技能或环境变更必须先征求怡哥批准。
+- 并行改动不能被覆盖或当成无关文件删除。
+
+### Gate 0
+
+怡哥确认准备报告和处理方案后，才能开始产品澄清。
+
+---
+
+## 阶段 1：产品澄清与领域语言
+
+### 目标
+
+解决“为谁做、解决什么问题、什么属于范围、业务概念如何命名”，暂时不讨论界面长什么样。
+
+### 调用技能
+
+- Matt `grill-with-docs`。
+- 该技能内部结合 `grilling` 和 `domain-modeling`。
+
+### 必需输入
+
+| 输入文件或信息 | 用途 |
+|---|---|
+| `00-readiness-report.md` | 避免重复已有工作或违反项目约束 |
+| `CONTEXT.md` | 沿用已有领域语言 |
+| 相关 `docs/adr/*.md` | 避免重新讨论已批准决策 |
+| 怡哥的产品想法 | 明确用户、场景、价值和范围 |
+| 现有产品或竞品材料 | 作为事实输入，不直接当作最终需求 |
+
+### Codex 对话模板
+
+> 请使用 Matt 的 `grill-with-docs` 技能澄清当前功能。先读取 `00-readiness-report.md`、`CONTEXT.md` 和相关 ADR。只讨论用户、场景、业务流程、边界、术语和成功标准，不设计 UI，不写实施计划，不写生产代码。每次只问我一个真正未解决的问题。把已确认决定和未决问题持续记录到 `.scratch/<feature-slug>/01-product-decisions.md`，需要更新领域语言或长期决策时再更新 `CONTEXT.md` 和 ADR。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/01-product-decisions.md` | 用户、场景、问题、范围、成功标准、未决问题 |
+| `CONTEXT.md` | 新增或修订后的领域术语 |
+| `docs/adr/*.md` | 本阶段确认的长期设计或架构决策 |
+
+### 进入下一阶段前的合理性检查
+
+- 每个关键术语在决策记录和 `CONTEXT.md` 中含义一致。
+- 范围与不做事项没有互相冲突。
+- 所有影响用户主流程的问题已经解决。
+- UI 偏好可以暂时未决，但产品行为不能含糊。
+
+### Gate 1
+
+怡哥确认产品决策完整后，才能生成产品规格。
+
+---
+
+## 阶段 2：冻结产品规格
+
+### 目标
+
+把已确认对话整理成正式需求规格，成为后续 UI 和开发共同遵守的行为权威。
+
+### 调用技能
+
+- Matt `to-spec`。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `01-product-decisions.md` | 提供已经确认的功能决定 |
+| `CONTEXT.md` | 保证规格使用统一领域语言 |
+| 相关 ADR | 保证规格不违反长期决策 |
+| 现有工程只读分析 | 确认功能边界和可测试接口合理 |
+
+### Codex 对话模板
+
+> 请使用 Matt 的 `to-spec` 技能，把已经确认的产品对话整理成 `.scratch/<feature-slug>/spec.md`。输入是 `01-product-decisions.md`、`CONTEXT.md`、相关 ADR 和现有工程。不要重新访谈，不补充我没有确认的功能。规格必须包含问题、解决方案、完整用户故事、行为决定、测试决定、不做事项和进一步说明。完成自检后展示覆盖关系并停止，不进入 UI 设计。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/spec.md` | 产品问题、用户故事、行为规则、测试边界、不做事项 |
+
+### 进入下一阶段前的合理性检查
+
+- 每项产品决定都能在规格中找到对应位置。
+- 用户故事覆盖正常、异常、权限和恢复流程。
+- 规格描述行为，不提前锁死视觉实现。
+- 不做事项没有被偷偷写回解决方案。
+
+### Gate 2
+
+怡哥确认 `spec.md` 是当前产品行为基线后，才能开始 UI Brief。
+
+---
+
+## 阶段 3：生成 UI Brief
+
+### 目标
+
+把产品行为翻译成 UI 设计问题：用户会看到哪些页面、执行哪些操作、遇到哪些状态。
+
+### 调用技能
+
+- `ui-ux-pro-max`：把已确认视觉方向整理成全局设计建议和页面差异。
+- `design-system`：把建议转成 primitive → semantic → component 三层 tokens、CSS 变量、组件规格和状态矩阵。
+- Codex 的仓库只读分析能力。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 决定页面、任务、状态和业务边界 |
+| `CONTEXT.md` | 决定界面文案使用的领域语言 |
+| 相关 ADR | 约束平台、设备、权限和架构边界 |
+| 现有组件与页面 | 判断应复用什么视觉语言和交互模式 |
+| `00-readiness-report.md` | 识别已有设计资产和并行工作 |
+
+### Codex 对话模板
+
+> 请使用 `ui-ux-pro-max`，读取 `spec.md`、`CONTEXT.md`、相关 ADR 和现有前端界面。现在只创建 `.scratch/<feature-slug>/UI-BRIEF.md`，不生成原型和生产代码。文件必须列出页面与导航、每页核心任务、信息层级、代表性数据、正常与异常状态、窗口或响应式要求、键盘与触摸要求、无障碍要求、已有品牌约束、禁止的视觉方向和仍需我确认的问题。每次只问我一个视觉问题。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/UI-BRIEF.md` | 页面地图、任务、数据、状态、设备、交互、无障碍和视觉约束 |
+
+### 进入下一阶段前的合理性检查
+
+- 每个用户故事至少对应一个页面、流程节点或明确的无界面行为。
+- 每个页面都列出正常、加载、空白、错误、禁用和成功状态中适用的部分。
+- UI Brief 不得新增 `spec.md` 中不存在的业务能力。
+- 平台和尺寸要求必须与 ADR 及现有工程一致。
+
+### Gate 3
+
+怡哥确认 UI Brief 完整后，才能探索视觉方向。
+
+---
+
+## 阶段 4：比较并确认视觉方向
+
+### 目标
+
+让 UI UX Pro Max 基于产品类型、受众、品牌气质和信息密度提出三个真正不同的方向，由怡哥选择或组合。
+
+### 调用技能
+
+- `ui-ux-pro-max`。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `UI-BRIEF.md` | 提供页面、状态、设备和视觉问题 |
+| `spec.md` | 防止视觉方向偏离产品目标 |
+| 现有品牌资产与界面 | 保证新方向与产品已有身份相容 |
+
+### Codex 对话模板
+
+> 请使用 `ui-ux-pro-max`，读取 `UI-BRIEF.md`、`spec.md` 和现有品牌资产，提出三个视觉方向。三个方向必须在版式、信息层级和主要操作方式上有明显区别，不能只是换颜色。每个方向说明风格、布局、配色、字体、密度、组件、动效、无障碍表现、优点、风险和反模式。把比较写入 `.scratch/<feature-slug>/visual-directions.md`，推荐一个方向并说明理由，然后停止等待我选择，不创建原型。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/visual-directions.md` | 三个方向、比较维度、推荐理由、怡哥选择、组合调整和禁止项 |
+
+### 进入下一阶段前的合理性检查
+
+- 三个方向必须结构不同，而不是颜色微调。
+- 每个方向都必须满足 UI Brief 的任务和状态要求。
+- 推荐理由必须联系真实用户结果，而不是只评价“现代”“高级”。
+- 怡哥的颜色、圆角、字号、密度和动效反馈必须写成硬约束。
+
+### Gate 4
+
+怡哥明确选择方向并确认调整项后，才能固化设计系统。
+
+---
+
+## 阶段 5：建立项目级设计系统
+
+### 目标
+
+把已确认的视觉方向工程化为项目级、可复用、可供原型和生产代码共同消费的设计系统。这个阶段只定义视觉语言、tokens、组件和状态，不编写页面流程契约。
+
+### 调用技能
+
+- `ui-ux-pro-max`：整理已确认视觉方向、UX 原则、响应式和无障碍要求。
+- `design-system`：建立三层 tokens、CSS 变量、组件规格与状态矩阵。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `visual-directions.md` | 提供已确认方向、调整项和禁止项 |
+| `UI-BRIEF.md` | 提供页面、状态、设备和无障碍要求 |
+| `spec.md` | 约束产品行为、权限、异常和恢复路径 |
+| 品牌规范或已有品牌资产 | 为 primitive tokens 提供颜色、字体、尺度和形态来源 |
+| 现有设计系统或组件库 | 决定复用、扩展或兼容方式 |
+| 当前工程技术栈与平台约束 | 保证 CSS 变量和组件规则可以在现有工程实施 |
+
+### Codex 对话模板
+
+> 请先使用 `ui-ux-pro-max` 读取已经确认的 `visual-directions.md`、`UI-BRIEF.md`、`spec.md`、品牌资产、现有设计系统和技术栈，整理全局设计原则、UX 约束与真正需要的页面差异。然后使用 `design-system` 建立 primitive → semantic → component 三层 token 体系，生成 MASTER、页面覆盖、`design-tokens.json`、`design-tokens.css`、`component-specs.md`、`state-matrix.md` 和验证报告。已有文件时先读取并报告差异，不得擅自覆盖。完成后停止，不创建 UI Contract，也不制作原型。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `design-system/<project-slug>/MASTER.md` | 供人阅读的设计原则、语义角色、映射关系和使用理由；具体值以 JSON/CSS 为准 |
+| `design-system/<project-slug>/pages/*.md` | 页面级例外，只记录相对 MASTER 的差异 |
+| `assets/design-tokens.json` | primitive、semantic、component 三层 token 定义 |
+| `assets/design-tokens.css` | 原型和生产界面共同消费的 CSS 变量 |
+| `docs/ui-ux/<feature-slug>/component-specs.md` | 组件结构、变体、状态、尺寸和可访问性要求 |
+| `docs/ui-ux/<feature-slug>/state-matrix.md` | 产品状态、页面状态和组件状态的映射 |
+| `docs/ui-ux/<feature-slug>/token-validation-report.md` | token 完整性、引用关系和硬编码检查结果 |
+
+### 进入下一阶段前的合理性检查
+
+- MASTER 必须实现 `visual-directions.md` 中确认的方向，但不与 JSON/CSS 重复维护另一套具体值。
+- primitive 只保存原始值，semantic 必须表达用途，component 只表达组件特例。
+- CSS 变量必须能追溯到 `design-tokens.json`，组件视觉值不能另行硬编码。
+- `component-specs.md` 必须包含适用的默认、悬停、按下、焦点、禁用和错误状态。
+- `state-matrix.md` 的业务状态必须来自 `spec.md` 和 `UI-BRIEF.md`。
+- 设计系统不能新增 `spec.md` 中不存在的产品行为。
+
+### Gate 5
+
+怡哥确认设计系统与所选视觉方向一致、tokens 和组件状态完整后，才能建立 UI Contract。
+
+---
+
+## 阶段 6：建立功能级 UI Contract
+
+### 目标
+
+在设计系统已经确认的基础上，把具体功能的页面结构、导航、交互、响应式、无障碍和验收规则整理为正式契约。UI Contract 负责组合和引用设计系统，不重新定义颜色、尺寸或组件视觉值。
+
+### 调用技能
+
+- `ui-ux-pro-max`：复核页面流程、UX、响应式和无障碍完整性。
+- `design-system`：检查 UI Contract 引用的 token、组件和状态是否真实存在。
+- Codex：整理页面结构、导航、交互和可验证验收规则。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 提供产品行为、权限、异常和恢复路径权威 |
+| `UI-BRIEF.md` | 提供页面、数据、状态、设备和无障碍要求 |
+| `visual-directions.md` | 保留已确认方向和禁止项 |
+| `MASTER.md` 与页面覆盖文件 | 提供全局视觉规则和页面例外 |
+| `design-tokens.json` 与 `design-tokens.css` | 提供可引用的正式 token 名称和 CSS 变量 |
+| `component-specs.md` 与 `state-matrix.md` | 提供组件、变体和状态规则 |
+| `token-validation-report.md` | 证明设计系统已经通过阶段 5 检查 |
+| 当前工程技术栈与平台约束 | 保证契约可以在现有工程中实施 |
+
+### Codex 对话模板
+
+> 请建立功能级 UI Contract。先读取 `spec.md`、`UI-BRIEF.md`、`visual-directions.md`、MASTER、页面覆盖、`design-tokens.json`、`design-tokens.css`、`component-specs.md`、`state-matrix.md`、`token-validation-report.md` 和当前技术栈。由 Codex整理页面结构、导航、交互、响应式、无障碍和验收规则，生成 `docs/ui-ux/<feature-slug>/UI-CONTRACT.md`；使用 `ui-ux-pro-max` 复核 UX 完整性，再使用 `design-system` 检查 UI Contract 引用的 token、组件和状态全部存在。UI Contract 不得复制另一套视觉值，也不得新增 `spec.md` 中不存在的产品行为。最后生成 `design-readiness-report.md`。完成后停止，不制作原型。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `docs/ui-ux/<feature-slug>/UI-CONTRACT.md` | 页面结构、导航、交互、设计系统引用、响应式与验收规则 |
+| `docs/ui-ux/<feature-slug>/design-readiness-report.md` | 设计系统与 UI Contract 的双向一致性、缺失引用、未决项和原型准入结论 |
+
+### 进入下一阶段前的合理性检查
+
+- UI Contract 的产品行为必须与 `spec.md` 一致，不能新增业务能力。
+- UI Contract 只能引用设计系统中的 token 名称、组件和状态，不能复制另一套视觉值。
+- 页面、导航和交互必须覆盖 `UI-BRIEF.md` 中适用的正常、加载、空白、错误、禁用和成功状态。
+- 响应式、键盘操作、焦点顺序、对比度和减少动态效果必须可验证。
+- `design-readiness-report.md` 必须确认设计系统与 UI Contract 双向覆盖完整且没有关键未决项。
+
+### Gate 6
+
+怡哥确认 UI Contract 和设计准备报告后，才能制作原型。此时设计系统与 UI Contract 共同成为原型的正式输入。
+
+---
+
+## 阶段 7：制作、评审与受控迭代原型
+
+### 目标
+
+严格按照已经确认的设计系统和 UI Contract 制作一个忠实原型，让怡哥在生产开发前验证真实的信息层级、状态和交互。原型负责验证规范，不能自动反向定义规范。
+
+### 调用技能
+
+- Matt `prototype` 的 UI 分支：建立与生产代码隔离的抛弃式原型。
+- `ui-styling`：在现有技术栈内消费 tokens、CSS 变量和组件规格。
+- `ui-ux-pro-max`：复核 UX、可访问性、响应式和视觉一致性。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 保证原型表达正确产品行为 |
+| `UI-BRIEF.md` | 保证页面、数据和状态完整 |
+| `MASTER.md` 与页面覆盖文件 | 保证全局视觉和页面例外正确 |
+| `design-tokens.json` 与 `design-tokens.css` | 保证所有视觉值来自正式 tokens |
+| `component-specs.md` 与 `state-matrix.md` | 保证组件结构、变体和状态覆盖正确 |
+| `UI-CONTRACT.md` | 保证页面结构、导航、交互、响应式和验收规则正确 |
+| `design-readiness-report.md` | 证明正式设计输入已通过准入检查 |
+
+### Codex 对话模板
+
+> 请同时使用 Matt 的 `prototype` UI 分支、`ui-styling` 和 `ui-ux-pro-max`，严格读取 `spec.md`、`UI-BRIEF.md`、MASTER、页面覆盖、`design-tokens.json`、`design-tokens.css`、`component-specs.md`、`state-matrix.md`、`UI-CONTRACT.md` 和 `design-readiness-report.md`。先提交原型实施说明并停止，得到我确认后制作一个忠实于正式规范的可交互原型，不再探索未经批准的替代设计。复用现有技术栈，不得擅自引入新框架；使用代表性真实数据，覆盖规定的正常、加载、空白、错误、禁用和成功状态。完成后使用 `ui-ux-pro-max` 复核可访问性、响应式和交互质量，并生成原型评审记录与规范符合性报告。原型必须与生产代码隔离，不连接真实后端。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/ui-prototype/` | 忠实消费正式规范的抛弃式可交互原型 |
+| `.scratch/<feature-slug>/prototype-review.md` | 每轮体验反馈、通过或不通过结论、问题归属和未决项 |
+| `.scratch/<feature-slug>/prototype-conformance-report.md` | 原型对产品规格、设计系统和 UI Contract 的逐项符合性 |
+| `.scratch/<feature-slug>/prototype-baselines/*.png` | 可选的固定页面、状态、尺寸和数据条件截图 |
+| `.scratch/<feature-slug>/design-change-request.md` | 仅在确认正式规范本身有问题时创建；记录原因、影响文件和批准状态 |
+
+### 原型不通过时的四类处理
+
+| 问题归属 | 处理方式 | 是否修改正式规范 |
+|---|---|---|
+| 原型实现错误 | 修正原型，使其重新符合 tokens、组件规格或 UI Contract | 否 |
+| UI Contract 遗漏或错误 | 创建变更记录，返回阶段 6 修改并重新确认 | 是，仅修改 UI Contract 相关内容 |
+| 设计系统缺失或错误 | 创建变更记录，返回阶段 5 修改；完成后重新进入阶段 6 验证引用 | 是，修改对应设计系统文件 |
+| 产品行为错误 | 停止 UI 流程，返回 `spec.md` 对应阶段 | 是，并重新走所有受影响下游阶段 |
+
+任何正式规范变更都必须先得到怡哥确认，完成后重新生成 `design-readiness-report.md`，再制作或更新原型并重新评审，直到通过。不能因为原型做起来方便，就把临时实现反向写成规范。
+
+### 进入下一阶段前的合理性检查
+
+- 原型中的每个页面、状态和交互都能追溯到正式输入。
+- 原型视觉值能追溯到三层 tokens，组件结构能追溯到 `component-specs.md`。
+- `prototype-conformance-report.md` 区分“原型实现偏差”和“正式规范问题”。
+- 不通过项已经按问题归属处理；需要修改规范的都有已批准变更记录。
+- 最近一次原型评审结论为通过，且不存在关键未决项。
+- 原型是验证证据，不是生产代码，也不是 Superpowers 的必需输入。
+
+### Gate 7
+
+只有怡哥确认原型效果通过，并确认符合性报告准确后，才能冻结设计基线。若不通过，则按问题归属返回阶段 5、阶段 6 或产品规格阶段，再重新进入阶段 7。
+
+---
+
+## 阶段 8：冻结设计基线并准备开发交接
+
+### 目标
+
+在不例行改写设计内容的前提下，确认正式设计文件已经通过原型验证，记录版本与权威优先级，并整理 Superpowers 可以逐条消费的开发输入。阶段 8 默认只审查、冻结和交接，不根据原型重新设计。
+
+### 调用技能
+
+- `design-system`：重新检查 tokens、CSS 变量、组件规格、状态矩阵和 UI Contract 引用完整性。
+- `ui-ux-pro-max`：复核已通过原型与正式 UX、可访问性和视觉方向一致。
+- Codex：整理版本、可选证据和交接清单。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 提供产品行为权威 |
+| 已确认设计系统全部文件 | 提供视觉实现权威 |
+| `UI-CONTRACT.md` | 提供页面结构、导航、交互和验收权威 |
+| `design-readiness-report.md` | 证明设计系统与 UI Contract 已双向一致 |
+| `prototype-review.md` | 证明怡哥已确认最终体验 |
+| `prototype-conformance-report.md` | 证明原型对正式规范的符合性 |
+| 已批准的 `design-change-request.md` | 如存在，证明变更已回到对应阶段处理并重新确认 |
+
+原型代码和截图只作为可选参考证据，不定义生产实现，也不能覆盖上述正式文件。
+
+### Codex 对话模板
+
+> 请使用 `design-system` 对 MASTER、页面覆盖、`design-tokens.json`、`design-tokens.css`、`component-specs.md`、`state-matrix.md` 与 `UI-CONTRACT.md` 做最终只读一致性检查；再使用 `ui-ux-pro-max` 对照已经通过的 `prototype-review.md` 和 `prototype-conformance-report.md` 复核 UX、可访问性和视觉方向。默认不得修改正式设计内容。如果发现冲突，先判断是原型偏差还是规范问题：原型偏差返回阶段 7；设计系统问题返回阶段 5，UI Contract 问题返回阶段 6，并先创建或补充 `design-change-request.md` 等待我确认。只有所有检查通过时，才更新验证报告并创建 `handoff-manifest.md`，列明必需生产输入、版本、权威优先级和可选参考证据。把原型放入可选参考并明确禁止复制原型代码。完成后停止，不创建 Implementation Plan。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| 更新后的 `token-validation-report.md` | tokens、CSS 变量、组件规格、状态矩阵和 UI Contract 的一致性结论 |
+| `docs/ui-ux/<feature-slug>/design-baseline-record.md` | 已冻结文件、版本、确认人、确认时间和变更历史 |
+| `docs/ui-ux/<feature-slug>/visual-baselines/*.png` | 可选的固定尺寸视觉参考，不作为生产实现权威 |
+| `docs/ui-ux/<feature-slug>/handoff-manifest.md` | 必需生产输入、可选参考证据、版本记录和权威优先级 |
+
+### 进入下一阶段前的合理性检查
+
+- 阶段 8 没有未经批准地修改任何正式设计内容。
+- 设计系统、UI Contract 和已通过原型之间不存在未解释冲突。
+- 所有历史变更都能追溯到批准记录和重新评审结果。
+- 交接清单不存在路径不明、版本未知或关键未决项。
+- 原型和截图位于“可选参考证据”，临时实现细节没有进入生产合同。
+- 即使移除原型，Superpowers 仍能只凭规格、设计系统和 UI Contract 完整实施。
+
+### Gate 8
+
+怡哥确认冻结记录、最终验证报告和交接清单后，才能创建 Implementation Plan。
+
+---
+
+## 阶段 9：创建并确认 Implementation Plan
+
+### 目标
+
+让 Superpowers 把产品规格与 UI/UX 契约翻译成可测试、可审查、逐步执行的生产实施计划。
+
+### 调用技能
+
+- Superpowers `writing-plans`。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 产品行为权威 |
+| `CONTEXT.md` 与 ADR | 领域语言和长期技术约束 |
+| `UI-CONTRACT.md` | UI 与交互权威 |
+| `MASTER.md` 与页面覆盖文件 | 设计令牌和页面特例 |
+| `design-tokens.json` 与 `design-tokens.css` | 三层 tokens 和生产 CSS 变量的单一事实源 |
+| `component-specs.md` 与 `state-matrix.md` | 组件结构、变体和状态实现合同 |
+| `token-validation-report.md` | 设计到代码交接的完整性证据 |
+| `design-baseline-record.md` | 锁定本次实施应消费的正式设计版本 |
+| `handoff-manifest.md` | 检查输入完整性和版本 |
+
+原型位置、`prototype-review.md` 与 `visual-baselines/*.png` 可以附在交接清单的“可选参考证据”中，但不是创建 Implementation Plan 的必需输入。没有原型代码和截图，流程仍应仅凭产品规格、设计系统和 UI Contract 完整实施。
+
+### Codex 对话模板
+
+> 请使用 Superpowers 的 `writing-plans` 技能创建 Implementation Plan。先读取 `handoff-manifest.md` 并核对全部必需输入。产品行为以 `spec.md` 为准，视觉实现以已冻结设计系统为准：三层 token 读取 `design-tokens.json`，生产 CSS 变量读取 `design-tokens.css`，组件与状态读取 `component-specs.md` 和 `state-matrix.md`；页面结构、导航和交互读取 `UI-CONTRACT.md`。原型和截图如存在只能帮助理解，不得成为代码来源；它们与设计系统冲突时必须停止并报告，不能按原型覆盖规范。计划必须安排 `ui-styling` 在当前技术栈内严格消费设计系统实现正式界面，并覆盖 TDD、全部状态、token 硬编码检查、响应式或窗口尺寸、无障碍、视觉检查和人工验收。当前只创建和自审计划，完成后停止，不写生产代码。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` | 文件结构、任务、接口、测试、提交边界和验证步骤 |
+
+### 进入下一阶段前的合理性检查
+
+- 每条产品要求都有对应实施任务和测试。
+- UI Contract 中的页面、状态和尺寸都有对应实施任务。
+- 计划引用准确文件，不能只写“按设计稿实现”。
+- 计划必须明确消费三层 tokens、CSS 变量、组件规格和状态矩阵，不能让实现者重新发明视觉值。
+- 即使不提供原型，计划也必须能凭正式设计交付物完整实施。
+- 计划没有新增颜色、布局或交互决定。
+- 计划明确区分自动测试、视觉检查和怡哥人工验收。
+
+### Gate 9
+
+怡哥确认 Implementation Plan 后，才能创建隔离工作树和生产代码。
+
+---
+
+## 阶段 10：隔离实施与持续验证
+
+### 目标
+
+严格按已确认计划实施生产代码，并持续保留行为和视觉证据。
+
+### 调用技能
+
+- Superpowers `using-git-worktrees`。
+- Superpowers `subagent-driven-development`，推荐用于逐任务实施；或 `executing-plans`，用于当前任务内分批执行。
+- Superpowers `test-driven-development`。
+- `ui-styling`：只在已确认 tokens、组件规格和当前技术栈约束下实现正式界面。
+- 遇到问题时使用 `systematic-debugging`。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| 已确认 Implementation Plan | 决定任务顺序、文件、接口和测试 |
+| `handoff-manifest.md` | 锁定权威输入版本 |
+| `spec.md` | 验证生产行为 |
+| `UI-CONTRACT.md` | 验证界面与交互 |
+| `design-tokens.json`、`design-tokens.css` | 实现三层 tokens 并阻止硬编码漂移 |
+| `component-specs.md`、`state-matrix.md` | 实现正式组件、变体和全部状态 |
+| MASTER 与页面覆盖文件 | 保持全局方向和页面例外一致 |
+| 当前 Git 和工作树状态 | 避免覆盖并行工作 |
+
+视觉参考截图如果存在，可以用于辅助人工比较，但不是实施任务的视觉值来源。
+
+### Codex 对话模板
+
+> 请按已确认的 Implementation Plan 开始实施。使用 `using-git-worktrees` 创建隔离环境，再使用 `subagent-driven-development` 逐任务执行，并在每个行为切片中遵循 `test-driven-development`。涉及正式界面的任务必须调用 `ui-styling`，读取 `design-tokens.json`、`design-tokens.css`、`component-specs.md`、`state-matrix.md` 和 `UI-CONTRACT.md`，适配当前技术栈实现组件，不得自行换用新框架。每完成一个任务都检查视觉值是否来自 token，并核对 `spec.md` 与已冻结设计系统；可选截图只用于辅助比较。不得直接复制原型代码，不得重新设计。持续把完成项、测试证据、token 检查、视觉检查、偏差和阻塞写入 `.scratch/<feature-slug>/implementation-evidence.md`。遇到输入冲突、权限、不可逆操作或 Git 冲突时停止等待我确认。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| 生产源代码 | 按计划实现的正式功能 |
+| 自动化测试 | 行为、边界和回归测试 |
+| 视觉验证截图 | 固定状态与尺寸下的实现截图 |
+| `.scratch/<feature-slug>/implementation-evidence.md` | 各任务完成情况、测试、截图、差异、阻塞和提交边界 |
+
+### 进入下一阶段前的合理性检查
+
+- 实现证据中的每个任务都能追溯到 Implementation Plan。
+- 每个行为测试都能追溯到 `spec.md`。
+- 每个视觉检查都能追溯到三层 tokens、组件规格、状态矩阵或 UI Contract。
+- 正式组件的视觉值必须能追溯到三层 tokens，不能出现未经批准的硬编码替代。
+- 任何偏离都必须记录原因，不能把偏离后的实现反向当成新规范。
+- “测试通过”不能替代视觉审查和怡哥验收。
+
+### Gate 10
+
+计划任务、自动测试和内部视觉检查完成后，才能进入独立审查；此时仍不能宣称发布完成。
+
+---
+
+## 阶段 11：产品、代码和设计系统三轴审查
+
+### 目标
+
+分别回答三个问题：实现是否符合产品规格、代码是否可靠、最终界面是否严格遵循已冻结设计系统和 UI Contract。
+
+### 调用技能
+
+- Superpowers `requesting-code-review`。
+- Superpowers `verification-before-completion`。
+- `design-system`：复查生产代码的 token 使用、组件状态和硬编码漂移。
+- `ui-ux-pro-max`：视觉一致性、交互和无障碍复审。
+- `ui-styling`：只用于修复审查确认的界面实现问题，不得借审查重新设计。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `spec.md` | 规格符合度审查 |
+| Implementation Plan | 任务完成度审查 |
+| `UI-CONTRACT.md` | UI 与交互符合度审查 |
+| 三层 tokens、组件规格和状态矩阵 | 设计到代码符合度与硬编码审查 |
+| 生产代码与测试 | 代码质量和行为证据 |
+| `implementation-evidence.md` | 定位已知差异、验证结果和遗漏 |
+
+原型和基准截图如果存在，可以作为可选参考帮助发现整体效果偏差；它们不替代设计系统规范，也不能覆盖 token 和组件合同。
+
+### Codex 对话模板
+
+> 请执行独立审查。使用 `requesting-code-review` 检查代码质量和规格符合度，使用 `verification-before-completion` 重新运行真实验证；使用 `design-system` 对照三层 tokens、CSS 变量、组件规格和状态矩阵检查硬编码漂移与状态缺失；再使用 `ui-ux-pro-max` 对照 `UI-CONTRACT.md` 和已冻结设计系统检查页面结构、字体、颜色、间距、响应式、键盘操作、对比度和减少动态效果。原型或截图如存在只能用于辅助发现偏差。需要修复已确认的界面实现问题时调用 `ui-styling`，但不得改变设计基线。不要把内部测试称为发布批准。把发现、严重级别、证据、修复状态和剩余差异写入 `.scratch/<feature-slug>/review-report.md`，并同步更新 `token-validation-report.md`。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/review-report.md` | 产品规格、代码质量、视觉一致性、无障碍和剩余风险 |
+| 最终实现截图 | 固定页面、状态、尺寸和数据条件下的实现证据 |
+| 修复后的代码与测试 | 审查发现对应修复 |
+
+### 进入下一阶段前的合理性检查
+
+- 产品审查与代码审查必须分开给出结论。
+- 视觉对比必须使用与基准一致的页面、状态、尺寸和数据。
+- 所有 Critical、High 和影响核心体验的问题必须关闭或由怡哥明确接受。
+- 报告必须区分“内部验证通过”与“怡哥最终验收”。
+
+### Gate 11
+
+审查报告满足进入条件后，提交怡哥实际体验；不得自动合并、发布或删除工作树。
+
+---
+
+## 阶段 12：怡哥最终验收与收口
+
+### 目标
+
+由怡哥实际体验最终产品，确认行为和视觉都符合预期，再单独决定 Git 集成与后续交付。
+
+### 调用技能
+
+- Superpowers `verification-before-completion`：提供最终验证证据。
+- Superpowers `finishing-a-development-branch`：仅在怡哥已经验收并明确要求处理分支时使用。
+
+### 必需输入
+
+| 输入文件 | 用途 |
+|---|---|
+| `review-report.md` | 了解已关闭问题和剩余风险 |
+| 最终可运行产品 | 怡哥执行真实用户任务 |
+| 已冻结设计系统与 `UI-CONTRACT.md` | 人工判断视觉和交互是否符合正式规范 |
+| 最终实现截图和测试证据 | 验证固定条件下的结果 |
+| Git 分支和工作树清单 | 决定是否集成、保留或清理 |
+
+### Codex 对话模板
+
+> 请整理最终验收包。展示可运行产品、核心任务入口、`review-report.md`、已冻结设计系统、UI Contract、最终实现截图和剩余差异；原型或基准截图如存在，只放在可选参考区。引导我逐项体验，但不要替我判断审美是否通过。把我的结论、接受的差异、需要返工的事项和当前交付边界写入 `.scratch/<feature-slug>/acceptance-record.md`。在我明确验收前，不要合并、发布、删除工作树或清理证据。
+
+### 输出文件
+
+| 输出文件 | 内容 |
+|---|---|
+| `.scratch/<feature-slug>/acceptance-record.md` | 怡哥通过、返工或有条件接受的正式结论 |
+| 最终交付物 | 已验收的产品构建或运行目录 |
+| Git 处理记录 | 在怡哥另行确认后记录合并、保留、推送或清理结果 |
+
+### 进入下一阶段前的合理性检查
+
+- 验收记录必须引用当前审查报告和最终构建。
+- 怡哥接受的差异必须逐项写明，不能概括为“基本一致”。
+- 返工项必须回到对应阶段修正：产品行为回阶段 2，tokens 或组件规则回阶段 5，页面结构或交互回阶段 6，生产实现问题回阶段 10。
+- Git 集成、推送、发布和清理是独立 Gate，不由“验收通过”自动授权。
+
+### Gate 12
+
+只有怡哥明确确认验收结论并另行确认 Git 或交付动作后，流程才真正完成。
+
+---
+
+## 三、端到端输入输出闭环审查
+
+下面这张表用于检查流程能否真正接起来。
+
+| 阶段 | 关键输入 | 关键输出 | 下一阶段依赖 | 断链时如何处理 |
+|---|---|---|---|---|
+| 准备检查 | 项目、代理说明、现有文档 | 准备报告 | 产品澄清读取约束 | 停止，补技能、权限或权威文件 |
+| 产品澄清 | 准备报告、领域文档、产品想法 | 产品决策、领域语言、ADR | 产品规格据此合成 | 继续访谈，每次解决一个问题 |
+| 产品规格 | 产品决策、领域语言、ADR | `spec.md` | UI Brief 提取页面与状态 | 返回产品澄清，不让 UI 阶段猜业务 |
+| UI Brief | 规格、现有界面、平台约束 | `UI-BRIEF.md` | 视觉方向据此设计 | 补页面、状态、设备或无障碍要求 |
+| 视觉方向 | UI Brief、规格、品牌资产 | 方向比较与选择记录 | 设计系统据此固化 | 等怡哥选择，不自动采用推荐 |
+| 设计系统 | 已确认方向、UI Brief、规格、品牌资产、技术栈 | MASTER、三层 tokens、CSS 变量、组件规格、状态矩阵、验证报告 | UI Contract 据此引用视觉规则 | 修正规则冲突、token 越级或缺失状态 |
+| UI Contract | 规格、UI Brief、已确认设计系统、技术栈 | UI Contract、设计准备报告 | 原型据此实现页面结构与交互 | 引用缺失返回设计系统；行为冲突返回产品规格 |
+| 原型验证与受控迭代 | 规格、设计系统、UI Contract、准备报告 | 原型、评审记录、符合性报告、可选变更单 | 通过后才能冻结；不通过按归属回退 | 原型错误只改原型；设计系统问题返回阶段 5；契约问题返回阶段 6；产品错误返回规格 |
+| 基线冻结与交接 | 已通过评审、符合性报告、全部正式设计文件 | 冻结记录、最终验证报告、交接清单 | 实施计划逐项消费正式合同 | 发现冲突就返回责任阶段，不在交接阶段重新设计 |
+| 实施计划 | 规格、设计系统、UI Contract、交接清单 | Implementation Plan | 生产开发逐任务执行 | 返回计划阶段补覆盖，不依赖原型猜实现 |
+| 隔离开发 | 已确认计划和全部权威输入 | 代码、测试、实现证据 | 独立审查核对 | 修复实现或升级真实冲突 |
+| 三轴审查 | 规格、设计系统、UI Contract、代码、证据 | 审查报告、最终截图 | 怡哥最终体验 | 关闭问题或记录明确风险 |
+| 最终验收 | 审查报告、最终产品、基准 | 验收记录、交付结论 | Git 与交付决策 | 退回对应权威阶段返工 |
+
+### 闭环审查的五条硬规则
+
+1. **分层权威**：产品行为以 `spec.md` 为准；视觉实现以三层 tokens、CSS 变量、组件规格和状态矩阵为准；页面结构与交互以 `UI-CONTRACT.md` 为准。
+2. **逐级派生**：下游文件可以细化上游文件，但不能默默改变上游决定。
+3. **有冲突就停止**：规格、UI Contract、设计系统和参考原型不一致时，Codex必须指出冲突并等待怡哥决定；生产实现不能优先服从原型。
+4. **原型验证而不统治规范**：原型只验证已经确认的合同；只有规范本身被确认有误时，才通过变更控制返回责任阶段。Superpowers 不需要原型代码也应能完整实施。
+5. **验证不等于批准**：自动测试、代码审查和截图对比只是内部证据，最终视觉效果由怡哥确认。
+
+---
+
+## 四、最小可执行版本
+
+时间紧时可以压缩文档数量，但不能删除关键 Gate。
+
+| 步骤 | 对话调用技能 | 必需输入 | 必需输出 |
+|---|---|---|---|
+| 1. 产品规格 | Matt `grill-with-docs`、`to-spec` | 产品想法、领域文档 | `spec.md` |
+| 2. UI 任务 | `ui-ux-pro-max` | `spec.md`、现有界面 | `UI-BRIEF.md` |
+| 3. 设计系统 | `ui-ux-pro-max`、`design-system` | UI Brief、设计选择、规格、品牌资产、技术栈 | MASTER、三层 tokens、CSS 变量、组件规格、状态矩阵、验证报告 |
+| 4. UI Contract | `ui-ux-pro-max`、`design-system`、Codex | 规格、UI Brief、已确认设计系统、技术栈 | UI Contract、设计准备报告 |
+| 5. 原型验证 | Matt `prototype`、`ui-styling`、`ui-ux-pro-max` | 规格、设计系统、UI Contract、准备报告 | 原型、评审记录、符合性报告；不通过时按归属受控回退 |
+| 6. 基线冻结与交接 | `design-system`、`ui-ux-pro-max`、Codex | 已通过原型评审、正式设计文件、符合性报告 | 冻结记录、验证报告、交接清单；原型仅可选参考 |
+| 7. 实施计划 | Superpowers `writing-plans` | 规格、设计系统、UI Contract、交接清单 | Implementation Plan |
+| 8. 开发与验收 | Superpowers、`ui-styling` 与验证技能 | 已确认计划和设计系统 | 代码、测试、审查报告、验收记录 |
+
+即使采用最小流程，也必须保留：
+
+- 产品规格确认。
+- 原型确认。
+- UI Contract 确认。
+- Implementation Plan 确认。
+- 最终人工验收。
+
+---
+
+## 五、每次交给 Superpowers 前的检查清单
+
+- [ ] `spec.md` 已经由怡哥确认。
+- [ ] `UI-BRIEF.md` 覆盖页面、数据、状态和设备要求。
+- [ ] 视觉方向选择已经写入文件，不只存在于聊天中。
+- [ ] MASTER 与页面覆盖文件来自已确认方向。
+- [ ] `design-tokens.json`、`design-tokens.css`、`component-specs.md` 和 `state-matrix.md` 已生成并通过一致性检查。
+- [ ] `UI-CONTRACT.md` 已在制作原型前生成，并引用正式设计系统而不重复维护另一套视觉值。
+- [ ] `design-readiness-report.md` 确认设计系统与 UI Contract 双向覆盖完整。
+- [ ] 怡哥已经实际看过界面效果，`prototype-review.md` 记录了通过结论、问题归属和迭代历史。
+- [ ] `prototype-conformance-report.md` 证明原型符合产品规格、设计系统和 UI Contract。
+- [ ] 规范变更如存在，均有已批准的 `design-change-request.md`，并完成对应阶段回退和重新评审。
+- [ ] 可选视觉基准已标明页面、状态、尺寸和数据，并明确只是参考证据。
+- [ ] `handoff-manifest.md` 中没有缺失文件或关键未决项。
+- [ ] Implementation Plan 将分别验证产品行为与视觉一致性。
+- [ ] 原型被标记为非权威参考，不是 Superpowers 的必需输入，也不会直接进入生产。
+- [ ] 任何 Git、发布或清理动作仍保留独立确认 Gate。
+
+只要有一项关键条件不满足，Codex就应停在当前阶段，不让 Superpowers 开始生产开发。
+
+---
+
+## 六、一句话记忆
+
+**Matt 决定做什么，UI UX Pro Max 帮你看见并规范它，怡哥确认它，Superpowers 按合同实现它。**
+
+## 官方资料
+
+- [UI UX Pro Max 仓库](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+- [UI UX Pro Max 中文说明](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/README.zh.md)
+- [UI UX Pro Max design-system 技能说明](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/.claude/skills/design-system/SKILL.md)
+- [UI UX Pro Max ui-styling 技能说明](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/.claude/skills/ui-styling/SKILL.md)
+- [Matt Pocock Skills](https://github.com/mattpocock/skills)
+
+> 工具能力和技能内容会随版本变化。实际执行时，Codex应先读取当前项目和本机实际安装的技能说明，再按本教程定义的 Gate 与交付物合同工作。
+
+  </script>
+  <script>
+    (() => {
+      'use strict';
+
+      const source = document.getElementById('markdownSource').textContent.replace(/^\s*\n/, '');
+      const article = document.getElementById('article');
+      const toc = document.getElementById('toc');
+      const phaseList = document.getElementById('phaseList');
+      const search = document.getElementById('search');
+      const searchMeta = document.getElementById('searchMeta');
+      const emptySearch = document.getElementById('emptySearch');
+      const menuButton = document.getElementById('menuButton');
+      const leftRail = document.getElementById('leftRail');
+      const progressBar = document.getElementById('progressBar');
+      const backTop = document.getElementById('backTop');
+
+      const escapeHtml = value => value
+        .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+
+      const inline = value => {
+        let text = escapeHtml(value);
+        const code = [];
+        text = text.replace(/`([^`]+)`/g, (_, body) => {
+          const index = code.push(`<code>${body}</code>`) - 1;
+          return `@@CODE${index}@@`;
+        });
+        text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+        text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/@@CODE(\d+)@@/g, (_, index) => code[Number(index)]);
+        return text;
+      };
+
+      const isTableDivider = line => /^\s*\|?\s*:?-{3,}/.test(line) && line.includes('|');
+      const tableCells = line => line.trim().replace(/^\||\|$/g, '').split('|').map(cell => cell.trim());
+
+      function renderMarkdown(markdown) {
+        const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+        const output = [];
+        let paragraph = [];
+        let listType = null;
+        let inCode = false;
+        let codeLanguage = '';
+        let codeLines = [];
+        let quoteLines = [];
+
+        const flushParagraph = () => {
+          if (!paragraph.length) return;
+          output.push(`<p>${inline(paragraph.join(' '))}</p>`);
+          paragraph = [];
+        };
+        const closeList = () => {
+          if (!listType) return;
+          output.push(`</${listType}>`);
+          listType = null;
+        };
+        const flushQuote = () => {
+          if (!quoteLines.length) return;
+          output.push(`<blockquote><p>${inline(quoteLines.join(' '))}</p></blockquote>`);
+          quoteLines = [];
+        };
+
+        for (let i = 0; i < lines.length; i += 1) {
+          const line = lines[i];
+          if (inCode) {
+            if (/^```/.test(line.trim())) {
+              output.push(`<div class="code-wrap"><pre data-language="${escapeHtml(codeLanguage)}"><code>${escapeHtml(codeLines.join('\n'))}</code></pre><button class="copy-code" type="button">复制</button></div>`);
+              inCode = false; codeLanguage = ''; codeLines = [];
+            } else codeLines.push(line);
+            continue;
+          }
+          const fence = line.match(/^```\s*([^\s]*)/);
+          if (fence) {
+            flushParagraph(); closeList(); flushQuote();
+            inCode = true; codeLanguage = fence[1] || 'text';
+            continue;
+          }
+          if (/^\s*>/.test(line)) {
+            flushParagraph(); closeList();
+            quoteLines.push(line.replace(/^\s*>\s?/, ''));
+            continue;
+          }
+          flushQuote();
+          if (!line.trim()) { flushParagraph(); closeList(); continue; }
+          if (/^---+$/.test(line.trim())) { flushParagraph(); closeList(); output.push('<hr>'); continue; }
+
+          const heading = line.match(/^(#{1,4})\s+(.+)$/);
+          if (heading) {
+            flushParagraph(); closeList();
+            const level = heading[1].length;
+            output.push(`<h${level}>${inline(heading[2])}</h${level}>`);
+            continue;
+          }
+
+          if (line.includes('|') && i + 1 < lines.length && isTableDivider(lines[i + 1])) {
+            flushParagraph(); closeList();
+            const headers = tableCells(line);
+            i += 2;
+            const rows = [];
+            while (i < lines.length && lines[i].includes('|') && lines[i].trim()) {
+              rows.push(tableCells(lines[i])); i += 1;
+            }
+            i -= 1;
+            output.push('<div class="table-wrap"><table><thead><tr>' + headers.map(cell => `<th>${inline(cell)}</th>`).join('') + '</tr></thead><tbody>' + rows.map(row => '<tr>' + row.map(cell => `<td>${inline(cell)}</td>`).join('') + '</tr>').join('') + '</tbody></table></div>');
+            continue;
+          }
+
+          const unordered = line.match(/^\s*[-*]\s+(.+)$/);
+          const ordered = line.match(/^\s*\d+\.\s+(.+)$/);
+          if (unordered || ordered) {
+            flushParagraph();
+            const nextType = unordered ? 'ul' : 'ol';
+            if (listType !== nextType) { closeList(); output.push(`<${nextType}>`); listType = nextType; }
+            output.push(`<li>${inline((unordered || ordered)[1])}</li>`);
+            continue;
+          }
+          paragraph.push(line.trim());
+        }
+        flushParagraph(); closeList(); flushQuote();
+        if (inCode) output.push(`<div class="code-wrap"><pre><code>${escapeHtml(codeLines.join('\n'))}</code></pre><button class="copy-code" type="button">复制</button></div>`);
+        return output.join('\n');
+      }
+
+      function makeSlug(text, used) {
+        const base = text.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '') || 'section';
+        let slug = base; let index = 2;
+        while (used.has(slug)) slug = `${base}-${index++}`;
+        used.add(slug); return slug;
+      }
+
+      function buildNavigation() {
+        const headings = [...article.querySelectorAll('h2')];
+        const used = new Set();
+        toc.innerHTML = '';
+        phaseList.innerHTML = '';
+        headings.forEach(heading => {
+          heading.id = makeSlug(heading.textContent, used);
+          const item = document.createElement('li');
+          item.className = `level-${heading.tagName.slice(1)}`;
+          item.innerHTML = `<a href="#${heading.id}">${escapeHtml(heading.textContent)}</a>`;
+          toc.appendChild(item);
+        });
+        const phases = headings.filter(h => /^阶段\s*\d+/.test(h.textContent));
+        phases.forEach((heading, index) => {
+          const item = document.createElement('li');
+          const phaseNumber = heading.textContent.match(/^阶段\s*(\d+)/)?.[1] ?? String(index + 1);
+          item.innerHTML = `<a href="#${heading.id}" data-index="${phaseNumber}">${escapeHtml(heading.textContent.replace(/：.*/, ''))}</a>`;
+          phaseList.appendChild(item);
+        });
+
+        if ('IntersectionObserver' in window) {
+          const links = [...toc.querySelectorAll('a')];
+          const byId = new Map(links.map(link => [decodeURIComponent(link.hash.slice(1)), link]));
+          const observer = new IntersectionObserver(entries => {
+            entries.filter(entry => entry.isIntersecting).forEach(entry => {
+              links.forEach(link => link.classList.remove('active'));
+              byId.get(entry.target.id)?.classList.add('active');
+            });
+          }, { rootMargin: '-18% 0px -72% 0px' });
+          headings.forEach(heading => observer.observe(heading));
+        }
+      }
+
+      function clearMarks() {
+        article.querySelectorAll('mark').forEach(mark => mark.replaceWith(document.createTextNode(mark.textContent)));
+        article.normalize();
+      }
+
+      function highlight(term) {
+        clearMarks();
+        emptySearch.classList.remove('visible');
+        const query = term.trim();
+        if (!query) { searchMeta.textContent = 'Ctrl K'; return; }
+        const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT, {
+          acceptNode(node) {
+            if (!node.nodeValue.toLowerCase().includes(query.toLowerCase())) return NodeFilter.FILTER_REJECT;
+            if (node.parentElement.closest('script, style, mark, .copy-code')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+        const expression = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        let count = 0;
+        nodes.forEach(node => {
+          const fragment = document.createDocumentFragment();
+          let last = 0;
+          node.nodeValue.replace(expression, (match, offset) => {
+            fragment.append(node.nodeValue.slice(last, offset));
+            const mark = document.createElement('mark'); mark.textContent = match; fragment.append(mark);
+            last = offset + match.length; count += 1;
+          });
+          fragment.append(node.nodeValue.slice(last)); node.replaceWith(fragment);
+        });
+        searchMeta.textContent = count ? `${count} 处` : '无结果';
+        emptySearch.classList.toggle('visible', count === 0);
+        article.querySelector('mark')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+      }
+
+      article.innerHTML = renderMarkdown(source);
+      buildNavigation();
+
+      document.addEventListener('click', async event => {
+        const copy = event.target.closest('.copy-code');
+        if (copy) {
+          const text = copy.parentElement.querySelector('code').textContent;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const area = document.createElement('textarea'); area.value = text; document.body.append(area); area.select(); document.execCommand('copy'); area.remove();
+          }
+          copy.textContent = '已复制'; setTimeout(() => { copy.textContent = '复制'; }, 1400);
+        }
+        if (event.target.closest('#leftRail a')) {
+          leftRail.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      search.addEventListener('input', () => highlight(search.value));
+      document.addEventListener('keydown', event => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); search.focus(); }
+        if (event.key === 'Escape') { search.value = ''; highlight(''); leftRail.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); }
+      });
+      menuButton.addEventListener('click', () => {
+        const open = leftRail.classList.toggle('open'); menuButton.setAttribute('aria-expanded', String(open));
+      });
+      backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+
+      const updateScroll = () => {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        const ratio = max > 0 ? scrollY / max : 0;
+        progressBar.style.width = `${Math.min(100, Math.max(0, ratio * 100))}%`;
+        backTop.classList.toggle('visible', scrollY > 600);
+        const phases = [...phaseList.querySelectorAll('a')];
+        phases.forEach(link => {
+          const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+          link.classList.toggle('done', Boolean(target && target.getBoundingClientRect().top < innerHeight * .38));
+        });
+      };
+      addEventListener('scroll', updateScroll, { passive: true });
+      updateScroll();
+    })();
+  </script>
+</body>
+</html>

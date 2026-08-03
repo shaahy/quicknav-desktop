@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Taste Skill 中文离线教程：项目定位、适用场景、工作流与技能速查。">
+  <title>Taste Skill 项目教程</title>
+  <style>
+    :root {
+      --paper:#f3efe5; --paper-2:#ebe4d5; --ink:#1b1a17; --muted:#686258;
+      --line:#cfc5b4; --accent:#c4472d; --accent-soft:#f0d8cd; --green:#286755;
+      --panel:#faf7ef; --code:#24221f; --code-ink:#f7f1e5; --shadow:0 18px 45px rgba(48,35,20,.10);
+      --radius:2px; --max:1440px; --nav:248px;
+    }
+    html[data-theme="dark"] {
+      --paper:#181714; --paper-2:#22201c; --ink:#eee8dc; --muted:#aaa296;
+      --line:#454039; --accent:#e66a4b; --accent-soft:#45271f; --green:#70b49f;
+      --panel:#201e1a; --code:#0d0d0c; --code-ink:#f4ecdc; --shadow:0 18px 45px rgba(0,0,0,.28);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"Microsoft YaHei UI","PingFang SC","Noto Sans CJK SC",Arial,sans-serif; line-height:1.72; }
+    button,input { font:inherit; }
+    a { color:inherit; }
+    button:focus-visible,a:focus-visible,input:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+    .skip { position:fixed; top:10px; left:10px; z-index:99; padding:8px 12px; background:var(--ink); color:var(--paper); transform:translateY(-160%); }
+    .skip:focus { transform:none; }
+    .shell { width:min(100%,var(--max)); margin:auto; display:grid; grid-template-columns:var(--nav) 1fr; }
+    .rail { position:sticky; top:0; height:100vh; padding:28px 22px; border-right:1px solid var(--line); display:flex; flex-direction:column; background:var(--paper); z-index:10; }
+    .brand { display:flex; gap:11px; align-items:center; font-weight:900; letter-spacing:-.03em; font-size:19px; }
+    .brand-mark { width:28px; height:28px; border:2px solid var(--ink); display:grid; place-items:center; transform:rotate(-4deg); }
+    .brand-mark:after { content:"T"; color:var(--accent); transform:rotate(4deg); }
+    .rail-note { margin:12px 0 24px; font:12px/1.5 Consolas,monospace; color:var(--muted); }
+    .toc { display:grid; gap:3px; }
+    .toc a { padding:8px 10px; border-left:2px solid transparent; text-decoration:none; color:var(--muted); font-size:13px; }
+    .toc a:hover,.toc a.active { color:var(--ink); border-color:var(--accent); background:var(--accent-soft); }
+    .rail-actions { margin-top:auto; display:grid; gap:10px; }
+    .icon-btn { width:100%; min-height:42px; border:1px solid var(--line); color:var(--ink); background:transparent; cursor:pointer; text-align:left; padding:8px 11px; }
+    .icon-btn:hover { background:var(--panel); }
+    main { min-width:0; }
+    section { padding:88px clamp(28px,6vw,88px); border-bottom:1px solid var(--line); scroll-margin-top:16px; }
+    .hero { min-height:86vh; display:flex; flex-direction:column; justify-content:space-between; padding-top:48px; }
+    .eyebrow { display:flex; align-items:center; gap:10px; font:700 12px/1.3 Consolas,monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); }
+    .eyebrow:before { content:""; width:28px; border-top:2px solid currentColor; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { max-width:920px; margin:58px 0 30px; font-family:Georgia,"SimSun",serif; font-size:clamp(52px,8.4vw,126px); line-height:.92; letter-spacing:-.065em; font-weight:700; }
+    h1 em { color:var(--accent); font-style:italic; }
+    .hero-lead { max-width:770px; font-size:clamp(18px,2vw,25px); line-height:1.55; }
+    .hero-meta { display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--ink); margin-top:70px; }
+    .hero-meta div { padding:18px 18px 0 0; }
+    .hero-meta div+div { border-left:1px solid var(--line); padding-left:18px; }
+    .meta-k { display:block; color:var(--muted); font:11px Consolas,monospace; text-transform:uppercase; margin-bottom:6px; }
+    .meta-v { font-weight:800; }
+    .section-head { display:grid; grid-template-columns:minmax(220px,.65fr) minmax(300px,1fr); gap:40px; margin-bottom:54px; align-items:end; }
+    h2 { margin:12px 0 0; font-family:Georgia,"SimSun",serif; font-size:clamp(38px,5vw,72px); line-height:1; letter-spacing:-.045em; }
+    .section-intro { margin:0; font-size:17px; color:var(--muted); max-width:620px; }
+    .definition { display:grid; grid-template-columns:1.25fr .75fr; gap:20px; }
+    .statement { padding:38px; border:1px solid var(--ink); background:var(--panel); box-shadow:var(--shadow); }
+    .statement strong { display:block; font-family:Georgia,"SimSun",serif; font-size:clamp(26px,3vw,43px); line-height:1.2; margin-bottom:28px; }
+    .not-list { display:grid; gap:10px; }
+    .not-item { border-top:1px solid var(--line); padding:15px 0; display:grid; grid-template-columns:28px 1fr; gap:10px; }
+    .not-item b { color:var(--accent); }
+    .compare { display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--ink); }
+    .compare article { padding:30px; }
+    .compare article+article { border-left:1px solid var(--ink); background:var(--panel); }
+    .tag { display:inline-block; padding:3px 8px; border:1px solid currentColor; font:700 11px Consolas,monospace; text-transform:uppercase; color:var(--muted); }
+    .tag.good { color:var(--green); }
+    .compare h3 { font:700 27px/1.25 Georgia,"SimSun",serif; margin:22px 0; }
+    .compare ul,.plain-list { padding-left:1.2em; margin-bottom:0; }
+    .compare li,.plain-list li { margin:9px 0; }
+    .dials { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:26px; }
+    .dial { padding:24px; border:1px solid var(--line); background:var(--panel); }
+    .dial-num { font:800 42px/1 Consolas,monospace; color:var(--accent); }
+    .dial h3 { margin:22px 0 8px; font-size:17px; }
+    .meter { height:5px; background:var(--paper-2); margin-top:20px; }
+    .meter i { display:block; width:var(--w); height:100%; background:var(--accent); }
+    .scenario-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .scenario { padding:28px; border:1px solid var(--line); background:var(--panel); }
+    .scenario h3 { display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:22px; }
+    .scenario .mark { width:30px; height:30px; display:grid; place-items:center; border:1px solid currentColor; color:var(--green); font-weight:900; }
+    .scenario.no .mark { color:var(--accent); }
+    .scenario p { color:var(--muted); margin-bottom:0; }
+    .workflow { display:grid; grid-template-columns:minmax(250px,.72fr) minmax(320px,1.28fr); border:1px solid var(--ink); background:var(--panel); min-height:470px; }
+    .steps { border-right:1px solid var(--ink); }
+    .step { width:100%; display:grid; grid-template-columns:44px 1fr; gap:12px; border:0; border-bottom:1px solid var(--line); background:transparent; color:var(--ink); padding:16px; cursor:pointer; text-align:left; }
+    .step:last-child { border-bottom:0; }
+    .step:hover,.step.active { background:var(--accent-soft); }
+    .step-num { font:700 13px Consolas,monospace; color:var(--accent); }
+    .step strong { display:block; }
+    .step small { color:var(--muted); }
+    .step-detail { padding:clamp(28px,5vw,58px); display:flex; flex-direction:column; justify-content:center; }
+    .step-detail h3 { font:700 clamp(30px,4vw,52px)/1.08 Georgia,"SimSun",serif; margin:12px 0 20px; }
+    .io-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px; }
+    .io { border-top:2px solid var(--ink); padding-top:13px; }
+    .io b { display:block; font:11px Consolas,monospace; color:var(--accent); margin-bottom:6px; }
+    .tool-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+    .filter { border:1px solid var(--line); background:transparent; color:var(--ink); padding:8px 13px; cursor:pointer; }
+    .filter:hover,.filter.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+    .search { display:block; width:100%; min-height:48px; margin-bottom:18px; padding:10px 14px; border:1px solid var(--ink); background:var(--panel); color:var(--ink); }
+    .skill-list { display:grid; gap:9px; }
+    .skill-card { border:1px solid var(--line); background:var(--panel); }
+    .skill-card[hidden] { display:none; }
+    .skill-head { width:100%; display:grid; grid-template-columns:minmax(170px,.7fr) minmax(240px,1.2fr) 30px; gap:18px; align-items:center; text-align:left; padding:18px 20px; border:0; background:transparent; color:var(--ink); cursor:pointer; }
+    .skill-head:hover { background:var(--paper-2); }
+    .skill-name strong { display:block; font-size:17px; }
+    .skill-name code { color:var(--accent); font-size:12px; overflow-wrap:anywhere; }
+    .skill-summary { color:var(--muted); }
+    .chev { font-size:20px; transition:transform .2s; }
+    .skill-card.open .chev { transform:rotate(45deg); }
+    .skill-body { display:none; padding:0 20px 22px; }
+    .skill-card.open .skill-body { display:block; }
+    .skill-body-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; border-top:1px solid var(--line); padding-top:18px; }
+    .skill-body h4 { margin:0 0 7px; color:var(--accent); font:700 11px Consolas,monospace; text-transform:uppercase; }
+    .skill-body p { margin:0; font-size:14px; }
+    .recipe-tabs { display:flex; gap:0; border-bottom:1px solid var(--ink); }
+    .recipe-tab { flex:1; border:0; border-right:1px solid var(--line); color:var(--muted); background:transparent; padding:15px; cursor:pointer; }
+    .recipe-tab.active { background:var(--ink); color:var(--paper); }
+    .recipe-panel { display:none; grid-template-columns:.8fr 1.2fr; gap:32px; padding:36px; border:1px solid var(--ink); border-top:0; background:var(--panel); }
+    .recipe-panel.active { display:grid; }
+    .recipe-panel h3 { font:700 34px/1.15 Georgia,"SimSun",serif; }
+    .chain { display:grid; gap:10px; counter-reset:chain; }
+    .chain div { counter-increment:chain; display:grid; grid-template-columns:34px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .chain div:before { content:counter(chain); width:28px; height:28px; display:grid; place-items:center; background:var(--accent); color:white; font:700 12px Consolas,monospace; }
+    .codebox { position:relative; min-width:0; margin-top:22px; padding:20px; background:var(--code); color:var(--code-ink); font:13px/1.7 Consolas,"Microsoft YaHei UI",monospace; overflow:auto; overflow-wrap:anywhere; white-space:pre-wrap; }
+    .copy { position:absolute; top:10px; right:10px; border:1px solid #777; background:#333; color:#fff; padding:6px 9px; cursor:pointer; }
+    .limits { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .limit { border-top:4px solid var(--accent); padding:22px 0; }
+    .limit h3 { font-size:20px; }
+    .limit p { color:var(--muted); }
+    .decision { padding:38px; background:var(--ink); color:var(--paper); display:grid; grid-template-columns:.85fr 1.15fr; gap:35px; }
+    .decision h3 { font:700 38px/1.15 Georgia,"SimSun",serif; }
+    .decision p { color:var(--paper-2); }
+    .source-list { display:grid; gap:8px; }
+    .source-list a { color:var(--paper); text-underline-offset:4px; overflow-wrap:anywhere; }
+    footer { padding:36px clamp(28px,6vw,88px); color:var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:20px; }
+    .toast { position:fixed; right:20px; bottom:20px; background:var(--ink); color:var(--paper); padding:10px 14px; opacity:0; transform:translateY(10px); pointer-events:none; transition:.2s; z-index:50; }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:980px) {
+      .shell { display:block; }
+      .rail { position:sticky; height:auto; padding:12px 18px; border-right:0; border-bottom:1px solid var(--line); display:grid; grid-template-columns:minmax(0,1fr) auto; overflow:hidden; }
+      .rail-note,.rail-actions .source-short { display:none; }
+      .toc { grid-column:1/-1; display:flex; width:100%; min-width:0; max-width:100%; overflow:auto; margin-top:10px; }
+      .toc a { white-space:nowrap; border-left:0; border-bottom:2px solid transparent; }
+      .toc a.active { border-bottom-color:var(--accent); }
+      .rail-actions { margin:0; }
+      section { padding-top:68px; }
+      .hero { min-height:auto; }
+      .section-head,.definition,.workflow,.recipe-panel,.decision { min-width:0; grid-template-columns:1fr; }
+      .steps { border-right:0; border-bottom:1px solid var(--ink); display:grid; grid-template-columns:repeat(2,1fr); }
+      .skill-body-grid { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:650px) {
+      section { padding:58px 18px; }
+      .statement { min-width:0; padding:24px; }
+      h1 { font-size:54px; margin-top:42px; }
+      .hero-meta,.compare,.dials,.scenario-grid,.io-grid,.limits { grid-template-columns:1fr; }
+      .hero-meta div+div,.compare article+article { border-left:0; border-top:1px solid var(--line); padding-left:0; }
+      .compare article+article { padding-left:30px; }
+      .steps { grid-template-columns:1fr; }
+      .skill-head { grid-template-columns:1fr 24px; gap:8px; }
+      .skill-summary { grid-column:1/-1; }
+      .skill-body-grid { grid-template-columns:1fr; }
+      .recipe-tabs { display:grid; grid-template-columns:1fr; }
+      .recipe-panel { padding:24px 18px; }
+      footer { flex-direction:column; padding:28px 18px; }
+    }
+    @media print {
+      .rail,.tool-row,.search,.copy,.toast { display:none!important; }
+      .shell { display:block; }
+      section { break-inside:avoid; padding:34px 0; }
+      .skill-body { display:block!important; }
+      .recipe-panel { display:grid!important; border-top:1px solid var(--ink); margin-bottom:20px; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*:before,*:after { scroll-behavior:auto!important; transition:none!important; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <div class="shell">
+    <aside class="rail" aria-label="教程导航">
+      <div>
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>Taste Skill 教程</span></div>
+        <p class="rail-note">OFFLINE FIELD GUIDE<br>内容基线：2026-08-03</p>
+      </div>
+      <nav class="toc">
+        <a href="#overview">项目定位</a><a href="#problem">解决的问题</a><a href="#mechanism">运行机制</a>
+        <a href="#scenarios">适用场景</a><a href="#workflow">工作流</a><a href="#skills">技能速查</a>
+        <a href="#recipes">实战配方</a><a href="#limits">边界与判断</a>
+      </nav>
+      <div class="rail-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="切换明暗主题">切换明暗主题</button>
+        <a class="icon-btn source-short" href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noreferrer">打开官方仓库</a>
+      </div>
+    </aside>
+
+    <main id="main">
+      <section class="hero" id="overview">
+        <div>
+          <div class="eyebrow">AI Agent Design Rules</div>
+          <h1>给 AI 一套<br><em>可执行的品味</em></h1>
+          <p class="hero-lead">Taste Skill 是一组面向 Codex、Claude Code、Cursor 等 AI 编程代理的前端设计指令。它不提供组件，而是规定代理如何理解需求、选择设计语言、组织布局、使用动效并完成交付检查。</p>
+        </div>
+        <div class="hero-meta" aria-label="项目核心信息">
+          <div><span class="meta-k">本质</span><span class="meta-v">可移植的 SKILL.md 规则集</span></div>
+          <div><span class="meta-k">核心目标</span><span class="meta-v">减少模板味与 AI 设计痕迹</span></div>
+          <div><span class="meta-k">当前默认</span><span class="meta-v">design-taste-frontend v2 experimental</span></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="definition-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Definition</div><h2 id="definition-title">它是什么</h2></div>
+          <p class="section-intro">最准确的理解方式，是把它看成“给 AI 前端设计师使用的工作手册”。模型读到这些规则后，仍然负责生成代码，但它的判断空间被更具体的设计约束包围。</p>
+        </div>
+        <div class="definition">
+          <article class="statement">
+            <strong>它把模糊的“做得高级一点”，翻译成 AI 可以逐条执行和检查的规则。</strong>
+            <p>规则覆盖需求判断、设计系统映射、色彩与圆角一致性、Hero 纪律、区块去重复、动画实现、无障碍与交付前检查。仓库同时提供从零设计、旧项目改造、图片转代码和品牌视觉等专用 Skill。</p>
+          </article>
+          <div class="not-list" aria-label="它不是什么">
+            <div class="not-item"><b>×</b><span><strong>不是 UI 组件库</strong><br>不会提供现成按钮、表格或卡片组件。</span></div>
+            <div class="not-item"><b>×</b><span><strong>不是前端框架</strong><br>不替代 React、Vue、Svelte 或原生 Web。</span></div>
+            <div class="not-item"><b>×</b><span><strong>不是审美保证书</strong><br>规则能抬高下限，但不能替代真实设计判断。</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="problem" aria-labelledby="problem-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Why</div><h2 id="problem-title">它解决什么</h2></div>
+          <p class="section-intro">AI 并非不会写 CSS，而是常在缺少约束时回到训练数据里最常见、最安全也最无聊的组合。Taste Skill 主要处理这种“默认化”。</p>
+        </div>
+        <div class="compare">
+          <article>
+            <span class="tag">未约束的 AI 输出</span>
+            <h3>看起来完整，细看像同一个模板</h3>
+            <ul><li>居中标题、胶囊标签、三张等宽功能卡</li><li>每个区块重复同一种左右结构</li><li>渐变、发光、装饰圆点被当成高级感</li><li>凭空制造客户 Logo、状态数据和产品截图</li><li>动画很多，却没有性能和减弱动效处理</li></ul>
+          </article>
+          <article>
+            <span class="tag good">Taste Skill 约束后</span>
+            <h3>先建立设计逻辑，再选择表现形式</h3>
+            <ul><li>先判断页面类型、受众、气质与参考体系</li><li>统一强调色、圆角、字号和间距系统</li><li>要求多个区块使用不同的布局家族</li><li>禁止虚假内容和无意义的装饰性 UI</li><li>高强度动画必须有真实实现和 reduced motion</li></ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="mechanism" aria-labelledby="mechanism-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Core Mechanism</div><h2 id="mechanism-title">运行机制</h2></div>
+          <p class="section-intro">默认 v2 会先读取需求，再形成一句设计判断；随后映射合适的设计体系，通过三个调节参数控制结果，最后以硬规则和检查清单收口。</p>
+        </div>
+        <div class="dials" aria-label="三个设计参数">
+          <article class="dial"><div class="dial-num">01</div><h3>DESIGN_VARIANCE</h3><p>布局实验程度。低值偏居中、克制和熟悉；高值允许更强的非对称与现代排版。</p><div class="meter"><i style="--w:72%"></i></div></article>
+          <article class="dial"><div class="dial-num">02</div><h3>MOTION_INTENSITY</h3><p>动效深度。低值只有基础反馈；高值可使用滚动联动、吸附和空间运动，但必须控制性能。</p><div class="meter"><i style="--w:48%"></i></div></article>
+          <article class="dial"><div class="dial-num">03</div><h3>VISUAL_DENSITY</h3><p>每屏信息量。低值适合品牌叙事；高值适合工具型界面和密集内容，但仍需清晰层级。</p><div class="meter"><i style="--w:62%"></i></div></article>
+        </div>
+        <div class="codebox" aria-label="运行逻辑示意">Brief → 一句话设计判断 → 设计系统映射 → 三参数调节 → 实现规则 → Anti-slop 禁令 → Pre-flight 检查</div>
+        <div class="definition" style="margin-top:20px">
+          <article class="statement">
+            <span class="tag">安装整个技能仓库</span>
+            <div class="codebox">npx skills add https://github.com/Leonxlnx/taste-skill<button class="copy" type="button">复制</button></div>
+            <p>CLI 会扫描仓库的 <code>skills/</code> 目录。安装后仍应按任务选择 Skill，而不是在一次提示中同时调用全部规则。</p>
+          </article>
+          <article class="statement">
+            <span class="tag">只安装一个 Skill</span>
+            <div class="codebox">npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"<button class="copy" type="button">复制</button></div>
+            <p>也可以直接复制目标 <code>SKILL.md</code> 到项目或对话中。参数使用 frontmatter 的 <code>name</code>，不一定等于文件夹名。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="scenarios" aria-labelledby="scenarios-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Fit Check</div><h2 id="scenarios-title">适用场景</h2></div>
+          <p class="section-intro">它最擅长视觉表达型前端。判断时不要只问“能不能做”，还要问这个 Skill 是否覆盖了该产品真正困难的部分。</p>
+        </div>
+        <div class="scenario-grid">
+          <article class="scenario"><h3>从零制作视觉型页面 <span class="mark">✓</span></h3><p>产品官网、Landing Page、发布页、活动页、作品集和品牌展示页。这是默认 Skill 的主战场。</p></article>
+          <article class="scenario"><h3>改造已有项目外观 <span class="mark">✓</span></h3><p>功能已完成，但信息层级、间距、布局和视觉一致性不理想。应使用 redesign Skill 先审计再修改。</p></article>
+          <article class="scenario"><h3>图片先行的开发流程 <span class="mark">✓</span></h3><p>先生成视觉参考图，人工选定方向，再让代理分析画面并实现代码，适合重视设计确认 Gate 的团队。</p></article>
+          <article class="scenario"><h3>小团队快速建立下限 <span class="mark">✓</span></h3><p>没有专职设计师，或需要产品经理、独立开发者快速完成可演示原型时，可用它建立共同规则。</p></article>
+          <article class="scenario no"><h3>复杂业务后台 <span class="mark">!</span></h3><p>大型数据表、密集仪表盘、多步骤表单和权限流程的难点在信息架构与业务逻辑，不是它的核心覆盖范围。</p></article>
+          <article class="scenario no"><h3>原生与实时协作产品 <span class="mark">!</span></h3><p>原生移动端、代码编辑器、多人实时协作界面需要平台级交互和状态设计，应搭配专门规范。</p></article>
+        </div>
+      </section>
+
+      <section id="workflow" aria-labelledby="workflow-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Workflow</div><h2 id="workflow-title">工作流</h2></div>
+          <p class="section-intro">点击步骤查看每个阶段的输入、执行重点和输出。Taste Skill 不是一次性咒语，它更适合作为完整设计开发流程中的约束层。</p>
+        </div>
+        <div class="workflow">
+          <div class="steps" id="workflowSteps" role="tablist" aria-label="工作流步骤"></div>
+          <article class="step-detail" id="stepDetail" role="tabpanel" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section id="skills" aria-labelledby="skills-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Cheat Sheet</div><h2 id="skills-title">技能速查</h2></div>
+          <p class="section-intro">仓库中的 Skill 各做一件事。实现型 Skill 输出代码，图片生成型 Skill 输出视觉参考图。不要为了“更强”一次叠加全部规则。</p>
+        </div>
+        <input class="search" id="skillSearch" type="search" placeholder="搜索 Skill、用途或输出，例如：重设计、移动端、代码……" aria-label="搜索技能">
+        <div class="tool-row" id="filters" aria-label="技能分类筛选"></div>
+        <div class="skill-list" id="skillList"></div>
+        <p id="noResults" hidden>没有符合条件的 Skill，请清除搜索词或切换分类。</p>
+      </section>
+
+      <section id="recipes" aria-labelledby="recipes-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Recipes</div><h2 id="recipes-title">实战配方</h2></div>
+          <p class="section-intro">同一个仓库，三种任务对应三条不同路径。先决定交付物是代码、改造结果还是参考图，再选 Skill。</p>
+        </div>
+        <div class="recipe-tabs" role="tablist" aria-label="实战配方">
+          <button class="recipe-tab active" role="tab" aria-selected="true" data-recipe="new">从零制作官网</button>
+          <button class="recipe-tab" role="tab" aria-selected="false" data-recipe="redesign">改造已有项目</button>
+          <button class="recipe-tab" role="tab" aria-selected="false" data-recipe="image">图片先行开发</button>
+        </div>
+        <article class="recipe-panel active" id="recipe-new" role="tabpanel">
+          <div><span class="tag good">推荐 Skill</span><h3>design-taste-frontend</h3><p>适合需求基本明确、需要直接产出页面代码的任务。若使用 Codex 且希望约束更强，可换成 gpt-taste。</p></div>
+          <div><div class="chain"><div><span>写清页面目的、受众、内容和技术限制。</span></div><div><span>让 Skill 推断设计语言，并确认三个参数。</span></div><div><span>生成代码并按 Pre-flight 清单自检。</span></div><div><span>人工确认视觉、真实内容和业务正确性。</span></div></div><div class="codebox">使用 design-taste-frontend。为一款本地优先的知识工具制作中文官网。受众是独立开发者；视觉克制、编辑感强；不使用虚假客户 Logo。先声明设计判断与三个参数，再实现响应式页面。<button class="copy" type="button">复制</button></div></div>
+        </article>
+        <article class="recipe-panel" id="recipe-redesign" role="tabpanel">
+          <div><span class="tag good">推荐 Skill</span><h3>redesign-existing-projects</h3><p>适合保留现有功能和关键契约，在审计之后逐步改善视觉。不要直接把旧页面当作从零项目重写。</p></div>
+          <div><div class="chain"><div><span>读取现有代码、截图、设计 Token 和不可变契约。</span></div><div><span>判断 Preserve、局部现代化或 Overhaul 模式。</span></div><div><span>列出布局、层级、间距和样式问题并排序。</span></div><div><span>按优先级修改，逐项回归原有功能。</span></div></div><div class="codebox">使用 redesign-existing-projects。先审计当前界面，不要立即修改。必须保留 URL、导航名称、表单字段、品牌字样和功能行为。输出问题证据、改造优先级及验收标准，待确认后再实施。<button class="copy" type="button">复制</button></div></div>
+        </article>
+        <article class="recipe-panel" id="recipe-image" role="tabpanel">
+          <div><span class="tag good">推荐组合</span><h3>imagegen + image-to-code</h3><p>适合设计方向尚未确定，或者人工必须先批准视觉稿的工作。图片只是设计基线，不是最终可用产品。</p></div>
+          <div><div class="chain"><div><span>用 imagegen-frontend-web/mobile 生成参考画面。</span></div><div><span>人工选择方向，确认内容与视觉默认值。</span></div><div><span>用 image-to-code 分析版式、字体、色彩和组件。</span></div><div><span>实现代码并进行响应式、交互和可访问性验证。</span></div></div><div class="codebox">遵循 image-to-code 工作流：先生成参考图，再分析，最后编码。在视觉方向获得人工确认前不要实现页面。实现时以确认图为视觉基线，但使用真实文本和语义化 HTML。<button class="copy" type="button">复制</button></div></div>
+        </article>
+      </section>
+
+      <section id="limits" aria-labelledby="limits-title">
+        <div class="section-head">
+          <div><div class="eyebrow">Limits</div><h2 id="limits-title">边界与判断</h2></div>
+          <p class="section-intro">Taste Skill 能降低“默认模板”出现的概率，但它仍是提示规则，不是确定性渲染引擎。最终质量取决于需求、素材、模型执行力和验证流程。</p>
+        </div>
+        <div class="limits">
+          <article class="limit"><h3>不能替代 UX 研究</h3><p>它不知道真实用户最重要的任务、业务优先级和认知负担。信息架构与用户验证仍需单独完成。</p></article>
+          <article class="limit"><h3>不能制造真实内容</h3><p>品牌文案、客户 Logo、数据、产品截图和社会证明必须来自真实来源，不能让 AI 为了画面完整而编造。</p></article>
+          <article class="limit"><h3>规则带有作者偏好</h3><p>一些禁止项非常绝对。它们适合抑制常见 AI 痕迹，但不应凌驾于已确认的品牌规范和设计意图。</p></article>
+          <article class="limit"><h3>v2 仍是实验版本</h3><p>默认 Skill 正在向 v2.0.0 stable 收敛。需要结果可重复的长期项目，应审查更新或显式固定 v1。</p></article>
+        </div>
+        <div class="decision">
+          <div><h3>最合适的定位：设计起点、质量下限、反模板检查器。</h3></div>
+          <div><p>它最有价值的地方，不是让 AI 突然拥有人的品味，而是把常见的设计判断转换成代理不容易跳过的硬规则。用它建立基线，用真实项目约束修正规则，再用人工 Gate 决定是否交付。</p>
+            <div class="source-list"><strong>官方来源</strong><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noreferrer">GitHub：Leonxlnx/taste-skill</a><a href="https://github.com/Leonxlnx/taste-skill/blob/main/CHANGELOG.md" target="_blank" rel="noreferrer">CHANGELOG：v2 experimental 说明</a><a href="https://github.com/Leonxlnx/taste-skill/tree/main/skills" target="_blank" rel="noreferrer">Skills 目录：当前技能清单</a></div>
+          </div>
+        </div>
+      </section>
+      <footer><span>Taste Skill 中文离线教程</span><span>单文件 · 零运行时依赖 · 内容基线 2026-08-03</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+  <script>
+    'use strict';
+    const workflow = [
+      {title:'明确 Brief',sub:'目标、受众、内容、约束',why:'先把“做什么”和“为谁做”讲清楚。缺少真实内容时，任何视觉规则都会把空洞需求包装得更漂亮。',input:'页面目标、用户、真实文案、技术栈、不可变约束',output:'可验证的设计任务说明与非目标'},
+      {title:'选择 Skill',sub:'按交付物和项目状态路由',why:'从零开发、旧项目改造和图片生成不是同一种任务。选择错误会让代理跳过审计，或在需要代码时只产出图片。',input:'项目状态、最终交付物、目标代理',output:'一个主 Skill，必要时一个风格辅助 Skill'},
+      {title:'设计判断',sub:'读取语境并声明方向',why:'默认 v2 会先判断页面类型、气质、参考体系、受众与限制，再用一句话声明设计方向，减少直接套模板。',input:'Brief、品牌规范、参考页面或批准的视觉稿',output:'设计语言、主题、字体、色彩与布局策略'},
+      {title:'调节三参数',sub:'变化、动效、密度',why:'三个 1 到 10 的参数把“更大胆”“少一点动画”“信息更密”变成相对稳定的控制面。',input:'DESIGN_VARIANCE、MOTION_INTENSITY、VISUAL_DENSITY',output:'与场景匹配的表现强度'},
+      {title:'生成或审计',sub:'绿地实现或存量诊断',why:'新页面直接建立系统；已有项目必须先识别 Preserve、局部升级或 Overhaul，且不能静默改变关键契约。',input:'代码库、页面结构、现有 Token、不可变契约',output:'实现代码，或带证据的审计与改造清单'},
+      {title:'执行硬规则',sub:'一致性、动效、反 AI 痕迹',why:'实现过程中应用强调色锁、圆角系统、Hero 纪律、区块去重复、真实素材和动效性能规则。',input:'设计系统与组件实现',output:'更一致、可解释且减少模板痕迹的界面'},
+      {title:'检查与人工 Gate',sub:'Pre-flight 后再决定交付',why:'清单只能发现已编码的规则，不能判断业务是否正确、品牌是否准确或用户是否真正理解。最终决定仍由人完成。',input:'响应式页面、真实内容、检查清单、测试结果',output:'通过验证的候选交付物，或明确返工项'}
+    ];
+    const skills = [
+      {cat:'general',name:'taste-skill',install:'design-taste-frontend',summary:'默认通用前端设计 Skill；v2 experimental，先推断 Brief，再用硬规则实现。',input:'页面 Brief、受众、参考、技术与品牌约束；可选三个参数。',output:'带设计系统、布局、动效和 Pre-flight 自检的前端代码。',fit:'从零制作官网、Landing Page、作品集和视觉表达型页面。',avoid:'复杂后台、数据表、多步骤表单；要求规则长期完全不变的项目。'},
+      {cat:'general',name:'taste-skill-v1',install:'design-taste-frontend-v1',summary:'保留原始 v1 行为，用于依赖旧版规则的项目。',input:'与默认 Skill 相同，但使用原始规则与模式词汇。',output:'符合 v1 规则的前端代码。',fit:'已有项目必须保持旧版生成行为，或 v2 导致具体回归。',avoid:'新项目默认选择；除非能说明为什么需要固定 v1。'},
+      {cat:'general',name:'gpt-tasteskill',install:'gpt-taste',summary:'面向 GPT/Codex 的更严格变体，增强布局变化、GSAP 方向与反模板约束。',input:'清晰 Brief、Codex/GPT 执行环境、期望的布局和动效强度。',output:'约束更强、变化更大胆的前端实现。',fit:'Codex 生成营销页，且普通规则仍容易回到模板布局。',avoid:'品牌规范极严、只需要保守微调或不希望强动效的项目。'},
+      {cat:'pipeline',name:'image-to-code-skill',install:'image-to-code',summary:'图片优先流程：生成参考、分析画面，再实现前端。',input:'设计需求与参考图；明确“生成图片 → 分析 → 编码”的顺序。',output:'视觉参考、结构分析和匹配参考图的前端代码。',fit:'必须先确认视觉稿、希望以画面作为实现基线的官网项目。',avoid:'没有人工视觉确认，或复杂功能正确性比视觉还原更重要。'},
+      {cat:'redesign',name:'redesign-skill',install:'redesign-existing-projects',summary:'面向已有项目：先审计 UI，再修复布局、间距、层级与样式。',input:'现有代码、页面截图、设计 Token、功能及不可变契约。',output:'审计结果、改造优先级和实施后的界面代码。',fit:'功能已有但“不好看”、视觉债务多、需要渐进现代化。',avoid:'完全空白的新项目；未允许修改代码时只能停在审计阶段。'},
+      {cat:'style',name:'soft-skill',install:'high-end-visual-design',summary:'柔和、安静、昂贵感的视觉方向：低对比、留白、高级字体与弹性动效。',input:'已确定的高端品牌方向、真实内容和产品约束。',output:'克制、精致、低噪音的前端视觉实现。',fit:'精品服务、生活方式、高端品牌与成熟产品展示。',avoid:'工业工具、高密度操作台或需要强烈警示色的产品。'},
+      {cat:'utility',name:'output-skill',install:'full-output-enforcement',summary:'约束模型交付完整结果，减少占位注释、截断和“其余类似”。',input:'明确的完整交付范围和目标文件。',output:'不以占位符省略的完整代码或内容。',fit:'模型经常只给半成品、示意代码或省略重复部分。',avoid:'它不改善视觉方向，也不替代测试和内容正确性检查。'},
+      {cat:'style',name:'minimalist-skill',install:'minimalist-ui',summary:'Notion、Linear 气质的编辑型产品 UI，克制配色与清晰结构。',input:'工具型产品需求、信息层级、操作频率和密度要求。',output:'简洁、清晰、偏编辑工具感的界面代码。',fit:'知识管理、任务、文档和轻量生产力工具。',avoid:'需要强品牌叙事、沉浸式营销或高视觉冲击的页面。'},
+      {cat:'style',name:'brutalist-skill',install:'industrial-brutalist-ui',summary:'工业粗野主义：瑞士字体、锐利对比、机械语言与实验布局。',input:'明确批准的强风格方向和可接受的可用性边界。',output:'高对比、硬边、实验性强的界面实现。',fit:'创意工作室、文化项目、实验品牌和艺术型作品集。',avoid:'大众业务系统、严肃政企产品、可访问性风险无法接受的场景。'},
+      {cat:'utility',name:'stitch-skill',install:'stitch-design-taste',summary:'与 Google Stitch 兼容的设计规则，可选输出 DESIGN.md 格式。',input:'Stitch 工作流上下文、页面需求和设计系统导出要求。',output:'Stitch 兼容的设计结果，必要时生成 DESIGN.md 规范。',fit:'团队已经使用 Stitch，并希望把 Taste 规则接入其产物。',avoid:'完全不使用 Stitch，也不需要 DESIGN.md 交换格式。'},
+      {cat:'image',name:'imagegen-frontend-web',install:'imagegen-frontend-web',summary:'生成网站概念图：Hero、Landing Page、多区块页面与排版方向。',input:'网站类型、受众、内容结构、品牌气质和画面比例。',output:'网站视觉参考图，不输出代码。',fit:'设计探索、视觉方向比较、编码前的人工确认。',avoid:'要求立即获得可运行页面，或把概念图误当真实产品截图。'},
+      {cat:'image',name:'imagegen-frontend-mobile',install:'imagegen-frontend-mobile',summary:'生成移动端屏幕与流程参考，强调可读字体和成套一致性。',input:'平台、用户任务、屏幕清单、流程关系与品牌方向。',output:'iOS、Android 或跨平台移动端参考画面，不输出代码。',fit:'移动端概念探索、关键流程评审和设计方向确认。',avoid:'直接交付原生应用、验证手势细节或平台技术实现。'},
+      {cat:'image',name:'brandkit',install:'brandkit',summary:'生成品牌板，包括 Logo 方向、色板、字体和应用示例。',input:'品牌定位、受众、关键词、品类和禁用方向。',output:'品牌视觉方向板，不输出可直接注册或生产的完整品牌资产。',fit:'早期品牌探索、为网站或移动端建立视觉语汇。',avoid:'商标法律审查、最终 Logo 制图和完整品牌战略。'}
+    ];
+    const categories = [['all','全部'],['general','通用实现'],['redesign','存量改造'],['pipeline','图片转代码'],['style','风格强化'],['image','图片生成'],['utility','辅助约束']];
+    const stepsEl=document.getElementById('workflowSteps'),detailEl=document.getElementById('stepDetail');
+    function showStep(i){
+      document.querySelectorAll('.step').forEach((b,n)=>{b.classList.toggle('active',n===i);b.setAttribute('aria-selected',n===i)});
+      const s=workflow[i]; detailEl.innerHTML=`<div class="eyebrow">Step ${String(i+1).padStart(2,'0')}</div><h3>${s.title}</h3><p>${s.why}</p><div class="io-grid"><div class="io"><b>INPUT</b><span>${s.input}</span></div><div class="io"><b>OUTPUT</b><span>${s.output}</span></div></div>`;
+    }
+    workflow.forEach((s,i)=>{const b=document.createElement('button');b.className='step';b.type='button';b.role='tab';b.innerHTML=`<span class="step-num">${String(i+1).padStart(2,'0')}</span><span><strong>${s.title}</strong><small>${s.sub}</small></span>`;b.addEventListener('click',()=>showStep(i));stepsEl.appendChild(b)}); showStep(0);
+    const filters=document.getElementById('filters'),list=document.getElementById('skillList'),search=document.getElementById('skillSearch'),empty=document.getElementById('noResults'); let activeCat='all';
+    categories.forEach(([key,label],i)=>{const b=document.createElement('button');b.className='filter'+(i===0?' active':'');b.type='button';b.textContent=label;b.dataset.cat=key;b.addEventListener('click',()=>{activeCat=key;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));applyFilter()});filters.appendChild(b)});
+    skills.forEach((s,i)=>{const el=document.createElement('article');el.className='skill-card';el.dataset.cat=s.cat;el.dataset.search=Object.values(s).join(' ').toLowerCase();el.innerHTML=`<button class="skill-head" type="button" aria-expanded="false" aria-controls="skill-${i}"><span class="skill-name"><strong>${s.name}</strong><code>${s.install}</code></span><span class="skill-summary">${s.summary}</span><span class="chev" aria-hidden="true">+</span></button><div class="skill-body" id="skill-${i}"><div class="skill-body-grid"><div><h4>Input</h4><p>${s.input}</p></div><div><h4>Output</h4><p>${s.output}</p></div><div><h4>Best fit</h4><p>${s.fit}</p></div><div><h4>Avoid when</h4><p>${s.avoid}</p></div></div></div>`;const btn=el.querySelector('button');btn.addEventListener('click',()=>{const open=el.classList.toggle('open');btn.setAttribute('aria-expanded',open)});list.appendChild(el)});
+    function applyFilter(){const q=search.value.trim().toLowerCase();let count=0;document.querySelectorAll('.skill-card').forEach(el=>{const show=(activeCat==='all'||el.dataset.cat===activeCat)&&(!q||el.dataset.search.includes(q));el.hidden=!show;if(show)count++});empty.hidden=count>0}
+    search.addEventListener('input',applyFilter);
+    document.querySelectorAll('.recipe-tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.recipe-tab').forEach(t=>{const on=t===tab;t.classList.toggle('active',on);t.setAttribute('aria-selected',on)});document.querySelectorAll('.recipe-panel').forEach(p=>p.classList.toggle('active',p.id==='recipe-'+tab.dataset.recipe))}));
+    const toast=document.getElementById('toast');document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{const text=b.parentElement.childNodes[0].textContent.trim();try{await navigator.clipboard.writeText(text)}catch(e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1200)}));
+    const root=document.documentElement,toggle=document.getElementById('themeToggle');toggle.addEventListener('click',()=>{const next=root.dataset.theme==='light'?'dark':'light';root.dataset.theme=next;try{localStorage.setItem('taste-theme',next)}catch(e){}});try{const saved=localStorage.getItem('taste-theme');if(saved)root.dataset.theme=saved}catch(e){}
+    const tocLinks=[...document.querySelectorAll('.toc a')],sections=tocLinks.map(a=>document.querySelector(a.getAttribute('href')));const observer=new IntersectionObserver(entries=>{entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio).slice(0,1).forEach(e=>tocLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id)))},{rootMargin:'-20% 0px -65% 0px',threshold:[0,.2,.5]});sections.forEach(s=>s&&observer.observe(s));
+  </script>
+</body>
+</html>

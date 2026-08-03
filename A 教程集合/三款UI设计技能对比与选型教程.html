@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>三款 UI 设计技能对比与选型教程</title>
+  <style>
+    :root {
+      --navy-950:#0b1736;
+      --navy-900:#122352;
+      --navy-800:#1e3a8a;
+      --navy-700:#1e40af;
+      --gold-700:#9a4c08;
+      --gold-600:#b45309;
+      --gold-100:#fff5dd;
+      --blue-100:#e8efff;
+      --blue-50:#f3f6ff;
+      --ink:#0f172a;
+      --muted:#526078;
+      --line:#cbd5e1;
+      --line-soft:#e2e8f0;
+      --surface:#ffffff;
+      --canvas:#f8fafc;
+      --success:#166534;
+      --success-bg:#ecfdf3;
+      --radius:16px;
+      --shadow:0 12px 34px rgba(15,23,42,.08);
+      --max:1180px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:24px}
+    body{
+      margin:0;
+      background:var(--canvas);
+      color:var(--ink);
+      font-family:"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",Arial,sans-serif;
+      font-size:16px;
+      line-height:1.7;
+      text-rendering:optimizeLegibility;
+    }
+    a{color:var(--navy-700);text-underline-offset:3px}
+    a:hover{color:var(--gold-700)}
+    button,a{touch-action:manipulation}
+    button{font:inherit}
+    :focus-visible{outline:3px solid #f59e0b;outline-offset:3px;border-radius:5px}
+    .skip-link{position:fixed;left:16px;top:-80px;z-index:100;background:var(--ink);color:#fff;padding:12px 18px;border-radius:8px}
+    .skip-link:focus{top:16px}
+
+    .topbar{background:var(--navy-950);color:#dbeafe;border-bottom:4px solid var(--gold-600)}
+    .topbar-inner{max-width:var(--max);margin:auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.02em}
+    .brand-mark{width:28px;height:28px;display:grid;place-items:center;border:1px solid #7aa2ff;border-radius:7px;color:#fff;font:700 12px/1 Consolas,monospace}
+    .snapshot{font-size:13px;color:#a9bce7}
+
+    .hero{background:linear-gradient(135deg,var(--navy-950),var(--navy-900));color:#fff;position:relative;overflow:hidden}
+    .hero:after{content:"";position:absolute;width:520px;height:520px;right:-260px;top:-300px;border:1px solid rgba(255,255,255,.16);border-radius:50%;box-shadow:0 0 0 80px rgba(255,255,255,.025),0 0 0 160px rgba(255,255,255,.018)}
+    .hero-inner{max-width:var(--max);margin:auto;padding:76px 24px 70px;position:relative;z-index:1}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;color:#f8d990;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:28px;height:2px;background:#f8d990}
+    h1{font-size:clamp(38px,6vw,72px);line-height:1.08;letter-spacing:-.045em;margin:18px 0 22px;max-width:880px}
+    .lead{max-width:790px;font-size:clamp(17px,2vw,21px);color:#dbe7ff;margin:0 0 32px}
+    .hero-verdict{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.7fr);gap:22px;max-width:980px}
+    .verdict-main,.verdict-side{border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);padding:22px 24px;background:rgba(255,255,255,.07);backdrop-filter:blur(8px)}
+    .verdict-label{color:#f8d990;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+    .verdict-main strong{font-size:22px;line-height:1.45;display:block}
+    .verdict-side{font-size:14px;color:#dbe7ff}
+    .verdict-side b{color:#fff}
+
+    .page{max-width:var(--max);margin:0 auto;padding:42px 24px 90px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:44px;align-items:start}
+    .side{position:sticky;top:24px;border:1px solid var(--line-soft);border-radius:14px;background:var(--surface);padding:16px;box-shadow:0 6px 18px rgba(15,23,42,.04)}
+    .side-title{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;padding:4px 10px 10px}
+    .side a{display:flex;gap:10px;align-items:center;min-height:44px;padding:8px 10px;border-radius:9px;color:#334155;text-decoration:none;font-size:14px;font-weight:650}
+    .side a:before{content:"";width:6px;height:6px;border-radius:50%;background:#cbd5e1;flex:0 0 auto}
+    .side a:hover,.side a.active{background:var(--blue-100);color:var(--navy-800)}
+    .side a.active:before{background:var(--navy-700);box-shadow:0 0 0 4px rgba(30,64,175,.12)}
+    .side-note{margin-top:12px;border-top:1px solid var(--line-soft);padding:13px 10px 2px;font-size:12px;color:var(--muted)}
+
+    main{min-width:0}
+    section{scroll-margin-top:24px;margin-bottom:70px}
+    .section-kicker{color:var(--gold-700);font:800 12px/1.4 Consolas,"Microsoft YaHei UI",monospace;letter-spacing:.12em;text-transform:uppercase}
+    h2{font-size:clamp(28px,4vw,42px);line-height:1.18;letter-spacing:-.035em;margin:10px 0 16px;color:var(--navy-950)}
+    h3{font-size:21px;line-height:1.35;margin:0 0 12px;color:var(--navy-950)}
+    p{margin:0 0 16px}
+    .section-intro{font-size:18px;color:#334155;max-width:780px;margin-bottom:28px}
+    .note{border-left:4px solid var(--gold-600);background:var(--gold-100);padding:16px 18px;border-radius:0 10px 10px 0;color:#4a2a0a}
+    .note strong{color:#341d07}
+
+    .method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .method-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:13px;padding:20px}
+    .method-num{font:800 13px/1 Consolas,monospace;color:var(--gold-700);margin-bottom:13px}
+    .method-card p{font-size:14px;color:var(--muted);margin:0}
+
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 5px 16px rgba(15,23,42,.04)}
+    table{width:100%;border-collapse:collapse;min-width:760px}
+    caption{text-align:left;padding:16px 18px;background:var(--blue-50);font-weight:800;color:var(--navy-950);border-bottom:1px solid var(--line)}
+    th,td{text-align:left;vertical-align:top;padding:15px 17px;border-bottom:1px solid var(--line-soft)}
+    th{font-size:13px;color:#475569;background:#f8fafc}
+    td{font-size:14px}
+    tbody tr:last-child td{border-bottom:0}
+    .winner{font-weight:800;color:var(--navy-800)}
+    .tag{display:inline-flex;align-items:center;min-height:26px;padding:2px 9px;border-radius:999px;background:var(--blue-100);color:var(--navy-800);font-size:12px;font-weight:750;white-space:nowrap}
+    .tag.gold{background:var(--gold-100);color:#824006}
+    .tag.green{background:var(--success-bg);color:var(--success)}
+
+    .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .metric{border:1px solid var(--line-soft);border-radius:13px;padding:18px;background:var(--surface)}
+    .metric-name{font-size:13px;color:var(--muted)}
+    .metric-value{font:800 28px/1.25 Consolas,"Segoe UI",sans-serif;color:var(--navy-950);margin:6px 0 3px}
+    .metric-meta{font-size:12px;color:#64748b}
+
+    .project-list{display:grid;gap:22px}
+    .project-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .project-head{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:22px 24px;border-bottom:1px solid var(--line-soft)}
+    .project-index{width:48px;height:48px;border-radius:12px;background:var(--navy-950);color:#fff;display:grid;place-items:center;font:800 15px/1 Consolas,monospace}
+    .project-title h3{margin:0;font-size:24px}
+    .project-sub{font-size:13px;color:var(--muted);margin-top:3px}
+    .project-fit{text-align:right}
+    .project-fit b{display:block;color:var(--gold-700);font-size:13px}
+    .project-fit span{font-size:12px;color:var(--muted)}
+    .project-body{padding:24px;display:grid;grid-template-columns:1.25fr .75fr;gap:28px}
+    .facts{display:grid;gap:10px;margin-top:18px}
+    .fact{display:grid;grid-template-columns:92px 1fr;gap:12px;font-size:14px}
+    .fact dt{font-weight:800;color:#334155}
+    .fact dd{margin:0;color:#526078}
+    .good-at{background:var(--blue-50);border-radius:12px;padding:18px}
+    .good-at h4{margin:0 0 10px;color:var(--navy-900)}
+    .check-list{list-style:none;padding:0;margin:0;display:grid;gap:9px}
+    .check-list li{position:relative;padding-left:22px;font-size:14px;color:#334155}
+    .check-list li:before{content:"";position:absolute;left:1px;top:.58em;width:9px;height:5px;border-left:2px solid var(--success);border-bottom:2px solid var(--success);transform:rotate(-45deg)}
+    .caution{margin-top:14px;padding-top:14px;border-top:1px solid #d9e2f2;font-size:13px;color:#5b6475}
+
+    .route-panel{background:var(--navy-950);border-radius:18px;padding:28px;color:#fff;box-shadow:var(--shadow)}
+    .route-panel h3{color:#fff;font-size:26px}
+    .route-panel>p{color:#bdcae8}
+    .route-buttons{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+    .route-btn{min-height:44px;border:1px solid #586d9b;background:#172a5b;color:#eaf0ff;padding:9px 14px;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+    .route-btn:hover{background:#203d80;border-color:#88a9f4}
+    .route-btn[aria-pressed="true"]{background:#fff;color:var(--navy-950);border-color:#fff;font-weight:800}
+    .route-result{background:#fff;color:var(--ink);border-radius:13px;padding:22px;min-height:180px}
+    .route-result-top{display:flex;justify-content:space-between;gap:18px;align-items:start}
+    .route-result h4{font-size:23px;color:var(--navy-950);margin:0 0 8px}
+    .route-owner{display:inline-flex;background:var(--gold-100);color:#783b06;padding:5px 10px;border-radius:999px;font-weight:800;font-size:12px;white-space:nowrap}
+    .route-why{color:#475569;margin:0}
+    .route-process{margin-top:16px;padding-top:15px;border-top:1px solid var(--line-soft);font-size:14px;color:#334155}
+
+    .matrix{display:grid;grid-template-columns:180px repeat(3,1fr);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .matrix>div{padding:13px 14px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);font-size:13px}
+    .matrix>div:nth-child(4n){border-right:0}
+    .matrix>div:nth-last-child(-n+4){border-bottom:0}
+    .matrix .head{font-weight:800;background:var(--navy-950);color:#fff}
+    .matrix .rowhead{font-weight:750;background:#f8fafc;color:#334155}
+    .level{display:flex;gap:4px;align-items:center}
+    .level i{display:block;width:19px;height:7px;border-radius:4px;background:#dbe3ef}
+    .level i.on{background:var(--navy-700)}
+    .level.best i.on{background:var(--gold-600)}
+
+    .workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+    .workflow-step{padding:20px;border-right:1px solid var(--line-soft);position:relative}
+    .workflow-step:last-child{border-right:0}
+    .workflow-step .num{font:800 12px/1 Consolas,monospace;color:var(--gold-700);margin-bottom:12px}
+    .workflow-step h4{margin:0 0 8px;color:var(--navy-950)}
+    .workflow-step p{font-size:13px;color:var(--muted);margin:0}
+    .workflow-step:not(:last-child):after{content:"";position:absolute;right:-6px;top:29px;width:10px;height:10px;background:#fff;border-top:1px solid var(--line);border-right:1px solid var(--line);transform:rotate(45deg);z-index:1}
+
+    .prompt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .prompt-card{border:1px solid var(--line);border-radius:13px;background:#fff;overflow:hidden}
+    .prompt-head{padding:14px 16px;background:var(--blue-50);border-bottom:1px solid var(--line-soft);font-weight:800;color:var(--navy-900)}
+    .prompt-body{padding:16px;font:13px/1.7 Consolas,"Microsoft YaHei UI",monospace;color:#27344c;white-space:pre-wrap}
+    .prompt-foot{padding:0 16px 16px}
+    .copy-btn{min-height:44px;width:100%;border:1px solid var(--line);background:#fff;color:var(--navy-800);font-weight:750;border-radius:9px;cursor:pointer;transition:background .2s,border-color .2s}
+    .copy-btn:hover{background:var(--blue-50);border-color:#9db4e7}
+
+    .decision{border:2px solid var(--navy-800);border-radius:18px;background:#fff;overflow:hidden}
+    .decision-head{padding:22px 24px;background:var(--navy-800);color:#fff}
+    .decision-head h3{color:#fff;margin:0 0 4px;font-size:26px}
+    .decision-head p{margin:0;color:#dbe7ff}
+    .decision-body{padding:24px}
+    .decision-line{display:grid;grid-template-columns:180px 1fr;gap:18px;padding:15px 0;border-bottom:1px solid var(--line-soft)}
+    .decision-line:last-child{border-bottom:0}
+    .decision-line strong{color:var(--navy-950)}
+    .decision-line span{color:#475569}
+
+    .source-list{counter-reset:source;list-style:none;padding:0;margin:0;display:grid;gap:10px}
+    .source-list li{counter-increment:source;display:grid;grid-template-columns:36px 1fr;gap:10px;padding:13px 14px;background:#fff;border:1px solid var(--line-soft);border-radius:10px;font-size:14px}
+    .source-list li:before{content:counter(source,decimal-leading-zero);font:800 12px/1.8 Consolas,monospace;color:var(--gold-700)}
+    .source-list small{display:block;color:var(--muted);margin-top:2px}
+
+    footer{background:var(--navy-950);color:#b9c7e5}
+    .footer-inner{max-width:var(--max);margin:auto;padding:32px 24px;display:flex;justify-content:space-between;gap:30px;font-size:13px}
+    .footer-inner strong{color:#fff}
+
+    .mobile-nav{display:none;margin:0 0 28px}
+    .mobile-nav label{display:block;font-weight:800;font-size:13px;margin-bottom:7px;color:#334155}
+    .mobile-nav select{width:100%;min-height:48px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+
+    @media (max-width:980px){
+      .page{grid-template-columns:1fr;gap:0}.side{display:none}.mobile-nav{display:block}
+      .hero-verdict{grid-template-columns:1fr}.project-body{grid-template-columns:1fr}
+      .method-grid,.prompt-grid{grid-template-columns:1fr}.workflow{grid-template-columns:1fr 1fr}
+      .workflow-step:nth-child(2){border-right:0}.workflow-step:nth-child(-n+2){border-bottom:1px solid var(--line-soft)}
+      .workflow-step:after{display:none}.matrix{grid-template-columns:150px repeat(3,minmax(130px,1fr));overflow-x:auto}
+    }
+    @media (max-width:680px){
+      .topbar-inner{padding:10px 16px}.snapshot{display:none}.hero-inner{padding:54px 18px 48px}.page{padding:30px 16px 64px}
+      h1{font-size:42px}.lead{font-size:17px}.verdict-main,.verdict-side{padding:18px}
+      .metric-grid{grid-template-columns:1fr}.project-head{grid-template-columns:auto 1fr}.project-fit{display:none}.project-body{padding:18px}
+      .route-panel{padding:20px}.route-buttons{display:grid;grid-template-columns:1fr 1fr}.route-result-top{display:block}.route-owner{margin-top:8px}
+      .workflow{grid-template-columns:1fr}.workflow-step{border-right:0;border-bottom:1px solid var(--line-soft)}.workflow-step:last-child{border-bottom:0}
+      .decision-line{grid-template-columns:1fr;gap:4px}.footer-inner{display:block}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+    @media print{.topbar,.side,.mobile-nav,.copy-btn{display:none!important}.hero{background:#fff;color:#000}.hero .lead,.verdict-side{color:#333}.hero-verdict>*{border-color:#aaa;background:#fff;color:#000}.page{display:block;padding-top:24px}.project-card,.route-panel{box-shadow:none;break-inside:avoid}.route-panel{background:#fff;color:#000;border:1px solid #aaa}.route-panel h3,.route-panel>p{color:#000}.route-buttons{display:none}a{color:#000}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">UX</span><span>设计技能选型指南</span></div>
+      <div class="snapshot">公开资料快照 · 2026-08-03</div>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">Independent comparison tutorial</div>
+      <h1>不要问谁最好，<br>先问你要交付什么。</h1>
+      <p class="lead">Huashu Design、Taste Skill 与 UI UX Pro Max 不是同一种工具：一个偏成品视觉交付，一个偏营销前端审美，一个偏系统化 UI/UX 规则与跨技术栈实现。</p>
+      <div class="hero-verdict">
+        <div class="verdict-main">
+          <div class="verdict-label">给怡哥的默认选择</div>
+          <strong>以 UI UX Pro Max 作为日常产品界面的默认技能；需要营销页个性时临时启用 Taste。Huashu 不再作为本项目的设计方法。</strong>
+        </div>
+        <div class="verdict-side"><b>关键原则</b><br>一次任务只指定一个“审美主责”。第二个技能最多承担审查，不要让三套规则同时争夺页面控制权。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <aside class="side" aria-label="页面目录">
+      <div class="side-title">本页目录</div>
+      <nav>
+        <a href="#method">如何比较</a>
+        <a href="#snapshot">一分钟结论</a>
+        <a href="#projects">三个项目</a>
+        <a href="#router">场景选择器</a>
+        <a href="#matrix">能力矩阵</a>
+        <a href="#workflow">推荐工作流</a>
+        <a href="#prompts">提示词模板</a>
+        <a href="#decision">综合建议</a>
+        <a href="#sources">来源与边界</a>
+      </nav>
+      <div class="side-note">所有样式和交互均内嵌。页面本身不会请求字体、脚本、图片或在线模块。</div>
+    </aside>
+
+    <main id="main">
+      <div class="mobile-nav">
+        <label for="section-select">跳转到章节</label>
+        <select id="section-select">
+          <option value="#method">如何比较</option><option value="#snapshot">一分钟结论</option><option value="#projects">三个项目</option><option value="#router">场景选择器</option><option value="#matrix">能力矩阵</option><option value="#workflow">推荐工作流</option><option value="#prompts">提示词模板</option><option value="#decision">综合建议</option><option value="#sources">来源与边界</option>
+        </select>
+      </div>
+
+      <section id="method">
+        <div class="section-kicker">01 / Method</div>
+        <h2>我们比较的不是 Star，而是任务适配度</h2>
+        <p class="section-intro">公开资料里没有一项可信的、控制变量一致的三方盲测。因此，本教程不制造“总冠军”，而是把官方能力、社区采用量与实际工作场景分开判断。</p>
+        <div class="method-grid">
+          <article class="method-card"><div class="method-num">EVIDENCE 01</div><h3>官方能力</h3><p>检查 SKILL.md、仓库结构、支持技术栈、工作流和明确写出的限制。这决定“它声称能做什么”。</p></article>
+          <article class="method-card"><div class="method-num">EVIDENCE 02</div><h3>采用信号</h3><p>GitHub Star、skills.sh 安装量只说明传播与尝试规模，不等于同一提示词下的输出质量。</p></article>
+          <article class="method-card"><div class="method-num">EVIDENCE 03</div><h3>场景判断</h3><p>把任务拆成视觉成品、营销审美、产品系统、可访问性和工程落地，再决定由谁主责。</p></article>
+        </div>
+        <p class="note" style="margin-top:18px"><strong>没有公开三方盲测。</strong> 下文的“更好”均表示在特定任务上更适配，而不是证明某个技能在所有模型、提示词和项目上下文中绝对胜出。</p>
+      </section>
+
+      <section id="snapshot">
+        <div class="section-kicker">02 / Executive summary</div>
+        <h2>一分钟先拿走结论</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>按交付目标选技能</caption>
+            <thead><tr><th>你真正要的结果</th><th>首选</th><th>为什么</th><th>主要风险</th></tr></thead>
+            <tbody>
+              <tr><td>中文视觉报告、原型、幻灯片、信息图或动画成品</td><td><span class="tag gold">Huashu Design</span></td><td class="winner">成品交付链最完整</td><td>流程较重；审美方向若不匹配，成本会快速放大</td></tr>
+              <tr><td>落地页、作品集、营销前端和改版去模板味</td><td><span class="tag">Taste Skill</span></td><td class="winner">审美约束鲜明，擅长反套路</td><td>v2 仍标记实验性；不主打仪表盘和复杂产品 UI</td></tr>
+              <tr><td>后台、仪表盘、桌面/移动产品、设计系统与可访问性</td><td><span class="tag green">UI UX Pro Max</span></td><td class="winner">规则库广、技术栈覆盖宽</td><td>更像导航与护栏；原创性仍依赖上下文和实现者</td></tr>
+              <tr><td>只允许装一个，覆盖大多数日常产品开发</td><td><span class="tag green">UI UX Pro Max</span></td><td class="winner">综合覆盖最稳妥</td><td>应补充品牌资料与真实内容，防止输出趋同</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="metric-grid" aria-label="公开采用量快照">
+          <div class="metric"><div class="metric-name">Huashu Design</div><div class="metric-value">22.4K</div><div class="metric-meta">GitHub Stars · skills.sh 约 40.1K installs</div></div>
+          <div class="metric"><div class="metric-name">Taste Skill</div><div class="metric-value">70.4K</div><div class="metric-meta">GitHub Stars · skills.sh 约 316K installs</div></div>
+          <div class="metric"><div class="metric-name">UI UX Pro Max</div><div class="metric-value">112.7K</div><div class="metric-meta">GitHub Stars · skills.sh 约 297.5K installs</div></div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-top:10px">快照日期为 2026-08-03，数字会变化。安装量不是完成率、留存率或输出质量。</p>
+      </section>
+
+      <section id="projects">
+        <div class="section-kicker">03 / Project anatomy</div>
+        <h2>三个项目，三种“设计能力”</h2>
+        <p class="section-intro">理解定位差异，比背诵功能列表更重要。下面分别说明它们如何工作、擅长什么，以及什么时候不该用。</p>
+        <div class="project-list">
+          <article class="project-card">
+            <div class="project-head"><div class="project-index">01</div><div class="project-title"><h3>Huashu Design</h3><div class="project-sub">从方向探索到多格式视觉成品</div></div><div class="project-fit"><b>成品导向</b><span>HTML / PPTX / 动画</span></div></div>
+            <div class="project-body">
+              <div>
+                <p>Huashu 把设计视为一套交付流程：先探索多个真实视觉方向，再根据选择产出可点击原型、幻灯片、信息图、GIF/MP4 等结果，并强调品牌资产、真实内容和浏览器验证。</p>
+                <dl class="facts"><div class="fact"><dt>核心角色</dt><dd>视觉设计师与成品制作流程</dd></div><div class="fact"><dt>优势</dt><dd>交付类型广、中文场景友好、方向确认机制完整</dd></div><div class="fact"><dt>限制</dt><dd>流程和上下文都较重；官方也承认缺少品牌输入时存在质量上限</dd></div></dl>
+              </div>
+              <div class="good-at"><h4>优先使用</h4><ul class="check-list"><li>高完成度视觉演示</li><li>管理层汇报材料</li><li>需要多方向探索</li><li>HTML 与演示文稿联动</li></ul><div class="caution"><b>不适合：</b>方向不明确但又不愿经过选择闸门，或者只想快速建立稳定产品界面规则。</div></div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-head"><div class="project-index">02</div><div class="project-title"><h3>Taste Skill</h3><div class="project-sub">反模板化的营销前端审美约束</div></div><div class="project-fit"><b>审美导向</b><span>Landing / Portfolio / Redesign</span></div></div>
+            <div class="project-body">
+              <div>
+                <p>Taste 通过明确的“禁止清单”和风格分支，压制常见 AI 页面套路，例如平均三卡片、紫色渐变和虚假的产品截图。它更关注页面的构图、节奏、动画骨架与品牌个性。</p>
+                <dl class="facts"><div class="fact"><dt>核心角色</dt><dd>有强烈主张的前端艺术指导</dd></div><div class="fact"><dt>优势</dt><dd>对营销前端的模板味诊断具体，适合重设计和作品型网站</dd></div><div class="fact"><dt>限制</dt><dd>官方明确说明主要面向落地页、作品集和改版，而非仪表盘、数据表与多步骤产品 UI</dd></div></dl>
+              </div>
+              <div class="good-at"><h4>优先使用</h4><ul class="check-list"><li>品牌落地页</li><li>作品集与创意网站</li><li>旧官网视觉重构</li><li>去除 AI 模板感</li></ul><div class="caution"><b>不适合：</b>严格遵守既有企业设计系统，或复杂后台、数据表和流程型产品。v2 当前仍带实验性标签。</div></div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-head"><div class="project-index">03</div><div class="project-title"><h3>UI UX Pro Max</h3><div class="project-sub">可检索设计知识库、设计系统生成器与工程护栏</div></div><div class="project-fit"><b>系统导向</b><span>84 styles / 22 stacks</span></div></div>
+            <div class="project-body">
+              <div>
+                <p>Pro Max 不是单一视觉风格，而是一套本地可检索的设计决策库。它根据产品类型生成样式、颜色、字体、布局、反模式和交付检查表，再结合不同技术栈给出实现规则。</p>
+                <dl class="facts"><div class="fact"><dt>核心角色</dt><dd>设计系统顾问、UX 检查员与跨栈实现导航</dd></div><div class="fact"><dt>优势</dt><dd>覆盖可访问性、响应式、图表、产品类型和 22 种技术栈；本地搜索不联网</dd></div><div class="fact"><dt>限制</dt><dd>规则广不等于自动拥有独特品味；字体推荐可能指向 Google Fonts，需要按离线约束替换</dd></div></dl>
+              </div>
+              <div class="good-at"><h4>优先使用</h4><ul class="check-list"><li>后台与仪表盘</li><li>桌面和移动产品</li><li>设计系统与规范</li><li>可访问性与交付审查</li></ul><div class="caution"><b>不适合：</b>把它当作品牌资产生成器。开源基础版不包含完整品牌、Logo、CIP、演示文稿等高级资产能力。</div></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="router">
+        <div class="section-kicker">04 / Interactive router</div>
+        <h2>选择你的任务，立即得到路由建议</h2>
+        <div class="route-panel">
+          <h3>这次你准备交付什么？</h3>
+          <p>点击最接近的任务类型。结果不是排行榜，而是“谁主责、谁审查”的组合方式。</p>
+          <div class="route-buttons" role="group" aria-label="任务类型">
+            <button class="route-btn" data-route="product" aria-pressed="true">产品界面</button>
+            <button class="route-btn" data-route="marketing" aria-pressed="false">营销官网</button>
+            <button class="route-btn" data-route="report" aria-pressed="false">视觉汇报</button>
+            <button class="route-btn" data-route="dashboard" aria-pressed="false">数据后台</button>
+            <button class="route-btn" data-route="redesign" aria-pressed="false">旧站改版</button>
+            <button class="route-btn" data-route="strict" aria-pressed="false">严格设计系统</button>
+          </div>
+          <div class="route-result" aria-live="polite">
+            <div class="route-result-top"><div><h4 id="route-title">产品界面：UI UX Pro Max 主责</h4><p class="route-why" id="route-why">它能先生成产品匹配的设计系统，再用可访问性、交互、响应式和技术栈规则约束实现。</p></div><span class="route-owner" id="route-owner">主责：Pro Max</span></div>
+            <div class="route-process" id="route-process"><b>推荐流程：</b>项目设计资料 → Pro Max 生成/校验规则 → 原生实现 → 浏览器验证。若是公开营销入口，可只让 Taste 审查首屏个性，不接管应用内部页面。</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="matrix">
+        <div class="section-kicker">05 / Capability matrix</div>
+        <h2>能力强弱必须拆轴看</h2>
+        <p class="section-intro">以下为基于官方文档和工作流的场景化判断，不是实验室评分。色块越多，表示该项目对该能力投入越完整。</p>
+        <div class="matrix" role="table" aria-label="三款技能能力矩阵">
+          <div class="head" role="columnheader">能力维度</div><div class="head" role="columnheader">Huashu</div><div class="head" role="columnheader">Taste</div><div class="head" role="columnheader">Pro Max</div>
+          <div class="rowhead" role="rowheader">视觉成品交付</div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div><div><span class="level" aria-label="中等"><i class="on"></i><i class="on"></i><i></i><i></i></span></div><div><span class="level" aria-label="较强"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+          <div class="rowhead" role="rowheader">营销前端个性</div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+          <div class="rowhead" role="rowheader">UX 与可访问性</div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+          <div class="rowhead" role="rowheader">复杂产品与数据</div><div><span class="level"><i class="on"></i><i class="on"></i><i></i><i></i></span></div><div><span class="level"><i class="on"></i><i></i><i></i><i></i></span></div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+          <div class="rowhead" role="rowheader">跨技术栈指导</div><div><span class="level"><i class="on"></i><i class="on"></i><i></i><i></i></span></div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+          <div class="rowhead" role="rowheader">中文工作体验</div><div><span class="level best" aria-label="很强"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div><div><span class="level"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="section-kicker">06 / Recommended workflow</div>
+        <h2>正确的组合不是“三个都开”</h2>
+        <p class="section-intro">技能叠加会带来上下文膨胀和规则冲突。更稳妥的方式是先锁定项目事实，再指定一个审美主责，最后让第二个技能做有边界的审查。</p>
+        <div class="workflow">
+          <div class="workflow-step"><div class="num">STEP 01</div><h4>锁定事实</h4><p>用户、任务、内容、品牌资产、技术栈与离线限制先成为源事实。</p></div>
+          <div class="workflow-step"><div class="num">STEP 02</div><h4>选择主责</h4><p>产品系统选 Pro Max；营销个性选 Taste；视觉成品选 Huashu。</p></div>
+          <div class="workflow-step"><div class="num">STEP 03</div><h4>生成与实现</h4><p>只让主责技能决定结构、视觉令牌和交互，避免混合美学。</p></div>
+          <div class="workflow-step"><div class="num">STEP 04</div><h4>边界审查</h4><p>第二技能只检查指定维度，例如可访问性或营销首屏个性。</p></div>
+        </div>
+        <p class="note" style="margin-top:18px"><strong>本教程自身就是示例：</strong>由 UI UX Pro Max 生成 Trust & Authority 设计系统；在线字体被离线约束否决，Tailwind 写法被转换为原生 CSS；Huashu 不再参与视觉决策。</p>
+      </section>
+
+      <section id="prompts">
+        <div class="section-kicker">07 / Prompt recipes</div>
+        <h2>可以直接复用的三类提示词</h2>
+        <p class="section-intro">高质量输出依赖具体上下文。把品牌、受众、技术栈、内容和验收标准写清楚，比单独说“做得高级一点”有效得多。</p>
+        <div class="prompt-grid">
+          <article class="prompt-card"><div class="prompt-head">产品界面 · Pro Max</div><div class="prompt-body" id="prompt-pro">使用 UI UX Pro Max，为【产品】设计【页面】。
+目标用户：【用户】；核心任务：【任务】。
+技术栈：【栈】；品牌令牌：【颜色/字体/组件】。
+先生成设计系统，再实现页面。
+必须满足：键盘导航、4.5:1 对比度、375/768/1440 响应式、无横向溢出。
+不要引入未授权的在线资源。</div><div class="prompt-foot"><button class="copy-btn" data-copy="prompt-pro">复制提示词</button></div></article>
+          <article class="prompt-card"><div class="prompt-head">营销页面 · Taste</div><div class="prompt-body" id="prompt-taste">使用 Taste Skill 重构【品牌】的【落地页/作品集】。
+品牌资产：【链接或本地文件】；受众：【人群】。
+保留：【必须保留内容】；转化目标：【CTA】。
+明确避开：平均三卡片、AI 紫色渐变、虚假产品 UI。
+先审计当前模板味来源，再给出一个主方向并实现。</div><div class="prompt-foot"><button class="copy-btn" data-copy="prompt-taste">复制提示词</button></div></article>
+          <article class="prompt-card"><div class="prompt-head">视觉成品 · Huashu</div><div class="prompt-body" id="prompt-huashu">使用 Huashu Design，为【主题】制作【HTML/PPTX/信息图】。
+唯一内容基线：【文件】；受众：【对象】。
+品牌资产：【文件夹】；尺寸与格式：【规格】。
+先给 3 个真实方向截图，等待我选择后再制作最终稿。
+验收：真实内容、浏览器截图、无溢出、交付文件可编辑。</div><div class="prompt-foot"><button class="copy-btn" data-copy="prompt-huashu">复制提示词</button></div></article>
+        </div>
+      </section>
+
+      <section id="decision">
+        <div class="section-kicker">08 / Final recommendation</div>
+        <h2>给怡哥的综合建议</h2>
+        <div class="decision">
+          <div class="decision-head"><h3>默认 Pro Max，按需 Taste，不再默认 Huashu</h3><p>这是结合你的反馈与当前工作类型得出的个人化路由，不是对三个项目的绝对排名。</p></div>
+          <div class="decision-body">
+            <div class="decision-line"><strong>日常默认</strong><span>UI UX Pro Max。适合教程、工具、后台、桌面产品、复杂流程和需要明确验收规则的工作。</span></div>
+            <div class="decision-line"><strong>临时增强</strong><span>Taste 只在官网、落地页、作品集或“去模板味”改版任务中担任审美主责。</span></div>
+            <div class="decision-line"><strong>Huashu 处理</strong><span>本项目停止使用。未来只有当你明确需要幻灯片、信息图、动画等视觉成品，并认可其方向闸门时再单独启用。</span></div>
+            <div class="decision-line"><strong>不要这样做</strong><span>不要全局常驻三个技能；不要把 Star 或安装量当成质量分；不要让技能覆盖项目已经批准的设计系统。</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="section-kicker">09 / Sources & limits</div>
+        <h2>来源、口径与不确定性</h2>
+        <p class="section-intro">主要结论优先引用官方仓库与技能文档；社区评论只用于识别使用摩擦，不作为受控效果证明。以下链接仅在你主动点击时访问网络，本页面加载时不会请求它们。</p>
+        <ol class="source-list">
+          <li><div><a href="https://github.com/alchaincyf/huashu-design" target="_blank" rel="noreferrer">Huashu Design 官方仓库</a><small>定位、能力、流程、仓库结构、限制与许可证。</small></div></li>
+          <li><div><a href="https://skills.sh/alchaincyf/huashu-design" target="_blank" rel="noreferrer">Huashu Design · skills.sh</a><small>公开安装量快照；不能推导完成率和质量。</small></div></li>
+          <li><div><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noreferrer">Taste Skill 官方仓库</a><small>技能目录、版本与项目结构。</small></div></li>
+          <li><div><a href="https://www.taste-skill.com/" target="_blank" rel="noreferrer">Taste Skill 官方网站与文档</a><small>v2 实验性状态、适用范围和反模板化规则。</small></div></li>
+          <li><div><a href="https://skills.sh/Leonxlnx/taste-skill" target="_blank" rel="noreferrer">Taste Skill · skills.sh</a><small>公开安装量与安全扫描展示。</small></div></li>
+          <li><div><a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill" target="_blank" rel="noreferrer">UI UX Pro Max 官方仓库</a><small>84 种风格、192 类产品/配色、22 个技术栈及设计系统生成流程。</small></div></li>
+          <li><div><a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/blob/main/README.zh.md" target="_blank" rel="noreferrer">UI UX Pro Max 中文 README</a><small>中文能力说明、安装与使用方式。</small></div></li>
+          <li><div><a href="https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill" target="_blank" rel="noreferrer">UI UX Pro Max · skills.sh</a><small>公开安装量与安全扫描快照；部分摘要数据可能落后于仓库当前 SKILL.md。</small></div></li>
+        </ol>
+        <p class="note" style="margin-top:18px"><strong>结论边界：</strong>模型版本、提示词质量、品牌输入、项目代码和人工验收都会显著影响结果。真正严谨的“谁效果更好”需要同模型、同需求、同上下文、盲评和多轮重复；目前未找到覆盖三者的公开受控测试。</p>
+      </section>
+    </main>
+  </div>
+
+  <footer><div class="footer-inner"><div><strong>三款 UI 设计技能对比与选型教程</strong><br>单文件离线版 · 原生 HTML / CSS / JavaScript</div><div>设计方法：UI UX Pro Max · Trust & Authority<br>内容快照：2026-08-03</div></div></footer>
+
+  <script>
+    const routeData={
+      product:{title:'产品界面：UI UX Pro Max 主责',owner:'主责：Pro Max',why:'它能先生成产品匹配的设计系统，再用可访问性、交互、响应式和技术栈规则约束实现。',process:'<b>推荐流程：</b>项目设计资料 → Pro Max 生成/校验规则 → 原生实现 → 浏览器验证。若是公开营销入口，可只让 Taste 审查首屏个性，不接管应用内部页面。'},
+      marketing:{title:'营销官网：Taste Skill 主责',owner:'主责：Taste',why:'落地页与品牌前端需要明确个性和构图主张，Taste 的反模板清单与改版流程更直接。',process:'<b>推荐流程：</b>先提供真实品牌资产和竞品参考 → Taste 负责视觉与实现 → Pro Max 只审查对比度、键盘与响应式。'},
+      report:{title:'视觉汇报：Huashu Design 更完整',owner:'主责：Huashu',why:'如果目标是 PPTX、信息图、动画或多格式视觉成品，Huashu 的交付链覆盖更完整。',process:'<b>推荐流程：</b>锁定唯一内容基线 → 生成三个方向并选择 → 制作成品 → 浏览器/文件验证。若你不接受方向闸门，则不应选它。'},
+      dashboard:{title:'数据后台：UI UX Pro Max 明显更适配',owner:'主责：Pro Max',why:'它提供仪表盘风格、图表规则、数据密度、技术栈和可访问性建议；Taste 官方并不主打这类任务。',process:'<b>推荐流程：</b>先定义指标层级和用户决策 → Pro Max 生成高密度设计系统 → 实现表格与图表 → 进行 375/768/1440 响应式和键盘检查。'},
+      redesign:{title:'旧站改版：先判断是“品牌”还是“系统”问题',owner:'条件路由',why:'视觉同质化、模板味重，选 Taste；信息架构混乱、组件不一致、可访问性差，选 Pro Max。',process:'<b>推荐流程：</b>先做问题清单。Taste 只解决视觉个性，Pro Max 解决规则与系统；不要在同一轮让两者同时重构全部页面。'},
+      strict:{title:'严格设计系统：现有规范优先，Pro Max 只审查',owner:'主责：项目规范',why:'任何技能都不应覆盖已经批准的品牌令牌、组件契约和产品决策。',process:'<b>推荐流程：</b>先读取现有设计系统 → 按原规范实现 → 让 Pro Max 检查可访问性、响应式和技术栈反模式。Taste 通常关闭，Huashu 仅在独立视觉物料中使用。'}
+    };
+    const routeButtons=[...document.querySelectorAll('.route-btn')];
+    routeButtons.forEach(button=>button.addEventListener('click',()=>{
+      routeButtons.forEach(b=>b.setAttribute('aria-pressed','false'));
+      button.setAttribute('aria-pressed','true');
+      const data=routeData[button.dataset.route];
+      document.getElementById('route-title').textContent=data.title;
+      document.getElementById('route-owner').textContent=data.owner;
+      document.getElementById('route-why').textContent=data.why;
+      document.getElementById('route-process').innerHTML=data.process;
+    }));
+
+    document.querySelectorAll('.copy-btn').forEach(button=>button.addEventListener('click',async()=>{
+      const text=document.getElementById(button.dataset.copy).innerText;
+      const original=button.textContent;
+      try{
+        await navigator.clipboard.writeText(text);
+        button.textContent='已复制';
+      }catch(e){
+        const area=document.createElement('textarea');area.value=text;area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();button.textContent='已复制';
+      }
+      setTimeout(()=>button.textContent=original,1500);
+    }));
+
+    const sectionSelect=document.getElementById('section-select');
+    sectionSelect.addEventListener('change',()=>document.querySelector(sectionSelect.value)?.scrollIntoView());
+    const navLinks=[...document.querySelectorAll('.side nav a')];
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+        if(entry.isIntersecting){navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+entry.target.id));}
+      }),{rootMargin:'-15% 0px -72% 0px'});
+      document.querySelectorAll('main section').forEach(section=>observer.observe(section));
+    }
+  </script>
+</body>
+</html>

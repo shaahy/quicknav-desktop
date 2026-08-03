@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Ponytail 的 Codex 桌面端实战教程：适用场景、工作流、六项技能速查与可复制示例。">
+  <title>Ponytail × Codex 桌面端｜简明实战教程</title>
+  <style>
+    :root {
+      --paper: #f4f0e7;
+      --paper-2: #ece5d7;
+      --ink: #17211c;
+      --muted: #5c665f;
+      --line: #c9c1b1;
+      --green: #174e3a;
+      --green-2: #dbe8df;
+      --orange: #b64b24;
+      --orange-2: #f3ded2;
+      --blue: #315a70;
+      --blue-2: #dce8ec;
+      --code: #111916;
+      --code-ink: #eaf1ec;
+      --white: #fffdf8;
+      --radius: 12px;
+      --max: 1200px;
+      --sans: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 78, 58, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 100% 36px;
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    a { color: var(--green); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    :focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+    code, pre { font-family: var(--mono); }
+    code:not(pre code) {
+      padding: .12em .35em;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: rgba(255,255,255,.45);
+      font-size: .92em;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 99;
+      padding: 8px 12px;
+      transform: translateY(-160%);
+      color: white;
+      background: var(--green);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--line);
+      background: var(--ink);
+      color: #f7f2e8;
+    }
+    .masthead::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, transparent 0 72px, rgba(255,255,255,.035) 72px 73px);
+    }
+    .mast-inner {
+      position: relative;
+      z-index: 1;
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 72px 0 62px;
+      min-width: 0;
+    }
+    .kicker {
+      margin: 0 0 16px;
+      color: #a8c9b5;
+      font: 700 .78rem/1.2 var(--mono);
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 920px;
+      margin: 0;
+      font-size: clamp(2.7rem, 6vw, 6.5rem);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    .title-accent { color: #f0a078; }
+    .lead {
+      max-width: 790px;
+      margin: 28px 0 0;
+      color: #cad5ce;
+      font-size: clamp(1.05rem, 1.7vw, 1.28rem);
+    }
+    .hero-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 44px;
+      border: 1px solid #3b4a42;
+      background: #3b4a42;
+    }
+    .hero-stat { padding: 18px; background: #1d2923; }
+    .hero-stat strong { display: block; color: #fff8eb; font-size: 1.35rem; }
+    .hero-stat span { color: #9fb0a6; font-size: .82rem; }
+
+    .page {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 46px;
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 48px 0 100px;
+      min-width: 0;
+    }
+    .toc {
+      position: sticky;
+      top: 18px;
+      align-self: start;
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      padding: 18px 16px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(8px);
+    }
+    .toc-title {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font: 700 .72rem/1.2 var(--mono);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .toc ol { margin: 0; padding: 0; list-style: none; counter-reset: nav; }
+    .toc li { counter-increment: nav; }
+    .toc a {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 7px;
+      padding: 7px 2px;
+      color: var(--ink);
+      text-decoration: none;
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+    .toc a::before { content: counter(nav, decimal-leading-zero); color: var(--orange); font-family: var(--mono); }
+    .toc a:hover { color: var(--green); }
+
+    main { min-width: 0; }
+    section { scroll-margin-top: 24px; margin-bottom: 80px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: 68px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 26px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid var(--ink);
+    }
+    .section-no {
+      padding-top: 5px;
+      color: var(--orange);
+      font: 800 1.15rem/1 var(--mono);
+    }
+    h2 { margin: 0; font-size: clamp(1.8rem, 3.4vw, 3rem); line-height: 1.12; letter-spacing: -.035em; }
+    h3 { margin: 34px 0 12px; font-size: 1.28rem; line-height: 1.35; }
+    h4 { margin: 0 0 8px; font-size: 1rem; }
+    p { margin: 0 0 1em; }
+    .subhead { max-width: 760px; margin: 8px 0 0; color: var(--muted); }
+
+    .callout {
+      margin: 24px 0;
+      padding: 20px 22px;
+      border-left: 5px solid var(--green);
+      background: var(--green-2);
+    }
+    .callout.warn { border-left-color: var(--orange); background: var(--orange-2); }
+    .callout.blue { border-left-color: var(--blue); background: var(--blue-2); }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    .two-col, .three-col {
+      display: grid;
+      gap: 16px;
+    }
+    .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .panel {
+      padding: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 248, .64);
+    }
+    .panel h3 { margin-top: 0; }
+    .panel ul { margin-bottom: 0; }
+    .good { border-top: 5px solid var(--green); }
+    .bad { border-top: 5px solid var(--orange); }
+    .neutral { border-top: 5px solid var(--blue); }
+
+    .ladder { margin: 24px 0; padding: 0; list-style: none; counter-reset: ladder; }
+    .ladder li {
+      counter-increment: ladder;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin: 0 0 8px;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .ladder li::before {
+      content: counter(ladder);
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: white;
+      font: 700 .9rem var(--mono);
+    }
+    .ladder b { display: block; }
+    .ladder small { color: var(--muted); }
+    .stop { color: var(--orange); font: 700 .75rem var(--mono); text-transform: uppercase; }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 26px 0;
+    }
+    .flow-step {
+      position: relative;
+      min-height: 170px;
+      padding: 18px 14px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .flow-step:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      z-index: 2;
+      color: var(--orange);
+      font-weight: 900;
+    }
+    .flow-step .num { color: var(--orange); font: 800 .75rem var(--mono); }
+    .flow-step strong { display: block; margin: 12px 0 8px; line-height: 1.3; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.55; }
+    .gate {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 2px 6px;
+      background: var(--green-2);
+      color: var(--green);
+      font: 700 .68rem var(--mono);
+    }
+
+    .mode-table, .quick-table { width: 100%; border-collapse: collapse; background: var(--white); }
+    .mode-table th, .mode-table td, .quick-table th, .quick-table td {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .mode-table th, .quick-table th { background: var(--ink); color: white; font-size: .82rem; }
+    .mode-badge { white-space: nowrap; font: 800 .8rem var(--mono); color: var(--green); }
+
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+    .filter-btn {
+      min-height: 42px;
+      padding: 8px 13px;
+      border: 1px solid var(--ink);
+      border-radius: 0;
+      color: var(--ink);
+      background: transparent;
+      font: 700 .82rem var(--sans);
+      cursor: pointer;
+    }
+    .filter-btn[aria-pressed="true"], .filter-btn:hover { color: white; background: var(--ink); }
+    .skill-list { display: grid; gap: 18px; }
+    .skill-card {
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .skill-card[hidden] { display: none; }
+    .skill-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .skill-name { margin: 0; font: 800 1.3rem/1.2 var(--mono); color: var(--green); }
+    .skill-role { margin: 6px 0 0; color: var(--muted); }
+    .stage-pill { padding: 5px 8px; background: var(--paper-2); font: 700 .72rem var(--mono); white-space: nowrap; }
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .skill-cell { min-width: 0; padding: 16px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .skill-cell:nth-child(2n) { border-right: 0; }
+    .skill-cell:nth-last-child(-n+2) { border-bottom: 0; }
+    .label { margin-bottom: 7px; color: var(--orange); font: 800 .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .skill-cell p, .skill-cell ul { margin: 0; }
+
+    .codebox { position: relative; margin: 16px 0; background: var(--code); color: var(--code-ink); }
+    .codebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 40px;
+      padding: 8px 10px 8px 15px;
+      border-bottom: 1px solid #34423a;
+      color: #9eb0a5;
+      font: 700 .72rem var(--mono);
+    }
+    .copy-btn {
+      min-height: 32px;
+      padding: 5px 9px;
+      border: 1px solid #627067;
+      color: #e9f0eb;
+      background: transparent;
+      font: 700 .72rem var(--sans);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #2a3931; }
+    pre { margin: 0; padding: 17px 18px; overflow: auto; font-size: .84rem; line-height: 1.65; tab-size: 2; }
+    .comment { color: #86a891; }
+    .string { color: #f1b48f; }
+    .key { color: #9dc9df; }
+
+    .compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      margin: 20px 0;
+      border: 1px solid var(--line);
+      background: var(--line);
+    }
+    .compare > div { padding: 20px; background: var(--white); }
+    .compare .before { box-shadow: inset 0 5px 0 var(--orange); }
+    .compare .after { box-shadow: inset 0 5px 0 var(--green); }
+    .compare h4 { margin-top: 8px; }
+
+    .lab-step {
+      display: grid;
+      grid-template-columns: 62px minmax(0, 1fr);
+      gap: 18px;
+      margin: 0 0 26px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-index {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border: 2px solid var(--ink);
+      font: 800 .9rem var(--mono);
+    }
+    .lab-step h3 { margin-top: 0; }
+    .expected { padding: 12px 14px; border-left: 3px solid var(--blue); background: var(--blue-2); font-size: .9rem; }
+
+    .checklist { display: grid; gap: 9px; margin: 20px 0; }
+    .check-row {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: var(--white);
+    }
+    .check-row input { width: 18px; height: 18px; margin-top: 4px; accent-color: var(--green); }
+    .check-row:has(input:checked) { opacity: .62; }
+    .check-row:has(input:checked) span { text-decoration: line-through; }
+
+    .source-list { padding-left: 1.3em; }
+    .source-list li { margin-bottom: 8px; overflow-wrap: anywhere; }
+    .version-note { color: var(--muted); font-size: .86rem; }
+
+    footer {
+      padding: 36px 20px;
+      border-top: 1px solid var(--line);
+      color: #b9c5bd;
+      background: var(--ink);
+      text-align: center;
+      font-size: .86rem;
+    }
+    #copy-status { position: fixed; right: 16px; bottom: 16px; z-index: 20; padding: 10px 14px; color: white; background: var(--green); opacity: 0; transform: translateY(10px); transition: .2s ease; pointer-events: none; }
+    #copy-status.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1040px) {
+      .page { grid-template-columns: 1fr; }
+      .toc { position: static; max-height: none; }
+      .toc ol { columns: 2; }
+      .workflow { grid-template-columns: repeat(3, 1fr); }
+      .flow-step:nth-child(3)::after { content: none; }
+    }
+    @media (max-width: 760px) {
+      body { background-size: 100% 30px; }
+      .mast-inner, .page { width: min(100% - 28px, var(--max)); }
+      .mast-inner { padding: 52px 0 42px; }
+      .kicker { max-width: 100%; font-size: .68rem; overflow-wrap: anywhere; }
+      .lead, h1, h2, h3, p, li { overflow-wrap: anywhere; }
+      .hero-strip, .two-col, .three-col, .compare, .skill-grid { grid-template-columns: 1fr; }
+      .hero-stat { padding: 14px; }
+      .toc ol { columns: 1; }
+      .workflow { grid-template-columns: 1fr; }
+      .flow-step { min-height: auto; }
+      .flow-step:not(:last-child)::after { content: "↓"; top: auto; right: 50%; bottom: -17px; }
+      .skill-cell { border-right: 0; }
+      .skill-cell:nth-last-child(2) { border-bottom: 1px solid var(--line); }
+      .ladder li { grid-template-columns: 44px minmax(0, 1fr); }
+      .stop { grid-column: 2; }
+      .lab-step { grid-template-columns: 1fr; }
+      .lab-step > div, main, section, .codebox { min-width: 0; max-width: 100%; }
+      pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+      .section-head { grid-template-columns: 48px minmax(0, 1fr); }
+      .quick-table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --paper: #141a17;
+        --paper-2: #26302a;
+        --ink: #edf1ee;
+        --muted: #a9b4ad;
+        --line: #414b45;
+        --green: #8dc6a5;
+        --green-2: #20382b;
+        --orange: #ef946d;
+        --orange-2: #49291f;
+        --blue: #8ab8cd;
+        --blue-2: #213943;
+        --white: #1c231f;
+      }
+      .masthead, footer { background: #0d120f; }
+      code:not(pre code) { background: rgba(255,255,255,.06); }
+    }
+    @media print {
+      :root { --paper: #fff; --ink: #111; --muted: #444; --white: #fff; --line: #aaa; }
+      body { background: white; font-size: 10.5pt; }
+      .masthead { color: white !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .mast-inner, .page { width: 100%; }
+      .mast-inner { padding: 30px 22px; }
+      .page { display: block; padding: 24px 22px; }
+      .toc, .filters, .copy-btn, #copy-status { display: none !important; }
+      section { margin-bottom: 34px; break-inside: auto; }
+      .skill-card, .panel, .lab-step, .codebox { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 8pt; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="masthead">
+    <div class="mast-inner">
+      <p class="kicker">Codex desktop field guide · Ponytail 4.8.4 baseline</p>
+      <h1>在 Codex 桌面端，<br><span class="title-accent">用更少代码交付。</span></h1>
+      <p class="lead">一份简洁、可复制的 Ponytail 实战教程：先选技能，再照着提示词操作，最后完成复杂度审查与正常代码审查。</p>
+      <div class="hero-strip" aria-label="教程概览">
+        <div class="hero-stat"><strong>3 分钟</strong><span>理解核心用法</span></div>
+        <div class="hero-stat"><strong>6 项</strong><span>核心技能速查</span></div>
+        <div class="hero-stat"><strong>3 档</strong><span>Lite / Full / Ultra</span></div>
+        <div class="hero-stat"><strong>1 条</strong><span>Codex 完整实战链</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+    <nav class="toc" aria-label="章节导航">
+      <p class="toc-title">章节导航</p>
+      <ol>
+        <li><a href="#mental-model">30 秒认识 Ponytail</a></li>
+        <li><a href="#desktop-start">Codex 桌面端怎么用</a></li>
+        <li><a href="#workflow">推荐工作流</a></li>
+        <li><a href="#skills">六项技能速查</a></li>
+        <li><a href="#lab">Codex 桌面端实战</a></li>
+        <li><a href="#pitfalls">边界与常见误区</a></li>
+        <li><a href="#checklist">一页式执行清单</a></li>
+      </ol>
+    </nav>
+
+    <main id="main">
+      <section id="mental-model">
+        <div class="section-head"><span class="section-no">01</span><div><h2>30 秒认识 Ponytail</h2><p class="subhead">它是 Codex 的“反过度工程”约束：先复用、再用原生能力，最后才写最小可行代码。</p></div></div>
+
+        <div class="callout">
+          <strong>一句话定位</strong>
+          Ponytail 让 Agent 在写代码前先问：能不能不做、复用现有代码、使用标准库或平台原生能力？都不行时，才写能工作的最小实现。
+        </div>
+
+        <ol class="ladder" aria-label="Ponytail 决策顺序">
+          <li><div><b>先判断是否真的要做</b><small>不为猜测中的未来需求增加配置、抽象或扩展点。</small></div><span class="stop">YAGNI</span></li>
+          <li><div><b>再查现有代码、标准库和平台原生能力</b><small>能复用就不重写，能原生完成就不新增依赖。</small></div><span class="stop">优先复用</span></li>
+          <li><div><b>最后写最小可靠实现</b><small>改在根因位置，保留必要校验、安全边界和最小验证。</small></div><span class="stop">正确且小</span></li>
+        </ol>
+
+        <div class="two-col">
+          <article class="panel good"><h3>懒在方案</h3><ul><li>删除优先于新增。</li><li>标准库优先于自定义。</li><li>根因修复优先于入口补丁。</li><li>一个最小检查优先于空口保证。</li></ul></article>
+          <article class="panel bad"><h3>不能懒的地方</h3><ul><li>理解需求与真实调用链。</li><li>信任边界输入校验。</li><li>防数据丢失的错误处理。</li><li>安全、可访问性和硬件校准。</li></ul></article>
+        </div>
+      </section>
+
+      <section id="desktop-start">
+        <div class="section-head"><span class="section-no">02</span><div><h2>在 Codex 桌面端怎么用</h2><p class="subhead">前提：Ponytail 插件已经安装，并在安装后重新启动过 Codex 桌面端。本教程不负责联网安装。</p></div></div>
+        <div class="three-col">
+          <article class="panel good"><h3>1. 打开任务</h3><p>在 Codex 桌面端打开目标项目，创建或进入一个编码任务。</p></article>
+          <article class="panel good"><h3>2. 输入技能</h3><p>在输入框键入 <code>@ponytail full</code>，发送后继续描述开发任务。</p></article>
+          <article class="panel good"><h3>3. 核对结果</h3><p>检查变更、运行验证，再用 <code>@ponytail-review</code> 查是否写多。</p></article>
+        </div>
+        <div class="codebox"><div class="codebar"><span>第一次使用：直接复制到 Codex 输入框</span><button class="copy-btn" type="button">复制</button></div><pre><code>@ponytail full
+
+读取当前项目后完成这个任务：
+[写明必须实现的功能]
+
+约束：不新增依赖；优先复用现有代码；保留错误处理和验证。
+完成后说明：修改了什么、运行了什么验证、哪些内容有意没有增加。</code></pre></div>
+        <h3>模式怎么选</h3>
+        <table class="mode-table">
+          <thead><tr><th>模式</th><th>行为</th><th>适用阶段</th><th>风险</th></tr></thead>
+          <tbody>
+            <tr><td><span class="mode-badge">LITE</span></td><td>先按要求做，再提示更轻方案。</td><td>刚开始试用、强约束任务。</td><td>约束较弱。</td></tr>
+            <tr><td><span class="mode-badge">FULL</span></td><td>完整执行最小实现纪律，默认推荐。</td><td>日常功能、修 Bug、重构。</td><td>需求必须先明确。</td></tr>
+            <tr><td><span class="mode-badge">ULTRA</span></td><td>主动删减范围和抽象。</td><td>一次性脚本、允许砍范围的原型。</td><td>可能挑战既有方案。</td></tr>
+            <tr><td><span class="mode-badge">OFF</span></td><td>退出 Ponytail 持续模式。</td><td>非编码或架构探索。</td><td>不再自动约束过度工程。</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="workflow">
+        <div class="section-head"><span class="section-no">03</span><div><h2>推荐工作流</h2><p class="subhead">Ponytail 负责“尽量少写”，但需求确认、正确性审查和人工验收仍要独立完成。</p></div></div>
+        <div class="workflow" aria-label="推荐交付工作流">
+          <article class="flow-step"><span class="num">01</span><strong>确认任务</strong><p>写清功能、约束和验收条件。</p><span class="gate">人工决策</span></article>
+          <article class="flow-step"><span class="num">02</span><strong>最小实现</strong><p><code>@ponytail full</code> 后提交任务。</p><span class="gate">Codex 执行</span></article>
+          <article class="flow-step"><span class="num">03</span><strong>运行验证</strong><p>检查实际变更并运行相关测试。</p><span class="gate">证据</span></article>
+          <article class="flow-step"><span class="num">04</span><strong>复杂度审查</strong><p><code>@ponytail-review</code> 查多余代码。</p><span class="gate">只读报告</span></article>
+          <article class="flow-step"><span class="num">05</span><strong>正常审查</strong><p>另查正确性、安全和回归风险。</p><span class="gate">质量 Gate</span></article>
+          <article class="flow-step"><span class="num">06</span><strong>验收与债务</strong><p>人工验收，延期能力进入债务台账。</p><span class="gate">完成</span></article>
+        </div>
+        <div class="callout blue"><strong>核心职责分工</strong><code>ponytail-review</code> 回答“写多了吗”；正常 Code Review 回答“写对了吗”；测试回答“以后坏了能发现吗”；人工验收回答“这是不是用户要的”。</div>
+      </section>
+
+      <section id="skills">
+        <div class="section-head"><span class="section-no">04</span><div><h2>六项技能速查</h2><p class="subhead">每张卡只回答四件事：给什么、得到什么、什么时候用、在 Codex 桌面端输入什么。</p></div></div>
+        <div class="filters" role="group" aria-label="筛选技能">
+          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button class="filter-btn" type="button" data-filter="build" aria-pressed="false">实现</button>
+          <button class="filter-btn" type="button" data-filter="review" aria-pressed="false">审查</button>
+          <button class="filter-btn" type="button" data-filter="governance" aria-pressed="false">治理</button>
+          <button class="filter-btn" type="button" data-filter="reference" aria-pressed="false">参考</button>
+        </div>
+
+        <div class="skill-list">
+          <article class="skill-card" data-group="build">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail</h3><p class="skill-role">持续模式：让当前编码任务采用最小可靠实现。</p></div><span class="stage-pill">实现前 → 实现中</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>明确需求、相关代码、调用链、现有依赖、不可删约束；可选参数 <code>lite | full | ultra</code>。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>代码优先；最多三行说明跳过了什么、什么条件下再增加。复杂逻辑附一个最小可运行检查。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>需求已经明确后的实现前与实现中；日常功能、Bug 修复和小型重构优先使用 Full。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail full</code><br>“读取现有导出逻辑，增加 CSV 导出；不要新增依赖，保留字段转义和现有测试。”</p></div>
+            </div>
+          </article>
+
+          <article class="skill-card" data-group="review">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail-review</h3><p class="skill-role">一次性报告：只审当前 Diff 中的过度工程。</p></div><span class="stage-pill">实现后 → 提交前</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>当前未提交 Diff 或明确的变更范围；最好同时提供任务验收标准，避免把必需代码误判为多余。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>逐行发现：<code>delete</code>、<code>stdlib</code>、<code>native</code>、<code>yagni</code>、<code>shrink</code>，结尾给出可能减少的行数。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>实现与验证完成后、提交前；也适合检查一段 AI 生成的当前 Diff。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail-review</code><br>“只审当前 Diff 是否过度工程；只报告，不修改，也不要审正确性、安全或性能。”</p></div>
+            </div>
+          </article>
+
+          <article class="skill-card" data-group="review">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail-audit</h3><p class="skill-role">一次性报告：扫描整个仓库的过度工程。</p></div><span class="stage-pill">专项治理 / 迭代间隙</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>完整代码树、依赖清单和项目边界；应排除构建产物、第三方目录和生成代码。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>按可削减量排序的清单：删什么、用什么替代、路径在哪里；结尾估算可减少行数和依赖数。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>迭代间隙、重构立项前或旧仓库治理时；不适合在紧急修复中扩大范围。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail-audit</code><br>“扫描仓库的单实现接口、代理包装层、死配置和重复标准库能力；只报告，不修改。”</p></div>
+            </div>
+          </article>
+
+          <article class="skill-card" data-group="governance">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail-debt</h3><p class="skill-role">一次性报告：收集有意识的简化与升级触发条件。</p></div><span class="stage-pill">迭代末 / 发布前</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>代码库中的 <code># ponytail:</code> 或 <code>// ponytail:</code> 注释。约定内容应写明能力上限和升级触发条件。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>按文件分组的债务台账：位置、简化内容、上限、升级条件；缺少触发条件的项标记 <code>no-trigger</code>。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>迭代末、发布前或技术债盘点时；前提是代码中已经存在带触发条件的 <code>ponytail:</code> 注释。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail-debt</code><br>“汇总项目中的 ponytail 注释；标出没有升级触发条件的项，不要写文件。”</p></div>
+            </div>
+          </article>
+
+          <article class="skill-card" data-group="reference">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail-gain</h3><p class="skill-role">一次性卡片：展示项目发布的基准数据。</p></div><span class="stage-pill">评估 / 分享</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>无需仓库输入；直接调用。它不会分析当前项目。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>ASCII 记分牌，展示代码、成本和速度的发布基准；不改变模式、不写文件。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>团队介绍、工具评估或演示时；不参与当前项目的实现与审查。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail-gain</code><br>直接发送即可。它展示发布基准，不会测量当前仓库的真实收益。</p></div>
+            </div>
+          </article>
+
+          <article class="skill-card" data-group="reference">
+            <div class="skill-top"><div><h3 class="skill-name">ponytail-help</h3><p class="skill-role">一次性卡片：查询模式、技能、配置和停用方法。</p></div><span class="stage-pill">任何阶段</span></div>
+            <div class="skill-grid">
+              <div class="skill-cell"><div class="label">输入</div><p>无需上下文；直接调用或询问“Ponytail 有哪些命令”。</p></div>
+              <div class="skill-cell"><div class="label">输出</div><p>模式表、六项技能列表、停用方式和默认模式配置位置。</p></div>
+              <div class="skill-cell"><div class="label">适用阶段</div><p>任何阶段；忘记模式、技能名称、配置位置或退出方式时使用。</p></div>
+              <div class="skill-cell"><div class="label">Codex 桌面端示例</div><p><code>@ponytail-help</code><br>直接发送即可。它只显示帮助；退出持续模式可输入 <code>stop ponytail</code>。</p></div>
+            </div>
+          </article>
+        </div>
+        <div class="callout warn"><strong>统一边界</strong><code>review</code> 与 <code>audit</code> 只审“是否写多”，不审正确性、安全和性能；所有只读技能都不会自动修改代码。安全校验、防数据丢失处理和用户明确要求不能为了少代码而删除。</div>
+      </section>
+
+      <section id="lab">
+        <div class="section-head"><span class="section-no">05</span><div><h2>Codex 桌面端完整实战</h2><p class="subhead">示例任务：在现有本地 Todo 项目中增加 CSV 导出。重点不是抄代码，而是走完一次可复用的 Codex 操作链。</p></div></div>
+
+        <div class="callout blue"><strong>先写清验收</strong>导出的 CSV 包含任务名和到期日；逗号、双引号与换行不会破坏列结构；不新增依赖；保留现有校验和测试。</div>
+
+        <div class="lab-step">
+          <div class="lab-index">01</div>
+          <div><h3>开启 Full 模式并提交任务</h3><div class="codebox"><div class="codebar"><span>粘贴到 Codex 输入框</span><button class="copy-btn" type="button">复制</button></div><pre><code>@ponytail full
+
+读取当前 Todo 项目，实现 CSV 导出：
+1. 导出任务名和到期日；
+2. 正确处理逗号、双引号和换行；
+3. 不新增依赖，优先复用现有逻辑；
+4. 保留现有校验，并运行相关测试。
+
+完成后告诉我：改了什么、验证结果、哪些未来能力有意没做。</code></pre></div><p class="expected">你应该看到：Codex 先检查现有实现和依赖，再做局部修改，而不是先安装 CSV 库或建立新架构。</p></div>
+        </div>
+
+        <div class="lab-step">
+          <div class="lab-index">02</div>
+          <div><h3>检查改动证据</h3><p>在 Codex 的变更视图中确认：修改集中在真实导出位置；没有无关文件、额外依赖或为未来需求准备的接口；CSV 边界处理没有被省略。</p><div class="codebox"><div class="codebar"><span>证据不足时继续输入</span><button class="copy-btn" type="button">复制</button></div><pre><code>先不要继续扩展。请列出本次实际修改的文件、运行过的验证命令及结果，并说明为什么没有新增依赖。</code></pre></div><p class="expected">进入下一步的条件：能看到具体文件和真实验证结果，而不是只有“应该可以”。</p></div>
+        </div>
+
+        <div class="lab-step">
+          <div class="lab-index">03</div>
+          <div><h3>用 Ponytail Review 查“是否写多了”</h3><div class="codebox"><div class="codebar"><span>粘贴到 Codex 输入框</span><button class="copy-btn" type="button">复制</button></div><pre><code>@ponytail-review
+
+只审查当前 Diff 是否过度工程。
+只列问题，不要修改；不要审正确性、安全或性能。
+验收要求中的 CSV 转义、现有校验和测试不能当作多余代码删除。</code></pre></div><p class="expected">你应该看到：逐项精简建议，或 <code>Lean already. Ship.</code>。这不是质量验收结论。</p></div>
+        </div>
+
+        <div class="lab-step">
+          <div class="lab-index">04</div>
+          <div><h3>单独做正常代码审查</h3><div class="codebox"><div class="codebar"><span>新的 Codex 提示词</span><button class="copy-btn" type="button">复制</button></div><pre><code>现在进行正常代码审查，只报告，不修改。
+检查：验收标准、CSV 转义正确性、错误处理、安全、回归风险和测试覆盖。
+不要因为 Ponytail Review 判定精简就省略这些检查。</code></pre></div><p class="expected">你应该看到：基于正确性和风险的独立发现。它与“是否写多了”是两份不同报告。</p></div>
+        </div>
+
+        <div class="lab-step">
+          <div class="lab-index">05</div>
+          <div><h3>记录明确接受的能力上限</h3><p>假设当前只支持少量本地任务，服务端大数据导出不在本次范围。让 Codex 添加带升级触发条件的注释：</p><div class="codebox"><div class="codebar"><span>债务标记示例</span><button class="copy-btn" type="button">复制</button></div><pre><code>请只在真实限制附近添加一条注释：
+// ponytail: 当前仅导出已加载任务；需要导出全部服务端数据时升级为分页流式导出
+
+不要创建债务文件，也不要实现未来方案。</code></pre></div><p class="expected">好的债务说明同时包含“当前上限”和“何时升级”，而不是模糊的 TODO。</p></div>
+        </div>
+
+        <div class="lab-step">
+          <div class="lab-index">06</div>
+          <div><h3>生成债务台账并人工验收</h3><div class="codebox"><div class="codebar"><span>最后一次调用</span><button class="copy-btn" type="button">复制</button></div><pre><code>@ponytail-debt
+
+汇总当前项目的 ponytail 注释；标记缺少升级触发条件的项。只报告，不写文件。</code></pre></div><p class="expected">最后由人按验收条件实际导出边界数据。测试变绿、Review 显示 Lean，都不能替代人工验收。</p></div>
+        </div>
+      </section>
+
+      <section id="pitfalls">
+        <div class="section-head"><span class="section-no">06</span><div><h2>边界与常见误区</h2><p class="subhead">Ponytail 的目标是减少没有当前价值的维护面，不是机械追求最少行数。</p></div></div>
+        <div class="two-col">
+          <article class="panel bad"><h3>不要用它决定需求</h3><p>已确认的 SPEC、兼容性和合规约束不能被“更少代码”推翻。</p></article>
+          <article class="panel bad"><h3>不要把 Review 当完整审查</h3><p><code>review</code> 和 <code>audit</code> 不负责正确性、安全、性能与发布审批。</p></article>
+          <article class="panel bad"><h3>不要为了短而删验证</h3><p>边界处理、信任边界校验、防数据丢失和最小测试不是样板代码。</p></article>
+          <article class="panel bad"><h3>不要默认使用 Ultra</h3><p>日常任务选 Full；只有明确允许主动砍范围时才使用 Ultra。</p></article>
+        </div>
+        <div class="callout warn"><strong>关于 gain</strong><code>@ponytail-gain</code> 展示的是项目发布基准，不会测量当前仓库。没有自己的对照实验，不要宣称实际节省了多少代码或成本。</div>
+      </section>
+
+      <section id="checklist">
+        <div class="section-head"><span class="section-no">07</span><div><h2>一页式执行清单</h2><p class="subhead">勾选状态只保存在当前浏览器，不会上传。</p></div></div>
+        <div class="checklist" id="codex-done-list">
+          <label class="check-row"><input type="checkbox"><span>任务、约束和验收标准已经写清。</span></label>
+          <label class="check-row"><input type="checkbox"><span>使用 <code>@ponytail full</code> 完成最小实现。</span></label>
+          <label class="check-row"><input type="checkbox"><span>检查了实际 Diff，并看到了真实测试或运行证据。</span></label>
+          <label class="check-row"><input type="checkbox"><span>使用 <code>@ponytail-review</code> 完成复杂度专项审查。</span></label>
+          <label class="check-row"><input type="checkbox"><span>另行完成正确性、安全和回归风险审查。</span></label>
+          <label class="check-row"><input type="checkbox"><span>人工核对验收标准；延期项写明能力上限和升级触发条件。</span></label>
+        </div>
+        <p class="version-note">内容基线：Ponytail 4.8.4，核验日期 2026-08-03。页面的字体、样式与脚本全部内联，不加载在线模块或外部资源。</p>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>DietrichGebert/ponytail · Codex 桌面端中文实战教程 · 单文件 HTML · 2026-08-03</footer>
+  <div id="copy-status" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    (() => {
+      const status = document.querySelector('#copy-status');
+      let statusTimer;
+
+      document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const text = button.closest('.codebox').querySelector('code').innerText;
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (_) {
+            const area = Object.assign(document.createElement('textarea'), { value: text });
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand('copy');
+            area.remove();
+          }
+          status.classList.add('show');
+          clearTimeout(statusTimer);
+          statusTimer = setTimeout(() => status.classList.remove('show'), 1300);
+        });
+      });
+
+      const buttons = [...document.querySelectorAll('.filter-btn')];
+      const cards = [...document.querySelectorAll('.skill-card')];
+      buttons.forEach(button => button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+        buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        cards.forEach(card => { card.hidden = filter !== 'all' && card.dataset.group !== filter; });
+      }));
+
+      const checks = [...document.querySelectorAll('#codex-done-list input')];
+      const storageKey = 'ponytail-codex-tutorial-done-v2';
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        checks.forEach((check, index) => { check.checked = Boolean(saved[index]); });
+        checks.forEach(check => check.addEventListener('change', () => {
+          localStorage.setItem(storageKey, JSON.stringify(checks.map(item => item.checked)));
+        }));
+      } catch (_) {
+        // 文件隐私模式可能禁用 localStorage；清单仍可在当前页面使用。
+      }
+    })();
+  </script>
+</body>
+</html>
