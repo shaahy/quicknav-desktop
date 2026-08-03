@@ -6,12 +6,8 @@
 
 - `src/`：Electron 主进程、预加载脚本和 React 界面。
 - `tests/`：单元测试、可访问性检查和测试辅助代码。
-- `specs/`：产品规格、数据模型、契约和验证清单。
-- `_bmad-output/`：需要长期保留的 BMAD 规划与设计产物。
 - `A 教程集合/`：应用实际使用的 Markdown、HTML、图片和教程源码，属于核心内容并由 Git 跟踪。
 - `app-data.json`：卡片、分类和相对文件路径数据；相对路径以该文件所在目录为基准。
-
-`node_modules/`、构建产物、测试结果、本机 Agent 设置和 Edge QA 浏览器配置不会进入 Git。
 
 ## 教程与资料目录
 
@@ -182,76 +178,6 @@ git diff --check
 - `A 教程集合/` 中重新出现 Edge QA 浏览器配置目录；
 - 待跟踪文件中出现 50 MiB 及以上的大文件。
 
-## GitHub 仓库与协作权限
-
-当前仓库为公开仓库：[`shaahy/quicknav-desktop`](https://github.com/shaahy/quicknav-desktop)。任何人都可以直接克隆和读取仓库内容，不需要由仓库所有者逐一邀请。
-
-公开访问只代表可读取。其他人若要向本仓库 `push`，仍需由仓库所有者在 GitHub 仓库的 `Settings → Collaborators` 中授予协作者权限。
-
-```powershell
-git clone https://github.com/shaahy/quicknav-desktop.git
-```
-
-不要共享 GitHub 密码、个人访问令牌或一次性设备码。协作者应使用各自的 GitHub 账号进行身份验证。
-
-## 在另一台电脑使用
-
-### Windows
-
-1. 安装 Git for Windows 和 Node.js 24。
-2. 打开 PowerShell，克隆公开仓库。
-3. 进入仓库目录，双击 `启动速查.bat`，或在 PowerShell 中运行该 BAT。
-
-```powershell
-git clone https://github.com/shaahy/quicknav-desktop.git
-cd quicknav-desktop
-.\启动速查.bat
-```
-
-### macOS
-
-1. 安装 Git 和 Node.js 24。
-2. 打开终端并克隆公开仓库。
-3. 在 Finder 中打开 `quicknav-desktop` 文件夹，双击 `启动速查.command`；也可以直接在终端运行。
-
-```shell
-git clone https://github.com/shaahy/quicknav-desktop.git
-cd quicknav-desktop
-./启动速查.command
-```
-
-第一次运行会根据 Mac 的处理器架构安装对应依赖，不要从 Windows 电脑复制 `node_modules/`。若 macOS 显示安全确认，可在 Finder 中右键该文件并选择“打开”。
-
-由于教程路径相对于 `app-data.json`，请保持仓库内 `app-data.json` 和 `A 教程集合/` 的相对位置不变。
-
-当前38项仓库内资料可以随仓库同步；4项标为“本机/外部工作区资料”的卡片依赖原电脑路径，在同事的 Mac 上不会自动可用。
-
-`node_modules/` 不会上传 GitHub。每台电脑会根据同一个 `package-lock.json` 在本机生成依赖，因此不要在电脑之间复制 `node_modules/`。
-
-## 日常同步
-
-开始工作前：
-
-```powershell
-git status
-git pull --ff-only
-```
-
-完成一组可验证的修改后：
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-repository-hygiene.ps1
-git status
-git add --all
-git status
-git commit -m "说明本次修改"
-git push
-```
-
-不要在两台电脑上同时保留未推送修改。若 `git pull --ff-only` 提示分支已分叉，先停止操作并检查两边的提交，不要强制覆盖。
-
-拉取更新后可以直接双击 Windows BAT 或 macOS `.command`。如果 `package-lock.json` 发生变化，启动文件会自动重新执行 `npm ci`。
-
 ## 故障排查
 
 ### 提示找不到 Node.js 或 npm
@@ -298,24 +224,3 @@ npm run build
 ### 只想运行应用，不想安装开发环境
 
 源码仓库的 BAT 和 `.command` 都依赖 Node.js。完全不安装 Node.js 的电脑应使用后续发布到 GitHub Release 的 Windows 便携版或 macOS 应用包，而不是直接运行源码仓库。
-
-## 添加新教程
-
-1. 将 Markdown、HTML、图片或必要源码放入 `A 教程集合/` 的清晰子目录。
-2. 在速查工具中添加或更新卡片与分类，确认 `app-data.json` 已保存。
-3. 刷新 README 教程目录：
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1
-   ```
-
-4. 不要复制浏览器用户数据目录、缓存、日志、数据库 journal 或其他项目的 `.git`。
-5. 运行仓库体检和目录一致性检查：
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-repository-hygiene.ps1
-   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1 -Check
-   ```
-
-6. 使用 `git status` 审核新增文件后再提交。
-7. 二进制文件达到 50 MiB 时先评估 Git LFS，不要直接提交。
