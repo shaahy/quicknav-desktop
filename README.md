@@ -47,10 +47,9 @@ git status
 git add --all
 git status
 git commit -m "chore: 整理项目并纳入教程内容"
-git branch -M main
 git remote add origin https://github.com/<你的账号>/<仓库名>.git
 git remote -v
-git push -u origin main
+git push -u origin master
 ```
 
 执行 `git add --all` 后必须再次检查 `git status`，确认没有缓存、凭据、无关数据库或意外的大文件，再执行提交。
