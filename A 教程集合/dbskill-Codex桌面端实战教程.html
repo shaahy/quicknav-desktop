@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>dbskill × Codex 桌面端实战教程</title>
+  <style>
+    :root{
+      --ink:#15263a;--muted:#657080;--paper:#f4f0e7;--paper2:#fffdf8;
+      --line:#cfc7b8;--blue:#176b87;--blue2:#d9edf0;--red:#d8573c;
+      --yellow:#e5b94f;--green:#3e7967;--shadow:0 18px 60px rgba(27,38,50,.12);
+      --radius:18px;--sans:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",sans-serif;
+      --serif:"STSong","Songti SC","Noto Serif CJK SC",serif;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.75}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.32;background-image:radial-gradient(#6c665b 0.55px,transparent .55px);background-size:8px 8px;mix-blend-mode:multiply}
+    a{color:inherit} button,input,textarea{font:inherit}
+    .shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+    .rail{position:sticky;top:0;height:100vh;padding:28px 22px;border-right:1px solid var(--line);background:rgba(244,240,231,.94);backdrop-filter:blur(10px);z-index:20}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:30px}.mark{width:42px;height:42px;display:grid;place-items:center;background:var(--ink);color:white;border-radius:50%;font-weight:900;box-shadow:6px 6px 0 var(--yellow)}
+    .brand strong{display:block;font-family:var(--serif);font-size:20px}.brand small{color:var(--muted)}
+    .nav a{display:flex;gap:10px;align-items:center;text-decoration:none;padding:9px 10px;margin:3px 0;border-radius:10px;color:#465364;font-size:14px}.nav a:hover,.nav a.active{background:var(--ink);color:white}.nav .num{font-family:ui-monospace,monospace;opacity:.62}
+    .rail-note{position:absolute;left:22px;right:22px;bottom:24px;padding:13px;border:1px dashed var(--red);font-size:12px;background:#fff8e8;color:#684a32}
+    main{min-width:0}.wrap{width:min(1120px,calc(100% - 64px));margin:auto}
+    .hero{min-height:690px;display:grid;align-items:center;padding:70px 0 60px;position:relative;overflow:hidden}
+    .hero::after{content:"DBS";position:absolute;right:-10px;top:24px;font-family:Georgia,serif;font-weight:900;font-size:clamp(150px,23vw,330px);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(21,38,58,.1);z-index:-1}
+    .eyebrow{display:inline-flex;align-items:center;gap:9px;text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:12px;color:var(--red)}.eyebrow::before{content:"";width:34px;height:3px;background:var(--red)}
+    h1{font-family:var(--serif);font-size:clamp(46px,7vw,92px);line-height:1.03;letter-spacing:-.055em;margin:18px 0 22px;max-width:900px}.hero h1 em{font-style:normal;color:var(--blue);position:relative}.hero h1 em::after{content:"";position:absolute;height:8px;background:var(--yellow);left:2%;right:-2%;bottom:3px;z-index:-1;transform:rotate(-1.2deg)}
+    .lede{max-width:720px;font-size:20px;color:#536071}.hero-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:34px;align-items:end}
+    .truth-card{background:var(--ink);color:white;padding:26px;border-radius:var(--radius);box-shadow:12px 12px 0 var(--red);transform:rotate(1deg)}.truth-card b{display:block;color:#9fe0e6;margin-bottom:8px}.truth-card p{margin:0;color:#d7dee6}.truth-card code{color:#ffd879}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.btn{border:1px solid var(--ink);background:var(--ink);color:white;padding:11px 16px;border-radius:999px;cursor:pointer;text-decoration:none;font-weight:700;font-size:14px}.btn.ghost{background:transparent;color:var(--ink)}.btn:hover{transform:translateY(-2px)}
+    section{padding:82px 0;border-top:1px solid var(--line);scroll-margin-top:20px}.section-head{display:grid;grid-template-columns:110px 1fr;gap:24px;margin-bottom:34px}.section-no{font-family:Georgia,serif;font-size:60px;line-height:1;color:var(--red)}
+    h2{font-family:var(--serif);font-size:clamp(34px,5vw,58px);line-height:1.1;margin:0 0 10px;letter-spacing:-.035em}.section-head p{margin:0;color:var(--muted);max-width:760px}
+    h3{font-family:var(--serif);font-size:26px;margin:0 0 12px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--paper2);border:1px solid var(--line);border-radius:var(--radius);padding:23px;box-shadow:0 5px 0 rgba(21,38,58,.04)}.card .icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--blue2);color:var(--blue);font-weight:900;margin-bottom:16px}.card p{color:var(--muted);margin:0}.card.good{border-top:5px solid var(--green)}.card.bad{border-top:5px solid var(--red)}
+    .decision{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}.decision>div{padding:22px;border-left:5px solid var(--blue);background:rgba(255,255,255,.5)}.decision .no{border-color:var(--red)}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch}.flow-step{position:relative;padding:22px 18px 20px;background:var(--paper2);border:1px solid var(--line);min-height:175px}.flow-step:first-child{border-radius:18px 0 0 18px}.flow-step:last-child{border-radius:0 18px 18px 0}.flow-step:not(:last-child)::after{content:"→";position:absolute;right:-15px;top:24px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:white;z-index:2;font-weight:900}.flow-step b{font-size:13px;color:var(--red);letter-spacing:.08em}.flow-step strong{display:block;font-size:18px;margin:8px 0}.flow-step small{color:var(--muted)}
+    .callout{margin-top:22px;padding:18px 20px;background:#fff5d7;border:1px solid #d9b45d;border-radius:14px}.callout strong{color:#7b4e14}
+    .install-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.terminal{background:#111d2c;color:#e8f2f4;border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}.term-top{display:flex;align-items:center;justify-content:space-between;background:#1c2b3d;padding:10px 14px;color:#9fb2c6;font-size:12px}.dots{display:flex;gap:6px}.dots i{width:9px;height:9px;border-radius:50%;background:#e15c46}.dots i:nth-child(2){background:#e2b84c}.dots i:nth-child(3){background:#5caf7a}.code{position:relative;padding:22px;white-space:pre-wrap;font-family:Consolas,"Courier New",monospace;font-size:14px;color:#d6e7ed;min-height:96px}.copy{border:0;border-radius:8px;background:#314760;color:white;padding:6px 10px;cursor:pointer;font-size:12px}.copy.ok{background:var(--green)}
+    .steps{counter-reset:step;display:grid;gap:13px}.steps li{list-style:none;counter-increment:step;position:relative;padding:16px 18px 16px 58px;background:var(--paper2);border:1px solid var(--line);border-radius:12px}.steps li::before{content:counter(step);position:absolute;left:15px;top:14px;width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:var(--blue);color:white;font-weight:800}
+    .skill-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.search{flex:1;min-width:230px;border:1px solid var(--line);background:var(--paper2);padding:12px 15px;border-radius:12px;outline:none}.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(23,107,135,.12)}.filter{border:1px solid var(--line);background:transparent;padding:9px 12px;border-radius:999px;cursor:pointer}.filter.active{background:var(--ink);color:white;border-color:var(--ink)}
+    .skill-table-wrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:var(--paper2)}table{width:100%;border-collapse:collapse;min-width:880px}th,td{text-align:left;padding:15px 14px;border-bottom:1px solid #e4ded3;vertical-align:top;font-size:13px}th{position:sticky;top:0;background:var(--ink);color:white;z-index:2;font-size:12px;letter-spacing:.06em}td:first-child{font-family:Consolas,monospace;color:var(--blue);font-weight:800;white-space:nowrap}.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:#e8e3d9;color:#6c6255;font-size:11px}.hidden{display:none!important}.count{color:var(--muted);font-size:13px;margin-left:auto;align-self:center}
+    .core-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:26px}.core{background:var(--paper2);border:1px solid var(--line);border-radius:16px;overflow:hidden}.core summary{cursor:pointer;padding:19px 20px;font-weight:800;list-style:none;display:flex;justify-content:space-between}.core summary::after{content:"＋";color:var(--red)}.core[open] summary::after{content:"—"}.core-body{padding:0 20px 20px;color:var(--muted)}.core-body b{color:var(--ink)}
+    .lab{display:grid;grid-template-columns:.82fr 1.18fr;gap:22px}.form{background:var(--paper2);border:1px solid var(--line);padding:23px;border-radius:18px}.field{margin-bottom:14px}.field label{display:block;font-size:12px;font-weight:800;margin-bottom:5px;color:#586270}.field input,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fffefa;outline:none}.field textarea{min-height:90px;resize:vertical}.result{background:var(--ink);color:white;border-radius:18px;padding:24px;min-height:100%}.result h3{color:#aee0e5}.prompt-output{white-space:pre-wrap;font-family:Consolas,monospace;color:#d8e4ed;font-size:14px}
+    .practice{display:grid;grid-template-columns:180px 1fr;gap:24px}.timeline{position:sticky;top:20px;align-self:start}.timeline button{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--line);background:transparent;padding:10px 12px;color:var(--muted);cursor:pointer}.timeline button.active{border-color:var(--red);color:var(--ink);font-weight:800}.stage{display:none}.stage.active{display:block}.stage-card{background:var(--paper2);border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:var(--shadow)}.stage-card .meta{font-size:12px;color:var(--red);font-weight:800;letter-spacing:.09em}.sample{padding:17px 18px;background:#eee9df;border-left:4px solid var(--blue);white-space:pre-wrap}.before-after{display:grid;grid-template-columns:1fr 1fr;gap:14px}.before-after>div{padding:18px;border-radius:14px;background:#f0ece3}.before-after .after{background:#e2f0ed}.before-after b{display:block;margin-bottom:7px}
+    .rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.rule{padding:22px;background:var(--ink);color:white;border-radius:16px}.rule:nth-child(2){background:var(--blue)}.rule:nth-child(3){background:var(--red)}.rule b{font-size:24px;font-family:var(--serif)}.rule p{margin:8px 0 0;color:#e8edf2}
+    .sources{font-size:13px;color:var(--muted)}.sources a{color:var(--blue)}footer{padding:40px 0 70px;border-top:1px solid var(--line);color:var(--muted)}
+    .mobile-nav{display:none}.toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:white;padding:10px 16px;border-radius:10px;transform:translateY(120px);transition:.25s;z-index:99}.toast.show{transform:translateY(0)}
+    @media(max-width:900px){.shell{display:block}.rail{display:none}.mobile-nav{display:flex;position:sticky;top:0;z-index:30;gap:8px;overflow:auto;padding:10px 14px;background:rgba(244,240,231,.96);border-bottom:1px solid var(--line)}.mobile-nav a{white-space:nowrap;text-decoration:none;font-size:12px;background:var(--paper2);border:1px solid var(--line);padding:6px 10px;border-radius:99px}.wrap{width:min(100% - 30px,720px)}.hero{min-height:auto;padding-top:70px}.hero-grid,.install-grid,.lab{grid-template-columns:1fr}.cards,.rule-grid{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}.flow-step:first-child,.flow-step:last-child{border-radius:14px}.flow-step:not(:last-child)::after{content:"↓";right:20px;top:auto;bottom:-15px}.practice{grid-template-columns:1fr}.timeline{position:static;display:flex;overflow:auto}.timeline button{white-space:nowrap;border-left:0;border-bottom:3px solid var(--line)}.core-grid{grid-template-columns:1fr}}
+    @media(max-width:600px){.section-head{grid-template-columns:1fr}.section-no{font-size:38px}.cards,.rule-grid,.decision,.before-after{grid-template-columns:1fr}section{padding:60px 0}h1{font-size:47px}.lede{font-size:17px}.hero-actions{align-items:stretch}.btn{text-align:center}.truth-card{transform:none}.skill-toolbar{align-items:stretch}.search{flex-basis:100%}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+    @media print{.rail,.mobile-nav,.hero-actions,.copy,.skill-toolbar,.timeline{display:none!important}.shell{display:block}.wrap{width:100%}section{page-break-inside:avoid}.stage{display:block!important}.hero{min-height:0}.card,.stage-card{box-shadow:none}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand"><div class="mark">db</div><div><strong>实战手册</strong><small>Codex 桌面端</small></div></div>
+    <nav class="nav">
+      <a href="#start"><span class="num">01</span>先判断适不适合</a>
+      <a href="#workflow"><span class="num">02</span>工作流</a>
+      <a href="#install"><span class="num">03</span>安装与调用</a>
+      <a href="#skills"><span class="num">04</span>29 项速查</a>
+      <a href="#builder"><span class="num">05</span>输入生成器</a>
+      <a href="#practice"><span class="num">06</span>逐字稿实战</a>
+      <a href="#pitfalls"><span class="num">07</span>边界与误区</a>
+    </nav>
+    <div class="rail-note">离线单文件<br>CSS、JS、内容全部内嵌；外部链接仅供主动查看来源。</div>
+  </aside>
+  <main>
+    <nav class="mobile-nav"><a href="#start">适用</a><a href="#workflow">工作流</a><a href="#install">安装</a><a href="#skills">速查</a><a href="#practice">实战</a></nav>
+    <header class="hero" id="top"><div class="wrap">
+      <div class="eyebrow">field guide · 2026-08-10</div>
+      <div class="hero-grid"><div>
+        <h1>把真实问题交给 <em>dbskill</em></h1>
+        <p class="lede">面向创业者与内容创作者的中文 AI Skills 工具箱。本教程只讲一件事：怎样在 Codex 桌面端，把一个模糊任务推进成清晰判断和下一步。</p>
+        <div class="hero-actions"><a class="btn" href="#install">两分钟开始</a><a class="btn ghost" href="#practice">直接看逐字稿案例</a></div>
+      </div><aside class="truth-card"><b>先记住这个边界</b><p><code>dbskill ≠ 一键代写器</code><br>`dbs-content` 负责诊断方向，`dbs-ai-check` 默认只检测。真正成稿需要你提供事实、立场与反馈，再由 Codex 综合写作。</p></aside></div>
+    </div></header>
+
+    <section id="start"><div class="wrap">
+      <div class="section-head"><div class="section-no">01</div><div><h2>先判断：它适不适合你</h2><p>dbskill 擅长把真实处境拆清楚、诊断内容与行动，并把结论保存下来；它不替代事实、判断与执行。</p></div></div>
+      <div class="cards">
+        <article class="card good"><div class="icon">稿</div><h3>内容与逐字稿</h3><p>选题方向、开头、共鸣、逻辑衔接、信息密度、AI 写作特征。</p></article>
+        <article class="card good"><div class="icon">商</div><h3>业务与选择</h3><p>商业模式、产品、定价、客户、对标和下一步验证动作。</p></article>
+        <article class="card good"><div class="icon">记</div><h3>长期积累</h3><p>保存诊断、恢复上下文、生成报告、建立决策或内容资产系统。</p></article>
+      </div>
+      <div class="decision"><div><h3>很适合</h3><p>你已经有真实材料或明确困境，希望得到诊断、取舍与可执行下一步。</p></div><div class="no"><h3>不该直接用</h3><p>要求预测平台精确数据、凭空补事实，或只输入一句题目就期待稳定爆款成稿。</p></div></div>
+    </div></section>
+
+    <section id="workflow"><div class="wrap">
+      <div class="section-head"><div class="section-no">02</div><div><h2>工作流：一次只推进一个结点</h2><p>官方并不预设僵硬流水线。`/dbs` 读取当前对话，选择眼下最值得完成的 Skill；你补充结果后再继续路由。</p></div></div>
+      <div class="flow">
+        <div class="flow-step"><b>INPUT</b><strong>提交真实任务</strong><small>处境、目标、材料、约束、卡点。</small></div>
+        <div class="flow-step"><b>ROUTE</b><strong>/dbs 读上下文</strong><small>不确定入口时让主 Skill 判断。</small></div>
+        <div class="flow-step"><b>DO</b><strong>一个 Skill 工作</strong><small>诊断、产出、记录或提出关键问题。</small></div>
+        <div class="flow-step"><b>FEEDBACK</b><strong>补充事实反馈</strong><small>确认、否决或提供真实结果。</small></div>
+        <div class="flow-step"><b>NEXT</b><strong>再次 /dbs</strong><small>基于新状态决定下一步。</small></div>
+      </div>
+      <div class="callout"><strong>最省心用法：</strong>第一次只记 `/dbs 新手入门`；之后不知道下一步，就在同一任务里输入 `/dbs`。已经知道具体需求时，再直接使用 `/dbs-hook` 等技术名称。</div>
+    </div></section>
+
+    <section id="install"><div class="wrap">
+      <div class="section-head"><div class="section-no">03</div><div><h2>Codex 桌面端：安装与调用</h2><p>官方推荐通过通用 Skills CLI 安装全部正式 Skill。安装命令需要联网；安装完成后的本教程本身不需要联网。</p></div></div>
+      <div class="install-grid">
+        <div class="terminal"><div class="term-top"><span class="dots"><i></i><i></i><i></i></span><span>PowerShell / Codex 终端</span><button class="copy" data-copy="npx -y skills add dontbesilent2025/dbskill -g --all">复制</button></div><div class="code">npx -y skills add dontbesilent2025/dbskill -g --all</div></div>
+        <ol class="steps"><li>在系统终端或 Codex 任务终端执行安装命令。</li><li>回到 Codex 桌面端；若当前任务尚未识别新安装的 Skill，再新建一个任务。</li><li>输入 <code>/dbs 新手入门</code>，或者直接描述你的真实任务。</li><li>`/dbs-xxx` 是仓库调用写法，Codex 不保证显示 Claude 式斜杠菜单；可直接用自然语言说“请使用 dbs-hook Skill…”。</li></ol>
+      </div>
+      <div class="callout"><strong>输入质量公式：</strong>背景 + 目标 + 原始材料 + 真实约束 + 你最担心的问题。不要只说“帮我优化”。</div>
+    </div></section>
+
+    <section id="skills"><div class="wrap">
+      <div class="section-head"><div class="section-no">04</div><div><h2>29 项技能速查</h2><p>输入、输出、适用阶段与 Codex 桌面端示例都压缩在一张表里。可搜索技术名称或问题关键词。</p></div></div>
+      <div class="skill-toolbar"><input class="search" id="skillSearch" placeholder="搜索：逐字稿 / 定价 / 知识库 / 保存…"><button class="filter active" data-filter="all">全部</button><button class="filter" data-filter="content">内容</button><button class="filter" data-filter="business">商业</button><button class="filter" data-filter="record">记录</button><button class="filter" data-filter="agent">工作台</button><span class="count" id="skillCount">29 项</span></div>
+      <div class="skill-table-wrap"><table><thead><tr><th>Skill</th><th>适用阶段</th><th>输入</th><th>输出</th><th>Codex 桌面端示例</th></tr></thead><tbody id="skillBody"></tbody></table></div>
+      <div class="core-grid">
+        <details class="core" open><summary>逐字稿最常用：dbs-script-flow</summary><div class="core-body"><b>检查三件事：</b>逻辑有没有断、信息密度有没有掉、句子能不能自然说出口。输出分段检查；用户确认后可做保留原文痕迹的标记式改稿。</div></details>
+        <details class="core"><summary>开头最常用：dbs-hook</summary><div class="core-body"><b>核心公式：</b>话题 + Hook + 可信度。开头需要在 5 秒内独立工作；先诊断内容价值，再给多套方案和 Top 3。</div></details>
+        <details class="core"><summary>内容没感觉：dbs-resonate</summary><div class="core-body"><b>解决：</b>“写得很全面但没刺中核心”。判断共鸣结构、情绪与立场断点，给具体删改方向，但不预测平台数据。</div></details>
+        <details class="core"><summary>检查 AI 腔：dbs-ai-check</summary><div class="core-body"><b>默认只诊断：</b>按原文顺序指出 AI 写作特征。想修改时，需要先说明自己的真实意图与偏好，不做无依据的机械“人类伪装”。</div></details>
+      </div>
+    </div></section>
+
+    <section id="builder"><div class="wrap">
+      <div class="section-head"><div class="section-no">05</div><div><h2>输入生成器</h2><p>填四项，就能生成一段更容易让 `/dbs` 正确路由的任务描述。内容只在当前浏览器内处理，不上传。</p></div></div>
+      <div class="lab"><div class="form">
+        <div class="field"><label for="bg">背景 / 你在做什么</label><input id="bg" value="我做面向职场新人的效率类短视频"></div>
+        <div class="field"><label for="goal">本次目标</label><input id="goal" value="完成一篇 60 秒口播逐字稿"></div>
+        <div class="field"><label for="material">已有材料</label><textarea id="material">我有一个观点：多数人不是不会管理时间，而是没有决定什么事情不做。</textarea></div>
+        <div class="field"><label for="constraint">约束与担心</label><textarea id="constraint">不要鸡汤；保留我的判断；希望前 5 秒留人；总字数约 240 字。</textarea></div>
+        <button class="btn" id="buildPrompt">生成输入</button>
+      </div><div class="result"><h3>可直接发给 Codex</h3><div class="prompt-output" id="promptOutput"></div><div style="margin-top:18px"><button class="copy" id="copyPrompt">复制这段输入</button></div></div></div>
+    </div></section>
+
+    <section id="practice"><div class="wrap">
+      <div class="section-head"><div class="section-no">06</div><div><h2>实战：把粗稿改成可说的逐字稿</h2><p>示例不追求“万能爆款”，只展示正确协作方式：诊断 → 反馈 → 再诊断 → 综合成稿。</p></div></div>
+      <div class="practice"><div class="timeline" id="timeline">
+        <button class="active" data-stage="s1">1. 提交上下文</button><button data-stage="s2">2. 检查流失点</button><button data-stage="s3">3. 重做开头</button><button data-stage="s4">4. 检查共鸣</button><button data-stage="s5">5. AI 特征</button><button data-stage="s6">6. 综合成稿</button><button data-stage="s7">7. 保存结论</button>
+      </div><div>
+        <article class="stage active" id="s1"><div class="stage-card"><span class="meta">STEP 1 · /dbs 或 /dbs-content</span><h3>先把选题与约束说清楚</h3><div class="sample">/dbs 我想写一篇 60 秒口播逐字稿。
+受众：刚工作 1—3 年、总觉得时间不够的人。
+核心观点：时间管理的关键不是做更多，而是先决定什么不做。
+真实经历：我曾经同时维护 7 个待办清单，反而每天都在整理任务。
+要求：不要鸡汤，不虚构数据，约 240 字。</div><p>这一轮的目标是让系统判断方向，而不是立刻要求成稿。`dbs-content` 官方定位是内容诊断，不负责代写。</p></div></article>
+        <article class="stage" id="s2"><div class="stage-card"><span class="meta">STEP 2 · /dbs-script-flow</span><h3>让它找“哪一秒会划走”</h3><div class="sample">/dbs-script-flow
+下面是我的粗稿。请按逻辑断裂、信息密度、口播流畅度检查；先给诊断，不要直接全文重写：
+
+很多人总觉得时间不够，所以会学习各种各样的时间管理方法。时间管理是一门非常重要的学问……</div><div class="before-after"><div><b>可能诊断</b>第一句过于公共；“非常重要的学问”没有新信息；长句像书面总结，口播会卡。</div><div class="after"><b>你的反馈</b>确认删除公共铺垫，保留“7 个待办清单”的真实经历作为证据。</div></div></div></article>
+        <article class="stage" id="s3"><div class="stage-card"><span class="meta">STEP 3 · /dbs-hook</span><h3>只救开头，不急着改全文</h3><div class="sample">/dbs-hook
+内容主题：时间管理不是多做，而是先决定不做什么。
+可信事实：我曾同时维护 7 个待办清单，每天花很多时间整理清单。
+请阅读下面完整文案，重点诊断开头，并给 5 个口播友好的方案，推荐 Top 3：
+[粘贴完整文案：开头 + 正文]</div><p>期待的不是夸张标题，而是让开头同时交代话题、看下去的理由与可信度。</p></div></article>
+        <article class="stage" id="s4"><div class="stage-card"><span class="meta">STEP 4 · /dbs-resonate</span><h3>确保只有一个核心机制</h3><div class="sample">/dbs-resonate
+请判断这篇稿子是否真正击中“努力安排却越来越焦虑”的职场新人。
+重点检查：是不是一次讲了太多方法；有没有明确的情绪和立场；哪些内容应该删掉。</div><p>这一轮不问“预测多少完播率”。Skill 的边界是传播心理诊断，不是平台数据预测。</p></div></article>
+        <article class="stage" id="s5"><div class="stage-card"><span class="meta">STEP 5 · /dbs-ai-check</span><h3>找 AI 特征，但先不机械改写</h3><div class="sample">/dbs-ai-check
+请按原文顺序指出 AI 写作特征。只诊断，不改写；每处说明为什么不像我在镜头前说话。
+[粘贴当前逐字稿]</div><p>看到检测结果后，再告诉 Codex你的真实表达习惯，例如：“我说话短、直接，不用排比，也不喜欢总结口号。”</p></div></article>
+        <article class="stage" id="s6"><div class="stage-card"><span class="meta">STEP 6 · CODEX 综合写作</span><h3>基于已确认结论生成终稿</h3><div class="sample">请综合本任务中已经确认的结论，写出最终 60 秒逐字稿。
+硬约束：不新增事实；保留“7 个待办清单”；一个核心观点；约 240 字；句子适合一口气说完；用 [停] 标出 3 处自然停顿。
+输出：标题、逐字稿、预计字数。不要再解释方法。</div><div class="before-after"><div><b>原开头</b>今天和大家聊一聊，普通人应该怎样做好时间管理。</div><div class="after"><b>改后示意</b>我以前同时维护 7 个待办清单。结果每天最忙的一件事，是整理待办。[停]</div></div></div></article>
+        <article class="stage" id="s7"><div class="stage-card"><span class="meta">STEP 7 · /dbs-save</span><h3>把有效判断留给下一篇</h3><div class="sample">/dbs-save 时间管理口播风格
+
+请保存：我的受众、已确认的表达偏好、被否决的开头类型，以及下一篇仍要验证的问题。</div><p>下次可用 `/dbs-restore` 或“接着上次”恢复；积累多次后用 `/dbs-report` 生成 Markdown 报告。</p></div></article>
+      </div></div>
+    </div></section>
+
+    <section id="pitfalls"><div class="wrap">
+      <div class="section-head"><div class="section-no">07</div><div><h2>三个边界，避免用错</h2><p>正确预期比“多装几个 Skill”更重要。</p></div></div>
+      <div class="rule-grid"><div class="rule"><b>诊断不等于代写</b><p>`dbs-content` 明确帮助判断方向，不替用户写内容。终稿要由事实、立场和反馈共同生成。</p></div><div class="rule"><b>检测不等于伪装</b><p>`dbs-ai-check` 默认只指出特征；改写应回到你的意图与语言习惯。</p></div><div class="rule"><b>许可不等于商用</b><p>项目采用 CC BY-NC 4.0。个人学习可用；公开衍生作品需署名，商业用途需联系作者授权。</p></div></div>
+      <div class="callout"><strong>安全提示：</strong>`dbs-save`、`dbs-restore`、`dbs-report` 会处理本地存档；在执行涉及文件写入、迁移或清理的 Skill 前，先让 Codex 报告路径和影响范围。</div>
+    </div></section>
+
+    <section id="sources"><div class="wrap sources">
+      <div class="section-head"><div class="section-no">↗</div><div><h2>一手来源</h2><p>教程依据 2026-08-10 可见的官方仓库内容整理。以下链接点击后需要联网，本页面不自动加载任何外部资源。</p></div></div>
+      <p><a href="https://github.com/dontbesilent2025/dbskill">官方仓库 README</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/docs/%E6%96%B0%E6%89%8B%E5%85%A5%E9%97%A8.md">新手入门与 29 Skill 全目录</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/skills/dbs/SKILL.md">dbs 主入口</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/skills/dbs-script-flow/SKILL.md">逐字稿逻辑延续</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/skills/dbs-hook/SKILL.md">开头优化</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/skills/dbs-resonate/SKILL.md">共鸣诊断</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/skills/dbs-ai-check/SKILL.md">AI 特征识别</a> · <a href="https://github.com/dontbesilent2025/dbskill/blob/main/LICENSE">许可证</a></p>
+    </section>
+    <footer><div class="wrap">dbskill × Codex 桌面端实战教程 · 单文件离线版<br>内容力来自真实事实与判断，Skill 负责把问题看清楚。</div></footer>
+  </main>
+</div>
+<div class="toast" id="toast">已复制</div>
+<script>
+  const skills=[
+    ['dbs','入口','当前处境、材料或卡点','读取上下文并路由当前最合适的 Skill','/dbs 我有一篇口播稿，不知道先改哪里','business'],
+    ['dbs-diagnosis','商业判断','生意、产品、定价或客户问题','核心判断、风险与验证方案','/dbs-diagnosis 客户总说贵，我该改什么？','business'],
+    ['dbs-benchmark','研究前','领域或候选对标对象','五重过滤后的对标与研究重点','/dbs-benchmark 帮我找中小老板内容账号对标','business'],
+    ['dbs-standard-answer','复杂决策前','现实困境及约束','同构案例、反例与失效边界','/dbs-standard-answer 定制业务总拖累产品，历史上怎么办？','business'],
+    ['dbs-slowisfast','策略选择','想走捷径或长期投入的事项','值得慢做/不必慢做与下一步','/dbs-slowisfast 每天追热点能快速起号吗？','business'],
+    ['dbs-deconstruct','定义阶段','影响判断的模糊概念','场景用法、可检验定义与关系','/dbs-deconstruct 个人 IP 到底是什么？','business'],
+    ['dbs-goal','立项前','模糊目标及已有约束','可验收目标卡或关键追问','/dbs-goal 我想成为有影响力的商业博主','business'],
+    ['dbs-good-question','提问前','说不清的问题或不适感','问题断点、所需事实与问题说明书','/dbs-good-question 我觉得稿子不对，但说不出哪里','business'],
+    ['dbs-content','选题确认后','明确选题、业务、受众、目标','内容形式、五维诊断与第一步','/dbs-content 普通人别急着做个人 IP，这题怎么做？','content'],
+    ['dbs-hook','已有完整文案','完整文案（开头+正文）、主题与可信事实','开头诊断、多套方案与 Top 3','请使用 dbs-hook Skill，重点优化这篇完整文案的开头','content'],
+    ['dbs-xhs-title','发布前','内容主题与行业','标题候选、Top 3 与公式说明','/dbs-xhs-title 主题是自由职业者报价','content'],
+    ['dbs-resonate','稿件完成后','草稿、受众与担心','共鸣判断、情绪断点与删改方向','/dbs-resonate 这篇稿有没有戳中受众：……','content'],
+    ['dbs-spread','传播分析','文稿、话题片段或已发布内容','5 个理论下的机制、立场与延展方向','/dbs-spread 这条内容为什么容易引发转发？','content'],
+    ['dbs-script-flow','逐字稿审校','完整逐字稿','逻辑/密度/口播三维报告与标记改稿','/dbs-script-flow 找出这篇稿哪里会划走：……','content'],
+    ['dbs-ai-check','终稿检查','待检测文案','按原文顺序列 AI 特征；默认不改','/dbs-ai-check 检查这篇稿的 AI 味：……','content'],
+    ['dbs-wechat-html','排版交付','Markdown 文章与风格偏好','公众号 HTML 与预览页','/dbs-wechat-html 我的文章.md，做商业分析风格','content'],
+    ['dbs-content-system','资产化','本地文稿、选题、案例目录','素材审计、内容单元与主题地图','/dbs-content-system 把800篇文章做成内容资产','content'],
+    ['dbs-action','执行受阻','目标、反复行为与卡点','阻塞信号、原因与可开始动作','/dbs-action 我每次写一半就去研究别人','record'],
+    ['dbs-learning','持续学习','主题、水平与反馈方式','本地学习计划和连续文章','/dbs-learning 带我系统学习定价','record'],
+    ['dbs-decision','长期复盘','需要长期追踪的判断领域','决策工程、结果回填与规律库','/dbs-decision 建立我的内容业务决策系统','record'],
+    ['dbs-save','阶段结束','当前对话结论','本地结构化存档','/dbs-save 时间管理口播风格','record'],
+    ['dbs-restore','新任务续接','项目或存档范围','恢复已确定结论与未解决问题','/dbs-restore 或 接着上次','record'],
+    ['dbs-report','多次复盘后','当前项目或指定项目的多个存档','去重分类后的 Markdown 报告','/dbs-report 或 /dbs-report 内容项目','record'],
+    ['dbs-chatroom','需要多视角','议题与希望的冲突视角','专家视角、讨论与判官总结','/dbs-chatroom 创作者该不该做付费社群？','business'],
+    ['dbs-chatroom-austrian','经济议题','价格、利润、市场或企业家问题','奥派经济学多角色讨论','/dbs-chatroom-austrian 创业和做生意有何不同？','business'],
+    ['dbs-knowledge','资料治理','本地文件夹与使用目标','知识库导航、版本规则与调用入口','/dbs-knowledge 把这个文件夹变成知识库','agent'],
+    ['dbs-agent-migration','多端整理','多 Agent 项目与规则文件','真源识别、命名整理与迁移方案','/dbs-agent-migration 统一 Claude、Codex 和 Grok','agent'],
+    ['dbs-bridge','技能复用','单个 Skill 或 skills 目录','跨端软链与薄 bridge','/dbs-bridge skills/dbs-hook','agent'],
+    ['dbs-skill-cleaner','安装审计','本地 Skill 路径或扫描范围','只读风险报告；确认后才隔离','扫描本地 skill，先只报告风险','agent']
+  ];
+  const labels={content:'内容',business:'商业',record:'记录',agent:'工作台'};
+  const body=document.getElementById('skillBody'),search=document.getElementById('skillSearch'),count=document.getElementById('skillCount');let current='all';
+  function renderSkills(){const q=search.value.trim().toLowerCase();const rows=skills.filter(s=>(current==='all'||s[5]===current)&&s.join(' ').toLowerCase().includes(q));body.innerHTML=rows.map(s=>`<tr><td>/${s[0]}</td><td><span class="tag">${labels[s[5]]}</span><br>${s[1]}</td><td>${s[2]}</td><td>${s[3]}</td><td>${s[4]}</td></tr>`).join('');count.textContent=`${rows.length} 项`;}
+  search.addEventListener('input',renderSkills);document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');current=b.dataset.filter;renderSkills()}));renderSkills();
+  const toast=document.getElementById('toast');function copyText(text,button){const done=()=>{toast.classList.add('show');if(button){button.classList.add('ok');const old=button.textContent;button.textContent='已复制';setTimeout(()=>{button.classList.remove('ok');button.textContent=old},1400)}setTimeout(()=>toast.classList.remove('show'),1500)};if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done))}else fallback(text,done)}
+  function fallback(text,done){const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}finally{ta.remove()}}
+  document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(b.dataset.copy,b)));
+  const ids=['bg','goal','material','constraint'];function build(){const v=Object.fromEntries(ids.map(id=>[id,document.getElementById(id).value.trim()]));document.getElementById('promptOutput').textContent=`/dbs\n\n背景：${v.bg||'（请填写）'}\n本次目标：${v.goal||'（请填写）'}\n已有材料：${v.material||'（请填写）'}\n真实约束与担心：${v.constraint||'（请填写）'}\n\n请先读取以上信息，判断当前最适合使用哪个 dbskill；缺少会改变结论的信息时再追问。`;}
+  document.getElementById('buildPrompt').addEventListener('click',build);document.getElementById('copyPrompt').addEventListener('click',e=>copyText(document.getElementById('promptOutput').textContent,e.currentTarget));build();
+  document.querySelectorAll('#timeline button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#timeline button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.stage').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById(b.dataset.stage).classList.add('active')}));
+  const navLinks=[...document.querySelectorAll('.nav a')],sections=navLinks.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){navLinks.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-25% 0px -65%'});sections.forEach(s=>io.observe(s));
+</script>
+</body>
+</html>

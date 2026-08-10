@@ -14,7 +14,7 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **49 张卡片**、**8 个分类**；其中 **45 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **50 张卡片**、**9 个分类**；其中 **46 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
 ### AI开发教程（24）
 
@@ -96,12 +96,16 @@
 - 四个阶段规划 · MD · **本机/外部工作区资料，未随本仓库同步**
 - [常用提示词](<A 教程集合/常用提示词.md>) · MD
 
-### 其它（4）
+### 去AI味（3）
+
+- [说人话技能教程](<A 教程集合/说人话技能 Codex 桌面端实战教程.html>) · HTML
+- [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
+- [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
+
+### 其它（2）
 
 - [Github开源项目榜](<A 教程集合/github-top-repos-100k-stars.html>) · HTML
 - [GitHub 项目管理实战教程](<A 教程集合/github-tutorial.html>) · HTML
-- [说人话技能教程](<A 教程集合/说人话技能 Codex 桌面端实战教程.html>) · HTML
-- [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
 <!-- tutorial-catalog:end -->
 
 ## 运行环境

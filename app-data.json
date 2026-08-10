@@ -873,11 +873,11 @@
         "mtimeMs": 1786343353143.4097
       },
       "categoryIds": [
-        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+        "0e1ed6e2-4dfe-4300-9ac8-d95845516b51"
       ],
       "isFavorite": false,
       "createdAt": "2026-08-10T06:36:57.408Z",
-      "updatedAt": "2026-08-10T06:36:57.408Z"
+      "updatedAt": "2026-08-10T08:40:02.492Z"
     },
     {
       "id": "35fc925e-5c40-4483-9bd7-f03eed9ecf8d",
@@ -891,11 +891,29 @@
         "mtimeMs": 1786342821383.649
       },
       "categoryIds": [
-        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+        "0e1ed6e2-4dfe-4300-9ac8-d95845516b51"
       ],
       "isFavorite": false,
       "createdAt": "2026-08-10T06:36:57.408Z",
-      "updatedAt": "2026-08-10T06:36:57.408Z"
+      "updatedAt": "2026-08-10T08:40:15.962Z"
+    },
+    {
+      "id": "ec43894d-cd2f-4b55-9935-081b11ad65de",
+      "name": "dbskill内容与逐字稿",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/dbskill-Codex桌面端实战教程.html",
+        "fileName": "dbskill-Codex桌面端实战教程",
+        "extension": "html",
+        "fileSize": 38116,
+        "mtimeMs": 1786345695585.9133
+      },
+      "categoryIds": [
+        "0e1ed6e2-4dfe-4300-9ac8-d95845516b51"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-10T08:39:17.978Z",
+      "updatedAt": "2026-08-10T08:40:08.652Z"
     }
   ],
   "categories": [
@@ -949,9 +967,16 @@
       "createdAt": "2026-07-24T03:04:28.023Z"
     },
     {
+      "id": "0e1ed6e2-4dfe-4300-9ac8-d95845516b51",
+      "name": "去AI味",
+      "order": 7,
+      "type": "user",
+      "createdAt": "2026-08-10T08:39:24.196Z"
+    },
+    {
       "id": "6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "name": "其它",
-      "order": 7,
+      "order": 8,
       "type": "user",
       "createdAt": "2026-08-03T02:29:24.578Z"
     }
@@ -1037,7 +1062,8 @@
         "d15da457-c138-4521-a6fa-e92aab40cce5",
         "b344a4c3-9a5c-477f-9889-abfcd95614f8",
         "43e1e80d-843a-4df7-8393-4746b2d8feee",
-        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
+        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d",
+        "ec43894d-cd2f-4b55-9935-081b11ad65de"
       ]
     },
     {
@@ -1104,9 +1130,7 @@
       "viewType": "category:6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "cardIds": [
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
-        "c8230b6a-1452-4c83-81d2-cbab9d78cae1",
-        "43e1e80d-843a-4df7-8393-4746b2d8feee",
-        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
+        "c8230b6a-1452-4c83-81d2-cbab9d78cae1"
       ]
     },
     {
@@ -1125,6 +1149,14 @@
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
         "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+      ]
+    },
+    {
+      "viewType": "category:0e1ed6e2-4dfe-4300-9ac8-d95845516b51",
+      "cardIds": [
+        "43e1e80d-843a-4df7-8393-4746b2d8feee",
+        "ec43894d-cd2f-4b55-9935-081b11ad65de",
+        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
       ]
     }
   ]
