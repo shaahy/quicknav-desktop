@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Humanizer-zh｜Codex 桌面端实战教程</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffdf8;
+      --ink: #1b2926;
+      --muted: #60706b;
+      --line: #d8d7cd;
+      --brand: #126d59;
+      --brand-2: #e26d4b;
+      --soft: #e7f1ec;
+      --code: #172421;
+      --code-ink: #eef7f3;
+      --shadow: 0 18px 50px rgba(35, 49, 45, .09);
+      --radius: 20px;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 2%, rgba(226, 109, 75, .12), transparent 27rem),
+        linear-gradient(180deg, #f7f4ed 0, var(--bg) 34rem);
+      font-family: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+      line-height: 1.7;
+    }
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(226, 109, 75, .65); outline-offset: 3px; }
+    ::selection { background: #f7c9b8; color: #10211d; }
+
+    .skip-link {
+      position: fixed; left: 1rem; top: -5rem; z-index: 100;
+      padding: .75rem 1rem; border-radius: 10px; background: var(--ink); color: white;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      border-bottom: 1px solid rgba(216, 215, 205, .82);
+      background: rgba(247, 244, 237, .9);
+      backdrop-filter: blur(16px);
+    }
+    .topbar-inner {
+      width: min(calc(100% - 2rem), var(--max)); margin: auto;
+      min-height: 64px; display: flex; align-items: center; gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: .65rem; font-weight: 800; white-space: nowrap; }
+    .brand-mark {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      border-radius: 9px; background: var(--ink); color: #fff; font-family: Georgia, serif;
+    }
+    .nav { display: flex; margin-left: auto; gap: .2rem; overflow-x: auto; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav a { padding: .45rem .72rem; color: var(--muted); text-decoration: none; font-size: .9rem; white-space: nowrap; border-radius: 999px; }
+    .nav a:hover { color: var(--ink); background: rgba(18, 109, 89, .08); }
+
+    main, footer { width: min(calc(100% - 2rem), var(--max)); margin-inline: auto; }
+    .hero { padding: 5.2rem 0 3.5rem; display: grid; grid-template-columns: 1.3fr .7fr; gap: 2.5rem; align-items: end; }
+    .eyebrow { color: var(--brand); font-size: .82rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 1.25rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.65rem, 7vw, 6rem); line-height: .98; letter-spacing: -.055em; }
+    h1 span { color: var(--brand); }
+    .lead { max-width: 44rem; margin-bottom: 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.28rem); }
+    .install-card { padding: 1.3rem; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 253, 248, .78); box-shadow: var(--shadow); }
+    .status { display: flex; align-items: center; gap: .55rem; font-weight: 750; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #18a06f; box-shadow: 0 0 0 5px rgba(24, 160, 111, .12); }
+    .path { margin: .85rem 0 0; padding: .75rem; overflow-wrap: anywhere; border-radius: 12px; background: var(--soft); color: #275147; font: .84rem/1.5 Consolas, monospace; }
+    .notice { margin-top: 1rem; color: var(--muted); font-size: .88rem; }
+
+    .section { padding: 4.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 78px; }
+    .section-head { display: grid; grid-template-columns: .38fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+    .section-no { color: var(--brand-2); font: 700 1rem/1 Georgia, serif; }
+    h2 { margin-bottom: .75rem; font-family: Georgia, "Microsoft YaHei UI", serif; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.1; letter-spacing: -.035em; }
+    .section-intro { max-width: 45rem; margin-bottom: 0; color: var(--muted); }
+    h3 { line-height: 1.3; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .card { padding: 1.3rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+    .card h3 { margin-bottom: .45rem; font-size: 1.06rem; }
+    .card p { margin-bottom: 0; color: var(--muted); font-size: .94rem; }
+    .tag { display: inline-flex; margin-bottom: 1rem; padding: .2rem .55rem; border-radius: 999px; background: var(--soft); color: var(--brand); font-size: .75rem; font-weight: 800; }
+    .avoid { border-color: #edc8bb; background: #fff8f4; }
+    .avoid .tag { color: #9a4028; background: #fbe2d9; }
+
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; counter-reset: flow; }
+    .flow-step { position: relative; min-height: 190px; padding: 1.15rem; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); counter-increment: flow; }
+    .flow-step::before { content: "0" counter(flow); display: block; margin-bottom: 2.3rem; color: var(--brand-2); font: 700 1rem Georgia, serif; }
+    .flow-step h3 { margin-bottom: .45rem; font-size: 1rem; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: .86rem; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--paper); }
+    table { width: 100%; min-width: 840px; border-collapse: collapse; }
+    th, td { padding: 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); background: #f4f3ed; font-size: .8rem; letter-spacing: .04em; }
+    td { font-size: .91rem; }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { font-weight: 750; }
+
+    .codebox { position: relative; margin: 1rem 0 0; border-radius: 14px; background: var(--code); color: var(--code-ink); overflow: hidden; }
+    pre { margin: 0; padding: 1.2rem; overflow-x: auto; white-space: pre-wrap; word-break: break-word; font: .88rem/1.65 Consolas, "Microsoft YaHei UI", monospace; }
+    .copy-btn {
+      position: absolute; top: .6rem; right: .6rem; z-index: 2; min-width: 44px; min-height: 36px;
+      padding: .35rem .65rem; border: 1px solid rgba(255,255,255,.22); border-radius: 9px;
+      background: rgba(255,255,255,.09); color: white; cursor: pointer; font-size: .78rem;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.16); }
+
+    .practice { display: grid; grid-template-columns: .34fr .66fr; gap: 1rem; }
+    .case-tabs { display: grid; gap: .55rem; align-content: start; }
+    .case-tab {
+      min-height: 52px; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 13px;
+      background: var(--paper); cursor: pointer; text-align: left; font-weight: 750;
+    }
+    .case-tab[aria-selected="true"] { border-color: var(--brand); background: var(--soft); color: var(--brand); }
+    .case-panel { padding: 1.4rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+    .case-panel h3 { margin-bottom: .35rem; }
+    .case-note { color: var(--muted); font-size: .9rem; }
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: 1rem; }
+    .compare-block { padding: 1rem; border-radius: 13px; background: #f4f2ec; }
+    .compare-block.after { background: var(--soft); }
+    .compare-label { margin-bottom: .55rem; color: var(--muted); font-size: .75rem; font-weight: 800; letter-spacing: .08em; }
+    .compare-block p { margin: 0; font-size: .92rem; }
+
+    .steps { display: grid; gap: .7rem; }
+    details { border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+    summary { padding: 1rem 1.1rem; cursor: pointer; font-weight: 750; }
+    details[open] summary { border-bottom: 1px solid var(--line); }
+    .detail-body { padding: 1rem 1.1rem; color: var(--muted); }
+    .detail-body > :last-child { margin-bottom: 0; }
+
+    .checklist { padding: 1.35rem; border-radius: var(--radius); background: var(--ink); color: white; }
+    .meter { height: 8px; margin: .8rem 0 1.2rem; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.16); }
+    .meter span { display: block; width: 0; height: 100%; background: #66d0a9; transition: width .25s ease; }
+    .checks { display: grid; grid-template-columns: repeat(2, 1fr); gap: .65rem 1rem; }
+    .check { display: flex; align-items: flex-start; gap: .65rem; color: #e6efec; font-size: .9rem; }
+    .check input { width: 18px; height: 18px; margin-top: .2rem; accent-color: #66d0a9; }
+    .score { color: #9fe1c8; font-weight: 800; }
+
+    .callout { display: grid; grid-template-columns: auto 1fr; gap: 1rem; padding: 1.2rem; border-left: 4px solid var(--brand-2); border-radius: 0 14px 14px 0; background: #fff7f2; }
+    .callout strong { color: var(--brand-2); }
+    .callout p { margin: 0; }
+    footer { padding: 2.5rem 0 4rem; display: flex; justify-content: space-between; gap: 1rem; color: var(--muted); font-size: .85rem; }
+
+    @media (max-width: 900px) {
+      .hero, .section-head, .practice { grid-template-columns: 1fr; }
+      .hero { padding-top: 3.5rem; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .flow-step { min-height: 160px; }
+      .flow-step::before { margin-bottom: 1.4rem; }
+      .case-tabs { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 620px) {
+      .topbar-inner { width: min(calc(100% - 1.2rem), var(--max)); }
+      .nav a { padding-inline: .55rem; }
+      .nav a:nth-child(-n+2) { display: none; }
+      main, footer { width: min(calc(100% - 1.2rem), var(--max)); }
+      .hero { padding: 3rem 0 2.7rem; }
+      h1 { font-size: clamp(2.8rem, 16vw, 4.3rem); }
+      .section { padding: 3.4rem 0; }
+      .grid, .flow, .compare, .checks { grid-template-columns: 1fr; }
+      .case-tabs { grid-template-columns: 1fr; }
+      .flow-step { min-height: 0; }
+      .flow-step::before { margin-bottom: 1rem; }
+      .card, .case-panel { padding: 1.05rem; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark">H</span><span>Humanizer-zh</span></div>
+      <nav class="nav" aria-label="教程导航">
+        <a href="#scenes">场景</a><a href="#workflow">工作流</a><a href="#cheatsheet">速查</a><a href="#practice">实战</a><a href="#check">验收</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">Codex Desktop · 离线实战教程</p>
+        <h1 id="hero-title">把“AI 味”<br><span>改成你的声音</span></h1>
+        <p class="lead">Humanizer-zh 用 24 类常见模式检查文字：删掉空话、公式结构和模糊归因，同时保留事实、语气与真正想表达的意思。</p>
+      </div>
+      <aside class="install-card" aria-label="安装状态">
+        <div class="status"><span class="dot" aria-hidden="true"></span>已全局安装</div>
+        <p class="path">C:\Users\MSI\.codex\skills\humanizer-zh</p>
+        <p class="notice">在 Codex 桌面端新建任务后使用。当前已打开的旧任务可能不会立即刷新技能列表。</p>
+      </aside>
+    </section>
+
+    <section class="section" id="scenes">
+      <div class="section-head">
+        <span class="section-no">01 / 适用场景</span>
+        <div><h2>什么时候值得用</h2><p class="section-intro">它是编辑技能，不是事实生成器。最适合“内容已经有了，但读起来不像你”的阶段。</p></div>
+      </div>
+      <div class="grid">
+        <article class="card"><span class="tag">发布前</span><h3>公众号、博客、社媒</h3><p>去掉“此外、至关重要、不断演变的格局”等高频 AI 腔，让观点和节奏更自然。</p></article>
+        <article class="card"><span class="tag">交付前</span><h3>方案、PRD、汇报材料</h3><p>压缩套话，保留术语、数字、约束和决策，让读者更快抓住重点。</p></article>
+        <article class="card"><span class="tag">上线前</span><h3>产品与营销文案</h3><p>把“无缝、领先、革命性”换成具体功能、证据和用户能理解的收益。</p></article>
+        <article class="card"><span class="tag">投稿前</span><h3>论文摘要与研究说明</h3><p>删除夸大意义和模糊归因，明确样本、方法、范围与结论边界。</p></article>
+        <article class="card"><span class="tag">批处理</span><h3>Markdown 文档改写</h3><p>让 Codex 读取文件后编辑，同时明确要求保留标题、链接、代码块和固定标识符。</p></article>
+        <article class="card avoid"><span class="tag">不建议直接用</span><h3>事实尚未核验的初稿</h3><p>技能会润色表达，但不会自动证明信息真实。先核实数据与出处，再做“去 AI 化”。</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <div class="section-head">
+        <span class="section-no">02 / 工作流</span>
+        <div><h2>五步走完一次改写</h2><p class="section-intro">关键不是一句“写得自然点”，而是先锁定事实和语气，再让技能动笔。</p></div>
+      </div>
+      <div class="flow" aria-label="Humanizer 工作流">
+        <article class="flow-step"><h3>准备原文</h3><p>粘贴文本或给出本地文件路径。</p></article>
+        <article class="flow-step"><h3>锁定边界</h3><p>列出不能改的事实、术语、数字和格式。</p></article>
+        <article class="flow-step"><h3>指定声音</h3><p>说明读者、语气、长度和使用场景。</p></article>
+        <article class="flow-step"><h3>调用技能</h3><p>显式写出 <code>$humanizer-zh</code>，要求先诊断再改写。</p></article>
+        <article class="flow-step"><h3>人工验收</h3><p>核对事实、语气、删改幅度，再决定是否写回文件。</p></article>
+      </div>
+      <div class="callout" style="margin-top:1rem"><strong>原则</strong><p>先审后改，风险最低。重要文档可先要求 Codex “只标注问题，不修改文件”，确认后再执行写回。</p></div>
+    </section>
+
+    <section class="section" id="cheatsheet">
+      <div class="section-head">
+        <span class="section-no">03 / 技能速查</span>
+        <div><h2>输入、输出与调用方式</h2><p class="section-intro">下面四种模板覆盖日常大多数需求。表格可横向滚动。</p></div>
+      </div>
+      <div class="table-wrap" role="region" aria-label="技能速查表" tabindex="0">
+        <table>
+          <thead><tr><th>任务</th><th>输入</th><th>输出</th><th>适用阶段</th><th>Codex 桌面端示例</th></tr></thead>
+          <tbody>
+            <tr><td>短文改写</td><td>原文 + 读者 + 语气</td><td>改写稿；可附简短说明</td><td>初稿完成后</td><td><code>$humanizer-zh 把下文改得自然、直接，面向普通用户。</code></td></tr>
+            <tr><td>诊断 AI 痕迹</td><td>原文 + “只诊断”</td><td>问题片段、模式类型、修改建议</td><td>决定是否重写前</td><td><code>$humanizer-zh 只审阅，不改写。标出 AI 痕迹并解释原因。</code></td></tr>
+            <tr><td>文件编辑</td><td>本地路径 + 保留项 + 写回权限</td><td>修改后的文件或建议稿</td><td>文档交付前</td><td><code>$humanizer-zh 编辑 article.md；保留标题、链接和代码块。</code></td></tr>
+            <tr><td>两版对比</td><td>原文 + 目标声音 + 对照要求</td><td>原文/改写/变化摘要</td><td>团队评审时</td><td><code>$humanizer-zh 输出改写版，并用 5 条以内说明关键变化。</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="codebox">
+        <button class="copy-btn" type="button" data-copy="prompt-master" aria-label="复制通用提示词">复制</button>
+        <pre id="prompt-master">$humanizer-zh
+
+请处理下面的文本。
+目标读者：[填写]
+目标语气：[自然 / 专业 / 克制 / 口语]
+必须保留：[事实、数字、术语、链接、结构]
+允许调整：[句式、段落、重复内容]
+禁止：[虚构数据、补充未经证实的信息、改变原意]
+
+先给出改写稿，再用不超过 5 条说明主要变化。
+
+[粘贴原文]</pre>
+      </div>
+    </section>
+
+    <section class="section" id="practice">
+      <div class="section-head">
+        <span class="section-no">04 / Codex 实战</span>
+        <div><h2>三种典型任务，直接照着做</h2><p class="section-intro">选择场景查看完整提示词和前后对照。这里是离线预置示例，不会调用模型或上传文本。</p></div>
+      </div>
+      <div class="practice">
+        <div class="case-tabs" role="tablist" aria-label="实战场景">
+          <button class="case-tab" type="button" role="tab" aria-selected="true" data-case="marketing">营销文案</button>
+          <button class="case-tab" type="button" role="tab" aria-selected="false" data-case="prd">PRD 说明</button>
+          <button class="case-tab" type="button" role="tab" aria-selected="false" data-case="file">文件改写</button>
+        </div>
+        <article class="case-panel" role="tabpanel" aria-live="polite">
+          <h3 id="case-title"></h3>
+          <p class="case-note" id="case-note"></p>
+          <div class="codebox">
+            <button class="copy-btn" type="button" data-copy="case-prompt" aria-label="复制当前实战提示词">复制</button>
+            <pre id="case-prompt"></pre>
+          </div>
+          <div class="compare">
+            <div class="compare-block"><div class="compare-label">原文</div><p id="case-before"></p></div>
+            <div class="compare-block after"><div class="compare-label">参考改写</div><p id="case-after"></p></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="desktop">
+      <div class="section-head">
+        <span class="section-no">05 / 桌面端操作</span>
+        <div><h2>从新建任务到落盘</h2><p class="section-intro">Codex 能读取工作区文件，也能直接处理粘贴文本。是否允许写回，要在提示词里说清楚。</p></div>
+      </div>
+      <div class="steps">
+        <details open><summary>1. 新建一个 Codex 任务</summary><div class="detail-body">全局技能安装后，在新任务中更容易被识别。若旧任务找不到 <code>humanizer-zh</code>，新建任务或重启 Codex 桌面端。</div></details>
+        <details><summary>2. 显式调用并提供上下文</summary><div class="detail-body">输入 <code>$humanizer-zh</code>，随后说明文本用途、读者、语气和不能改变的内容。仅写“去 AI 味”通常不够稳定。</div></details>
+        <details><summary>3. 先看预览，再允许写文件</summary><div class="detail-body">文件类任务建议第一轮只输出改写预览。确认没有改错事实和格式后，再说“将确认版写回原文件”或指定一个新文件名。</div></details>
+        <details><summary>4. 用第二轮做针对性修订</summary><div class="detail-body">不要笼统地说“再自然一点”。可以说“减少宣传口吻，但保留专业感”“句子更短，不添加第一人称”“标题和项目符号不变”。</div></details>
+      </div>
+    </section>
+
+    <section class="section" id="check">
+      <div class="section-head">
+        <span class="section-no">06 / 验收</span>
+        <div><h2>改写后别急着交付</h2><p class="section-intro">Humanizer 的评分是编辑参考，不是事实正确性的证明。最后一关仍由人完成。</p></div>
+      </div>
+      <div class="checklist">
+        <div><span class="score" id="score">0 / 6</span> 项已确认</div>
+        <div class="meter" aria-hidden="true"><span id="meter-fill"></span></div>
+        <div class="checks">
+          <label class="check"><input type="checkbox">事实、数字、时间和人名没有被改错</label>
+          <label class="check"><input type="checkbox">术语、命令、链接和代码块保持原样</label>
+          <label class="check"><input type="checkbox">语气符合读者与发布渠道</label>
+          <label class="check"><input type="checkbox">没有新增未经证实的案例或数据</label>
+          <label class="check"><input type="checkbox">长短句有变化，朗读时自然</label>
+          <label class="check"><input type="checkbox">删掉套话后，核心信息仍然完整</label>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:1rem"><strong>边界</strong><p>不要把“更像人写的”误解成“故意制造错别字”或“保证绕过检测器”。这个技能的目标是提升表达质量，不是伪造作者身份。</p></div>
+    </section>
+  </main>
+
+  <footer><span>Humanizer-zh · Codex 桌面端实战教程</span><span>单文件 · 零外链资源 · 可离线打开</span></footer>
+
+  <script>
+    const cases = {
+      marketing: {
+        title: '实战一：把宣传腔改成具体卖点',
+        note: '适合官网、商品页、社媒发布前。先约束“不虚构”，否则改写可能擅自补充细节。',
+        prompt: `$humanizer-zh\n\n请把下面的产品文案改得自然、可信。\n读者：第一次了解产品的普通用户。\n保留：批处理、快捷键、离线模式三个功能。\n禁止：新增数据、用户评价或行业背书。\n输出：80 字以内的改写稿 + 3 条变化说明。\n\n原文：\n新版本作为我们持续创新的有力证明，提供无缝、直观且强大的体验，帮助用户在不断演变的工作格局中释放潜能。`,
+        before: '新版本作为我们持续创新的有力证明，提供无缝、直观且强大的体验，帮助用户在不断演变的工作格局中释放潜能。',
+        after: '新版本加入批处理、键盘快捷键和离线模式。重复任务可以一次完成，没网络时也能继续工作。'
+      },
+      prd: {
+        title: '实战二：压缩 PRD 里的空话',
+        note: '适合需求评审前。目标不是增加文采，而是让团队更快看清用户、问题与约束。',
+        prompt: `$humanizer-zh\n\n只改写下面这段 PRD 背景。\n语气：专业、直接、克制。\n必须保留：新用户、首次启动、3 个入口、7 天。\n不要改变需求含义，不要增加解决方案。\n输出改写稿，不需要评分。\n\n原文：\n在不断演变的产品体验格局中，新用户首次启动阶段发挥着至关重要的作用。为了提供无缝体验，我们需要深入探讨 3 个入口在 7 天内对用户行为产生的关键影响。`,
+        before: '在不断演变的产品体验格局中，新用户首次启动阶段发挥着至关重要的作用。为了提供无缝体验，我们需要深入探讨 3 个入口在 7 天内对用户行为产生的关键影响。',
+        after: '我们需要了解新用户首次启动后，3 个入口如何影响其 7 天内的使用行为。'
+      },
+      file: {
+        title: '实战三：安全地改写本地 Markdown',
+        note: '适合长文。第一轮只生成预览或新文件，确认后再覆盖原稿。',
+        prompt: `$humanizer-zh\n\n请读取工作区中的 docs/article.md，先做只读审阅：\n1. 标出明显的 AI 写作模式；\n2. 给出完整改写预览；\n3. 保留 YAML front matter、标题层级、链接、代码块、命令和产品名；\n4. 不修改任何文件。\n\n我确认预览后，再将版本写入 docs/article-humanized.md。`,
+        before: '直接要求“把 article.md 去 AI 化并覆盖”，没有声明格式保护，也没有预览门槛。',
+        after: '先只读诊断并预览；明确保护项；确认后写入新文件，原稿可随时回退。'
+      }
+    };
+
+    function renderCase(key) {
+      const item = cases[key];
+      document.getElementById('case-title').textContent = item.title;
+      document.getElementById('case-note').textContent = item.note;
+      document.getElementById('case-prompt').textContent = item.prompt;
+      document.getElementById('case-before').textContent = item.before;
+      document.getElementById('case-after').textContent = item.after;
+    }
+
+    document.querySelectorAll('.case-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.case-tab').forEach((item) => item.setAttribute('aria-selected', 'false'));
+        tab.setAttribute('aria-selected', 'true');
+        renderCase(tab.dataset.case);
+      });
+    });
+
+    async function copyText(id, button) {
+      const text = document.getElementById(id).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (_) {
+        const area = document.createElement('textarea');
+        area.value = text; area.style.position = 'fixed'; area.style.opacity = '0';
+        document.body.appendChild(area); area.select(); document.execCommand('copy'); area.remove();
+      }
+      const old = button.textContent;
+      button.textContent = '已复制';
+      window.setTimeout(() => { button.textContent = old; }, 1200);
+    }
+
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', () => copyText(button.dataset.copy, button));
+    });
+
+    const checks = [...document.querySelectorAll('.check input')];
+    function updateScore() {
+      const done = checks.filter((item) => item.checked).length;
+      document.getElementById('score').textContent = `${done} / ${checks.length}`;
+      document.getElementById('meter-fill').style.width = `${done / checks.length * 100}%`;
+    }
+    checks.forEach((item) => item.addEventListener('change', updateScore));
+    renderCase('marketing');
+    updateScore();
+  </script>
+</body>
+</html>

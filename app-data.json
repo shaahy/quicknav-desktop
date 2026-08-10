@@ -860,6 +860,42 @@
       "isFavorite": true,
       "createdAt": "2026-08-03T12:14:36.127Z",
       "updatedAt": "2026-08-03T12:14:41.007Z"
+    },
+    {
+      "id": "43e1e80d-843a-4df7-8393-4746b2d8feee",
+      "name": "说人话技能教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/说人话技能 Codex 桌面端实战教程.html",
+        "fileName": "说人话技能 Codex 桌面端实战教程",
+        "extension": "html",
+        "fileSize": 34188,
+        "mtimeMs": 1786343353143.4097
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-10T06:36:57.408Z",
+      "updatedAt": "2026-08-10T06:36:57.408Z"
+    },
+    {
+      "id": "35fc925e-5c40-4483-9bd7-f03eed9ecf8d",
+      "name": "Humanizer-zh 去AI味",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Humanizer-zh技能实战教程.html",
+        "fileName": "Humanizer-zh技能实战教程",
+        "extension": "html",
+        "fileSize": 26816,
+        "mtimeMs": 1786342821383.649
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-10T06:36:57.408Z",
+      "updatedAt": "2026-08-10T06:36:57.408Z"
     }
   ],
   "categories": [
@@ -999,7 +1035,9 @@
         "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
         "5bda62ed-58e1-47d2-b44c-ce35bc86c27e",
         "d15da457-c138-4521-a6fa-e92aab40cce5",
-        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8",
+        "43e1e80d-843a-4df7-8393-4746b2d8feee",
+        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
       ]
     },
     {
@@ -1066,16 +1104,9 @@
       "viewType": "category:6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "cardIds": [
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
-        "c8230b6a-1452-4c83-81d2-cbab9d78cae1"
-      ]
-    },
-    {
-      "viewType": "favorites",
-      "cardIds": [
-        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
-        "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
-        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
-        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+        "c8230b6a-1452-4c83-81d2-cbab9d78cae1",
+        "43e1e80d-843a-4df7-8393-4746b2d8feee",
+        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
       ]
     },
     {
@@ -1085,6 +1116,15 @@
         "5bda62ed-58e1-47d2-b44c-ce35bc86c27e",
         "d15da457-c138-4521-a6fa-e92aab40cce5",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0"
+      ]
+    },
+    {
+      "viewType": "favorites",
+      "cardIds": [
+        "238f1926-f7f5-4dd5-9fa0-196d4b570546",
+        "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
+        "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
       ]
     }
   ]
