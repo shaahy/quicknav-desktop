@@ -914,6 +914,78 @@
       "isFavorite": false,
       "createdAt": "2026-08-10T08:39:17.978Z",
       "updatedAt": "2026-08-10T08:40:08.652Z"
+    },
+    {
+      "id": "3cfb1013-c094-45a0-85e9-34cc1f24c9e7",
+      "name": "LangChain 离线实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/LangChain实战教程.html",
+        "fileName": "LangChain实战教程",
+        "extension": "html",
+        "fileSize": 44298,
+        "mtimeMs": 1786440312793.632
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-11T09:28:25.199Z",
+      "updatedAt": "2026-08-11T09:28:25.199Z"
+    },
+    {
+      "id": "068bd48b-0000-453c-ac9d-9d76c8e65c12",
+      "name": "Langflow 实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Langflow实战教程.html",
+        "fileName": "Langflow实战教程",
+        "extension": "html",
+        "fileSize": 37407,
+        "mtimeMs": 1786440328643.0068
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-11T09:28:25.199Z",
+      "updatedAt": "2026-08-11T09:28:25.199Z"
+    },
+    {
+      "id": "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
+      "name": "LangGraph 实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/LangGraph实战教程.html",
+        "fileName": "LangGraph实战教程",
+        "extension": "html",
+        "fileSize": 38363,
+        "mtimeMs": 1786439834151.7107
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-11T09:28:25.199Z",
+      "updatedAt": "2026-08-11T09:28:25.199Z"
+    },
+    {
+      "id": "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7",
+      "name": "Monorepo 工作流实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Monorepo工作流实战教程.html",
+        "fileName": "Monorepo工作流实战教程",
+        "extension": "html",
+        "fileSize": 45906,
+        "mtimeMs": 1786430023176.0496
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-11T09:28:25.199Z",
+      "updatedAt": "2026-08-11T09:28:25.199Z"
     }
   ],
   "categories": [
@@ -1063,7 +1135,11 @@
         "b344a4c3-9a5c-477f-9889-abfcd95614f8",
         "43e1e80d-843a-4df7-8393-4746b2d8feee",
         "35fc925e-5c40-4483-9bd7-f03eed9ecf8d",
-        "ec43894d-cd2f-4b55-9935-081b11ad65de"
+        "ec43894d-cd2f-4b55-9935-081b11ad65de",
+        "3cfb1013-c094-45a0-85e9-34cc1f24c9e7",
+        "068bd48b-0000-453c-ac9d-9d76c8e65c12",
+        "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
+        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7"
       ]
     },
     {
@@ -1130,7 +1206,11 @@
       "viewType": "category:6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "cardIds": [
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
-        "c8230b6a-1452-4c83-81d2-cbab9d78cae1"
+        "c8230b6a-1452-4c83-81d2-cbab9d78cae1",
+        "3cfb1013-c094-45a0-85e9-34cc1f24c9e7",
+        "068bd48b-0000-453c-ac9d-9d76c8e65c12",
+        "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
+        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7"
       ]
     },
     {
@@ -1143,20 +1223,20 @@
       ]
     },
     {
+      "viewType": "category:0e1ed6e2-4dfe-4300-9ac8-d95845516b51",
+      "cardIds": [
+        "43e1e80d-843a-4df7-8393-4746b2d8feee",
+        "ec43894d-cd2f-4b55-9935-081b11ad65de",
+        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
+      ]
+    },
+    {
       "viewType": "favorites",
       "cardIds": [
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
         "b344a4c3-9a5c-477f-9889-abfcd95614f8"
-      ]
-    },
-    {
-      "viewType": "category:0e1ed6e2-4dfe-4300-9ac8-d95845516b51",
-      "cardIds": [
-        "43e1e80d-843a-4df7-8393-4746b2d8feee",
-        "ec43894d-cd2f-4b55-9935-081b11ad65de",
-        "35fc925e-5c40-4483-9bd7-f03eed9ecf8d"
       ]
     }
   ]

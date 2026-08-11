@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="一份无需联网、可跟做的 Monorepo 工作流实战教程。">
+  <title>Monorepo 工作流实战教程</title>
+  <style>
+    :root {
+      --paper: #f4efe3;
+      --paper-2: #fffaf0;
+      --ink: #172026;
+      --muted: #5e686b;
+      --line: #c9c1ae;
+      --blue: #174d70;
+      --orange: #e4572e;
+      --green: #2d6a4f;
+      --yellow: #f2c14e;
+      --code: #11191e;
+      --code-text: #e9f0ec;
+      --shadow: 7px 7px 0 rgba(23, 32, 38, .12);
+      --radius: 4px;
+      --content: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 77, 112, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 77, 112, .055) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      line-height: 1.75;
+    }
+
+    ::selection { color: #fff; background: var(--orange); }
+    a { color: inherit; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    code, pre { font-family: Consolas, "Cascadia Code", monospace; }
+    :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 8px 12px;
+      background: var(--ink);
+      color: white;
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: none; }
+
+    .reading-progress {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 80;
+      height: 4px;
+      background: transparent;
+    }
+    .reading-progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--orange);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 2px solid var(--ink);
+      background: rgba(244, 239, 227, .94);
+      backdrop-filter: blur(12px);
+    }
+    .topbar-inner {
+      max-width: var(--content);
+      margin: auto;
+      min-height: 58px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 31px;
+      height: 31px;
+      color: white;
+      background: var(--blue);
+      box-shadow: 3px 3px 0 var(--orange);
+      font-family: Georgia, serif;
+    }
+    .topnav { display: flex; gap: 4px; }
+    .topnav a {
+      padding: 6px 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .topnav a:hover { color: var(--orange); }
+
+    .hero {
+      position: relative;
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 88px 20px 72px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(290px, .7fr);
+      gap: 64px;
+      align-items: end;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 17px;
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 34px; height: 3px; background: currentColor; }
+    h1, h2, h3 { font-family: "STSong", "SimSun", Georgia, serif; }
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(46px, 7.5vw, 92px);
+      line-height: .98;
+      letter-spacing: -.055em;
+    }
+    h1 .slash { color: var(--orange); }
+    .hero-lead {
+      max-width: 660px;
+      margin: 28px 0 0;
+      color: #35434a;
+      font-size: clamp(17px, 2vw, 21px);
+    }
+    .hero-lead strong { color: var(--blue); }
+    .hero-card {
+      position: relative;
+      padding: 26px;
+      border: 2px solid var(--ink);
+      background: var(--paper-2);
+      box-shadow: var(--shadow);
+      transform: rotate(1deg);
+    }
+    .hero-card::before {
+      content: "QUICK START";
+      position: absolute;
+      top: -13px;
+      right: 18px;
+      padding: 2px 9px;
+      color: white;
+      background: var(--orange);
+      font: 700 11px Consolas, monospace;
+      letter-spacing: .1em;
+    }
+    .meta-list { display: grid; gap: 13px; margin: 0; }
+    .meta-row {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 12px;
+      padding-bottom: 11px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .meta-row:last-child { padding-bottom: 0; border: 0; }
+    .meta-row dt { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .meta-row dd { margin: 0; font-size: 14px; font-weight: 700; }
+
+    .definition-strip {
+      border-block: 2px solid var(--ink);
+      background: var(--blue);
+      color: white;
+    }
+    .definition-inner {
+      max-width: var(--content);
+      margin: auto;
+      padding: 26px 20px;
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 36px;
+      align-items: center;
+    }
+    .definition-label { color: #b9d8ea; font-size: 12px; font-weight: 800; letter-spacing: .14em; }
+    .definition-text { margin: 0; font: 700 clamp(18px, 2.2vw, 25px)/1.5 "STSong", "SimSun", serif; }
+
+    .layout {
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 64px 20px 100px;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 58px;
+      align-items: start;
+    }
+    .sidebar { position: sticky; top: 88px; }
+    .sidebar-title {
+      margin: 0 0 11px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .18em;
+    }
+    .toc { display: grid; border-left: 2px solid var(--line); }
+    .toc a {
+      position: relative;
+      padding: 7px 0 7px 16px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .toc a::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: transparent;
+    }
+    .toc a:hover, .toc a.active { color: var(--orange); }
+    .toc a.active::before { background: var(--orange); }
+    .progress-card {
+      margin-top: 24px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, .68);
+      font-size: 12px;
+    }
+    .progress-card strong { display: block; margin-bottom: 8px; }
+    .progress-track { height: 7px; background: #ddd4c1; overflow: hidden; }
+    .progress-track span { display: block; width: 0; height: 100%; background: var(--green); transition: width .25s; }
+    .progress-text { margin: 7px 0 0; color: var(--muted); }
+
+    main { min-width: 0; }
+    .lesson {
+      scroll-margin-top: 88px;
+      margin-bottom: 92px;
+    }
+    .section-head {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 29px;
+    }
+    .section-no {
+      color: var(--orange);
+      font: 800 14px/1 Consolas, monospace;
+      border-top: 3px solid var(--orange);
+      padding-top: 9px;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.15;
+      letter-spacing: -.035em;
+    }
+    .section-desc { max-width: 720px; margin: 10px 0 0; color: var(--muted); }
+    h3 { margin: 34px 0 13px; font-size: 24px; line-height: 1.35; }
+    p { margin: 0 0 16px; }
+
+    .plain-card, .scenario-card, .step, .pitfall, .check-panel, .quiz {
+      border: 1.5px solid var(--ink);
+      background: var(--paper-2);
+      box-shadow: 4px 4px 0 rgba(23, 32, 38, .09);
+    }
+    .plain-card { padding: 25px; }
+    .analogy {
+      display: grid;
+      grid-template-columns: 1fr 70px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 24px;
+    }
+    .repo-box { padding: 22px; border: 2px solid var(--blue); background: rgba(23, 77, 112, .05); }
+    .repo-box strong { display: block; color: var(--blue); margin-bottom: 7px; }
+    .arrow { text-align: center; color: var(--orange); font-size: 30px; font-weight: 900; }
+
+    .scenario-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .scenario-card { padding: 21px; }
+    .scenario-card.good { border-top: 6px solid var(--green); }
+    .scenario-card.bad { border-top: 6px solid var(--orange); }
+    .scenario-card .tag { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .12em; }
+    .scenario-card h3 { margin: 6px 0 12px; font-size: 21px; }
+    .compact-list { margin: 0; padding-left: 20px; }
+    .compact-list li + li { margin-top: 7px; }
+
+    .decision-table { width: 100%; margin-top: 26px; border-collapse: collapse; background: var(--paper-2); }
+    .decision-table th, .decision-table td { padding: 13px 15px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .decision-table th { color: white; background: var(--ink); font-size: 13px; }
+    .decision-table td:first-child { font-weight: 800; }
+    .yes { color: var(--green); font-weight: 900; }
+    .no { color: var(--orange); font-weight: 900; }
+
+    .tree {
+      padding: 24px;
+      overflow-x: auto;
+      border-left: 7px solid var(--blue);
+      background: var(--code);
+      color: var(--code-text);
+      font: 14px/1.75 Consolas, monospace;
+      white-space: pre;
+    }
+    .tree .folder { color: #7fc8f8; }
+    .tree .note { color: #93a69d; }
+
+    .callout {
+      position: relative;
+      margin: 24px 0;
+      padding: 18px 20px 18px 54px;
+      border: 1px solid #d5aa3c;
+      background: #fff4cf;
+    }
+    .callout::before {
+      content: "!";
+      position: absolute;
+      left: 18px;
+      top: 17px;
+      display: grid;
+      place-items: center;
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      color: white;
+      background: var(--orange);
+      font-weight: 900;
+    }
+    .callout strong { display: block; margin-bottom: 3px; }
+
+    .workflow { position: relative; display: grid; gap: 16px; }
+    .workflow::before { content: ""; position: absolute; left: 27px; top: 28px; bottom: 28px; width: 2px; background: var(--line); }
+    .step {
+      position: relative;
+      margin-left: 58px;
+      padding: 20px 22px;
+    }
+    .step-num {
+      position: absolute;
+      left: -59px;
+      top: 17px;
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      color: white;
+      background: var(--blue);
+      font: 800 13px Consolas, monospace;
+      z-index: 1;
+    }
+    .step h3 { margin: 0 0 5px; font-size: 20px; }
+    .step p { margin: 0; color: var(--muted); font-size: 14px; }
+    .step code { padding: 2px 5px; color: var(--blue); background: #e5e0d4; font-size: 12px; }
+
+    .lab-banner {
+      margin-bottom: 28px;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: center;
+      border: 2px solid var(--ink);
+      color: white;
+      background: var(--blue);
+      box-shadow: var(--shadow);
+    }
+    .lab-banner h3 { margin: 0 0 6px; color: white; }
+    .lab-banner p { margin: 0; color: #c9deea; }
+    .lab-time { padding: 9px 13px; border: 1px solid #8db2c7; font: 800 12px Consolas, monospace; white-space: nowrap; }
+
+    .lab-step { margin: 34px 0 44px; }
+    .lab-step-title { display: flex; align-items: center; gap: 11px; margin-bottom: 13px; }
+    .lab-step-title span {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      color: white;
+      background: var(--orange);
+      font: 800 12px Consolas, monospace;
+    }
+    .lab-step-title h3 { margin: 0; }
+
+    .code-block { position: relative; margin: 15px 0 20px; }
+    .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      color: #9fb0a7;
+      background: #0a1014;
+      border-bottom: 1px solid #314049;
+      font: 12px Consolas, monospace;
+    }
+    .copy-btn {
+      padding: 4px 9px;
+      border: 1px solid #50616b;
+      color: #d7e2dc;
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .copy-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    pre {
+      margin: 0;
+      padding: 20px;
+      overflow: auto;
+      color: var(--code-text);
+      background: var(--code);
+      font-size: 13px;
+      line-height: 1.75;
+      tab-size: 2;
+    }
+    .code-comment { color: #91a59b; }
+    .cmd { color: #82cfff; }
+    .output { color: #f5cf6f; }
+
+    .result-box { padding: 18px 20px; border-left: 5px solid var(--green); background: #e5f0e8; }
+    .result-box strong { color: var(--green); }
+
+    .migration {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      align-items: stretch;
+      gap: 14px;
+      margin: 22px 0;
+    }
+    .migration-box { padding: 20px; border: 2px dashed var(--line); background: var(--paper-2); }
+    .migration-box.after { border-style: solid; border-color: var(--green); }
+    .migration-box strong { display: block; margin-bottom: 9px; }
+    .migration-arrow { display: grid; place-items: center; color: var(--orange); font-size: 29px; font-weight: 900; }
+    .mini-tree { margin: 0; font: 13px/1.8 Consolas, monospace; white-space: pre-wrap; }
+
+    .pitfalls { display: grid; gap: 14px; }
+    .pitfall { display: grid; grid-template-columns: 48px 1fr; gap: 15px; padding: 19px; }
+    .pitfall-icon { font: 900 24px/1 Georgia, serif; color: var(--orange); }
+    .pitfall h3 { margin: 0 0 4px; font-size: 19px; }
+    .pitfall p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .check-panel { padding: 24px; }
+    .check-panel h3 { margin-top: 0; }
+    .check-list { display: grid; gap: 10px; }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 10px 12px;
+      border: 1px solid transparent;
+      background: #f2ecdf;
+      cursor: pointer;
+    }
+    .check-item:hover { border-color: var(--line); }
+    .check-item input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--green); }
+    .check-item:has(input:checked) { color: var(--muted); text-decoration: line-through; background: #e1eadf; }
+
+    .command-table { width: 100%; border-collapse: collapse; background: var(--paper-2); }
+    .command-table th, .command-table td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+    .command-table th { color: var(--muted); font-size: 11px; letter-spacing: .1em; }
+    .command-table code { color: var(--blue); font-size: 12px; font-weight: 700; }
+
+    .quiz { padding: 24px; margin-top: 28px; border-color: var(--blue); }
+    .quiz h3 { margin-top: 0; }
+    .quiz-options { display: grid; gap: 9px; }
+    .quiz button {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      background: #f3eddf;
+      text-align: left;
+      cursor: pointer;
+    }
+    .quiz button:hover { border-color: var(--blue); }
+    .quiz button.correct { color: white; background: var(--green); border-color: var(--green); }
+    .quiz button.wrong { color: white; background: var(--orange); border-color: var(--orange); }
+    .quiz-result { min-height: 27px; margin: 12px 0 0; font-weight: 800; }
+
+    .summary {
+      padding: 32px;
+      border: 3px solid var(--ink);
+      background: var(--yellow);
+      box-shadow: var(--shadow);
+    }
+    .summary h2 { max-width: 690px; }
+    .summary ol { margin: 23px 0 0; padding-left: 22px; font-weight: 700; }
+    .summary li + li { margin-top: 9px; }
+
+    footer {
+      padding: 35px 20px;
+      border-top: 2px solid var(--ink);
+      background: var(--ink);
+      color: #c4d0ca;
+      text-align: center;
+      font-size: 13px;
+    }
+    footer strong { color: white; }
+    .back-top {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 42px;
+      height: 42px;
+      border: 2px solid var(--ink);
+      color: white;
+      background: var(--orange);
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: .2s;
+    }
+    .back-top.show { opacity: 1; transform: none; pointer-events: auto; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 90;
+      padding: 9px 15px;
+      color: white;
+      background: var(--green);
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 900px) {
+      .topnav { display: none; }
+      .hero { grid-template-columns: 1fr; gap: 40px; padding-top: 65px; }
+      .hero-card { max-width: 520px; transform: none; }
+      .layout { grid-template-columns: 1fr; padding-top: 45px; }
+      .sidebar { display: none; }
+      .lesson { margin-bottom: 72px; }
+    }
+    @media (max-width: 650px) {
+      .hero { padding-block: 48px 42px; }
+      h1 { font-size: clamp(42px, 16vw, 64px); }
+      .definition-inner { grid-template-columns: 1fr; gap: 7px; }
+      .section-head { grid-template-columns: 42px 1fr; gap: 12px; }
+      .scenario-grid, .analogy { grid-template-columns: 1fr; }
+      .analogy .arrow { transform: rotate(90deg); }
+      .decision-table { font-size: 13px; }
+      .decision-table th, .decision-table td { padding: 10px 8px; }
+      .lab-banner { grid-template-columns: 1fr; }
+      .migration { grid-template-columns: 1fr; }
+      .migration-arrow { transform: rotate(90deg); }
+      .pitfall { grid-template-columns: 34px 1fr; }
+      .summary { padding: 23px; }
+    }
+    @media print {
+      body { background: white; font-size: 11pt; }
+      .topbar, .sidebar, .reading-progress, .back-top, .copy-btn, .toast { display: none !important; }
+      .hero, .layout, .definition-inner { max-width: none; }
+      .hero { padding-top: 25px; }
+      .layout { display: block; padding-top: 30px; }
+      .lesson { break-inside: avoid; margin-bottom: 45px; }
+      .code-block, .plain-card, .scenario-card { break-inside: avoid; box-shadow: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到正文</a>
+  <div class="reading-progress" aria-hidden="true"><span id="readingBar"></span></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark">M</span><span>MONOREPO 实战手册</span></div>
+      <nav class="topnav" aria-label="快捷导航">
+        <a href="#scenarios">适用场景</a>
+        <a href="#workflow">工作流程</a>
+        <a href="#lab">实战示例</a>
+        <a href="#pitfalls">常见坑</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="page-title">
+    <div>
+      <div class="eyebrow">从概念到第一次提交</div>
+      <h1 id="page-title">Monorepo<span class="slash">/</span><br>工作流实战</h1>
+      <p class="hero-lead">把多个相关项目放进<strong>一个 Git 仓库</strong>统一管理。读完这份教程，你将能判断它是否适合自己，并用原生 npm workspaces 完成一个可运行的示例。</p>
+    </div>
+    <aside class="hero-card" aria-label="教程信息">
+      <dl class="meta-list">
+        <div class="meta-row"><dt>难度</dt><dd>入门 → 实战</dd></div>
+        <div class="meta-row"><dt>用时</dt><dd>约 35 分钟</dd></div>
+        <div class="meta-row"><dt>前置</dt><dd>Node.js 18+、Git</dd></div>
+        <div class="meta-row"><dt>产出</dt><dd>1 个应用 + 1 个共享包</dd></div>
+        <div class="meta-row"><dt>方式</dt><dd>无需安装 Monorepo 工具</dd></div>
+      </dl>
+    </aside>
+  </section>
+
+  <section class="definition-strip" aria-label="一句话定义">
+    <div class="definition-inner">
+      <div class="definition-label">ONE-LINE DEFINITION</div>
+      <p class="definition-text">Monorepo 不是“一个大项目”，而是“多个相互关联的项目，共用一个版本库与一套协作规则”。</p>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="文章目录">
+      <p class="sidebar-title">CONTENT MAP</p>
+      <nav class="toc" id="toc">
+        <a href="#concept">01 什么是 Monorepo</a>
+        <a href="#scenarios">02 适用场景</a>
+        <a href="#structure">03 目录结构</a>
+        <a href="#workflow">04 工作流程</a>
+        <a href="#lab">05 从零实战</a>
+        <a href="#daily">06 日常协作</a>
+        <a href="#migration">07 旧项目迁移</a>
+        <a href="#pitfalls">08 常见坑</a>
+        <a href="#checklist">09 检查清单</a>
+      </nav>
+      <div class="progress-card">
+        <strong>实战完成度</strong>
+        <div class="progress-track"><span id="taskProgress"></span></div>
+        <p class="progress-text" id="taskProgressText">0 / 6 步</p>
+      </div>
+    </aside>
+
+    <main id="content">
+      <section class="lesson" id="concept">
+        <div class="section-head">
+          <span class="section-no">01</span>
+          <div><h2>先把概念讲明白</h2><p class="section-desc">Monorepo 描述的是仓库组织方式，不限定语言、框架或部署方式。</p></div>
+        </div>
+
+        <div class="plain-card">
+          <p><strong>普通多仓库（Polyrepo）</strong>：网站、后台、组件库分别拥有自己的 Git 仓库，各自提交、发版和管理权限。</p>
+          <p><strong>单体仓库（Monorepo）</strong>：这些项目放在同一个 Git 仓库中，但仍保留独立目录、依赖和发布方式。</p>
+          <div class="analogy" aria-label="多仓库与单体仓库对比">
+            <div class="repo-box"><strong>多仓库</strong>三间分散的工作室，各有钥匙和规章。</div>
+            <div class="arrow" aria-hidden="true">↔</div>
+            <div class="repo-box"><strong>Monorepo</strong>一座共享园区，各团队有独立办公室，共用门禁和基础设施。</div>
+          </div>
+        </div>
+
+        <div class="callout"><strong>不要混淆：Monorepo ≠ Monolith</strong>Monorepo 是代码如何存放；Monolith 是系统如何运行和部署。仓库放在一起，服务仍然可以独立部署。</div>
+      </section>
+
+      <section class="lesson" id="scenarios">
+        <div class="section-head">
+          <span class="section-no">02</span>
+          <div><h2>什么时候适合使用？</h2><p class="section-desc">关键不是项目数量，而是项目之间是否需要频繁同步、共享代码和统一变更。</p></div>
+        </div>
+
+        <div class="scenario-grid">
+          <article class="scenario-card good">
+            <span class="tag">GOOD FIT</span>
+            <h3>推荐使用</h3>
+            <ul class="compact-list">
+              <li>前端、后台和共享组件经常联动修改</li>
+              <li>多个应用复用同一套工具、类型或业务规则</li>
+              <li>希望一次提交完成跨项目变更</li>
+              <li>需要统一代码规范、测试与自动化流程</li>
+              <li>同一团队维护一组关联产品</li>
+            </ul>
+          </article>
+          <article class="scenario-card bad">
+            <span class="tag">POOR FIT</span>
+            <h3>谨慎使用</h3>
+            <ul class="compact-list">
+              <li>项目完全独立，几乎没有共享代码</li>
+              <li>不同团队必须严格隔离仓库权限</li>
+              <li>仓库中有大量二进制素材或超大历史</li>
+              <li>每个项目的合规边界完全不同</li>
+              <li>只是为了“看起来更统一”而合并</li>
+            </ul>
+          </article>
+        </div>
+
+        <table class="decision-table">
+          <thead><tr><th>判断问题</th><th>如果回答“是”</th><th>倾向</th></tr></thead>
+          <tbody>
+            <tr><td>跨项目改动经常需要同时合并吗？</td><td>Monorepo 能让一次提交保持原子性</td><td class="yes">适合</td></tr>
+            <tr><td>多个应用共享内部包吗？</td><td>本地依赖和版本同步会更简单</td><td class="yes">适合</td></tr>
+            <tr><td>必须按仓库做严格访问隔离吗？</td><td>单仓库授权通常不够细</td><td class="no">不适合</td></tr>
+            <tr><td>项目间完全没有关联吗？</td><td>合并只会增加仓库复杂度</td><td class="no">不适合</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="lesson" id="structure">
+        <div class="section-head">
+          <span class="section-no">03</span>
+          <div><h2>一眼看懂目录结构</h2><p class="section-desc">常见做法是把可运行项目放进 apps，把可复用模块放进 packages。</p></div>
+        </div>
+
+        <div class="tree" aria-label="Monorepo 目录树"><span class="folder">my-monorepo/</span>
+├─ <span class="folder">apps/</span>                 <span class="note"># 可独立运行或部署的应用</span>
+│  ├─ <span class="folder">web/</span>              <span class="note"># 网站</span>
+│  └─ <span class="folder">admin/</span>            <span class="note"># 管理后台</span>
+├─ <span class="folder">packages/</span>             <span class="note"># 被应用复用的内部包</span>
+│  ├─ <span class="folder">ui/</span>               <span class="note"># 公共组件</span>
+│  └─ <span class="folder">utils/</span>            <span class="note"># 公共工具函数</span>
+├─ package.json          <span class="note"># 工作区入口与统一脚本</span>
+├─ package-lock.json     <span class="note"># 统一依赖锁定</span>
+├─ .gitignore
+└─ README.md</div>
+
+        <h3>三个核心规则</h3>
+        <ol class="compact-list">
+          <li><strong>只有根目录存在一个 <code>.git</code></strong>，子项目不再各自初始化 Git。</li>
+          <li><strong>每个项目保留自己的 <code>package.json</code></strong>，明确自己的依赖和命令。</li>
+          <li><strong>共享包通过工作区名称引用</strong>，开发时直接连接本地代码，不必先发布到 npm。</li>
+        </ol>
+      </section>
+
+      <section class="lesson" id="workflow">
+        <div class="section-head">
+          <span class="section-no">04</span>
+          <div><h2>标准工作流程</h2><p class="section-desc">先建立边界，再连接依赖，最后统一验证。不要一开始就堆工具。</p></div>
+        </div>
+
+        <div class="workflow">
+          <article class="step"><span class="step-num">01</span><h3>规划项目边界</h3><p>列出哪些是独立应用，哪些是共享能力。应用进 <code>apps/</code>，共享模块进 <code>packages/</code>。</p></article>
+          <article class="step"><span class="step-num">02</span><h3>建立根工作区</h3><p>根 <code>package.json</code> 声明 workspaces，并设置只在根目录执行的统一脚本。</p></article>
+          <article class="step"><span class="step-num">03</span><h3>连接内部依赖</h3><p>应用通过包名依赖共享模块，让包管理器自动建立本地链接。</p></article>
+          <article class="step"><span class="step-num">04</span><h3>局部开发</h3><p>只启动当前应用；修改共享包时，消费它的应用可以同步验证。</p></article>
+          <article class="step"><span class="step-num">05</span><h3>统一质量检查</h3><p>在根目录运行测试、格式化和构建，避免某个子项目被遗漏。</p></article>
+          <article class="step"><span class="step-num">06</span><h3>一次提交完整变更</h3><p>共享包和使用方放在同一提交中，评审者能看到完整影响链。</p></article>
+        </div>
+      </section>
+
+      <section class="lesson" id="lab">
+        <div class="section-head">
+          <span class="section-no">05</span>
+          <div><h2>从零搭建一个 Monorepo</h2><p class="section-desc">示例只使用 Node.js、Git 与原生 npm workspaces，不依赖 Turborepo、Nx 等额外工具。</p></div>
+        </div>
+
+        <div class="lab-banner">
+          <div><h3>实验目标：一句问候，两个项目协作</h3><p>共享包 <code>@demo/utils</code> 提供问候函数，应用 <code>@demo/web</code> 调用它。</p></div>
+          <div class="lab-time">约 15 MIN</div>
+        </div>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>01</span><h3>创建目录并初始化 Git</h3></div>
+          <div class="code-block">
+            <div class="code-label"><span>PowerShell</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code><span class="cmd">mkdir</span> my-monorepo
+<span class="cmd">cd</span> my-monorepo
+<span class="cmd">git init</span>
+<span class="cmd">mkdir</span> apps, packages
+<span class="cmd">mkdir</span> apps/web, packages/utils</code></pre>
+          </div>
+          <p>此时只在 <code>my-monorepo</code> 根目录初始化一次 Git。</p>
+        </article>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>02</span><h3>声明根工作区</h3></div>
+          <p>在根目录创建 <code>package.json</code>：</p>
+          <div class="code-block">
+            <div class="code-label"><span>my-monorepo/package.json</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code>{
+  "name": "my-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "npm run start --workspace=@demo/web",
+    "check": "npm run check --workspaces --if-present"
+  }
+}</code></pre>
+          </div>
+          <div class="callout"><strong><code>private: true</code> 很重要</strong>它可以防止误把整个仓库发布到 npm。真正需要发布的内部包可在自己的配置中单独管理。</div>
+        </article>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>03</span><h3>创建共享工具包</h3></div>
+          <div class="code-block">
+            <div class="code-label"><span>packages/utils/package.json</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code>{
+  "name": "@demo/utils",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./index.js",
+  "scripts": {
+    "check": "node --check index.js"
+  }
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-label"><span>packages/utils/index.js</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code>export function greet(name) {
+  return `你好，${name}！欢迎进入 Monorepo。`;
+}</code></pre>
+          </div>
+        </article>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>04</span><h3>创建使用方应用</h3></div>
+          <div class="code-block">
+            <div class="code-label"><span>apps/web/package.json</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code>{
+  "name": "@demo/web",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "check": "node --check index.js"
+  },
+  "dependencies": {
+    "@demo/utils": "1.0.0"
+  }
+}</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-label"><span>apps/web/index.js</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code>import { greet } from '@demo/utils';
+
+console.log(greet('怡哥'));</code></pre>
+          </div>
+        </article>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>05</span><h3>安装并运行</h3></div>
+          <div class="code-block">
+            <div class="code-label"><span>PowerShell · 根目录执行</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code><span class="cmd">npm install</span>
+<span class="cmd">npm start</span>
+
+<span class="output">你好，怡哥！欢迎进入 Monorepo。</span></code></pre>
+          </div>
+          <p><code>npm install</code> 会识别两个 workspace，并让 <code>@demo/web</code> 连接本地的 <code>@demo/utils</code>。</p>
+        </article>
+
+        <article class="lab-step">
+          <div class="lab-step-title"><span>06</span><h3>统一检查并提交</h3></div>
+          <div class="code-block">
+            <div class="code-label"><span>PowerShell · 根目录执行</span><button class="copy-btn" type="button">复制</button></div>
+            <pre><code><span class="cmd">npm run check</span>
+<span class="cmd">git add .</span>
+<span class="cmd">git commit -m</span> "feat: initialize npm workspaces monorepo"</code></pre>
+          </div>
+          <div class="result-box"><strong>完成标志：</strong>根目录有一个 Git 仓库；两个 workspace 能被识别；应用能直接调用本地共享包；统一检查通过。</div>
+        </article>
+      </section>
+
+      <section class="lesson" id="daily">
+        <div class="section-head">
+          <span class="section-no">06</span>
+          <div><h2>日常开发怎么做？</h2><p class="section-desc">Monorepo 的价值体现在跨项目改动仍然保持完整、可验证。</p></div>
+        </div>
+
+        <h3>示例：给共享函数新增参数</h3>
+        <ol class="compact-list">
+          <li>从主分支创建功能分支：<code>git switch -c feat/custom-greeting</code>。</li>
+          <li>修改 <code>packages/utils</code> 的函数和检查。</li>
+          <li>同步修改 <code>apps/web</code> 的调用方式。</li>
+          <li>在根目录执行 <code>npm run check</code>，验证所有相关 workspace。</li>
+          <li>把共享包和应用改动放进同一个提交与评审。</li>
+        </ol>
+
+        <div class="callout"><strong>提交边界比目录边界更重要</strong>一次业务变更涉及多个项目时，应在同一提交或同一合并请求中完整呈现，避免共享包先改、应用暂时坏掉。</div>
+
+        <h3>常用的 workspace 定向命令</h3>
+        <table class="command-table">
+          <thead><tr><th>目的</th><th>命令</th></tr></thead>
+          <tbody>
+            <tr><td>只运行某个应用</td><td><code>npm run start --workspace=@demo/web</code></td></tr>
+            <tr><td>给某个应用安装依赖</td><td><code>npm install axios --workspace=@demo/web</code></td></tr>
+            <tr><td>所有工作区运行脚本</td><td><code>npm run check --workspaces --if-present</code></td></tr>
+            <tr><td>查看工作区依赖</td><td><code>npm ls --workspaces</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="lesson" id="migration">
+        <div class="section-head">
+          <span class="section-no">07</span>
+          <div><h2>已有项目如何迁移？</h2><p class="section-desc">迁移重点不是“复制文件”，而是保留历史、消除嵌套仓库并验证路径变化。</p></div>
+        </div>
+
+        <p>假设你有教程文件夹 A（没有 Git）和工具项目 B（已有 Git 历史），目标是统一到仓库 C。</p>
+        <div class="migration" aria-label="迁移前后结构">
+          <div class="migration-box"><strong>迁移前</strong><pre class="mini-tree">A/  教程文件
+B/  工具代码
+└─ .git/  已有历史</pre></div>
+          <div class="migration-arrow" aria-hidden="true">→</div>
+          <div class="migration-box after"><strong>迁移后</strong><pre class="mini-tree">C/
+├─ .git/       唯一仓库
+├─ tutorials/  来自 A
+└─ tool/       来自 B</pre></div>
+        </div>
+
+        <h3>推荐迁移思路</h3>
+        <ol class="compact-list">
+          <li>先备份并检查 A、B 的状态、敏感文件、大文件和硬编码路径。</li>
+          <li>以 B 的 Git 仓库作为 C 的历史基础。</li>
+          <li>把 B 的普通内容移动到 <code>tool/</code>，但根 <code>.git</code> 留在 C。</li>
+          <li>把 A 的内容复制到 <code>tutorials/</code>。</li>
+          <li>修正相对路径、脚本和 <code>.gitignore</code>，再进行运行验证。</li>
+          <li>检查 <code>git status</code> 的确切变更后再提交。</li>
+        </ol>
+
+        <div class="callout"><strong>高风险操作必须先停下来确认</strong>移动、删除旧目录或推送远端都可能影响现有工作。先列出准确路径、改动范围、备份与回滚办法，再执行。</div>
+      </section>
+
+      <section class="lesson" id="pitfalls">
+        <div class="section-head">
+          <span class="section-no">08</span>
+          <div><h2>最常见的六个坑</h2><p class="section-desc">多数问题不是工具造成的，而是边界、依赖和 Git 规则没有先说清。</p></div>
+        </div>
+
+        <div class="pitfalls">
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>把子项目的 .git 一起复制进来</h3><p>会形成嵌套仓库，外层仓库可能只记录一个特殊引用。正确做法是整个 Monorepo 只保留根目录的一个 <code>.git</code>。</p></div></article>
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>所有依赖都装在根目录</h3><p>每个 workspace 应声明自己真正使用的依赖；根目录只放全仓库共用的开发工具和统一脚本。</p></div></article>
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>共享代码通过相对路径乱穿</h3><p>不要写 <code>../../../packages/utils</code>。给共享包正式命名，再通过 workspace 依赖引用。</p></div></article>
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>每次改动都构建所有项目</h3><p>小仓库可以先简单执行；规模变大后，再引入受影响项目检测和任务缓存，避免过早复杂化。</p></div></article>
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>忽略权限与责任边界</h3><p>单仓库并不自动解决代码所有权。团队项目应配置 CODEOWNERS、评审规则与敏感目录保护。</p></div></article>
+          <article class="pitfall"><div class="pitfall-icon">×</div><div><h3>仓库里塞入大量生成物</h3><p>构建产物、缓存、密钥和依赖目录应写入 <code>.gitignore</code>；大型二进制文件需单独评估 Git LFS。</p></div></article>
+        </div>
+      </section>
+
+      <section class="lesson" id="checklist">
+        <div class="section-head">
+          <span class="section-no">09</span>
+          <div><h2>动手检查清单</h2><p class="section-desc">勾选状态会保存在当前浏览器中。全部完成，说明你已经掌握最小闭环。</p></div>
+        </div>
+
+        <div class="check-panel">
+          <h3>我的第一次 Monorepo</h3>
+          <div class="check-list" id="checkList">
+            <label class="check-item"><input type="checkbox" data-task="1"><span>根目录只有一个 <code>.git</code></span></label>
+            <label class="check-item"><input type="checkbox" data-task="2"><span>根 <code>package.json</code> 已声明 workspaces</span></label>
+            <label class="check-item"><input type="checkbox" data-task="3"><span>应用与共享包各有自己的 <code>package.json</code></span></label>
+            <label class="check-item"><input type="checkbox" data-task="4"><span>应用通过包名引用共享包，没有跨目录相对路径</span></label>
+            <label class="check-item"><input type="checkbox" data-task="5"><span><code>npm start</code> 可以输出正确结果</span></label>
+            <label class="check-item"><input type="checkbox" data-task="6"><span><code>npm run check</code> 通过，并已检查提交范围</span></label>
+          </div>
+        </div>
+
+        <div class="quiz" id="quiz">
+          <h3>一分钟自测</h3>
+          <p>把一个已有 <code>.git</code> 的项目复制进 Monorepo 子目录，最可能出现什么问题？</p>
+          <div class="quiz-options">
+            <button type="button" data-correct="false">A. npm 会自动删除它</button>
+            <button type="button" data-correct="true">B. 形成嵌套仓库，外层可能无法正常记录内部文件</button>
+            <button type="button" data-correct="false">C. 所有 Git 历史会自动合并</button>
+          </div>
+          <p class="quiz-result" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">最后，只记住这四句话</h2>
+        <ol>
+          <li>Monorepo 是多个关联项目共享一个 Git 仓库。</li>
+          <li>应用放 apps，共享能力放 packages，根目录只有一个 .git。</li>
+          <li>一次跨项目变更，要一起修改、一起验证、一起评审。</li>
+          <li>先用原生 workspace 跑通，再按规模引入更复杂的工具。</li>
+        </ol>
+      </section>
+    </main>
+  </div>
+
+  <footer><strong>Monorepo 工作流实战手册</strong> · 单文件离线版 · HTML / CSS / JavaScript 全部内嵌</footer>
+  <button class="back-top" id="backTop" type="button" aria-label="返回顶部">↑</button>
+  <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    (() => {
+      const readingBar = document.getElementById('readingBar');
+      const backTop = document.getElementById('backTop');
+      const sections = [...document.querySelectorAll('.lesson')];
+      const tocLinks = [...document.querySelectorAll('.toc a')];
+
+      function updateScroll() {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const percent = max > 0 ? (window.scrollY / max) * 100 : 0;
+        readingBar.style.width = `${percent}%`;
+        backTop.classList.toggle('show', window.scrollY > 650);
+
+        let current = sections[0]?.id;
+        for (const section of sections) {
+          if (section.getBoundingClientRect().top <= 150) current = section.id;
+        }
+        tocLinks.forEach(link => link.classList.toggle('active', link.hash === `#${current}`));
+      }
+
+      window.addEventListener('scroll', updateScroll, { passive: true });
+      updateScroll();
+      backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      const toast = document.getElementById('toast');
+      let toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+      }
+
+      document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const code = button.closest('.code-block').querySelector('code').innerText;
+          try {
+            await navigator.clipboard.writeText(code);
+            showToast('代码已复制');
+          } catch {
+            const area = document.createElement('textarea');
+            area.value = code;
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            document.execCommand('copy');
+            area.remove();
+            showToast('代码已复制');
+          }
+        });
+      });
+
+      const checks = [...document.querySelectorAll('[data-task]')];
+      const taskProgress = document.getElementById('taskProgress');
+      const taskProgressText = document.getElementById('taskProgressText');
+      const storageKey = 'monorepo-tutorial-progress-v1';
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        checks.forEach(item => { item.checked = saved.includes(item.dataset.task); });
+      } catch { /* file mode or storage may be unavailable */ }
+
+      function updateTasks() {
+        const done = checks.filter(item => item.checked).length;
+        taskProgress.style.width = `${(done / checks.length) * 100}%`;
+        taskProgressText.textContent = `${done} / ${checks.length} 步`;
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(checks.filter(i => i.checked).map(i => i.dataset.task)));
+        } catch { /* progress still works for the current session */ }
+      }
+      checks.forEach(item => item.addEventListener('change', updateTasks));
+      updateTasks();
+
+      const quiz = document.getElementById('quiz');
+      const quizButtons = [...quiz.querySelectorAll('button')];
+      const quizResult = quiz.querySelector('.quiz-result');
+      quizButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          quizButtons.forEach(item => item.classList.remove('correct', 'wrong'));
+          const correct = button.dataset.correct === 'true';
+          button.classList.add(correct ? 'correct' : 'wrong');
+          quizResult.textContent = correct
+            ? '正确。子项目的 .git 应在迁移前妥善处理，最终只保留根仓库。'
+            : '再想想：外层 Git 不会自动合并子仓库历史。';
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>LangChain × Codex 桌面端｜离线实战教程</title>
+  <style>
+    :root{
+      --paper:#f5f1e8;--paper-2:#ebe4d6;--ink:#18201c;--muted:#5f675f;
+      --line:#c8c0af;--green:#176b4d;--green-2:#0d5139;--mint:#d7eadc;
+      --amber:#df8f23;--red:#a13b2b;--white:#fffdf7;--shadow:0 18px 50px rgba(25,32,28,.11);
+      --display:Georgia,"Times New Roman","Songti SC",serif;
+      --body:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC",sans-serif;
+      --mono:"Cascadia Code","SFMono-Regular",Consolas,monospace;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:84px}
+    body{margin:0;background:
+      linear-gradient(rgba(24,32,28,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(24,32,28,.035) 1px,transparent 1px),var(--paper);
+      background-size:28px 28px;color:var(--ink);font:15px/1.75 var(--body)}
+    a{color:var(--green-2);text-underline-offset:3px}
+    button,input{font:inherit}
+    :focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+    .skip{position:fixed;left:16px;top:-60px;z-index:100;padding:9px 14px;background:var(--ink);color:#fff}
+    .skip:focus{top:14px}
+    .topbar{position:sticky;top:0;z-index:30;border-bottom:1px solid rgba(24,32,28,.16);background:rgba(245,241,232,.93);backdrop-filter:blur(12px)}
+    .topbar-inner{max-width:1180px;margin:auto;min-height:64px;padding:0 24px;display:flex;align-items:center;gap:24px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;white-space:nowrap}
+    .mark{width:29px;height:29px;border:2px solid var(--ink);border-radius:50%;display:grid;place-items:center;background:var(--mint);font-family:var(--display);font-size:18px}
+    .nav{margin-left:auto;display:flex;gap:20px;overflow:auto;white-space:nowrap;scrollbar-width:none}
+    .nav a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:700}
+    .nav a:hover,.nav a.active{color:var(--green)}
+    .shell{max-width:1180px;margin:auto;padding:0 24px}
+    .hero{min-height:620px;padding:88px 0 70px;display:grid;grid-template-columns:1.25fr .75fr;gap:64px;align-items:center}
+    .eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:18px;color:var(--green);font:800 12px/1 var(--body);letter-spacing:.18em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:38px;height:3px;background:var(--green)}
+    h1,h2,h3{font-family:var(--display);line-height:1.12}
+    h1{max-width:760px;margin:0;font-size:clamp(48px,7.2vw,92px);letter-spacing:-.055em;font-weight:500}
+    h1 em{color:var(--green);font-style:italic}
+    .lead{max-width:680px;margin:28px 0 0;color:#3d463f;font-size:18px;line-height:1.8}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}
+    .btn{border:1px solid var(--ink);border-radius:3px;padding:11px 17px;background:transparent;color:var(--ink);font-weight:800;text-decoration:none;cursor:pointer}
+    .btn.primary{background:var(--ink);color:var(--white)}
+    .btn:hover{transform:translateY(-2px)}
+    .stamp-card{position:relative;padding:30px;border:1px solid var(--ink);background:var(--white);box-shadow:18px 18px 0 var(--mint)}
+    .stamp-card:before{content:"FIELD GUIDE";position:absolute;right:-22px;top:32px;padding:5px 12px;background:var(--amber);color:var(--ink);font:900 11px/1 var(--mono);letter-spacing:.12em;transform:rotate(7deg)}
+    .stamp-card h2{margin:0 0 22px;font-size:28px}
+    .meta-list{display:grid;gap:0;margin:0}
+    .meta-list div{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+    .meta-list dt{color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .meta-list dd{margin:0;font-weight:700}
+    .offline{margin-top:18px;padding:12px;background:var(--mint);font-size:13px}
+    .section{padding:88px 0;border-top:1px solid rgba(24,32,28,.2)}
+    .section-head{display:grid;grid-template-columns:260px 1fr;gap:44px;margin-bottom:46px}
+    .section-no{font:800 12px/1 var(--mono);color:var(--green);letter-spacing:.14em}
+    .section h2{margin:0;font-size:clamp(36px,5vw,58px);letter-spacing:-.035em;font-weight:500}
+    .section-intro{max-width:710px;margin:16px 0 0;color:var(--muted);font-size:17px}
+    .callout{padding:20px 22px;border-left:5px solid var(--green);background:var(--mint)}
+    .callout.warning{border-color:var(--amber);background:#f6e7c7}
+    .callout strong{display:block;margin-bottom:4px}
+    .decision{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
+    .decision-card{min-height:255px;padding:25px;border:1px solid var(--ink);background:var(--white);position:relative}
+    .decision-card .num{font:500 54px/1 var(--display);color:var(--line)}
+    .decision-card h3{margin:30px 0 10px;font-size:27px}
+    .decision-card p{margin:0;color:var(--muted)}
+    .decision-card .tag{position:absolute;right:15px;top:15px;border:1px solid currentColor;padding:3px 8px;font:800 10px/1.4 var(--mono);color:var(--green)}
+    .scenario-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .scenario{padding:22px;border:1px solid var(--line);background:rgba(255,253,247,.7)}
+    .scenario h3{margin:0 0 8px;font-size:21px}
+    .scenario p{margin:0;color:var(--muted)}
+    .scenario.good h3:before{content:"✓ ";color:var(--green)}
+    .scenario.bad h3:before{content:"× ";color:var(--red)}
+    .flow{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;counter-reset:flow}
+    .flow-step{counter-increment:flow;min-height:150px;padding:16px 12px;border-top:4px solid var(--green);background:var(--white);box-shadow:0 8px 18px rgba(25,32,28,.06)}
+    .flow-step:before{content:counter(flow,decimal-leading-zero);display:block;margin-bottom:24px;color:var(--green);font:800 11px/1 var(--mono)}
+    .flow-step strong{font-size:14px;line-height:1.35}
+    .flow-step small{display:block;margin-top:8px;color:var(--muted);line-height:1.5}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px}
+    .search{flex:1 1 300px;border:1px solid var(--ink);background:var(--white);padding:11px 14px;color:var(--ink)}
+    .chip{border:1px solid var(--line);background:transparent;padding:9px 13px;cursor:pointer;font-weight:800;color:var(--muted)}
+    .chip.active,.chip:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+    .skill-count{margin:0 0 16px;color:var(--muted);font:700 12px/1 var(--mono)}
+    .skills{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .skill{display:grid;grid-template-columns:170px 1fr;border:1px solid var(--line);background:var(--white)}
+    .skill-side{padding:20px;border-right:1px solid var(--line);background:#efeadf}
+    .skill-side code{font:800 13px/1.45 var(--mono);overflow-wrap:anywhere;color:var(--green-2)}
+    .stage{display:inline-block;margin-top:18px;padding:4px 7px;background:var(--mint);font:800 10px/1.2 var(--mono)}
+    .skill-main{padding:20px;min-width:0}
+    .io{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:15px}
+    .io b{display:block;margin-bottom:4px;font:800 10px/1 var(--mono);letter-spacing:.12em;color:var(--muted)}
+    .io p{margin:0;font-size:13px;line-height:1.55}
+    .prompt{position:relative;margin:0;padding:14px 46px 14px 14px;border-left:3px solid var(--amber);background:#f7f2e9;font:12px/1.65 var(--mono);white-space:pre-wrap}
+    .copy{position:absolute;right:8px;top:8px;border:1px solid var(--line);background:var(--white);padding:5px 7px;cursor:pointer;font:700 10px/1 var(--mono)}
+    .no-results{display:none;padding:32px;border:1px dashed var(--line);text-align:center;color:var(--muted)}
+    .practice-layout{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
+    .checklist{position:sticky;top:92px;padding:20px;border:1px solid var(--ink);background:var(--white)}
+    .checklist h3{margin:0 0 16px;font-size:22px}
+    .check-item{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+    .check-item input{accent-color:var(--green)}
+    .check-item span{font-size:13px;line-height:1.5}
+    .progress-track{height:7px;margin-top:16px;background:var(--paper-2);overflow:hidden}
+    .progress-bar{height:100%;width:0;background:var(--green);transition:width .25s}
+    .progress-label{display:block;margin-top:7px;color:var(--muted);font:800 10px/1 var(--mono)}
+    .lesson{margin-bottom:42px}
+    .lesson h3{margin:0 0 12px;font-size:28px}
+    .lesson p{color:var(--muted)}
+    .contract{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+    .contract div{padding:15px;border:1px solid var(--line);background:var(--white)}
+    .contract b{display:block;margin-bottom:5px;color:var(--green);font-size:12px}
+    .code-wrap{position:relative;margin:16px 0 22px;border:1px solid #343c37;background:#141a17;color:#e9eee9;overflow:hidden}
+    .code-title{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #343c37;color:#aab7ae;font:700 11px/1 var(--mono)}
+    .code-title .copy{position:static;background:#252e29;border-color:#4b574f;color:#fff}
+    pre{margin:0;padding:20px;overflow:auto;font:12.5px/1.72 var(--mono);tab-size:4}
+    .cmd{color:#c6e7d0}.comment{color:#829189}.string{color:#f1ca83}
+    .test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .test-card{padding:18px;border:1px solid var(--line);background:var(--white)}
+    .test-card b{display:block;margin-bottom:6px}
+    .test-card span{color:var(--muted);font-size:13px}
+    .pitfalls{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    details{border:1px solid var(--line);background:var(--white)}
+    summary{padding:16px 18px;cursor:pointer;font-weight:800;list-style:none}
+    summary::-webkit-details-marker{display:none}
+    summary:after{content:"＋";float:right;color:var(--green)}
+    details[open] summary:after{content:"－"}
+    details p{margin:0;padding:0 18px 18px;color:var(--muted)}
+    .sources{columns:2;column-gap:38px;margin:0;padding:0;list-style:none}
+    .sources li{break-inside:avoid;padding:11px 0;border-top:1px solid var(--line)}
+    .sources a{font-weight:700}
+    footer{padding:34px 0 54px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .to-top{position:fixed;right:20px;bottom:20px;width:42px;height:42px;border:1px solid var(--ink);background:var(--white);color:var(--ink);cursor:pointer;opacity:0;pointer-events:none;transition:.2s}
+    .to-top.show{opacity:1;pointer-events:auto}
+    .toast{position:fixed;left:50%;bottom:24px;z-index:50;transform:translate(-50%,20px);padding:9px 14px;background:var(--ink);color:#fff;opacity:0;pointer-events:none;transition:.2s;font-size:12px}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr}.stamp-card{max-width:620px}.section-head{grid-template-columns:1fr;gap:12px}
+      .flow{grid-template-columns:repeat(3,1fr)}.skills{grid-template-columns:1fr}.practice-layout{grid-template-columns:minmax(0,1fr)}
+      .checklist{position:relative;top:0}.decision{grid-template-columns:1fr}.decision-card{min-height:auto}.contract{grid-template-columns:1fr}
+    }
+    @media (max-width:680px){
+      .shell,.topbar-inner{padding-left:16px;padding-right:16px}.topbar-inner{gap:12px}.brand span:last-child{display:none}
+      .nav{gap:14px}.shell.hero{min-height:auto;padding:60px 16px}.lead{font-size:16px}.stamp-card{box-shadow:9px 9px 0 var(--mint)}
+      .stamp-card:before{right:8px;top:22px}
+      .section{padding:64px 0}.scenario-grid,.pitfalls,.test-grid{grid-template-columns:1fr}.flow{grid-template-columns:repeat(2,1fr)}
+      .skill{grid-template-columns:1fr}.skill-side{border-right:0;border-bottom:1px solid var(--line)}.io{grid-template-columns:1fr}
+      .sources{columns:1}.hero-actions .btn{width:100%;text-align:center}.to-top{right:12px;bottom:12px}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+    @media print{.topbar,.filters,.copy,.to-top,.toast,.hero-actions{display:none!important}body{background:#fff}.section{break-inside:avoid}.checklist{position:static}.skill{break-inside:avoid}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top" aria-label="返回顶部"><span class="mark">λ</span><span>LangChain × Codex</span></a>
+      <nav class="nav" aria-label="教程章节">
+        <a href="#choose">选择</a><a href="#scenarios">场景</a><a href="#workflow">工作流</a><a href="#skills">技能</a><a href="#practice">实战</a><a href="#pitfalls">避坑</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="shell hero" id="top">
+      <div>
+        <div class="eyebrow">Offline field guide · 2026.08</div>
+        <h1>用 Codex 驾驭<br><em>LangChain</em></h1>
+        <p class="lead">不背概念，从一个可控的订单风险分诊助手开始：先选对框架，再定义工具与输出，最后让 Codex 帮你实现、测试和收口。</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#practice">直接开始实战</a>
+          <a class="btn" href="#skills">查看技能速查</a>
+        </div>
+      </div>
+      <aside class="stamp-card" aria-label="教程信息">
+        <h2>读完你会得到什么？</h2>
+        <dl class="meta-list">
+          <div><dt>主线 API</dt><dd><code>create_agent()</code></dd></div>
+          <div><dt>实战项目</dt><dd>本地订单风险分诊助手</dd></div>
+          <div><dt>技能速查</dt><dd>精选 10 个官方 Skills</dd></div>
+          <div><dt>预计用时</dt><dd>阅读 20 分钟 · 实战 40 分钟</dd></div>
+          <div><dt>资料核验</dt><dd>2026-08-11</dd></div>
+        </dl>
+        <div class="offline"><strong>完全离线阅读</strong><br>本页不加载 CDN、在线字体、图片或远程脚本。外部链接仅作为资料出处，不参与页面渲染。</div>
+      </aside>
+    </section>
+
+    <section class="section" id="choose">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">01 / 先选对层级</div>
+          <div><h2>别一上来就堆框架</h2><p class="section-intro">LangChain、LangGraph、Deep Agents 不是互相替代的三个品牌，而是不同抽象层。按任务复杂度选最薄的一层。</p></div>
+        </div>
+        <div class="callout"><strong>30 秒判断</strong>固定工具、单用途 Agent → LangChain；复杂分支、循环、暂停恢复 → LangGraph；长任务、规划、文件和子 Agent → Deep Agents。若只是一次模型调用，甚至不需要 Agent。</div>
+        <div class="decision">
+          <article class="decision-card"><span class="tag">本教程主线</span><span class="num">01</span><h3>LangChain</h3><p>高层 Agent 框架。模型、工具、结构化输出和中间件组合快速，适合先跑通业务闭环。</p></article>
+          <article class="decision-card"><span class="tag">控制更精细</span><span class="num">02</span><h3>LangGraph</h3><p>低层编排运行时。适合确定性步骤与 Agent 混合、复杂状态、持久化和人工中断。</p></article>
+          <article class="decision-card"><span class="tag">长任务套件</span><span class="num">03</span><h3>Deep Agents</h3><p>内置计划、文件系统、上下文管理与子 Agent。能力更全，但当前仍是 pre-1.0。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="scenarios">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">02 / 适用场景</div>
+          <div><h2>什么时候值得用？</h2><p class="section-intro">判断标准不是“是否用了大模型”，而是是否需要模型在受控边界内选择工具、读取数据，并多步完成任务。</p></div>
+        </div>
+        <div class="scenario-grid">
+          <article class="scenario good"><h3>固定工具的业务助手</h3><p>订单查询、报价建议、工单分类、文件问答。工具少而明确，Agent 循环清楚。</p></article>
+          <article class="scenario good"><h3>模型需要可替换</h3><p>希望在 OpenAI、Anthropic、Google、Ollama 等模型之间切换，而不重写业务骨架。</p></article>
+          <article class="scenario good"><h3>可靠的机器输出</h3><p>用 Pydantic、dataclass、TypedDict 或 JSON Schema 约束字段，而不是从自然语言里硬解析。</p></article>
+          <article class="scenario good"><h3>文档知识接入</h3><p>需要 Load → Split → Embed → Store → Retrieve → Generate 的 RAG 管线。</p></article>
+          <article class="scenario bad"><h3>只问模型一句话</h3><p>没有工具循环、检索或可复用编排时，直接调用模型接口更轻。</p></article>
+          <article class="scenario bad"><h3>复杂确定性审批流</h3><p>大量分支、并行、失败续跑和精确恢复点，应直接使用 LangGraph。</p></article>
+          <article class="scenario bad"><h3>机器没有任何模型</h3><p>LangChain 是框架，不自带推理模型。云模型需要网络，本地模型需要已安装服务。</p></article>
+          <article class="scenario bad"><h3>高风险动作只靠提示词</h3><p>支付、发信、删除、写生产库必须增加人工审批、最小权限和审计。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="workflow">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">03 / 标准工作流</div>
+          <div><h2>九步走完一条闭环</h2><p class="section-intro">先定义风险和输出，再让 Codex 写代码。这样工具、测试和审批边界都有明确落点。</p></div>
+        </div>
+        <div class="flow" aria-label="LangChain 开发工作流">
+          <div class="flow-step"><strong>界定任务</strong><small>输入、输出、允许动作、审批点</small></div>
+          <div class="flow-step"><strong>选择层级</strong><small>LangChain / LangGraph / Deep Agents</small></div>
+          <div class="flow-step"><strong>确认依赖</strong><small>Python、模型、供应商集成包</small></div>
+          <div class="flow-step"><strong>输出契约</strong><small>先写 schema，再写提示词</small></div>
+          <div class="flow-step"><strong>设计工具</strong><small>单一职责、类型、清楚 docstring</small></div>
+          <div class="flow-step"><strong>最小 Agent</strong><small><code>create_agent()</code> 跑通闭环</small></div>
+          <div class="flow-step"><strong>可靠性</strong><small>异常、重试、HITL、记忆</small></div>
+          <div class="flow-step"><strong>分层测试</strong><small>纯函数、fake model、真实集成</small></div>
+          <div class="flow-step"><strong>观测迭代</strong><small>追踪工具选择与状态问题</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="skills">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">04 / Skills 速查</div>
+          <div><h2>让 Codex 按套路办事</h2><p class="section-intro">这些是官方 <code>langchain-skills</code> 仓库中的 Agent Skills，不是 LangChain Python API。仓库处于 early development，技能名和内容可能变化。</p></div>
+        </div>
+        <div class="callout warning"><strong>先核对，再安装</strong>在 Codex 中先让它检查技能是否已安装。需要安装时可说：<code>Install the `ecosystem-primer` skill from `langchain-ai/langchain-skills`.</code> 安装和联网属于环境变更，应先说明影响并确认。</div>
+        <div class="filters" role="search">
+          <input class="search" id="skillSearch" type="search" placeholder="搜索技能、输入、输出或提示词…" aria-label="搜索技能">
+          <button class="chip active" data-filter="all">全部</button>
+          <button class="chip" data-filter="规划">规划</button>
+          <button class="chip" data-filter="开发">开发</button>
+          <button class="chip" data-filter="加固">加固</button>
+          <button class="chip" data-filter="进阶">进阶</button>
+        </div>
+        <p class="skill-count" id="skillCount">显示 10 / 10</p>
+        <div class="skills" id="skillGrid">
+          <article class="skill" data-stage="规划"><div class="skill-side"><code>ecosystem-primer</code><span class="stage">规划 · 第一步</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>任务目标；是否需长运行、分支、文件或子 Agent</p></div><div><b>OUTPUT</b><p>框架选择、环境变量与下一技能建议</p></div></div><pre class="prompt">使用 ecosystem-primer 审查这个需求，判断该用 LangChain、LangGraph 还是 Deep Agents；先给依据，不要写代码。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="规划"><div class="skill-side"><code>langchain-dependencies</code><span class="stage">规划 · 环境</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>语言版本、供应商、现有依赖文件</p></div><div><b>OUTPUT</b><p>最小包清单、兼容性和升级风险</p></div></div><pre class="prompt">使用 langchain-dependencies 检查 pyproject.toml，只列这个 Python Agent 必需的包和版本风险，未经确认不要安装。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="开发"><div class="skill-side"><code>langchain-python-quickstart</code><span class="stage">开发 · 首次跑通</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>模型供应商、模型名、新目录、密钥状态</p></div><div><b>OUTPUT</b><p>最小 Python Agent 与运行说明</p></div></div><pre class="prompt">使用 langchain-python-quickstart，在新目录 demo-agent 创建最小天气 Agent；密钥从环境变量读取，并添加最小验证。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="开发"><div class="skill-side"><code>langchain-fundamentals</code><span class="stage">开发 · 主体</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>Agent 目标、模型、工具、提示词、输出要求</p></div><div><b>OUTPUT</b><p><code>create_agent()</code>、工具定义与调用</p></div></div><pre class="prompt">使用 langchain-fundamentals，把现有两个 Python 函数封装成工具并构建订单助手；先列输入输出契约再修改。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="加固"><div class="skill-side"><code>langchain-middleware</code><span class="stage">加固 · 安全</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>危险工具、审批条件、schema、恢复方式</p></div><div><b>OUTPUT</b><p>HITL、hooks、Command 恢复与结构化输出</p></div></div><pre class="prompt">使用 langchain-middleware：调用 write_order 前必须暂停审批；加 checkpointer/thread_id，并演示批准、编辑、拒绝三条路径。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="开发"><div class="skill-side"><code>langchain-rag</code><span class="stage">开发 · 知识</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>文档、切块、embedding、向量库、查询</p></div><div><b>OUTPUT</b><p>完整 RAG 管线与来源返回</p></div></div><pre class="prompt">使用 langchain-rag，为 ./docs 下的本地 Markdown 做最小 RAG；先用内存向量库验证，回答必须返回来源文件名。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="进阶"><div class="skill-side"><code>langgraph-fundamentals</code><span class="stage">进阶 · 编排</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>节点、共享状态、边、分支、终止条件</p></div><div><b>OUTPUT</b><p>StateGraph、invoke/stream 示例</p></div></div><pre class="prompt">使用 langgraph-fundamentals，把“分类→查询→复核→输出”实现为状态图；先说明每个节点读写哪些 state 字段。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="进阶"><div class="skill-side"><code>langgraph-persistence</code><span class="stage">进阶 · 持久化</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>持久化范围、thread_id、存储、记忆需求</p></div><div><b>OUTPUT</b><p>checkpointer、Store 与恢复方案</p></div></div><pre class="prompt">使用 langgraph-persistence 给现有图增加线程级记忆；本地演示用 InMemorySaver，同时标出生产应替换的持久化实现。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="加固"><div class="skill-side"><code>langgraph-human-in-the-loop</code><span class="stage">加固 · 审批</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>中断点、审批数据、恢复数据、错误类别</p></div><div><b>OUTPUT</b><p>interrupt、Command(resume)、恢复策略</p></div></div><pre class="prompt">使用 langgraph-human-in-the-loop，在生成报价后中断让人确认折扣；分别验证批准、修改和拒绝。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+          <article class="skill" data-stage="进阶"><div class="skill-side"><code>deep-agents-core</code><span class="stage">进阶 · 长任务</span></div><div class="skill-main"><div class="io"><div><b>INPUT</b><p>长任务、模型、工具、文件后端、技能</p></div><div><b>OUTPUT</b><p>create_deep_agent 配置与能力边界</p></div></div><pre class="prompt">使用 deep-agents-core 评估这个跨文件研究任务；若确实需要 Deep Agents，再给最小配置，不要直接重构。<button class="copy" aria-label="复制提示词">复制</button></pre></div></article>
+        </div>
+        <div class="no-results" id="noResults">没有匹配的技能。试试更短的关键词。</div>
+      </div>
+    </section>
+
+    <section class="section" id="practice">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">05 / Codex 桌面端实战</div>
+          <div><h2>做一个订单风险分诊助手</h2><p class="section-intro">案例数据写在本地代码中，不访问网页或数据库。它会查订单、计算可退金额，并输出结构化建议；不会真的退款。</p></div>
+        </div>
+        <div class="practice-layout">
+          <aside class="checklist">
+            <h3>完成清单</h3>
+            <label class="check-item"><input type="checkbox"><span>在 Codex 打开目标工作区</span></label>
+            <label class="check-item"><input type="checkbox"><span>粘贴总提示词并确认计划</span></label>
+            <label class="check-item"><input type="checkbox"><span>检查依赖与密钥边界</span></label>
+            <label class="check-item"><input type="checkbox"><span>实现工具和结构化输出</span></label>
+            <label class="check-item"><input type="checkbox"><span>运行无密钥单元测试</span></label>
+            <label class="check-item"><input type="checkbox"><span>单独运行真实模型集成测试</span></label>
+            <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+            <span class="progress-label" id="progressLabel">0 / 6 完成</span>
+          </aside>
+          <div>
+            <article class="lesson">
+              <h3>1. 先写清楚契约</h3>
+              <div class="contract"><div><b>输入</b>“检查 A1002，告诉我风险和下一步”</div><div><b>输出</b>订单号、风险级别、原因、建议、是否人工复核</div><div><b>安全边界</b>只读、不退款、不联网、查不到不编造</div></div>
+              <p>高金额、争议状态或规则外情况必须要求人工复核。模型只负责判断与解释，业务事实由工具返回。</p>
+            </article>
+
+            <article class="lesson">
+              <h3>2. 把总提示词交给 Codex</h3>
+              <div class="code-wrap"><div class="code-title"><span>Codex 桌面端提示词</span><button class="copy" aria-label="复制完整提示词">复制</button></div><pre>请在当前工作区创建 order-triage 示例。
+先使用 ecosystem-primer 判断框架，再使用 langchain-dependencies 和 langchain-fundamentals。
+
+约束：
+- Python；数据只来自代码内置 ORDERS；不联网；不执行退款。
+- 输出使用 Pydantic 结构化 schema；密钥只读环境变量。
+- 先列出文件、输入输出契约和测试点，确认现有目录状态后实现。
+- 安装依赖或覆盖文件前，先说明影响并等待确认。
+
+完成后运行静态检查与不需要 API key 的单元测试；
+真实模型测试单独标记为 integration，不要伪造通过结果。</pre></div>
+              <div class="callout"><strong>在 Codex 里怎么看它做对了？</strong>先给计划；只创建约定目录；密钥不进入源码；无密钥测试和真实模型测试分开；遇到依赖冲突时停下来说明，而不是强装。</div>
+            </article>
+
+            <article class="lesson">
+              <h3>3. 核对最小实现</h3>
+              <p>Codex 生成的核心代码应接近下面的结构。模型名只是当前示例，可换成你已有且支持工具调用与结构化输出的模型。</p>
+              <div class="code-wrap"><div class="code-title"><span>agent.py</span><button class="copy" aria-label="复制 Python 代码">复制</button></div><pre><span class="cmd">import</span> json
+<span class="cmd">from</span> typing <span class="cmd">import</span> Literal
+<span class="cmd">from</span> pydantic <span class="cmd">import</span> BaseModel, Field
+<span class="cmd">from</span> langchain.agents <span class="cmd">import</span> create_agent
+<span class="cmd">from</span> langchain.tools <span class="cmd">import</span> tool
+
+ORDERS = {
+    <span class="string">"A1001"</span>: {<span class="string">"amount"</span>: 199.0, <span class="string">"days_since_purchase"</span>: 3, <span class="string">"status"</span>: <span class="string">"delivered"</span>},
+    <span class="string">"A1002"</span>: {<span class="string">"amount"</span>: 3899.0, <span class="string">"days_since_purchase"</span>: 42, <span class="string">"status"</span>: <span class="string">"disputed"</span>},
+}
+
+@tool
+<span class="cmd">def</span> get_order(order_id: str) -&gt; str:
+    <span class="string">"""读取指定订单；订单不存在时返回明确错误。"""</span>
+    order = ORDERS.get(order_id.upper())
+    <span class="cmd">return</span> json.dumps(order, ensure_ascii=False) <span class="cmd">if</span> order <span class="cmd">else</span> <span class="string">"ERROR: order not found"</span>
+
+@tool
+<span class="cmd">def</span> calculate_refund(order_id: str) -&gt; float:
+    <span class="string">"""按演示规则计算可退金额；只计算，不执行退款。"""</span>
+    order = ORDERS.get(order_id.upper())
+    <span class="cmd">if not</span> order:
+        <span class="cmd">raise</span> ValueError(<span class="string">"order not found"</span>)
+    <span class="cmd">return</span> order[<span class="string">"amount"</span>] <span class="cmd">if</span> order[<span class="string">"days_since_purchase"</span>] &lt;= 30 <span class="cmd">else</span> 0.0
+
+<span class="cmd">class</span> TriageResult(BaseModel):
+    order_id: str
+    risk_level: Literal[<span class="string">"low"</span>, <span class="string">"medium"</span>, <span class="string">"high"</span>]
+    reason: str
+    recommended_action: str
+    needs_human_review: bool = Field(
+        description=<span class="string">"高金额、争议或规则外情况必须为 true"</span>
+    )
+
+agent = create_agent(
+    model=<span class="string">"openai:gpt-5.5"</span>,  <span class="comment"># 可替换为你已有的受支持模型</span>
+    tools=[get_order, calculate_refund],
+    response_format=TriageResult,
+    system_prompt=(
+        <span class="string">"你是订单风险分诊助手。必须先查订单；不得编造。"</span>
+        <span class="string">"你只能给建议，不能执行退款。高金额、争议或规则外情况要求人工复核。"</span>
+    ),
+)
+
+result = agent.invoke({
+    <span class="string">"messages"</span>: [{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"检查 A1002，告诉我风险和下一步"</span>}]
+})
+print(result[<span class="string">"structured_response"</span>])</pre></div>
+            </article>
+
+            <article class="lesson">
+              <h3>4. 安装与运行要分清</h3>
+              <p>教程网页离线可读，但 Python 依赖与模型服务是另一层。让 Codex 先检查现有环境，再选择一条路线。</p>
+              <div class="code-wrap"><div class="code-title"><span>PowerShell · 云模型路线</span><button class="copy" aria-label="复制 PowerShell 命令">复制</button></div><pre><span class="comment"># 安装前先让 Codex 说明将修改哪些依赖文件</span>
+uv add langchain <span class="string">"langchain[openai]"</span> pydantic
+
+<span class="comment"># 密钥只放当前进程或受保护的环境配置，不写进 agent.py</span>
+$env:OPENAI_API_KEY = <span class="string">"你的密钥"</span>
+uv run python agent.py</pre></div>
+              <div class="callout warning"><strong>想减少联网依赖？</strong>可改用本机已安装并已下载模型的 Ollama，但这仍不是“零依赖”：需要 Ollama 服务、模型文件和相应 LangChain 集成包。</div>
+            </article>
+
+            <article class="lesson">
+              <h3>5. 三层验证，不伪造成功</h3>
+              <div class="test-grid"><div class="test-card"><b>① 纯工具测试</b><span>订单存在、未知订单、30 天边界、退款金额规则。无需模型。</span></div><div class="test-card"><b>② Fake model 单测</b><span>验证 Agent 结构与预期工具调用，快速、免费、可重复。</span></div><div class="test-card"><b>③ 真实集成测试</b><span>验证模型兼容性；断言字段与工具参数，不硬匹配整段回答。</span></div></div>
+              <p>最终让 Codex 报告：执行了哪些命令、哪些测试真实通过、哪些因缺少密钥或模型服务没有运行。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pitfalls">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">06 / 常见避坑</div>
+          <div><h2>少踩四个坑</h2><p class="section-intro">LangChain 的问题往往不在“能不能跑”，而在依赖边界、工具描述、安全动作和测试方法。</p></div>
+        </div>
+        <div class="pitfalls">
+          <details open><summary>工具越多越好吗？</summary><p>不是。工具过多或描述相似会增加误选。每个工具保持单一职责，函数名、参数名和 docstring 要准确说明“何时使用、输入什么、返回什么”。</p></details>
+          <details><summary>换模型只改一行就行？</summary><p>接口层通常可替换，但工具调用、结构化输出、流式等能力并不完全等价。换模型后必须重跑集成测试。</p></details>
+          <details><summary>LangSmith 是必需的吗？</summary><p>不是。它是可选的在线追踪、调试与评估平台。最小 LangChain Agent 可以不接 LangSmith。</p></details>
+          <details><summary>现在该学旧版 Chain API 吗？</summary><p>新教程应以 LangChain 1.x 的 <code>create_agent()</code> 为主线。旧 <code>langchain-classic</code> 不再增加新功能，不适合作为新项目起点。</p></details>
+          <details><summary>Deep Agents 更强，是否直接上？</summary><p>只有任务确实需要计划、文件系统、子 Agent 和长上下文时才值得。它仍是 pre-1.0，小版本间可能变化。</p></details>
+          <details><summary>怎样保管 API key？</summary><p>只通过环境变量或被 <code>.gitignore</code> 排除的本地配置读取；不要写入代码、教程、日志、截图或提交历史。</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sources">
+      <div class="shell">
+        <div class="section-head">
+          <div class="section-no">07 / 官方依据</div>
+          <div><h2>继续查证的入口</h2><p class="section-intro">以下链接只在点击时打开，不是本页运行依赖。LangChain 更新很快，实际开发前应重新核对实时文档。</p></div>
+        </div>
+        <ul class="sources">
+          <li><a href="https://github.com/langchain-ai/langchain" target="_blank" rel="noreferrer">LangChain 官方仓库</a> — 定位、快速入门、生态</li>
+          <li><a href="https://docs.langchain.com/oss/python/concepts/products" target="_blank" rel="noreferrer">产品层级比较</a> — LangChain / LangGraph / Deep Agents</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/overview" target="_blank" rel="noreferrer">LangChain Overview</a> — create_agent 与核心价值</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/quickstart" target="_blank" rel="noreferrer">Python Quickstart</a> — 从安装到真实 Agent</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/agents" target="_blank" rel="noreferrer">Agents</a> — Agent 循环与配置</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/tools" target="_blank" rel="noreferrer">Tools</a> — 工具定义与上下文</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/structured-output" target="_blank" rel="noreferrer">Structured Output</a> — 结构化响应</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/test/unit-testing" target="_blank" rel="noreferrer">Unit Testing</a> — Fake model 单测</li>
+          <li><a href="https://docs.langchain.com/oss/python/langchain/test/integration-testing" target="_blank" rel="noreferrer">Integration Testing</a> — 真实模型测试</li>
+          <li><a href="https://docs.langchain.com/oss/python/release-policy" target="_blank" rel="noreferrer">Release Policy</a> — LTS 与维护周期</li>
+          <li><a href="https://github.com/langchain-ai/langchain-skills" target="_blank" rel="noreferrer">LangChain Skills</a> — 官方 Skills 完整清单</li>
+          <li><a href="https://github.com/langchain-ai/langchain/blob/master/AGENTS.md" target="_blank" rel="noreferrer">仓库 AGENTS.md</a> — Monorepo 与开发约定</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell">LangChain × Codex 桌面端离线实战教程 · 资料核验于 2026-08-11 · 页面不加载任何外部资源。<br>LangChain Skills 处于 early development；Deep Agents 处于 pre-1.0。开发前请以最新官方文档为准。</div></footer>
+  <button class="to-top" id="toTop" aria-label="返回顶部">↑</button>
+  <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    (() => {
+      const $ = (s, root = document) => root.querySelector(s);
+      const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+      const toast = $('#toast');
+      let toastTimer;
+      function notify(text) {
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1300);
+      }
+      async function copyText(text) {
+        try {
+          if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+          else {
+            const area = document.createElement('textarea');
+            area.value = text; area.style.position = 'fixed'; area.style.opacity = '0';
+            document.body.appendChild(area); area.select();
+            if (!document.execCommand('copy')) throw new Error('copy failed');
+            area.remove();
+          }
+          notify('已复制到剪贴板');
+        } catch (_) { notify('复制失败，请手动选择'); }
+      }
+      $$('.copy').forEach(button => button.addEventListener('click', () => {
+        const box = button.closest('pre') || button.closest('.code-wrap')?.querySelector('pre');
+        if (!box) return;
+        const clone = box.cloneNode(true); clone.querySelectorAll('button').forEach(b => b.remove());
+        copyText(clone.textContent.trim());
+      }));
+
+      const search = $('#skillSearch'), cards = $$('.skill'), count = $('#skillCount'), empty = $('#noResults');
+      let stage = 'all';
+      function filterSkills() {
+        const term = search.value.trim().toLowerCase(); let visible = 0;
+        cards.forEach(card => {
+          const hitText = !term || card.textContent.toLowerCase().includes(term);
+          const hitStage = stage === 'all' || card.dataset.stage === stage;
+          card.hidden = !(hitText && hitStage); if (!card.hidden) visible++;
+        });
+        count.textContent = `显示 ${visible} / ${cards.length}`;
+        empty.style.display = visible ? 'none' : 'block';
+      }
+      search.addEventListener('input', filterSkills);
+      $$('.chip').forEach(chip => chip.addEventListener('click', () => {
+        $$('.chip').forEach(c => c.classList.remove('active')); chip.classList.add('active');
+        stage = chip.dataset.filter; filterSkills();
+      }));
+
+      const checks = $$('.check-item input'), bar = $('#progressBar'), label = $('#progressLabel');
+      function updateProgress() {
+        const done = checks.filter(c => c.checked).length;
+        bar.style.width = `${done / checks.length * 100}%`; label.textContent = `${done} / ${checks.length} 完成`;
+        try { localStorage.setItem('langchain-tutorial-progress', JSON.stringify(checks.map(c => c.checked))); } catch (_) {}
+      }
+      try {
+        const saved = JSON.parse(localStorage.getItem('langchain-tutorial-progress') || '[]');
+        checks.forEach((c, i) => c.checked = Boolean(saved[i]));
+      } catch (_) {}
+      checks.forEach(c => c.addEventListener('change', updateProgress)); updateProgress();
+
+      const topButton = $('#toTop');
+      topButton.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+      const navLinks = $$('.nav a'), sections = navLinks.map(a => $(a.getAttribute('href'))).filter(Boolean);
+      function onScroll() {
+        topButton.classList.toggle('show', window.scrollY > 500);
+        let current = sections[0];
+        sections.forEach(section => { if (section.getBoundingClientRect().top <= 130) current = section; });
+        navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${current?.id}`));
+      }
+      addEventListener('scroll', onScroll, {passive:true}); onScroll();
+    })();
+  </script>
+</body>
+</html>
