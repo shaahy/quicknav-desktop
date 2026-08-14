@@ -14,9 +14,9 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **54 张卡片**、**9 个分类**；其中 **50 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **55 张卡片**、**9 个分类**；其中 **51 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
-### AI开发教程（24）
+### AI开发教程（25）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
@@ -42,6 +42,7 @@
 - [Agent Skill 实战教程](<A 教程集合/Agent Skill实战教程/Agent Skill实战教程.html>) · HTML
 - [Ponytail × Codex 桌面端｜简明实战教程](<A 教程集合/Ponytail实战教程.html>) · HTML
 - [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
+- [Hermes Agent 教程](<A 教程集合/Hermes Agent实战教程.html>) · HTML
 
 ### 技能速查（9）
 
@@ -84,6 +85,12 @@
 - [Bug 修复：三种 AI 开发方式怎么选](<A 教程集合/MVP-Bug与功能修复三种方式对比/MVP-Bug与功能修复方式全面对比.html>) · HTML
 - [BMAD Bug 修复与功能 Fix 教程](<A 教程集合/BMAD Bug与功能Fix教程/index.html>) · HTML
 
+### 去AI味（3）
+
+- [说人话技能教程](<A 教程集合/说人话技能 Codex 桌面端实战教程.html>) · HTML
+- [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
+- [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
+
 ### 工作文档（9）
 
 - [工作记录](<A 教程集合/工作记录.md>) · MD
@@ -95,12 +102,6 @@
 - 16个场景内容 · MD · **本机/外部工作区资料，未随本仓库同步**
 - 四个阶段规划 · MD · **本机/外部工作区资料，未随本仓库同步**
 - [常用提示词](<A 教程集合/常用提示词.md>) · MD
-
-### 去AI味（3）
-
-- [说人话技能教程](<A 教程集合/说人话技能 Codex 桌面端实战教程.html>) · HTML
-- [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
-- [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
 
 ### 其它（6）
 

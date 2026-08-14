@@ -986,6 +986,24 @@
       "isFavorite": false,
       "createdAt": "2026-08-11T09:28:25.199Z",
       "updatedAt": "2026-08-11T09:28:25.199Z"
+    },
+    {
+      "id": "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0",
+      "name": "Hermes Agent 教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Hermes Agent实战教程.html",
+        "fileName": "Hermes Agent实战教程",
+        "extension": "html",
+        "fileSize": 50460,
+        "mtimeMs": 1786674732672.14
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-14T08:27:19.402Z",
+      "updatedAt": "2026-08-14T08:27:19.402Z"
     }
   ],
   "categories": [
@@ -1032,18 +1050,18 @@
       "createdAt": "2026-07-28T08:35:37.737Z"
     },
     {
-      "id": "572e876b-8996-46da-b618-8d5380a94045",
-      "name": "工作文档",
-      "order": 6,
-      "type": "user",
-      "createdAt": "2026-07-24T03:04:28.023Z"
-    },
-    {
       "id": "0e1ed6e2-4dfe-4300-9ac8-d95845516b51",
       "name": "去AI味",
-      "order": 7,
+      "order": 6,
       "type": "user",
       "createdAt": "2026-08-10T08:39:24.196Z"
+    },
+    {
+      "id": "572e876b-8996-46da-b618-8d5380a94045",
+      "name": "工作文档",
+      "order": 7,
+      "type": "user",
+      "createdAt": "2026-07-24T03:04:28.023Z"
     },
     {
       "id": "6e6bad8d-0100-4f99-827c-06a47dc270d6",
@@ -1080,7 +1098,8 @@
         "c302d701-4f34-447c-8bd6-02a402d5c06c",
         "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
         "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
-        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8",
+        "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0"
       ]
     },
     {
@@ -1139,7 +1158,8 @@
         "3cfb1013-c094-45a0-85e9-34cc1f24c9e7",
         "068bd48b-0000-453c-ac9d-9d76c8e65c12",
         "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
-        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7"
+        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7",
+        "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0"
       ]
     },
     {
