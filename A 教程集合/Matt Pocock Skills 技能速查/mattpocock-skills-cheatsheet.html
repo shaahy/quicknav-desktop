@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="mattpocock/skills 中文速查：22 个正式技能与 7 个实验候选的用途、输入、输出、场景和角色。">
+  <meta name="description" content="mattpocock/skills 中文速查：25 个正式技能与 3 个实验候选的用途、输入、输出、场景和角色。">
   <title>Matt Pocock Skills｜中文速查</title>
   <style>
     :root {
@@ -225,7 +225,7 @@
   <header class="masthead">
     <div class="shell masthead-inner">
       <div class="brand"><span class="brand-mark">MP/</span><span>Skills Quick Reference</span></div>
-      <div class="top-meta"><span class="hide-tablet">mattpocock/skills</span><span>v1.1.0</span><span>更新 2026-07-31</span></div>
+      <div class="top-meta"><span class="hide-tablet">mattpocock/skills</span><span>v1.2.3</span><span>更新 2026-08-14</span></div>
     </div>
   </header>
 
@@ -233,12 +233,12 @@
     <div class="shell">
       <div class="eyebrow">Skills for real engineers · 中文速查</div>
       <h1 id="page-title">先找对流程，<br>再调用技能。</h1>
-      <p class="hero-copy">22 个正式技能，加上 7 个值得关注的实验候选。搜索你手上的问题，页面只留下此刻真正用得上的技能。</p>
+      <p class="hero-copy">25 个正式技能，加上 3 个仍在开发中的写作候选。搜索你手上的问题，页面只留下此刻真正用得上的技能。</p>
       <div class="stats" aria-label="技能统计">
-        <div class="stat"><strong>29</strong><span>全部收录技能</span></div>
-        <div class="stat"><strong>22</strong><span>正式发布技能</span></div>
-        <div class="stat"><strong>7</strong><span>实验候选技能</span></div>
-        <div class="stat"><strong>20 / 9</strong><span>用户调用 / 模型调用</span></div>
+        <div class="stat"><strong>28</strong><span>全部收录技能</span></div>
+        <div class="stat"><strong>25</strong><span>正式发布技能</span></div>
+        <div class="stat"><strong>3</strong><span>实验候选技能</span></div>
+        <div class="stat"><strong>17 / 11</strong><span>用户调用 / 模型调用</span></div>
       </div>
     </div>
   </section>
@@ -275,7 +275,7 @@
   </div>
 
   <main id="skill-list" class="shell" tabindex="-1">
-    <div class="result-line"><span class="result-count" id="count" aria-live="polite">显示 29 / 29</span><span class="result-hint">点击条目展开详情；按 <kbd>/</kbd> 聚焦搜索</span></div>
+    <div class="result-line"><span class="result-count" id="count" aria-live="polite">显示 28 / 28</span><span class="result-hint">点击条目展开详情；按 <kbd>/</kbd> 聚焦搜索</span></div>
     <div class="skills" id="skills"></div>
     <div class="empty" id="empty" hidden><strong>没有匹配的技能</strong><br><span>减少筛选条件，或换一个更贴近工作结果的关键词。</span></div>
 
@@ -283,18 +283,18 @@
       <h2 id="legend-title">口径说明</h2>
       <p><strong>输入 / 输出：</strong>优先依据每个技能的 SKILL.md 与官方说明归纳；仓库未定义固定参数时，描述该工作流实际需要的上下文与会留下的产物。</p>
       <p><strong>适用角色：</strong>是为速查而增加的工作角色标签，不是仓库官方字段。技能本身并不限制职业。</p>
-      <p><strong>收录范围：</strong>正式集仍只包含 Engineering 与 Productivity 两个 promoted 目录；另收录 6 个 in-progress 技能和 1 个 personal 技能作为实验候选。misc 与 deprecated 不收录。</p>
+      <p><strong>收录范围：</strong>正式集包含 Engineering 与 Productivity 两个稳定目录；另收录 3 个仍在仓库中的 in-progress 写作技能作为实验候选。misc、deprecated 与其他未收录候选不在本页范围内。</p>
       <p><strong>候选判断：</strong>“值得试用 / 可能有用 / 条件性有用 / 偶尔有用”来自使用者的速查判断，不是仓库作者给出的成熟度评级。</p>
     </section>
   </main>
 
   <footer>
-    <div class="shell"><span>资料快照：commit <code>9603c1cc</code> · 2026-07-16 · 页面更新 2026-07-31</span><a href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">打开原始仓库 ↗</a></div>
+    <div class="shell"><span>资料快照：commit <code>8b78b531</code> · 2026-08-13 · 页面更新 2026-08-14</span><a href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">打开原始仓库 ↗</a></div>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite">已复制</div>
 
   <script>
-    const COMMIT = '9603c1cc8118d08bc1b3bf34cf714f62178dea3b';
+    const COMMIT = '8b78b531ab965735c5dc74f6f7a219e1e37326df';
     const skills = [
       {
         name:'ask-matt', title:'技能与流程路由器', category:'Engineering', invocation:'user', roles:['产品经理','技术负责人','开发者'],
@@ -450,6 +450,15 @@
         note:'不会使用 --abort，也不会为了消除冲突而发明两边都没有的新行为。'
       },
       {
+        name:'wizard', title:'人工操作流程 Bash 向导', category:'Engineering', invocation:'model', roles:['开发者','DevOps','仓库维护者','技术负责人'],
+        summary:'把只有人能完成的第三方配置、凭据设置或一次性迁移，编排成带进度、确认门禁和安全输入的交互式 Bash 向导。',
+        inputs:['完整且有顺序的人工操作阶段','仓库中的 .env、README、工作流与配置引用','每个值的来源、落点及其是否为秘密','当前状态、目标状态和不可逆动作'],
+        outputs:['从官方 template.sh 派生的可执行 Bash 脚本','分阶段进度、链接打开、值采集和确认门禁','按需写入 .env、GitHub Secrets / Variables 的逻辑','bash -n、shellcheck 与静态追踪结果'],
+        scenarios:['第三方服务需要多网页、多密钥的首次设置','为 CI 配置环境变量、Secrets 或 Variables','把一次性迁移或切换流程变成可确认的人工步骤'],
+        usage:['输入 /wizard 并说明目标流程','先确认阶段、每个值的来源/落点及不可逆动作','生成脚本后只做静态验证，由人按说明运行'],
+        note:'只用于 Agent 无法代劳的人工作业；默认是一次性脚本，不应由 Agent 端到端运行。涉及秘密时隐藏输入，涉及不可逆操作时必须确认。'
+      },
+      {
         name:'grill-me', title:'无落盘的深度追问', category:'Productivity', invocation:'user', roles:['产品经理','设计师','创业者','技术负责人'],
         summary:'围绕计划或设计一次只问一个问题，沿决策树解决全部隐含假设；不写任何文件。',
         inputs:['尚有软肋的计划、想法或设计','代码库能回答的事实（如适用）','用户对每个决策问题的回答'],
@@ -477,13 +486,13 @@
         note:'不把模型记忆直接当教材事实；一次性解释不需要使用该技能。'
       },
       {
-        name:'writing-great-skills', title:'高质量技能编写参考', category:'Productivity', invocation:'user', roles:['技能作者','Prompt 工程师','Agent 平台负责人'],
-        summary:'用可预测流程、认知负载/上下文负载、引导词、渐进披露和剪枝原则编写或诊断 Agent Skill。',
-        inputs:['要新建或修改的技能','当前调用方式、描述和 SKILL.md 结构','技能误触发、漏触发或执行漂移的症状'],
-        outputs:['更可预测的技能结构与写作决策','用户调用/模型调用模式建议','对重复、沉积、蔓延、无效指令等问题的诊断'],
-        scenarios:['设计新的 Agent Skill','技能越来越长且难维护','在认知负载和每轮上下文成本之间取舍'],
-        usage:['输入 /writing-great-skills','用 predictability 作为首要标准审查流程','按信息层级和 progressive disclosure 拆分内容，再做 no-op test'],
-        note:'它是元技能和参考框架，不直接替其他技能完成业务工作。'
+        name:'writing-for-agents', title:'面向 Agent 的文档写作', category:'Productivity', invocation:'model', roles:['技能作者','Prompt 工程师','Agent 平台负责人','技术负责人'],
+        summary:'为 Skill、AGENTS.md、CLAUDE.md 及其引用文档提供统一写作纪律，让 Agent 每次都沿着可预测流程执行。',
+        inputs:['要新建或修改的 Agent 消费型文档','当前上下文指针、步骤、参考资料和触发分支','误触发、漏触发、执行漂移或文档膨胀的症状'],
+        outputs:['更清晰的上下文指针与信息层级','带可检查完成条件的步骤','按分支拆分的渐进披露结构','对重复、沉积、蔓延与 no-op 指令的剪枝结果'],
+        scenarios:['创建或编辑 Agent Skill','维护 AGENTS.md / CLAUDE.md','诊断为什么 Agent 没有稳定读取或执行某份文档'],
+        usage:['输入 /writing-for-agents 或提出 Agent 文档编写任务','区分步骤、内联参考与应披露的外部参考','用触发分支、完成条件、leading word 和 no-op test 逐项检查'],
+        note:'这是模型可自动调用的参考技能。写 Skill 时还会读取同目录的 SKILL-MECHANICS.md，以处理 frontmatter、调用方式和路由技能。'
       },
       {
         name:'grilling', title:'可复用的追问原语', category:'Productivity', invocation:'model', roles:['产品经理','设计师','技术负责人','Agent 技能作者'],
@@ -495,31 +504,22 @@
         note:'这是模型可自动调用的底层能力；自身不负责 ADR 落盘或工单发布。'
       },
       {
-        name:'to-questionnaire', title:'把知识缺口转成访谈问卷', category:'Experimental', sourceBucket:'in-progress', judgment:'值得试用', invocation:'user', roles:['产品经理','业务负责人','研究员','咨询顾问'],
+        name:'to-questionnaire', title:'把知识缺口转成访谈问卷', category:'Productivity', invocation:'user', roles:['产品经理','业务负责人','研究员','咨询顾问'],
         summary:'把用户无法独自回答的未决问题，整理成可异步填写或会中共创的 discovery questionnaire。',
         inputs:['问卷接收者的角色、专业背景及与发起人的关系','需要从对方获得的具体事实或决策','问卷主题，以及截止时间与预计投入（如已知）'],
         outputs:['当前目录中的 to-questionnaire-<slug>.md','按重要性排序、按主题分组的发现问卷','覆盖全部知识缺口的问题、回答区与必要的 why this matters'],
         scenarios:['把未决问题整理成访谈问卷，适合产品、业务和专家调研','向领域专家异步收集关键事实','会前准备一份可共同填写的结构化提纲'],
         usage:['输入 /to-questionnaire 并说明问卷主题','先回答“发给谁”和“需要带回什么”','检查所有知识缺口均被问题覆盖后，交付给目标对象'],
-        note:'实验候选（in-progress）。它只追问“如何发出问卷”，不会让发起人代替专家回答未知事实。'
+        note:'它只追问“发给谁、需要带回什么”，不会让发起人代替专家回答未知事实；问题应优先覆盖收件人掌握、发起人缺少的知识。'
       },
       {
-        name:'batch-grill-me', title:'分轮批量深度追问', category:'Experimental', sourceBucket:'in-progress', judgment:'值得试用', invocation:'user', roles:['产品总监','业务负责人','架构师','DRI'],
-        summary:'把当前决策树中已经解锁的全部 frontier 问题一次成组提出，再根据回答重算下一轮。',
-        inputs:['仍有未决分支的计划、设计或复杂决策','当前已经解决的前置决策','环境中可自行调查的事实'],
-        outputs:['每轮编号问题及每题推荐答案','根据本轮回答重新计算的下一轮 frontier','所有分支完成后的共享理解'],
-        scenarios:['一次回答一组问题，比逐题追问更适合高密度决策','多个当前问题彼此独立，可集中决策','希望减少逐题往返但仍保留依赖顺序'],
-        usage:['输入 /batch-grill-me 并提供要压力测试的主题','按编号集中回答当前轮全部问题','让技能重算依赖并继续下一轮，直到 frontier 为空'],
-        note:'实验候选（in-progress）。同一轮只能包含前置条件已解决的问题；存在依赖的问题必须留到后续轮次。'
-      },
-      {
-        name:'edit-article', title:'长文结构与表达编辑', category:'Experimental', sourceBucket:'personal', judgment:'可能有用', invocation:'user', roles:['作者','内容编辑','产品经理','管理者'],
-        summary:'先按标题拆分并校正文章的信息依赖，再逐节压缩和改写，使表达更清晰、连贯、紧凑。',
-        inputs:['带标题或可识别段落的文章草稿','各章节想表达的核心观点','用户对章节划分与顺序的确认'],
-        outputs:['符合信息依赖顺序的章节结构','逐节改写后的清晰文本','单段不超过 240 个字符的紧凑段落'],
-        scenarios:['修改文章、汇报材料和长文','重排章节，避免后文依赖尚未解释的概念','压缩冗长段落并改善阅读节奏'],
-        usage:['输入 /edit-article 并提供文章草稿','先确认技能提出的章节划分和主要观点','按章节逐段改写并复核上下文衔接'],
-        note:'实验候选（personal）。原技能流程较精简，不自动承担事实核查、引用校验、发布排版或平台适配。'
+        name:'wait-what', title:'把没听懂的话重新讲清楚', category:'Productivity', invocation:'user', roles:['任何知识工作者','产品经理','开发者','领域专家'],
+        summary:'当上一条消息没有讲明白时立即暂停，让 Agent 补足背景、改用简明英语规则，并沿用项目 CONTEXT.md 的统一语言重新表述。',
+        inputs:['刚刚没有听懂或没有跟上的上一条消息','项目 CONTEXT.md 中已有的领域词汇（如存在）'],
+        outputs:['带必要背景的重新解释','更短、更直接、术语一致的表述'],
+        scenarios:['Agent 跳过关键背景，结论接不上','技术解释过密或句子过于复杂','项目术语和对话用词不一致'],
+        usage:['在没听懂时立即输入 /wait-what','让 Agent 只重讲上一条消息，不扩展新任务','确认新解释与 CONTEXT.md 术语一致'],
+        note:'这是一个极短的用户调用型纠偏技能；它不会修改文件，也不会推进原任务，只负责让上一条消息真正落地。'
       },
       {
         name:'writing-fragments', title:'从零散想法开采素材', category:'Experimental', sourceBucket:'in-progress', judgment:'条件性有用', invocation:'user', roles:['作者','内容创作者','产品负责人','演讲者'],
@@ -547,15 +547,6 @@
         scenarios:['设计文章或演讲的叙事节奏','需要在多个叙事方向间逐步选择','用场景、观点、问题、转折和插叙构建阅读旅程'],
         usage:['输入 /writing-beats 并提供素材文件','先确定受众前置知识，再选择起始 beat','每次只写入选中的一拍，重读文件后再选择下一拍'],
         note:'实验候选（in-progress）。文章在旅程完成时结束，不要求用完所有素材；任何未 grounded 的概念都不能被后续 beat 直接依赖。'
-      },
-      {
-        name:'wizard', title:'人工配置流程 Bash 向导', category:'Experimental', sourceBucket:'in-progress', judgment:'偶尔有用', invocation:'user', roles:['开发者','DevOps','仓库维护者','技术负责人'],
-        summary:'把第三方配置、一次性迁移或 A→B 状态转换，编排成会开网页、收集值、写环境变量并逐步确认的交互式 Bash 向导。',
-        inputs:['完整且有顺序的人工操作步骤','仓库中的 .env、README、工作流与配置引用','每个值的来源、落点及其是否为秘密','当前状态、目标状态和不可逆动作'],
-        outputs:['基于 template.sh 的可执行 Bash 脚本','分阶段进度、链接打开、值采集和确认门禁','按需写入 .env、GitHub Secrets / Variables 的逻辑','bash -n、shellcheck 与静态追踪结果'],
-        scenarios:['把复杂人工配置流程做成交互式 Bash 向导','第三方服务需要多网页、多密钥的首次设置','把一次性迁移变成可确认、可追踪的人工步骤'],
-        usage:['输入 /wizard 并说明目标流程','先确认阶段、每个值的来源/落点及不可逆动作','生成脚本后只做静态验证，由人按说明运行'],
-        note:'实验候选（in-progress）。默认是一次性脚本；涉及秘密时必须隐藏输入，涉及不可逆操作时必须确认，Agent 不应自行端到端执行。'
       }
     ];
 
