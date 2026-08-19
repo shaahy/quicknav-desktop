@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="DeepSeek Harness 中文离线实战教程：理解四种 Agent 模式，并完成第一个 Web UI 智能体任务。">
+  <title>DeepSeek Harness 实战教程</title>
+  <style>
+    :root {
+      --ink: #10231f;
+      --muted: #526862;
+      --paper: #f4f1e8;
+      --paper-2: #ebe6da;
+      --panel: rgba(255, 253, 247, .76);
+      --line: #c9c2b4;
+      --green: #0d7a60;
+      --green-dark: #075845;
+      --lime: #c5f04f;
+      --orange: #e8793b;
+      --red: #a33e32;
+      --blue: #246c8b;
+      --shadow: 0 18px 50px rgba(24, 43, 37, .10);
+      --radius: 18px;
+      --content: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(13, 122, 96, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(13, 122, 96, .055) 1px, transparent 1px),
+        var(--paper);
+      background-size: 36px 36px;
+      font-family: "Microsoft YaHei UI", "PingFang SC", sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    code, pre, .mono {
+      font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+    }
+    ::selection { background: var(--lime); color: var(--ink); }
+
+    .progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      z-index: 20;
+      width: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--orange), var(--lime), var(--green));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      border-bottom: 1px solid rgba(16, 35, 31, .16);
+      background: rgba(244, 241, 232, .88);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      max-width: var(--content);
+      min-height: 58px;
+      margin: auto;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 800; }
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      border: 6px solid var(--green);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      transform: rotate(-20deg);
+    }
+    .topnav { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+    .topnav a {
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .topnav a:hover, .topnav a.active { color: var(--green-dark); background: #ddebdc; }
+
+    main { overflow: hidden; }
+    .wrap { max-width: var(--content); margin: auto; padding: 0 24px; }
+    .hero {
+      min-height: 720px;
+      display: grid;
+      place-items: center;
+      padding: 96px 0 70px;
+      position: relative;
+    }
+    .hero::before, .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .hero::before {
+      width: 360px; height: 360px; right: -150px; top: 70px;
+      border: 70px solid rgba(197, 240, 79, .32);
+    }
+    .hero::after {
+      width: 240px; height: 240px; left: -130px; bottom: 10px;
+      background: rgba(232, 121, 59, .13);
+      border: 1px dashed var(--orange);
+    }
+    .eyebrow {
+      margin: 0 0 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--green-dark);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 32px; height: 3px; background: var(--orange); }
+    h1, h2, h3 { line-height: 1.18; text-wrap: balance; }
+    h1 {
+      max-width: 900px;
+      margin: 0;
+      font-family: Georgia, "STZhongsong", serif;
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 700;
+      letter-spacing: -.05em;
+    }
+    h1 span { color: var(--green); }
+    .hero-lead {
+      max-width: 700px;
+      margin: 28px 0 32px;
+      color: var(--muted);
+      font-size: clamp(18px, 2.2vw, 24px);
+      line-height: 1.6;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+    .button {
+      min-height: 46px;
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--ink);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .button.primary { background: var(--ink); color: #fffef7; box-shadow: 5px 5px 0 var(--lime); }
+    .button:hover { transform: translateY(-1px); }
+    .status-chip {
+      margin-left: 10px;
+      padding: 7px 11px;
+      border-left: 3px solid var(--orange);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .hero-meta {
+      margin-top: 58px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .hero-meta > div { padding: 20px 22px; border-right: 1px solid var(--line); }
+    .hero-meta > div:last-child { border-right: 0; }
+    .hero-meta small { display: block; color: var(--muted); }
+    .hero-meta strong { display: block; margin-top: 3px; font-size: 17px; }
+
+    section { padding: 92px 0; scroll-margin-top: 62px; }
+    section.tint { background: rgba(224, 229, 214, .62); border-block: 1px solid rgba(16, 35, 31, .09); }
+    .section-head { display: grid; grid-template-columns: 90px 1fr; gap: 30px; margin-bottom: 42px; }
+    .section-num {
+      color: var(--green);
+      font-family: Georgia, serif;
+      font-size: 54px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    h2 { margin: 0 0 12px; font-family: Georgia, "STZhongsong", serif; font-size: clamp(34px, 5vw, 56px); letter-spacing: -.035em; }
+    .section-head p { max-width: 720px; margin: 0; color: var(--muted); font-size: 18px; }
+    h3 { margin: 0 0 10px; font-size: 21px; }
+    p { margin: 0 0 14px; }
+    .muted { color: var(--muted); }
+
+    .plain-card, .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .definition { display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px; }
+    .definition-main { padding: 34px; }
+    .big-answer { margin: 0 0 22px; font-family: Georgia, "STZhongsong", serif; font-size: clamp(26px, 3vw, 38px); line-height: 1.35; }
+    .big-answer mark { background: var(--lime); padding: 0 .18em; color: inherit; }
+    .not-box { padding: 26px; background: var(--ink); color: #eff7ed; border-radius: var(--radius); }
+    .not-box h3 { color: var(--lime); }
+    .not-box ul { margin-bottom: 0; }
+    .fact-tag, .judge-tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .fact-tag { color: var(--green-dark); background: #d5eadf; }
+    .judge-tag { color: #714019; background: #f5d7bd; }
+
+    .layers { margin-top: 26px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .layer { min-height: 145px; padding: 20px; border: 1px solid var(--line); background: rgba(255,255,255,.45); }
+    .layer:first-child { border-radius: 14px 0 0 14px; }
+    .layer:last-child { border-radius: 0 14px 14px 0; }
+    .layer b { display: block; margin-bottom: 6px; color: var(--green-dark); }
+    .layer span { color: var(--muted); font-size: 14px; }
+
+    .fit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .fit { padding: 30px; }
+    .fit.good { border-top: 6px solid var(--green); }
+    .fit.bad { border-top: 6px solid var(--orange); }
+    .fit ul, .procon ul { padding-left: 1.2em; margin: 16px 0 0; }
+    li { margin: 7px 0; }
+    .verdict {
+      margin-top: 22px;
+      padding: 22px 26px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-left: 7px solid var(--lime);
+      background: var(--ink);
+      color: white;
+      border-radius: 0 14px 14px 0;
+    }
+    .verdict strong { color: var(--lime); }
+
+    .procon { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .procon > article { padding: 30px; }
+    .score { margin: 18px 0 22px; display: grid; gap: 9px; }
+    .score-row { display: grid; grid-template-columns: 90px 1fr 32px; align-items: center; gap: 10px; font-size: 13px; }
+    .track { height: 8px; overflow: hidden; border-radius: 99px; background: var(--paper-2); }
+    .track i { display: block; height: 100%; background: var(--green); }
+    .risk .track i { background: var(--orange); }
+
+    .mode-intro {
+      margin-bottom: 22px;
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: center;
+      border: 1px solid var(--green);
+      border-radius: var(--radius);
+      background: rgba(197, 240, 79, .13);
+    }
+    .mode-intro strong { font: 700 26px/1.2 Georgia, "STZhongsong", serif; color: var(--green-dark); }
+    .mode-intro p { margin: 0; color: var(--muted); }
+    .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .mode-card { position: relative; padding: 28px; overflow: hidden; }
+    .mode-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--mode-color); }
+    .mode-standard { --mode-color: var(--green); }
+    .mode-ptc { --mode-color: var(--blue); }
+    .mode-minimal { --mode-color: var(--orange); }
+    .mode-create { --mode-color: #7653a6; }
+    .mode-head { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+    .mode-head h3 { margin: 0; font-size: 25px; }
+    .mode-id { flex: 0 0 auto; padding: 3px 8px; border: 1px solid var(--mode-color); border-radius: 999px; color: var(--mode-color); font: 700 12px/1.5 Consolas, monospace; }
+    .mode-position { min-height: 56px; color: var(--muted); }
+    .mode-block { margin-top: 17px; padding-top: 15px; border-top: 1px solid var(--line); }
+    .mode-block b { display: block; margin-bottom: 5px; color: var(--green-dark); }
+    .mode-block ul { margin: 0; padding-left: 1.2em; }
+    .mode-caution { margin-top: 16px; padding: 11px 13px; border-left: 4px solid var(--mode-color); background: rgba(16, 35, 31, .045); font-size: 14px; }
+    .mode-table-wrap { margin-top: 24px; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.5); }
+    .mode-table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 14px; }
+    .mode-table caption { padding: 20px 20px 14px; text-align: left; font-size: 21px; font-weight: 800; }
+    .mode-table caption small { margin-left: 8px; color: var(--muted); font: 400 12px/1.5 "Microsoft YaHei UI", sans-serif; }
+    .mode-table th, .mode-table td { padding: 14px 16px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .mode-table thead th { color: var(--green-dark); background: rgba(13, 122, 96, .08); }
+    .mode-table tbody th { width: 110px; white-space: nowrap; }
+    .choice-grid { margin-top: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; counter-reset: choice; }
+    .choice { padding: 18px; border-top: 4px solid var(--green); background: rgba(255,255,255,.48); }
+    .choice::before { counter-increment: choice; content: "0" counter(choice); display: block; margin-bottom: 8px; color: var(--orange); font: 700 22px/1 Georgia, serif; }
+    .choice b { display: block; margin-bottom: 5px; }
+    .preset-rule { margin-top: 22px; padding: 23px 26px; border-radius: 0 14px 14px 0; border-left: 7px solid var(--orange); background: var(--ink); color: #eff7ed; }
+    .preset-rule strong { color: var(--lime); }
+    .preset-rule p:last-child { margin-bottom: 0; }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      counter-reset: flow;
+    }
+    .flow-step { position: relative; min-height: 200px; padding: 58px 18px 20px; border: 1px solid var(--line); background: rgba(255,255,255,.5); }
+    .flow-step::before {
+      counter-increment: flow;
+      content: "0" counter(flow);
+      position: absolute;
+      left: 18px; top: 15px;
+      color: var(--orange);
+      font-family: Georgia, serif;
+      font-size: 25px;
+      font-weight: 700;
+    }
+    .flow-step:not(:last-child)::after { content: "→"; position: absolute; right: -18px; top: 85px; z-index: 2; color: var(--green); font-size: 25px; }
+    .flow-step b { display: block; margin-bottom: 7px; }
+    .flow-step span { color: var(--muted); font-size: 14px; }
+    .architecture-note { margin-top: 24px; padding: 26px; }
+
+    .lab-shell { border: 1px solid var(--ink); border-radius: 20px; overflow: hidden; box-shadow: 10px 10px 0 rgba(13, 122, 96, .18); }
+    .lab-tabs { display: flex; background: var(--ink); padding: 8px 8px 0; gap: 6px; }
+    .lab-tab { padding: 10px 15px; border: 0; border-radius: 9px 9px 0 0; background: transparent; color: #b9cbc5; cursor: pointer; font-weight: 800; }
+    .lab-tab[aria-selected="true"] { background: var(--paper); color: var(--ink); }
+    .lab-panel { display: none; padding: 34px; background: var(--paper); }
+    .lab-panel.active { display: block; }
+    .route-note { margin-bottom: 28px; padding: 16px 18px; border: 1px dashed var(--green); background: rgba(197,240,79,.12); }
+
+    .steps { display: grid; gap: 18px; }
+    .step { display: grid; grid-template-columns: 52px 1fr; gap: 18px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .step:first-child { padding-top: 0; border-top: 0; }
+    .step-no { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%; background: var(--green); color: #fff; font-family: Georgia, serif; font-size: 20px; font-weight: 700; }
+    .step h3 { margin-top: 8px; }
+    .codebox { position: relative; margin: 14px 0; border-radius: 12px; overflow: hidden; background: #10231f; color: #e9f4ef; }
+    pre { margin: 0; padding: 18px 60px 18px 18px; overflow-x: auto; font-size: 14px; line-height: 1.65; white-space: pre-wrap; }
+    .copy {
+      position: absolute;
+      right: 9px; top: 9px;
+      min-width: 40px;
+      padding: 6px 9px;
+      border: 1px solid #5a716b;
+      border-radius: 7px;
+      background: #1d3932;
+      color: #e8f3ef;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .copy:hover { border-color: var(--lime); }
+    .task-card { margin: 14px 0; padding: 18px; border-left: 5px solid var(--blue); background: #e6eef0; }
+    .task-card b { display: block; margin-bottom: 5px; color: #184d63; }
+    .checkline { display: flex; gap: 10px; align-items: flex-start; margin: 9px 0; }
+    .checkline::before { content: "✓"; flex: 0 0 22px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: #d4eadf; color: var(--green-dark); font-weight: 900; line-height: 1; }
+
+    .advance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .advance { padding: 26px; position: relative; overflow: hidden; }
+    .advance::after { content: attr(data-no); position: absolute; right: 10px; bottom: -28px; color: rgba(13,122,96,.08); font: 700 100px/1 Georgia, serif; }
+    .advance > * { position: relative; z-index: 1; }
+    .advance code { color: var(--green-dark); font-size: 13px; }
+
+    .faq { display: grid; gap: 10px; }
+    details { border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.55); }
+    summary { padding: 18px 20px; cursor: pointer; font-weight: 800; }
+    details > div { padding: 0 20px 18px; color: var(--muted); }
+    details[open] { border-color: var(--green); }
+
+    .source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .source { padding: 18px; border: 1px solid var(--line); background: rgba(255,255,255,.5); }
+    .source b { display: block; margin-bottom: 5px; }
+    .source code { display: block; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .source .copy-url { margin-top: 12px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 6px; background: transparent; cursor: pointer; font-size: 12px; }
+    .disclaimer { margin-top: 28px; padding: 22px; border: 1px solid var(--orange); background: #faeadc; }
+
+    footer { padding: 38px 0 60px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; }
+    .backtop { color: var(--green-dark); text-decoration: none; font-weight: 800; }
+
+    .toast {
+      position: fixed;
+      right: 20px; bottom: 20px;
+      z-index: 30;
+      padding: 10px 15px;
+      border-radius: 10px;
+      background: var(--ink);
+      color: white;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 880px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; gap: 4px; padding-block: 10px; }
+      .topnav { width: 100%; }
+      .hero { min-height: auto; padding-top: 82px; }
+      .definition, .fit-grid, .procon, .mode-grid { grid-template-columns: 1fr; }
+      .layers { grid-template-columns: 1fr 1fr; }
+      .layer:first-child, .layer:last-child { border-radius: 0; }
+      .workflow { grid-template-columns: 1fr 1fr; }
+      .flow-step:not(:last-child)::after { display: none; }
+      .choice-grid { grid-template-columns: 1fr 1fr; }
+      .advance-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      body { font-size: 15px; }
+      .wrap { padding-inline: 17px; }
+      .hero { padding-top: 65px; }
+      .hero-meta { grid-template-columns: 1fr; }
+      .hero-meta > div { border-right: 0; border-bottom: 1px solid var(--line); }
+      .hero-meta > div:last-child { border-bottom: 0; }
+      section { padding: 68px 0; }
+      .section-head { grid-template-columns: 1fr; gap: 8px; }
+      .section-num { font-size: 32px; }
+      .layers, .workflow, .source-grid, .choice-grid { grid-template-columns: 1fr; }
+      .mode-intro { grid-template-columns: 1fr; padding: 21px; }
+      .mode-position { min-height: 0; }
+      .definition-main, .not-box, .fit, .procon > article, .lab-panel { padding: 22px; }
+      .step { grid-template-columns: 40px 1fr; gap: 12px; }
+      .step-no { width: 38px; height: 38px; font-size: 17px; }
+      .lab-tabs { overflow-x: auto; }
+      .lab-tab { white-space: nowrap; }
+      .status-chip { width: 100%; margin: 8px 0 0; }
+      .footer-inner { flex-direction: column; }
+    }
+    @media print {
+      .topbar, .progress, .hero-actions, .copy, .copy-url, .toast { display: none !important; }
+      body { background: white; color: black; font-size: 11pt; }
+      .hero { min-height: auto; padding: 30px 0; }
+      section { padding: 30px 0; break-inside: avoid; }
+      .plain-card, .card, .lab-shell { box-shadow: none; }
+      .lab-panel { display: block !important; }
+      .lab-tabs { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> DSH 实战手册</div>
+      <nav class="topnav" aria-label="教程目录">
+        <a href="#what">是什么</a><a href="#fit">适用场景</a><a href="#pros">优劣势</a><a href="#modes">四种模式</a>
+        <a href="#workflow">工作流</a><a href="#lab">实战</a><a href="#more">进阶</a><a href="#sources">来源</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="wrap">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">DeepSeek Harness · 离线实战教程</p>
+          <h1>把模型，装进一个<span>会做事</span>的框架</h1>
+          <p class="hero-lead">用最短路径理解 DeepSeek Harness，并在 Web UI 中完成一次“读仓库 → 出计划 → 经确认后执行”的智能体任务。</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#lab">直接开始实战</a>
+            <a class="button" href="#fit">先判断适不适合</a>
+            <span class="status-chip">资料基准：master · 2026-08-18</span>
+          </div>
+          <div class="hero-meta" aria-label="教程摘要">
+            <div><small>主路线</small><strong>Web UI 快速体验</strong></div>
+            <div><small>预计用时</small><strong>约 25 分钟</strong></div>
+            <div><small>当前阶段</small><strong>开发者预览</strong></div>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <section id="what">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">01</div>
+          <div><h2>它到底是什么？</h2><p>先把“模型”和“智能体运行框架”分开，很多困惑就消失了。</p></div>
+        </div>
+        <div class="definition">
+          <article class="plain-card definition-main">
+            <span class="fact-tag">官方事实</span>
+            <p class="big-answer">DeepSeek Harness（命令名 <code>dsh</code>）是一个开源的 <mark>智能体运行框架</mark>。</p>
+            <p>它负责把模型、工具、会话记录、文件系统、权限审批、沙箱和界面组织到一起，让模型不只“回答问题”，还可以在受控条件下读取文件、修改代码和运行命令。</p>
+            <p class="muted">一句话类比：模型像“大脑”，Harness 像“工作台 + 手脚 + 安全规则”。</p>
+          </article>
+          <aside class="not-box">
+            <h3>它不是什么</h3>
+            <ul>
+              <li>不是 DeepSeek 大模型本身</li>
+              <li>不是一个只会聊天的网页壳</li>
+              <li>不是默认无条件执行的自动化机器人</li>
+              <li>不是已经稳定定型的企业级成品</li>
+            </ul>
+          </aside>
+        </div>
+        <div class="layers" aria-label="核心构成">
+          <div class="layer"><b>模型适配器</b><span>连接 DeepSeek、OpenAI、Anthropic 或自定义兼容端点。</span></div>
+          <div class="layer"><b>Agent Loop</b><span>组织请求、工具调用、结果回填与下一步判断。</span></div>
+          <div class="layer"><b>能力与安全</b><span>文件、终端、工具、沙箱、权限审批都可替换。</span></div>
+          <div class="layer"><b>会话与界面</b><span>持久化事件日志，并通过 Web、Headless 或 SDK 使用。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fit" class="tint">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">02</div>
+          <div><h2>什么时候值得用？</h2><p>它更像可组合的智能体底座，而不是“下载即稳定办公”的大众应用。</p></div>
+        </div>
+        <div class="fit-grid">
+          <article class="card fit good">
+            <span class="judge-tag">教程判断</span>
+            <h3>适合这些场景</h3>
+            <ul>
+              <li><b>代码库理解：</b>总结结构、定位模块、梳理依赖。</li>
+              <li><b>受控开发：</b>先规划，经确认后改代码、跑检查。</li>
+              <li><b>智能体研发：</b>更换模型、工具、沙箱或审批策略。</li>
+              <li><b>自动化集成：</b>通过 Headless 或 Python SDK 嵌入流程。</li>
+              <li><b>插件实验：</b>围绕明确扩展点增加新能力。</li>
+            </ul>
+          </article>
+          <article class="card fit bad">
+            <span class="judge-tag">教程判断</span>
+            <h3>暂时不太适合</h3>
+            <ul>
+              <li>要求长期 API 稳定、零迁移成本的生产系统。</li>
+              <li>只想要简单问答，不需要文件或工具能力。</li>
+              <li>无法接受本地 Node.js、API Key 与权限配置。</li>
+              <li>希望完全无人看管地修改高风险仓库。</li>
+              <li>缺少隔离环境，却要让智能体接触敏感数据。</li>
+            </ul>
+          </article>
+        </div>
+        <div class="verdict"><strong>选择建议</strong><span>学习、试验和内部工具：值得体验；关键生产流程：先做小范围验证，并锁定版本与权限边界。</span></div>
+      </div>
+    </section>
+
+    <section id="pros">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">03</div>
+          <div><h2>优势与代价</h2><p>“一切皆插件”带来高度可组合性，也把一部分复杂度交给了使用者。</p></div>
+        </div>
+        <div class="procon">
+          <article class="card">
+            <h3>优势</h3>
+            <div class="score" aria-label="优势评分">
+              <div class="score-row"><span>可扩展性</span><div class="track"><i style="width:94%"></i></div><b>高</b></div>
+              <div class="score-row"><span>可替换性</span><div class="track"><i style="width:90%"></i></div><b>高</b></div>
+              <div class="score-row"><span>可追溯性</span><div class="track"><i style="width:86%"></i></div><b>高</b></div>
+            </div>
+            <ul>
+              <li><b>模块化：</b>模型、工具、会话日志和 Agent Loop 都由插件贡献。</li>
+              <li><b>多种入口：</b>Web UI、Headless 与 Python SDK 面向不同工作流。</li>
+              <li><b>安全边界显式：</b>工具执行可经过策略、审批与沙箱。</li>
+              <li><b>会话可重建：</b>模型可见内容与工具调用来自持久事件日志。</li>
+              <li><b>MIT 开源：</b>便于审查、二次开发和内部集成。</li>
+            </ul>
+          </article>
+          <article class="card risk">
+            <h3>劣势 / 风险</h3>
+            <div class="score" aria-label="风险评分">
+              <div class="score-row"><span>版本变动</span><div class="track"><i style="width:92%"></i></div><b>高</b></div>
+              <div class="score-row"><span>学习成本</span><div class="track"><i style="width:74%"></i></div><b>中</b></div>
+              <div class="score-row"><span>配置复杂</span><div class="track"><i style="width:68%"></i></div><b>中</b></div>
+            </div>
+            <ul>
+              <li><b>开发者预览：</b>官方明确提醒会出现破坏兼容性的变更。</li>
+              <li><b>架构门槛：</b>深入定制需要理解 Cordis、Profile、Bundle 和事件域。</li>
+              <li><b>运行成本：</b>仍需模型 API、令牌费用与本地运行环境。</li>
+              <li><b>能力即风险：</b>文件和终端工具配置不当会扩大影响范围。</li>
+              <li><b>平台差异：</b>Python SDK 官方入门当前只列 Linux 与 macOS 环境。</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="modes" class="tint">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">04</div>
+          <div><h2>四种 Agent 模式怎么选？</h2><p>它们不是“弱、中、强”四档模型，而是四套不同的 Agent preset：改变工具组合、调用方式和使用边界。</p></div>
+        </div>
+
+        <div class="mode-intro">
+          <strong>先记住一句话</strong>
+          <p>日常开发选<strong>标准模式</strong>；多工具链式操作选 <strong>PTC 模式</strong>；刻意限制工具选<strong>极简模式</strong>；只有在创建 Agent preset 或实验插件时才选<strong>创造模式</strong>。</p>
+        </div>
+
+        <div class="mode-grid">
+          <article class="card mode-card mode-standard">
+            <div class="mode-head"><h3>标准模式</h3><span class="mode-id">standard</span></div>
+            <p class="mode-position"><b>定位：</b>功能完整的通用编码 Agent，也是 Web UI 的默认选择。</p>
+            <div class="mode-block"><b>主要能力</b><ul><li>文件编辑、Shell、文件与网页检索</li><li>Skills、计划、目标、待办和上下文压缩</li><li>子代理、工作流与后台任务</li></ul></div>
+            <div class="mode-block"><b>最适合</b><ul><li>理解代码库、修复缺陷、开发功能</li><li>“先分析 → 出计划 → 修改 → 验证”的完整任务</li><li>不确定后续会用到哪些工具的日常工作</li></ul></div>
+            <div class="mode-caution"><b>不必选它：</b>任务只需两种基础工具，且你有意缩小能力面时，可以考虑极简模式。</div>
+          </article>
+
+          <article class="card mode-card mode-ptc">
+            <div class="mode-head"><h3>PTC 模式</h3><span class="mode-id">code</span></div>
+            <p class="mode-position"><b>定位：</b>保留标准模式全部能力，但通过 Code Mode SDK 把工具呈现给模型。</p>
+            <div class="mode-block"><b>它怎样工作</b><ul><li>模型编写一个 TypeScript 程序组合工具操作</li><li>由 <code>run_code</code> 执行程序，而非逐次发起每个工具调用</li><li>适合“读取 → 筛选 → 处理 → 汇总”一类多步链路</li></ul></div>
+            <div class="mode-block"><b>最适合</b><ul><li>同一任务需要连续调用多个工具</li><li>批量读取文件后按条件处理</li><li>步骤明确、数据要在多个操作间传递的自动化</li></ul></div>
+            <div class="mode-caution"><b>主要取舍：</b>减少多步工具往返，不代表模型更强，也不保证所有任务都更快或更省 Token；简单修改通常没有明显收益。</div>
+          </article>
+
+          <article class="card mode-card mode-minimal">
+            <div class="mode-head"><h3>极简模式</h3><span class="mode-id">minimal</span></div>
+            <p class="mode-position"><b>定位：</b>固定提示词的双工具编码 Agent，只组合持久 Bash 与 <code>str_replace_editor</code>。</p>
+            <div class="mode-block"><b>明确没有</b><ul><li>没有标准模式的计划、目标、Skills 与子代理工具</li><li>没有网页工具、后台任务和工作流</li><li>没有运行时上下文快照与上下文压缩</li></ul></div>
+            <div class="mode-block"><b>最适合</b><ul><li>简单、边界清楚的本地文件修改</li><li>研究“双工具 Agent”怎样完成任务</li><li>希望主动缩小工具面、观察基础行为</li></ul></div>
+            <div class="mode-caution"><b>主要取舍：</b>工具少不等于风险消失；Bash 仍可执行命令。复杂长任务也更容易受能力与上下文限制。</div>
+          </article>
+
+          <article class="card mode-card mode-create">
+            <div class="mode-head"><h3>创造模式</h3><span class="mode-id">cordis</span></div>
+            <p class="mode-position"><b>定位：</b>让 Agent 创建另一个 Agent；标准模式能力不变，再增加运行时自省与 preset 创作工具。</p>
+            <div class="mode-block"><b>额外能力</b><ul><li>读取和修改当前 Harness 运行时</li><li>临时挂载、测试和卸载插件</li><li>提供 Cordis composition / preset 创作指导</li></ul></div>
+            <div class="mode-block"><b>最适合</b><ul><li>制作自定义 Agent preset</li><li>验证工具、persona 与提示区段的组合</li><li>理解 Host 与 Agent Preset 两个配置平面</li></ul></div>
+            <div class="mode-caution"><b>高权限提醒：</b>官方要求把它视为 Shell 访问。不要直接改内置 preset；复制成用户 preset 后再实验。</div>
+          </article>
+        </div>
+
+        <div class="mode-table-wrap">
+          <table class="mode-table">
+            <caption>四种模式核心区别 <small>窄屏可左右滑动查看 →</small></caption>
+            <thead><tr><th>比较项</th><th>标准模式</th><th>PTC 模式</th><th>极简模式</th><th>创造模式</th></tr></thead>
+            <tbody>
+              <tr><th>能力范围</th><td>完整通用工具链</td><td>与标准模式相同</td><td>Bash + 文件替换编辑</td><td>标准模式 + 运行时创作工具</td></tr>
+              <tr><th>工具用法</th><td>逐个原生工具调用</td><td>TypeScript 程序组合调用</td><td>两个原生工具</td><td>原生工具 + Cordis 自省工具</td></tr>
+              <tr><th>最佳任务</th><td>常规软件开发</td><td>明确的多步自动化</td><td>简单、受限的本地修改</td><td>创建 preset、实验插件</td></tr>
+              <tr><th>主要代价</th><td>工具面较大</td><td>多一层程序编排</td><td>复杂能力和长上下文不足</td><td>权限高、配置知识要求高</td></tr>
+              <tr><th>推荐人群</th><td>绝大多数用户</td><td>熟悉流程编排的开发者</td><td>实验者或明确限制工具者</td><td>Harness / Agent 开发者</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="choice-grid" aria-label="30 秒模式选择">
+          <div class="choice"><b>先默认</b><span>不知道选什么，就选标准模式。</span></div>
+          <div class="choice"><b>再看步骤</b><span>大量连续工具操作，考虑 PTC。</span></div>
+          <div class="choice"><b>主动做减法</b><span>只要 Bash 和编辑器，选极简。</span></div>
+          <div class="choice"><b>只为造 Agent</b><span>创建 preset 或插件实验，选创造。</span></div>
+        </div>
+
+        <div class="preset-rule">
+          <p><strong>会话锁定规则：</strong>preset 按会话确定。修改默认模式只影响新会话；会话开始产生输出后，不能在原会话中切换 preset。</p>
+          <p><strong>自定义规则：</strong>用户 preset 与插件具有相近的信任等级。修改内置模式时，应先复制到用户 preset 目录，不要直接改随安装提供的内置配置。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">05</div>
+          <div><h2>一次任务怎样流动？</h2><p>理解这五步，就能知道“模型在想什么、工具何时执行、为什么会弹出审批”。</p></div>
+        </div>
+        <div class="workflow">
+          <div class="flow-step"><b>输入任务</b><span>用户消息进入会话，系统准备当前工作区和上下文。</span></div>
+          <div class="flow-step"><b>组装请求</b><span>插件提供系统提示、工具定义和模型适配器。</span></div>
+          <div class="flow-step"><b>模型判断</b><span>模型回答，或决定调用文件、终端等工具。</span></div>
+          <div class="flow-step"><b>受控执行</b><span>工具经过策略与审批，执行结果写回会话。</span></div>
+          <div class="flow-step"><b>继续或结束</b><span>若还欠一步就继续；任务完成后关闭本轮。</span></div>
+        </div>
+        <div class="plain-card architecture-note">
+          <span class="fact-tag">官方架构要点</span>
+          <p><b>Step</b> 是一次模型请求及其工具调用；<b>Turn</b> 可以包含零个或多个 Step。会话事件日志保存用户消息、模型消息和工具结果，恢复、分叉与回放都以此为基础。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">06</div>
+          <div><h2>完成第一个实战闭环</h2><p>目标不是让智能体“一把梭”，而是练习最可靠的三段式：只读理解 → 计划确认 → 小步执行。</p></div>
+        </div>
+
+        <div class="lab-shell">
+          <div class="lab-tabs" role="tablist" aria-label="运行路线">
+            <button class="lab-tab" role="tab" aria-selected="true" aria-controls="quick-panel" id="quick-tab">路线 A：npx 快速体验</button>
+            <button class="lab-tab" role="tab" aria-selected="false" aria-controls="source-panel" id="source-tab">路线 B：从源码运行</button>
+          </div>
+
+          <div class="lab-panel active" id="quick-panel" role="tabpanel" aria-labelledby="quick-tab">
+            <div class="route-note"><b>推荐新手：</b>不用克隆仓库或手动构建，先体验 Web UI。需要联网下载 npm 包，并准备一个可用模型的 API Key。</div>
+            <div class="steps">
+              <article class="step">
+                <div class="step-no">1</div>
+                <div><h3>准备一个安全的练习目录</h3><p>不要第一次就把高价值仓库交给智能体。新建一个测试目录，并放入少量可修改文件。</p>
+                  <div class="codebox"><pre><code>mkdir dsh-demo
+cd dsh-demo</code></pre><button class="copy" data-copy="mkdir dsh-demo&#10;cd dsh-demo" aria-label="复制命令">复制</button></div>
+                  <div class="checkline">已经安装兼容的 Node.js；源码仓库当前要求 <code>^22.19.0 || &gt;=24.0.0</code>。</div>
+                  <div class="checkline">练习目录不含真实密钥、客户数据或不可恢复文件。</div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">2</div>
+                <div><h3>启动 Web UI</h3>
+                  <div class="codebox"><pre><code>npx @deepseek-ai/dsh web</code></pre><button class="copy" data-copy="npx @deepseek-ai/dsh web" aria-label="复制命令">复制</button></div>
+                  <p>终端会打印访问地址，默认通常是 <code>http://127.0.0.1:3080</code>。保持这个终端窗口运行。</p>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">3</div>
+                <div><h3>配置模型</h3><p>打开 <b>设置 → 模型</b>。使用 DeepSeek 时输入 API Key 并保存；也可以新增 OpenAI、Anthropic 或自定义 OpenAI 兼容端点。</p>
+                  <div class="checkline">配置保存后，下一个请求立即生效，不需要重启服务。</div>
+                  <div class="checkline">官方说明 API Key 按只写方式处理，页面保存后只收到脱敏描述。</div>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">4</div>
+                <div><h3>选择工作区与标准模式</h3><p>点击 <b>选择工作区</b>，添加并选择刚才的 <code>dsh-demo</code>；模式选择<b>标准模式</b>。未选择工作区之前，会话输入框不可用。</p></div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">5</div>
+                <div><h3>任务一：只读理解</h3><p>先约束为只读，检查智能体是否正确理解目录。</p>
+                  <div class="task-card"><b>发送这段提示词</b><span>请只读检查当前工作区，不要修改文件或运行会改变状态的命令。告诉我：目录里有什么、每个文件可能做什么、有哪些风险或不确定项。</span></div>
+                  <p class="muted">验收：回答基于实际文件；明确说明不确定项；没有产生文件变更。</p>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">6</div>
+                <div><h3>任务二：先出计划</h3>
+                  <div class="task-card"><b>发送这段提示词</b><span>为这个目录设计一个最小 README。先给计划，包含目标、文件范围、内容结构和验收标准。现在不要写文件，等我确认。</span></div>
+                  <p>检查计划是否越界。满意后回复：<b>“确认，按计划执行，只修改 README.md。”</b></p>
+                </div>
+              </article>
+
+              <article class="step">
+                <div class="step-no">7</div>
+                <div><h3>验收结果</h3>
+                  <div class="checkline">查看修改摘要：是否只出现 <code>README.md</code>。</div>
+                  <div class="checkline">打开文件检查：内容是否符合计划，是否凭空编造。</div>
+                  <div class="checkline">若弹出审批：先读清命令、路径和影响范围，再决定允许或拒绝。</div>
+                  <div class="checkline">发现偏差时，让智能体先说明原因，不要立刻扩大权限。</div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="lab-panel" id="source-panel" role="tabpanel" aria-labelledby="source-tab" hidden>
+            <div class="route-note"><b>适合贡献者：</b>需要 Git、兼容 Node.js、Corepack 管理的 pnpm。源码路线安装和构建时间更长，但便于读源码、开发插件与参与贡献。</div>
+            <div class="steps">
+              <article class="step"><div class="step-no">1</div><div><h3>克隆并进入仓库</h3><div class="codebox"><pre><code>git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness</code></pre><button class="copy" data-copy="git clone https://github.com/deepseek-ai/deepseek-harness.git&#10;cd deepseek-harness" aria-label="复制命令">复制</button></div></div></article>
+              <article class="step"><div class="step-no">2</div><div><h3>安装与构建</h3><div class="codebox"><pre><code>corepack enable
+pnpm install
+pnpm run build</code></pre><button class="copy" data-copy="corepack enable&#10;pnpm install&#10;pnpm run build" aria-label="复制命令">复制</button></div><p>仓库当前固定 <code>pnpm@11.7.0</code>。首次开发环境搭好后，官方还建议运行 <code>pnpm run typecheck</code>。</p></div></article>
+              <article class="step"><div class="step-no">3</div><div><h3>启动源码版 Web UI</h3><div class="codebox"><pre><code>pnpm dsh web</code></pre><button class="copy" data-copy="pnpm dsh web" aria-label="复制命令">复制</button></div><p>随后按路线 A 的“配置模型 → 选择工作区 → 三段式任务”继续。</p></div></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="more" class="tint">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">07</div>
+          <div><h2>跑通以后，再看这些</h2><p>先选一种入口解决真实问题，再决定是否深入架构和插件系统。</p></div>
+        </div>
+        <div class="advance-grid">
+          <article class="card advance" data-no="1"><span class="fact-tag">自动化</span><h3>Headless 模式</h3><p>运行一次任务、保存会话、打印最终答案后退出，适合脚本和 CI。</p><code>dsh --profile headless "job"</code></article>
+          <article class="card advance" data-no="2"><span class="fact-tag">程序集成</span><h3>Python SDK</h3><p>从 Python 启动捆绑运行时并复用会话。官方入门要求 Python 3.10+，当前列出的目标平台为 Linux 与 macOS。</p><code>from deepseek_harness import DeepSeekHarness</code></article>
+          <article class="card advance" data-no="3"><span class="fact-tag">深度定制</span><h3>插件与 Profile</h3><p>用 Bundle、Profile 与 patch 组合能力，不必直接修改“核心”。先输出实际配置树，再决定扩展点。</p><code>dsh --profile web --dump-config</code></article>
+        </div>
+
+        <div class="section-head" style="margin-top:72px">
+          <div class="section-num">FAQ</div>
+          <div><h2>常见问题</h2><p>先排除环境、工作区与模型配置，再怀疑 Agent Loop。</p></div>
+        </div>
+        <div class="faq">
+          <details><summary>运行 npx 后没有打开网页？</summary><div>命令只负责启动服务，不一定自动打开浏览器。查看终端打印的 URL，手动访问；默认通常为 <code>http://127.0.0.1:3080</code>。同时确认终端进程没有退出或报错。</div></details>
+          <details><summary>为什么会话输入框不可用？</summary><div>新的 Web UI 默认没有选中工作区。点击“选择工作区”，添加并选中项目目录后再开始会话。</div></details>
+          <details><summary>保存 API Key 后模型仍不可用？</summary><div>先确认提供方、模型和凭证匹配。AWS Bedrock、Vertex、Azure 与 Codex 等原生认证方式不只是填写普通 API Key；自定义提供方还需要正确的 Base URL、协议和模型 ID。</div></details>
+          <details><summary>为什么工具执行前总要审批？</summary><div>这是权限策略在工作。审批不是故障，而是风险控制点。应检查具体命令、目标路径和影响范围；对不理解或超范围的操作选择拒绝。</div></details>
+          <details><summary>为什么切换模式后，当前会话没有变化？</summary><div>模式属于会话创建时确定的 preset。当前会话开始产生输出后会被锁定；请选择目标模式后新建会话。</div></details>
+          <details><summary>教程里的命令以后会不会失效？</summary><div>可能。项目仍处于开发者预览，官方明确提示会有破坏兼容性的变更。遇到差异时，以当前仓库 README 和对应版本文档为准。</div></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">08</div>
+          <div><h2>资料来源与边界</h2><p>本教程优先使用 DeepSeek 官方仓库材料；下列地址只作为文字保存，页面离线打开时不会访问网络。</p></div>
+        </div>
+        <div class="source-grid">
+          <div class="source"><b>项目 README（中文）</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/README.zh.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/README.zh.md">复制地址</button></div>
+          <div class="source"><b>Web UI 用户指南</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/index.zh.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/index.zh.md">复制地址</button></div>
+          <div class="source"><b>模型配置指南</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/providers.zh.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/providers.zh.md">复制地址</button></div>
+          <div class="source"><b>架构文档</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/architecture.md">复制地址</button></div>
+          <div class="source"><b>CLI 说明</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/README.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/cli/README.md">复制地址</button></div>
+          <div class="source"><b>Python SDK 入门</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/python-sdk.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/user/guide/python-sdk.md">复制地址</button></div>
+          <div class="source"><b>开发指南</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/development.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/development.md">复制地址</button></div>
+          <div class="source"><b>根 package.json</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/package.json</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/package.json">复制地址</button></div>
+          <div class="source"><b>Agent Preset 生命周期与安全说明</b><code>https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/preset/agent-presets/README.md</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/preset/agent-presets/README.md">复制地址</button></div>
+          <div class="source"><b>四种内置 Preset 配置</b><code>https://github.com/deepseek-ai/deepseek-harness/tree/master/apps/cli/config/agent-presets</code><button class="copy-url" data-copy="https://github.com/deepseek-ai/deepseek-harness/tree/master/apps/cli/config/agent-presets">复制地址</button></div>
+        </div>
+        <div class="disclaimer"><b>边界说明：</b>“当前阶段、运行命令、架构、模型配置和平台要求”来自官方材料；“适用场景、评分和选择建议”是基于这些材料做出的教程判断，不代表 DeepSeek 官方承诺。本教程没有实际替你安装 <code>dsh</code> 或调用模型 API。</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>DeepSeek Harness 实战教程 · 单文件离线版 · 2026-08-18</span>
+      <a class="backtop" href="#top">返回顶部 ↑</a>
+    </div>
+  </footer>
+  <div class="toast" role="status" aria-live="polite">已复制</div>
+
+  <script>
+    (() => {
+      const progress = document.querySelector('.progress');
+      const toast = document.querySelector('.toast');
+      const navLinks = [...document.querySelectorAll('.topnav a')];
+      const sections = navLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+      function updateProgress() {
+        const max = document.documentElement.scrollHeight - innerHeight;
+        progress.style.width = (max > 0 ? scrollY / max * 100 : 0) + '%';
+      }
+      addEventListener('scroll', updateProgress, { passive: true });
+      addEventListener('resize', updateProgress);
+      updateProgress();
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id));
+        });
+      }, { rootMargin: '-25% 0px -65% 0px' });
+      sections.forEach(section => observer.observe(section));
+
+      let toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1400);
+      }
+
+      document.addEventListener('click', async event => {
+        const copyButton = event.target.closest('[data-copy]');
+        if (copyButton) {
+          try {
+            await navigator.clipboard.writeText(copyButton.dataset.copy);
+            const old = copyButton.textContent;
+            copyButton.textContent = '已复制';
+            showToast('内容已复制');
+            setTimeout(() => copyButton.textContent = old, 1200);
+          } catch {
+            showToast('浏览器未允许剪贴板，请手动复制');
+          }
+        }
+      });
+
+      const tabs = [...document.querySelectorAll('.lab-tab')];
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        tabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+        document.querySelectorAll('.lab-panel').forEach(panel => {
+          const active = panel.id === tab.getAttribute('aria-controls');
+          panel.classList.toggle('active', active);
+          panel.hidden = !active;
+        });
+      }));
+
+      document.querySelector('.lab-tabs').addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        const current = tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+        const next = event.key === 'ArrowRight' ? (current + 1) % tabs.length : (current - 1 + tabs.length) % tabs.length;
+        tabs[next].focus();
+        tabs[next].click();
+      });
+    })();
+  </script>
+</body>
+</html>

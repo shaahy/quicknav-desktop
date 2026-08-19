@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Codex 统一词汇与指令示例</title>
+  <meta name="description" content="Codex 项目、任务、对话、Agent、Worktree 等统一词汇与可复制指令模板。">
+  <style>
+    :root {
+      --bg: #f4f2ec;
+      --surface: rgba(255,255,255,.84);
+      --surface-solid: #fff;
+      --ink: #17221f;
+      --muted: #66706c;
+      --line: rgba(23,34,31,.12);
+      --accent: #176b5b;
+      --accent-soft: #dceee8;
+      --warm: #b86035;
+      --warm-soft: #f4e5dc;
+      --code: #14201d;
+      --code-ink: #e9f5f1;
+      --shadow: 0 18px 55px rgba(35,45,41,.09);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 5%, rgba(23,107,91,.12), transparent 30rem),
+        radial-gradient(circle at 90% 30%, rgba(184,96,53,.10), transparent 28rem),
+        var(--bg);
+      font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+      line-height: 1.7;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
+    .hero { padding: 56px 0 30px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--accent); font-weight: 800; letter-spacing: .06em;
+      font-size: 13px; text-transform: uppercase;
+    }
+    h1 { margin: 12px 0 14px; max-width: 850px; font-size: clamp(34px, 6vw, 66px); line-height: 1.08; letter-spacing: -.045em; }
+    .lead { max-width: 760px; margin: 0; color: var(--muted); font-size: clamp(16px, 2.2vw, 20px); }
+    .summary {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 30px;
+    }
+    .summary div { padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); backdrop-filter: blur(12px); }
+    .summary strong { display: block; font-size: 14px; }
+    .summary span { color: var(--muted); font-size: 13px; }
+    .layout { display: grid; grid-template-columns: 230px minmax(0,1fr); gap: 26px; padding: 18px 0 80px; }
+    .side { position: sticky; top: 18px; align-self: start; padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); backdrop-filter: blur(14px); }
+    .side b { display: block; padding: 5px 8px 10px; font-size: 13px; color: var(--muted); }
+    .side a { display: block; padding: 9px 10px; border-radius: 10px; text-decoration: none; font-size: 14px; }
+    .side a:hover, .side a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+    .side button { width: 100%; margin-top: 10px; padding: 9px 12px; color: var(--ink); border: 1px solid var(--line); border-radius: 10px; background: transparent; cursor: pointer; }
+    main { min-width: 0; }
+    section { scroll-margin-top: 20px; margin-bottom: 28px; padding: clamp(22px, 4vw, 38px); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(16px); }
+    .section-head { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin-bottom: 24px; }
+    h2 { margin: 0; font-size: clamp(26px, 4vw, 40px); line-height: 1.2; letter-spacing: -.025em; }
+    .section-head p { max-width: 440px; margin: 0; color: var(--muted); font-size: 14px; }
+    .rule { margin: 0 0 24px; padding: 16px 18px; border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; background: var(--accent-soft); font-weight: 700; }
+    .terms { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .term { padding: 19px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.46); }
+    .term-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .term-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; background: var(--accent-soft); }
+    .term h3 { margin: 0; font-size: 17px; }
+    .term p { margin: 0; color: var(--muted); font-size: 14px; }
+    .term .boundary { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); color: var(--ink); font-size: 13px; }
+    .danger .term-icon { background: var(--warm-soft); }
+    .danger .boundary { color: var(--warm); }
+    .matrix { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
+    .matrix th, .matrix td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+    .matrix th { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
+    .yes { color: var(--accent); font-weight: 800; }
+    .no { color: var(--warm); font-weight: 800; }
+    .templates { display: grid; gap: 16px; }
+    .template { overflow: hidden; border: 1px solid var(--line); border-radius: 17px; background: var(--surface-solid); }
+    .template-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; }
+    .template-title { min-width: 0; }
+    .template-title strong { display: block; font-size: 15px; }
+    .template-title span { display: block; color: var(--muted); font-size: 12px; }
+    .copy { flex: 0 0 auto; padding: 8px 12px; color: var(--accent); border: 1px solid rgba(23,107,91,.24); border-radius: 10px; background: var(--accent-soft); font-weight: 800; font-size: 12px; cursor: pointer; }
+    .copy:hover, .copy:focus-visible { color: white; background: var(--accent); outline: none; }
+    pre { margin: 0; padding: 18px; overflow: auto; white-space: pre-wrap; color: var(--code-ink); background: var(--code); font: 14px/1.75 Consolas, "SFMono-Regular", monospace; }
+    .note { margin-top: 22px; padding: 17px 18px; border-radius: 14px; background: var(--warm-soft); color: #713b23; font-size: 14px; }
+    footer { padding: 0 0 50px; text-align: center; color: var(--muted); font-size: 12px; }
+    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 10; transform: translate(-50%, 20px); padding: 10px 15px; color: white; border-radius: 999px; background: var(--ink); opacity: 0; pointer-events: none; transition: .2s ease; }
+    .toast.show { transform: translate(-50%,0); opacity: 1; }
+    @media (max-width: 880px) {
+      .summary { grid-template-columns: repeat(2,1fr); }
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; display: flex; flex-wrap: wrap; gap: 6px; }
+      .side b { width: 100%; }
+      .side a { flex: 1 1 160px; text-align: center; border: 1px solid var(--line); }
+      .side button { flex: 1 1 160px; margin: 0; }
+    }
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 20px, 1180px); }
+      .hero { padding-top: 34px; }
+      .summary, .terms { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 8px; }
+      section { padding: 20px 15px; }
+      .matrix-wrap { overflow-x: auto; }
+      .matrix { min-width: 620px; }
+    }
+    @media print {
+      body { background: white; }
+      .side, .copy, .toast { display: none !important; }
+      .layout { display: block; }
+      section { box-shadow: none; break-inside: avoid; }
+      pre { color: #111; background: #f2f2f2; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#101815; --surface:rgba(24,35,31,.88); --surface-solid:#18231f; --ink:#edf4f1; --muted:#a8b5b0; --line:rgba(255,255,255,.12); --accent:#72cfb8; --accent-soft:#173b33; --warm:#f1a37d; --warm-soft:#42281e; --code:#09110f; --code-ink:#e8f5f1; --shadow:0 18px 55px rgba(0,0,0,.2); }
+      .term { background: rgba(255,255,255,.025); }
+      .note { color: #f4b895; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero shell">
+    <span class="eyebrow">Codex · Shared Vocabulary</span>
+    <h1>统一词汇与指令示例</h1>
+    <p class="lead">把“项目、任务、对话、Agent、工作树”说准确。后续你与 Codex 沟通时，直接复制模板，再替换任务名称和范围即可。</p>
+    <div class="summary" aria-label="核心关系">
+      <div><strong>项目</strong><span>组织多个任务</span></div>
+      <div><strong>任务 / 对话</strong><span>保存独立历史</span></div>
+      <div><strong>Agent</strong><span>负责实际执行</span></div>
+      <div><strong>Worktree</strong><span>隔离文件环境</span></div>
+    </div>
+  </header>
+
+  <div class="layout shell">
+    <nav class="side" aria-label="页面导航">
+      <b>快速导航</b>
+      <a href="#vocabulary">十二 · 统一词汇</a>
+      <a href="#prompts">十三 · 指令示例</a>
+      <button type="button" onclick="window.print()">打印 / 保存 PDF</button>
+    </nav>
+
+    <main>
+      <section id="vocabulary">
+        <div class="section-head">
+          <h2>十二 · 统一词汇</h2>
+          <p>默认采用下列含义。遇到“分支、子任务”等容易歧义的词，必须加限定词。</p>
+        </div>
+        <p class="rule">共同基准：项目负责组织；任务保存对话；Agent负责执行；Worktree负责隔离文件。</p>
+
+        <div class="terms">
+          <article class="term"><div class="term-top"><span class="term-icon">📁</span><h3>项目 Project</h3></div><p>Codex中的组织容器，关联本地目录、项目指令和多个任务。</p><span class="boundary">一个项目可以包含多个独立任务。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">💬</span><h3>独立任务 / 对话</h3></div><p>左侧项目列表中的一个持久化聊天线程，拥有独立标题、历史和状态。</p><span class="boundary">新建任务，通常就是新建一个独立对话。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">📍</span><h3>当前任务</h3></div><p>你现在正在交流的这个聊天线程。继续当前任务不会产生新的左侧条目。</p><span class="boundary">“停止当前回合”不等于删除或结束整个任务。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🔀</span><h3>聊天分支</h3></div><p>复制当前任务已完成的聊天历史，形成一个新的独立任务。</p><span class="boundary">它不是Git分支；是否隔离文件取决于是否使用Worktree。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🎛️</span><h3>总控任务</h3></div><p>被赋予统筹职责的独立任务：派发、等待、接收回调、验收和决策。</p><span class="boundary">这是职责名称，不是Codex中特殊的技术对象类型。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🧱</span><h3>独立执行任务</h3></div><p>由总控协调、但在左侧拥有自己对话条目的任务，如CA、CE、IR。</p><span class="boundary">推荐称“独立执行任务”，比“子任务”更不容易与子Agent混淆。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">👑</span><h3>主Agent</h3></div><p>当前任务中直接面对用户、负责拆解、执行、汇总和最终交付的根Agent。</p><span class="boundary">主Agent属于一个任务；主Agent本身不是任务。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🤖</span><h3>子Agent</h3></div><p>由主Agent在当前任务内部派生、处理明确子问题的执行Agent。</p><span class="boundary">子Agent会有Agent线程，但默认不是项目左侧的长期独立任务。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🧵</span><h3>Agent线程</h3></div><p>子Agent执行工作的内部线程，可用于查看进度和结果，最终通常回到主线程汇总。</p><span class="boundary">不要把Agent线程称为“独立项目任务”。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">↩️</span><h3>回调消息</h3></div><p>独立执行任务主动发给总控任务的状态消息，包含结果、异常、证据和下一步。</p><span class="boundary">独立任务默认不保证主动回调，必须在派单中明确要求。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🌳</span><h3>Worktree 工作树</h3></div><p>Git仓库的一份隔离checkout，拥有独立文件副本，适合多个任务并行修改。</p><span class="boundary">Worktree不是Git分支；Codex托管Worktree默认可能是detached HEAD。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🏠</span><h3>Local 本地检出</h3></div><p>项目原始目录。多个Local任务可以共享这同一份文件环境。</p><span class="boundary">对话独立不代表文件独立。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🌿</span><h3>Git分支</h3></div><p>Git中的代码版本指针，例如main、feature/login。</p><span class="boundary">必须明确说“Git分支”，不要只说“分支”。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🤝</span><h3>Handoff 交接</h3></div><p>把聊天及其代码状态在Local与关联Worktree之间安全移动，由Codex处理必要Git步骤。</p><span class="boundary">Handoff与“把Git分支合并进main”不是同一个动作。</span></article>
+          <article class="term"><div class="term-top"><span class="term-icon">🔁</span><h3>回合 Turn</h3></div><p>一次用户消息触发的执行周期：读取上下文、调用工具、验证并回复。</p><span class="boundary">一个任务包含多个回合。</span></article>
+          <article class="term danger"><div class="term-top"><span class="term-icon">⚠️</span><h3>避免单独使用“分支”</h3></div><p>“分支”可能指聊天分支、Git分支，也可能被误说成Worktree。</p><span class="boundary">统一改说：聊天分支 / Git分支 / Worktree工作树。</span></article>
+        </div>
+
+        <div class="matrix-wrap">
+          <table class="matrix">
+            <thead><tr><th>对象</th><th>有独立聊天历史</th><th>默认是左侧独立任务</th><th>默认隔离文件</th><th>结果自动回主任务</th></tr></thead>
+            <tbody>
+              <tr><td>新建独立任务</td><td class="yes">是</td><td class="yes">是</td><td class="no">不一定</td><td class="no">否</td></tr>
+              <tr><td>聊天分支</td><td class="yes">是</td><td class="yes">是</td><td class="no">不一定</td><td class="no">否</td></tr>
+              <tr><td>Worktree任务</td><td class="yes">是</td><td class="yes">是</td><td class="yes">是</td><td class="no">否</td></tr>
+              <tr><td>子Agent</td><td>有Agent线程</td><td class="no">否</td><td class="no">通常否</td><td class="yes">是</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="prompts">
+        <div class="section-head">
+          <h2>十三 · 指令示例</h2>
+          <p>每条模板都明确了任务类型、历史继承、文件环境和结果回传方式。</p>
+        </div>
+        <div class="templates">
+          <article class="template"><div class="template-head"><div class="template-title"><strong>继续当前任务</strong><span>不创建新对话</span></div><button class="copy" data-copy>复制</button></div><pre>继续在当前任务中执行，不创建新任务、不创建聊天分支。保留当前对话历史和当前文件环境。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>新建完全独立任务</strong><span>不继承历史</span></div><button class="copy" data-copy>复制</button></div><pre>在“〔项目名称〕”项目中新建一个独立任务，任务名为“〔任务名称〕”。不要继承当前对话历史；从任务说明和指定权威文件开始。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>创建聊天分支，共用当前目录</strong><span>继承历史，不隔离文件</span></div><button class="copy" data-copy>复制</button></div><pre>从当前任务创建聊天分支，继承当前已完成的对话历史；继续使用当前工作目录，不创建新Worktree。两个任务不得同时修改同一文件。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>创建聊天分支并隔离文件</strong><span>继承历史＋新Worktree</span></div><button class="copy" data-copy>复制</button></div><pre>从当前任务创建聊天分支，并在新的Codex托管Worktree中运行。继承当前已完成的对话历史，但文件修改必须与Local目录隔离。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>总控任务协调独立执行任务</strong><span>适合CA、CE、IR等长期阶段</span></div><button class="copy" data-copy>复制</button></div><pre>当前任务作为总控任务，只负责拆解、派发、等待、接收回调、验收和决策。
+
+为“〔阶段/工作名称〕”创建一个新的独立执行任务。该任务是项目中的独立对话，不是子Agent。
+
+独立执行任务无论完成、失败、被中断或遇到阻塞，都必须主动向总控任务发送回调消息。回调必须包含：任务名、状态、结论、修改范围、验证证据、文件路径、Git状态、风险和建议下一步。回调发送成功前，不视为完成交接。
+
+总控任务收到回调后负责验收，并决定继续、返工、停止或派发下一任务。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>当前任务内使用子Agent</strong><span>短期并行、结果自动汇总</span></div><button class="copy" data-copy>复制</button></div><pre>保持在当前任务中，由主Agent派生三个子Agent并行处理：
+1. 子Agent A：〔子问题A〕；
+2. 子Agent B：〔子问题B〕；
+3. 子Agent C：〔子问题C〕。
+
+子Agent只处理明确边界内的工作，不创建项目中的长期独立任务。等待全部子Agent完成，由主Agent核验、解决冲突并统一向我汇报。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>Worktree成果交回Local</strong><span>使用Handoff</span></div><button class="copy" data-copy>复制</button></div><pre>当前任务已在Worktree完成。先核验修改、测试、未提交文件和冲突风险；确认安全后，使用Handoff将当前聊天及代码状态交接回Local。不得覆盖Local中的未提交或并行成果；遇到冲突立即停止并汇报。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>Worktree成果合并到主分支</strong><span>使用Git分支/提交/合并</span></div><button class="copy" data-copy>复制</button></div><pre>当前Worktree成果需要进入主项目。请按以下顺序处理：
+1. 核验Worktree改动与测试结果；
+2. 在Worktree创建明确命名的Git分支“〔分支名〕”；
+3. 只提交本任务范围内的文件；
+4. 检查Local目标分支和未提交修改，确认无覆盖风险；
+5. 将该Git分支合并或择取到“〔目标分支〕”；
+6. 在目标分支重新执行验证；
+7. 验证通过后再清理Worktree。
+
+如存在冲突、脏工作区或无法确认的并行成果，停止合并并先向我汇报。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>停止当前回合但保留任务</strong><span>以后可以继续</span></div><button class="copy" data-copy>复制</button></div><pre>立即停止当前执行回合，不再调用工具或修改文件；保留当前任务、聊天历史和现有工作成果，等待我后续继续。</pre></article>
+
+          <article class="template"><div class="template-head"><div class="template-title"><strong>只读审查任务</strong><span>不允许修改来源</span></div><button class="copy" data-copy>复制</button></div><pre>新建一个独立只读审查任务。审查对象为“〔对象〕”；不得修改来源文件、不得替前序任务修复问题。输出问题、严重度、证据和结论，并在完成或阻塞时主动回调总控任务。</pre></article>
+        </div>
+
+        <p class="note"><strong>推荐用词：</strong>对于左侧长期对话，优先使用“独立执行任务”；对于主Agent内部的临时并行工作，使用“子Agent”。如果一定要说“子任务”，请明确写成“总控协调的独立子任务，不是子Agent”。</p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="shell">本文件完全离线运行 · 无外部资源 · 可直接双击打开</footer>
+  <div class="toast" role="status" aria-live="polite">已复制到剪贴板</div>
+
+  <script>
+    const toast = document.querySelector('.toast');
+    let toastTimer;
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (_) {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        area.remove();
+      }
+    }
+    document.querySelectorAll('[data-copy]').forEach(button => {
+      button.addEventListener('click', async () => {
+        const text = button.closest('.template').querySelector('pre').innerText.trim();
+        await copyText(text);
+        showToast('已复制到剪贴板');
+      });
+    });
+  </script>
+</body>
+</html>

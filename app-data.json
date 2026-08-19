@@ -1022,6 +1022,80 @@
       "isFavorite": false,
       "createdAt": "2026-08-17T03:54:14.328Z",
       "updatedAt": "2026-08-17T03:54:14.328Z"
+    },
+    {
+      "id": "07d93418-cd44-4b6c-8457-70cb2b964eb7",
+      "name": "DeepSeek Harness 实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/DeepSeek Harness实战教程.html",
+        "fileName": "DeepSeek Harness实战教程",
+        "extension": "html",
+        "fileSize": 41629,
+        "mtimeMs": 1786934448977.4106
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-17T06:08:58.070Z",
+      "updatedAt": "2026-08-17T06:08:58.070Z"
+    },
+    {
+      "id": "eedd624c-413b-4523-a8d4-e9a8239fdfe3",
+      "name": "Codex 桌面应用｜全面进阶实战教程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Codex桌面应用全面进阶实战教程.html",
+        "fileName": "Codex桌面应用全面进阶实战教程",
+        "extension": "html",
+        "fileSize": 54689,
+        "mtimeMs": 1786948287505.2402
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-17T08:11:06.656Z",
+      "updatedAt": "2026-08-17T08:11:06.656Z"
+    },
+    {
+      "id": "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
+      "name": "Matt 双工作流完整教程｜从迷雾到交付",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Matt双工作流完整教程.html",
+        "fileName": "Matt双工作流完整教程",
+        "extension": "html",
+        "fileSize": 62402,
+        "mtimeMs": 1786954014133.865
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5",
+        "58b460dc-76e8-49ec-960e-e412a7528992"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-17T08:11:06.656Z",
+      "updatedAt": "2026-08-17T08:11:06.656Z"
+    },
+    {
+      "id": "5cd2c2a3-804a-4367-8c8e-8929d022146a",
+      "name": "Codex 统一词汇与指令示例",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/Codex统一词汇与指令示例.html",
+        "fileName": "Codex统一词汇与指令示例",
+        "extension": "html",
+        "fileSize": 22606,
+        "mtimeMs": 1787132577371.9785
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-08-19T09:47:23.024Z",
+      "updatedAt": "2026-08-19T09:47:23.024Z"
     }
   ],
   "categories": [
@@ -1117,7 +1191,9 @@
         "3e6c78e0-e9cc-48ff-97d7-8eabe90f42af",
         "a8f55385-d72f-40b2-8fc4-629b6cf69e89",
         "b344a4c3-9a5c-477f-9889-abfcd95614f8",
-        "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0"
+        "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0",
+        "07d93418-cd44-4b6c-8457-70cb2b964eb7",
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
       ]
     },
     {
@@ -1178,7 +1254,11 @@
         "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
         "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7",
         "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0",
-        "9d223c7a-a76d-4c0b-ad63-6caaf0ad4f60"
+        "9d223c7a-a76d-4c0b-ad63-6caaf0ad4f60",
+        "07d93418-cd44-4b6c-8457-70cb2b964eb7",
+        "eedd624c-413b-4523-a8d4-e9a8239fdfe3",
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
+        "5cd2c2a3-804a-4367-8c8e-8929d022146a"
       ]
     },
     {
@@ -1197,7 +1277,8 @@
         "6998360c-0e2c-49be-841e-3030ee5c15b7",
         "4bc520d6-e3bc-48e3-b70f-237d4c1b90de",
         "ce94ff41-1a17-4492-8629-71c130051b26",
-        "9d223c7a-a76d-4c0b-ad63-6caaf0ad4f60"
+        "9d223c7a-a76d-4c0b-ad63-6caaf0ad4f60",
+        "eedd624c-413b-4523-a8d4-e9a8239fdfe3"
       ]
     },
     {
@@ -1222,7 +1303,8 @@
         "340b188b-bcd8-4a9c-bf4b-3850d9c4b7b5",
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
         "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
-        "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd"
+        "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd",
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
       ]
     },
     {
@@ -1239,7 +1321,8 @@
         "9d8dd7fa-7845-406a-9b07-18411732f569",
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
         "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
-        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8",
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
       ]
     },
     {
@@ -1250,7 +1333,8 @@
         "3cfb1013-c094-45a0-85e9-34cc1f24c9e7",
         "068bd48b-0000-453c-ac9d-9d76c8e65c12",
         "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
-        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7"
+        "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7",
+        "5cd2c2a3-804a-4367-8c8e-8929d022146a"
       ]
     },
     {

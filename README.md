@@ -14,9 +14,9 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **56 张卡片**、**9 个分类**；其中 **52 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **60 张卡片**、**9 个分类**；其中 **56 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
-### AI开发教程（25）
+### AI开发教程（27）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
@@ -43,6 +43,8 @@
 - [Ponytail × Codex 桌面端｜简明实战教程](<A 教程集合/Ponytail实战教程.html>) · HTML
 - [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
 - [Hermes Agent 教程](<A 教程集合/Hermes Agent实战教程.html>) · HTML
+- [DeepSeek Harness 实战教程](<A 教程集合/DeepSeek Harness实战教程.html>) · HTML
+- [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
 
 ### 技能速查（9）
 
@@ -56,13 +58,14 @@
 - [OpenMontage｜技能速查 + 工作流程图](<A 教程集合/openmontage-skill-quicklook.html>) · HTML
 - [Agent Skills 技能速查](<A 教程集合/Agent Skills技能速查/Agent Skills 技能速查.html>) · HTML
 
-### 新产品开发（5）
+### 新产品开发（6）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
 - [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
 - [两种 BMAD 产品设计交付](<A 教程集合/两种BMAD产品设计交付.html>) · HTML
 - [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
+- [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
 
 ### UX设计（4）
 
@@ -71,7 +74,7 @@
 - [UI UX Pro Max 教程](<A 教程集合/UI UX Pro Max 项目教程.html>) · HTML
 - [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
 
-### 增量开发（6）
+### 增量开发（7）
 
 - [增量迭代：五种开发方式怎么选](<A 教程集合/MVP-V1.0增量迭代方式对比教程/index.html>) · HTML
 - [BMAD Quick Dev 增量开发教程](<A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html>) · HTML
@@ -79,6 +82,7 @@
 - [Spec Kit Flow-Forward｜增量开发实战](<A 教程集合/Spec-kit Flow Forward使用场景与实战教程/Spec-Kit-Flow-Forward-使用场景与实战教程.html>) · HTML
 - [OpenSpec 增量开发实战](<A 教程集合/OpenSpec已上线MVP-V1增量开发实战教程/OpenSpec已上线MVP-V1增量开发实战教程.html>) · HTML
 - [Superpowers 增量开发实战](<A 教程集合/Superpowers上线MVP增量开发教程/superpowers-mvp-incremental-development.html>) · HTML
+- [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
 
 ### bug修复（2）
 
@@ -91,7 +95,7 @@
 - [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
 - [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
 
-### 工作文档（10）
+### 工作文档（11）
 
 - [工作记录](<A 教程集合/工作记录.md>) · MD
 - [AGENTS-卡帕西-开发用](<A 教程集合/AGENTS-卡帕西版本-开发用.md>) · MD
@@ -103,8 +107,9 @@
 - 四个阶段规划 · MD · **本机/外部工作区资料，未随本仓库同步**
 - [常用提示词](<A 教程集合/常用提示词.md>) · MD
 - [Codex规则](<A 教程集合/Codex规则.md>) · MD
+- [Codex 桌面应用｜全面进阶实战教程](<A 教程集合/Codex桌面应用全面进阶实战教程.html>) · HTML
 
-### 其它（6）
+### 其它（7）
 
 - [Github开源项目榜](<A 教程集合/github-top-repos-100k-stars.html>) · HTML
 - [GitHub 项目管理实战教程](<A 教程集合/github-tutorial.html>) · HTML
@@ -112,6 +117,7 @@
 - [Langflow 实战教程](<A 教程集合/Langflow实战教程.html>) · HTML
 - [LangGraph 实战教程](<A 教程集合/LangGraph实战教程.html>) · HTML
 - [Monorepo 工作流实战教程](<A 教程集合/Monorepo工作流实战教程.html>) · HTML
+- [Codex 统一词汇与指令示例](<A 教程集合/Codex统一词汇与指令示例.html>) · HTML
 <!-- tutorial-catalog:end -->
 
 ## 运行环境

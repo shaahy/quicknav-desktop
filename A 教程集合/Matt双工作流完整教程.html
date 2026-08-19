@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Matt Pocock 双工作流完整中文教程：Wayfinder 与 grill-with-docs 两条入口、技能输入输出、设计系统节点和质量门禁。">
+  <title>Matt 双工作流完整教程｜从迷雾到交付</title>
+  <style>
+    :root {
+      --paper: #f4f1e8;
+      --surface: #fffdf7;
+      --ink: #151515;
+      --muted: #625f58;
+      --line: #cbc5b8;
+      --soft: #e8e3d7;
+      --way: #e0522d;
+      --way-soft: #f9ded4;
+      --grill: #176b87;
+      --grill-soft: #d9edf3;
+      --gate: #256b45;
+      --gate-soft: #dcecdf;
+      --violet: #6c4ab6;
+      --violet-soft: #e8e0f7;
+      --danger: #a92d2d;
+      --shadow: 0 12px 30px rgba(21, 21, 21, .08);
+      --radius: 18px;
+      --content: 1180px;
+      --font-display: "Iowan Old Style", "Baskerville", "Songti SC", "STSong", serif;
+      --font-body: "Aptos", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+      --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+    }
+
+    html[data-theme="dark"] {
+      --paper: #121413;
+      --surface: #1a1d1b;
+      --ink: #f2f0e8;
+      --muted: #b9b6ad;
+      --line: #3e423f;
+      --soft: #282c29;
+      --way: #ff7a52;
+      --way-soft: #42271f;
+      --grill: #55b8d7;
+      --grill-soft: #1d3942;
+      --gate: #6dc28f;
+      --gate-soft: #203b2c;
+      --violet: #b69bf1;
+      --violet-soft: #32294a;
+      --danger: #ff8787;
+      --shadow: 0 14px 36px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, transparent 49.8%, rgba(98,95,88,.06) 50%, transparent 50.2%),
+        var(--paper);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+    button, input { font: inherit; }
+    button, a { touch-action: manipulation; }
+    a { color: inherit; text-underline-offset: 3px; }
+    a:hover { color: var(--way); }
+    :focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; }
+    .skip-link {
+      position: fixed; left: 16px; top: -80px; z-index: 1000;
+      padding: 10px 14px; background: var(--ink); color: var(--paper);
+      border-radius: 8px; text-decoration: none;
+    }
+    .skip-link:focus { top: 16px; }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: color-mix(in srgb, var(--paper) 88%, transparent);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+    .topbar-inner {
+      max-width: var(--content); margin: 0 auto; padding: 10px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .brand-mark {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      background: var(--ink); color: var(--paper); font: 700 13px/1 var(--font-mono);
+      border-radius: 50%; flex: 0 0 auto;
+    }
+    .brand strong { font-size: 14px; letter-spacing: .04em; white-space: nowrap; }
+    .toolbar { display: flex; gap: 8px; align-items: center; }
+    .icon-button {
+      min-height: 42px; padding: 8px 12px; border: 1px solid var(--line);
+      border-radius: 999px; background: var(--surface); color: var(--ink);
+      cursor: pointer; transition: border-color .2s ease, background .2s ease;
+    }
+    .icon-button:hover { border-color: var(--ink); background: var(--soft); }
+
+    .hero {
+      max-width: var(--content); margin: 0 auto; padding: clamp(56px, 8vw, 112px) 24px 52px;
+      display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr); gap: 52px;
+      align-items: end;
+    }
+    .eyebrow { font: 700 12px/1.2 var(--font-mono); text-transform: uppercase; letter-spacing: .13em; color: var(--muted); }
+    h1, h2, h3 { font-family: var(--font-display); line-height: 1.12; margin: 0; }
+    h1 { font-size: clamp(46px, 8vw, 104px); letter-spacing: -.055em; max-width: 850px; }
+    h1 span { color: var(--way); }
+    .hero-copy { max-width: 690px; font-size: clamp(18px, 2vw, 23px); line-height: 1.58; color: var(--muted); margin: 26px 0 0; }
+    .edition {
+      border-top: 6px solid var(--ink); border-bottom: 1px solid var(--line); padding: 18px 0;
+      display: grid; gap: 16px;
+    }
+    .edition-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+    .edition-row span:first-child { color: var(--muted); }
+    .edition-row span:last-child { text-align: right; font-weight: 700; }
+
+    .decision-band { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); }
+    .decision-inner { max-width: var(--content); margin: 0 auto; padding: 34px 24px; }
+    .route-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
+    .route-button {
+      min-height: 90px; text-align: left; padding: 18px 20px; border: 2px solid var(--line); border-radius: 14px;
+      color: var(--ink); background: var(--paper); cursor: pointer; transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .route-button:hover { transform: translateY(-2px); }
+    .route-button[aria-pressed="true"][data-route="wayfinder"] { border-color: var(--way); background: var(--way-soft); }
+    .route-button[aria-pressed="true"][data-route="grill"] { border-color: var(--grill); background: var(--grill-soft); }
+    .route-button strong { display: block; font-size: 20px; margin-bottom: 3px; }
+    .route-button small { color: var(--muted); }
+
+    .layout {
+      max-width: var(--content); margin: 0 auto; padding: 48px 24px 100px;
+      display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 56px;
+    }
+    .side-nav { position: sticky; top: 78px; align-self: start; }
+    .side-nav ol { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+    .side-nav a {
+      display: block; padding: 7px 10px; color: var(--muted); text-decoration: none; border-left: 2px solid transparent;
+      font-size: 14px;
+    }
+    .side-nav a:hover { color: var(--ink); border-left-color: var(--way); }
+    .side-nav .mini-rule { border-top: 1px solid var(--line); margin: 20px 0; }
+    .side-note { font-size: 12px; color: var(--muted); }
+
+    main { min-width: 0; }
+    section { scroll-margin-top: 84px; margin-bottom: 88px; }
+    .section-head { display: grid; grid-template-columns: 72px 1fr; gap: 20px; align-items: start; margin-bottom: 28px; }
+    .section-no { font: 700 13px/1 var(--font-mono); padding-top: 9px; border-top: 3px solid var(--ink); }
+    h2 { font-size: clamp(34px, 5vw, 58px); letter-spacing: -.035em; }
+    .lede { max-width: 760px; color: var(--muted); font-size: 18px; margin: 14px 0 0; }
+    h3 { font-size: 25px; letter-spacing: -.02em; }
+    h4 { margin: 0 0 8px; font-size: 15px; letter-spacing: .02em; }
+    p { margin: 0 0 1em; }
+    code, .code { font-family: var(--font-mono); font-size: .9em; }
+    code { padding: .12em .38em; border-radius: 5px; background: var(--soft); }
+
+    .callout {
+      padding: 20px 22px; border: 1px solid var(--line); border-left: 6px solid var(--ink);
+      border-radius: 0 var(--radius) var(--radius) 0; background: var(--surface); margin: 22px 0;
+    }
+    .callout.way { border-left-color: var(--way); }
+    .callout.grill { border-left-color: var(--grill); }
+    .callout.gate { border-left-color: var(--gate); }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+    .comparison-card { padding: 24px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+    .comparison-card.way { border-top: 8px solid var(--way); }
+    .comparison-card.grill { border-top: 8px solid var(--grill); }
+    .comparison-card ul { padding-left: 20px; margin-bottom: 0; }
+
+    .workflow-rail { position: relative; display: grid; gap: 14px; }
+    .workflow-rail::before { content: ""; position: absolute; left: 28px; top: 28px; bottom: 28px; width: 2px; background: var(--line); }
+    details.step {
+      position: relative; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+      overflow: clip; box-shadow: 0 6px 20px rgba(21,21,21,.04);
+    }
+    details.step[open] { box-shadow: var(--shadow); }
+    details.step summary {
+      list-style: none; cursor: pointer; display: grid; grid-template-columns: 58px minmax(0,1fr) auto; gap: 16px;
+      align-items: center; min-height: 88px; padding: 14px 20px 14px 0;
+    }
+    details.step summary::-webkit-details-marker { display: none; }
+    .step-index {
+      position: relative; z-index: 2; width: 58px; height: 58px; display: grid; place-items: center;
+      border-radius: 0 50% 50% 0; background: var(--ink); color: var(--paper); font: 700 13px/1 var(--font-mono);
+    }
+    .step.way .step-index { background: var(--way); color: #fff; }
+    .step.grill .step-index { background: var(--grill); color: #fff; }
+    .step.design .step-index { background: var(--violet); color: #fff; }
+    .step.gate .step-index { background: var(--gate); color: #fff; }
+    .step-title strong { display: block; font-size: 19px; }
+    .step-title small { color: var(--muted); }
+    .chevron { width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; font-size: 20px; }
+    details[open] .chevron { transform: rotate(45deg); }
+    .step-body { border-top: 1px solid var(--line); padding: 24px 24px 28px 74px; }
+    .io-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin: 18px 0; }
+    .io { padding: 16px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); }
+    .io-label { font: 700 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 9px; }
+    .io ul { padding-left: 18px; margin: 0; }
+    .exit { padding: 13px 15px; border-radius: 10px; background: var(--gate-soft); color: var(--ink); }
+
+    .ticket-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin: 18px 0; }
+    .ticket { min-height: 150px; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
+    .ticket .type { font: 700 11px/1 var(--font-mono); color: var(--muted); }
+    .ticket strong { display: block; margin: 12px 0 5px; }
+
+    .artifact-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; background: var(--surface); }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { font: 700 12px/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: .05em; background: var(--soft); }
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { font-weight: 700; }
+
+    .design-node {
+      position: relative; padding: clamp(24px, 4vw, 42px); border: 2px solid var(--violet); border-radius: 24px;
+      background: linear-gradient(140deg, var(--violet-soft), var(--surface) 58%); overflow: hidden;
+    }
+    .design-node::after { content: "DS"; position: absolute; right: -12px; bottom: -52px; font: 800 160px/1 var(--font-display); color: color-mix(in srgb, var(--violet) 10%, transparent); }
+    .design-node > * { position: relative; z-index: 1; }
+    .token-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .token { padding: 7px 10px; border-radius: 999px; border: 1px solid var(--violet); background: var(--surface); font: 600 12px/1 var(--font-mono); }
+
+    .gate-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+    .gate-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 20px; }
+    .gate-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; border-bottom: 1px solid var(--line); padding-bottom: 12px; margin-bottom: 12px; }
+    .gate-id { font: 800 12px/1 var(--font-mono); color: var(--gate); }
+    .owner { padding: 5px 8px; border-radius: 999px; background: var(--gate-soft); font-size: 11px; font-weight: 700; }
+    .checklist { padding-left: 0; list-style: none; margin: 0; }
+    .checklist li { position: relative; padding-left: 24px; margin: 7px 0; }
+    .checklist li::before { content: ""; position: absolute; left: 0; top: .42em; width: 11px; height: 11px; border: 2px solid var(--gate); border-radius: 3px; }
+
+    .skill-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .search {
+      min-height: 44px; flex: 1 1 260px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 10px;
+      background: var(--surface); color: var(--ink);
+    }
+    .skill-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+    .skill-card { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .skill-card[hidden] { display: none; }
+    .skill-name { font: 700 14px/1.2 var(--font-mono); color: var(--violet); }
+    .skill-card p { color: var(--muted); margin: 10px 0 0; font-size: 14px; }
+
+    .case-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    .case { padding: 20px; border-top: 5px solid var(--ink); background: var(--surface); border-radius: 0 0 14px 14px; }
+    .case .path { margin-top: 14px; font: 600 12px/1.6 var(--font-mono); color: var(--muted); }
+
+    .summary-box { background: #151515; color: #f4f1e8; padding: clamp(28px, 5vw, 56px); border-radius: 24px; }
+    .summary-box h2 { color: #fff; max-width: 760px; }
+    .summary-box p { color: #d7d2c7; max-width: 760px; font-size: 18px; }
+    .rule { font: 700 clamp(20px, 3vw, 34px)/1.45 var(--font-display); margin-top: 24px; padding-top: 22px; border-top: 1px solid #595b57; }
+    .source-list { columns: 2; column-gap: 34px; padding-left: 20px; }
+    .source-list li { break-inside: avoid; margin-bottom: 8px; }
+    .footer { max-width: var(--content); margin: 0 auto; padding: 28px 24px 46px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; gap: 20px; }
+
+    .route-panel[hidden] { display: none; }
+    .status-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; }
+    .status-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--gate); }
+
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; }
+      .edition { max-width: 560px; }
+      .layout { grid-template-columns: 1fr; gap: 28px; }
+      .side-nav { position: static; overflow-x: auto; padding-bottom: 8px; }
+      .side-nav ol { display: flex; width: max-content; }
+      .side-nav a { border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+      .side-nav a:hover { border-bottom-color: var(--way); }
+      .side-nav .mini-rule, .side-note { display: none; }
+      .ticket-grid, .skill-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .case-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 660px) {
+      body { font-size: 16px; }
+      .topbar-inner { padding-inline: 14px; }
+      .brand strong { display: none; }
+      .icon-button { min-width: 44px; padding-inline: 10px; }
+      .button-label { display: none; }
+      .hero { padding: 48px 18px 36px; gap: 30px; }
+      .decision-inner, .layout { padding-left: 18px; padding-right: 18px; }
+      .route-toggle, .comparison, .gate-grid, .io-grid, .ticket-grid, .skill-grid { grid-template-columns: 1fr; }
+      .section-head { grid-template-columns: 48px 1fr; gap: 14px; }
+      .section-no { font-size: 11px; }
+      details.step summary { grid-template-columns: 52px minmax(0,1fr) 30px; gap: 10px; padding-right: 12px; }
+      .step-index { width: 52px; height: 52px; }
+      .step-title strong { font-size: 16px; }
+      .step-body { padding: 20px 16px 24px; }
+      .workflow-rail::before { display: none; }
+      .source-list { columns: 1; }
+      .footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+
+    @media print {
+      :root { --paper: #fff; --surface: #fff; --ink: #000; --muted: #333; --line: #aaa; }
+      body { background: #fff; font-size: 10.5pt; }
+      .topbar, .side-nav, .decision-band, .skill-tools { display: none !important; }
+      .route-panel[hidden] { display: block !important; }
+      .hero, .layout { max-width: none; padding: 20px 0; display: block; }
+      .hero { border-bottom: 2px solid #000; }
+      h1 { font-size: 44pt; }
+      section { break-inside: auto; margin-bottom: 32px; }
+      details.step { break-inside: avoid; box-shadow: none; }
+      details.step > .step-body { display: block !important; }
+      .comparison-card, .gate-card, .case { box-shadow: none; break-inside: avoid; }
+      .summary-box { background: #fff; color: #000; border: 2px solid #000; }
+      .summary-box h2, .summary-box p { color: #000; }
+      a { text-decoration: none; }
+      .footer { max-width: none; padding-inline: 0; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">MW</span>
+        <strong>Matt Workflow Field Guide</strong>
+      </div>
+      <div class="toolbar" aria-label="页面工具">
+        <span class="status-pill">离线可用</span>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="切换深浅主题"><span aria-hidden="true">◐</span> <span class="button-label">主题</span></button>
+        <button class="icon-button" id="printButton" type="button" aria-label="打印或另存为 PDF"><span aria-hidden="true">▣</span> <span class="button-label">打印</span></button>
+      </div>
+    </div>
+  </header>
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Two routes · One quality system</div>
+      <h1>从<span>迷雾</span><br>到可验证交付</h1>
+      <p class="hero-copy">一份面向 OPC/DRI 超级个体的 Matt Pocock 双工作流教程：何时用 Wayfinder 管理跨会话决策，何时用 grill-with-docs 在一次会话内收敛，并把 UI 设计系统、规格、实施和质量门禁连接成可复用的交付链。</p>
+    </div>
+    <aside class="edition" aria-label="教程版本信息">
+      <div class="edition-row"><span>版本</span><span>2026-08-17</span></div>
+      <div class="edition-row"><span>源码基线</span><span>mattpocock/skills · main</span></div>
+      <div class="edition-row"><span>补充节点</span><span>ui-ux-pro-max</span></div>
+      <div class="edition-row"><span>交付形态</span><span>单文件 / 无外部依赖</span></div>
+    </aside>
+  </header>
+
+  <div class="decision-band">
+    <div class="decision-inner">
+      <div class="eyebrow">先选入口，不要先选工具</div>
+      <div class="route-toggle" role="group" aria-label="选择查看的工作流">
+        <button class="route-button" type="button" data-route="wayfinder" aria-pressed="true">
+          <strong>路线 A｜Wayfinder 开端</strong>
+          <small>跨多个会话、决策相互依赖、通往目标的路线仍有迷雾</small>
+        </button>
+        <button class="route-button" type="button" data-route="grill" aria-pressed="false">
+          <strong>路线 B｜grill-with-docs 开端</strong>
+          <small>真实仓库内、一个高质量会话能够完成核心决策收敛</small>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <nav class="side-nav" aria-label="教程目录">
+      <div class="eyebrow">Contents</div>
+      <ol>
+        <li><a href="#choose">01 入口判断</a></li>
+        <li><a href="#setup">02 共同前置</a></li>
+        <li><a href="#route-wayfinder">03A Wayfinder 路线</a></li>
+        <li><a href="#route-grill">03B Grill 路线</a></li>
+        <li><a href="#design-system">04 设计系统节点</a></li>
+        <li><a href="#artifacts">05 输入与输出</a></li>
+        <li><a href="#gates">06 质量门禁</a></li>
+        <li><a href="#skills">07 辅助技能</a></li>
+        <li><a href="#cases">08 场景案例</a></li>
+        <li><a href="#sources">09 来源与边界</a></li>
+      </ol>
+      <div class="mini-rule"></div>
+      <p class="side-note">提示：步骤卡片可展开；顶部可切换主题或打印为 PDF。</p>
+    </nav>
+
+    <main id="main">
+      <section id="choose">
+        <div class="section-head">
+          <div class="section-no">01</div>
+          <div>
+            <h2>先判断“装不装得下”</h2>
+            <p class="lede">二者的分界不是“复杂产品与简单项目”，而是决策是否能在一次会话内收敛，以及路线是否仍然处于迷雾中。</p>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <article class="comparison-card way">
+            <div class="eyebrow">Use Wayfinder when</div>
+            <h3>路线还看不清</h3>
+            <ul>
+              <li>工作明显超过一个 Agent 会话。</li>
+              <li>研究、原型、人类决策之间存在依赖。</li>
+              <li>当前只能描述目的地，还不能直接写可靠规格。</li>
+              <li>需要多人或多 Agent 通过认领和阻塞关系协作。</li>
+            </ul>
+          </article>
+          <article class="comparison-card grill">
+            <div class="eyebrow">Use grill-with-docs when</div>
+            <h3>一个会话能够谈清</h3>
+            <ul>
+              <li>已经在一个可安全写入的代码仓库中。</li>
+              <li>变更边界大体明确，只存在若干软点。</li>
+              <li>需要将术语和少数关键决定留在仓库中。</li>
+              <li>结束后可以沿同一上下文立即进入规格阶段。</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          <strong>最短选择规则</strong>
+          已经能精确描述需求就跳过两者；一次会话装不下且路线仍模糊，用 <code>/wayfinder</code>；一次会话能收敛且有仓库，用 <code>/grill-with-docs</code>；没有仓库的独立想法才考虑 <code>/grill-me</code>。
+        </div>
+      </section>
+
+      <section id="setup">
+        <div class="section-head">
+          <div class="section-no">02</div>
+          <div>
+            <h2>共同前置：先让仓库会说话</h2>
+            <p class="lede"><code>/setup-matt-pocock-skills</code> 是每个仓库运行一次的配置步骤。它配置工作流读写的位置，不安装技能，也不替代产品规划。</p>
+          </div>
+        </div>
+
+        <div class="workflow-rail">
+          <details class="step" open>
+            <summary>
+              <span class="step-index">S0</span>
+              <span class="step-title"><strong>/setup-matt-pocock-skills</strong><small>配置 Issue Tracker、领域文档与可选 Triage 标签</small></span>
+              <span class="chevron" aria-hidden="true">+</span>
+            </summary>
+            <div class="step-body">
+              <p>先探索 Git remote、现有 <code>AGENTS.md</code>/<code>CLAUDE.md</code>、领域文档、<code>.scratch/</code> 和 monorepo 信号，再展示草案并等待确认。它不是无脑脚手架。</p>
+              <div class="io-grid">
+                <div class="io"><div class="io-label">核心输入</div><ul><li>真实仓库结构与 Git remote</li><li>Issue Tracker 选择</li><li>单上下文或多上下文布局</li></ul></div>
+                <div class="io"><div class="io-label">核心输出</div><ul><li><code>docs/agents/issue-tracker.md</code></li><li><code>docs/agents/domain.md</code></li><li>可选 <code>triage-labels.md</code></li><li>Agent instructions 中的指针区块</li></ul></div>
+              </div>
+              <div class="exit"><strong>G0 通过条件：</strong>工作流知道去哪里读写 Issue、领域词汇和 ADR；配置草案已由人确认，没有重复覆盖现有规则。</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="route-wayfinder" class="route-panel" data-panel="wayfinder">
+        <div class="section-head">
+          <div class="section-no">03A</div>
+          <div>
+            <h2>路线 A：Wayfinder 从迷雾开图</h2>
+            <p class="lede">这条路线先找到“怎么走”，再进入“怎么建”。Wayfinder 的票是决策问题，不是实现切片；默认规划，不实施。</p>
+          </div>
+        </div>
+
+        <div class="workflow-rail">
+          <details class="step way" open>
+            <summary><span class="step-index">A1</span><span class="step-title"><strong>命名 Destination</strong><small>/wayfinder 内部调用 grilling + domain-modeling</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>先说清“地图完成时应得到什么”：可以是一份可交给 <code>to-spec</code> 的清晰路线，也可以是必须锁定的重大决策。Destination 固定本轮工作的范围。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>大型但松散的想法</li><li>现有仓库、历史决定与限制</li><li>谁拥有最终产品决策权</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>1–2 行 Destination</li><li>Notes：领域、偏好、必用技能</li><li>初步 Out of scope</li></ul></div></div>
+              <div class="exit"><strong>门禁：</strong>目的地必须可判断“是否到达”，而不是“做一个更好的产品”这类不可验证表达。</div>
+            </div>
+          </details>
+
+          <details class="step way">
+            <summary><span class="step-index">A2</span><span class="step-title"><strong>Chart the map</strong><small>广度优先识别 frontier、blocked 与 fog</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>创建一个标记为 <code>wayfinder:map</code> 的地图 Issue。能准确提问的内容建成子票；尚不能准确提问的内容保留在 <code>Not yet specified</code>，不要过早伪装成任务。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>Destination 与范围边界</li><li>现有事实和依赖关系</li><li>Issue Tracker 的 Wayfinding 约定</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>一个 canonical map Issue</li><li>可精确表述的 child tickets</li><li>native blocking edges</li><li>fog 与 Out of scope</li></ul></div></div>
+              <div class="ticket-grid">
+                <div class="ticket"><span class="type">AFK</span><strong>Research</strong><span>外部知识阻塞决策；由研究 Agent 查一手来源。</span></div>
+                <div class="ticket"><span class="type">HITL</span><strong>Prototype</strong><span>外观或行为无法靠文字决定；做低成本可反应原型。</span></div>
+                <div class="ticket"><span class="type">HITL</span><strong>Grilling</strong><span>默认类型；用户回答取舍，Agent 查事实并校准术语。</span></div>
+                <div class="ticket"><span class="type">AFK / HITL</span><strong>Task</strong><span>不是决策，但必须先完成才能继续判断的实际工作。</span></div>
+              </div>
+              <div class="exit"><strong>关键停止点：</strong>画图会话到此结束；除研究票外，不要顺手解决其他票。</div>
+            </div>
+          </details>
+
+          <details class="step way">
+            <summary><span class="step-index">A3</span><span class="step-title"><strong>逐票推进 Frontier</strong><small>每个会话原则上只认领并解决一张非研究票</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>每次只加载地图的低分辨率视图，再选择开放、未阻塞、无人认领的票。先 claim，再工作；解决后把答案写入 resolution，关闭票，并在地图的 <code>Decisions so far</code> 增加一行指针。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">每次会话输入</div><ul><li>Map URL/编号</li><li>一张 frontier ticket</li><li>相关历史决策的按需链接</li></ul></div><div class="io"><div class="io-label">每次会话输出</div><ul><li>一条可追溯 resolution</li><li>关闭并解除后续阻塞</li><li>新票、重连依赖或 fog 升格</li><li>地图中的上下文指针</li></ul></div></div>
+              <div class="exit"><strong>并发纪律：</strong>认领是防重机制；HITL 票必须由真人回答，Agent 不得替用户做决定。</div>
+            </div>
+          </details>
+
+          <details class="step design">
+            <summary><span class="step-index">A4</span><span class="step-title"><strong>设计系统规范节点</strong><small>ui-ux-pro-max；UI 项目必经，纯后端可跳过</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>当产品类型、用户、视觉方向和技术栈已经由地图决策明确后，生成并持久化设计系统。若“应该长什么样”仍未解决，先返回 Wayfinder 建立 prototype ticket，而不是让设计工具替产品负责人做决定。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>已解决的产品与品牌决策</li><li>目标受众和使用情境</li><li>检测到的真实技术栈</li><li>原型验证结论</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li><code>design-system/&lt;slug&gt;/MASTER.md</code></li><li>可选页面覆盖文件</li><li>无障碍、响应式和反模式约束</li></ul></div></div>
+              <div class="exit"><strong>G2 通过条件：</strong>设计系统已确认，并作为后续 spec 的权威输入；已有 MASTER 不得被静默覆盖。</div>
+            </div>
+          </details>
+
+          <details class="step">
+            <summary><span class="step-index">A5</span><span class="step-title"><strong>从地图折叠为 Spec</strong><small>/to-spec：综合既有决策，不重新访谈</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>当地图不再有阻塞目的地的未决问题，使用 <code>/to-spec</code> 将分散在票据中的决策折叠成一份可实施规格。不要从 map 直接跳到 implement，否则会丢失跨票细节。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>Map 与所有 resolution 指针</li><li>领域词汇、ADR、代码库现状</li><li>设计系统 MASTER 与页面覆盖</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>Tracker 中的完整 Spec</li><li>Problem / Solution / User Stories</li><li>Implementation / Testing Decisions</li><li>Out of Scope；<code>ready-for-agent</code></li></ul></div></div>
+              <div class="exit"><strong>G3 通过条件：</strong>测试 seam 已与用户确认；规格可追溯至地图决策和设计系统。</div>
+            </div>
+          </details>
+
+          <details class="step">
+            <summary><span class="step-index">A6</span><span class="step-title"><strong>Tracer-bullet 拆票</strong><small>/to-tickets：把 Spec 变成可独立验证的实现切片</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>每张票应纵向穿过必要层次并可单独演示，能够放入一个新上下文窗口。先展示拆分与 blocking edges，获得用户批准后再发布。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>批准后的 Spec</li><li>代码库 seam 与 prefactor 机会</li><li>设计系统中的 UI 约束</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>每票一个 Issue 或 Markdown 文件</li><li>What to build + Acceptance criteria</li><li>Blocked by 关系</li><li><code>ready-for-agent</code> 状态</li></ul></div></div>
+              <div class="exit"><strong>G4 通过条件：</strong>没有“只做数据库/只做 UI”的横向切片；每票可演示、可验证、依赖真实。</div>
+            </div>
+          </details>
+
+          <details class="step gate">
+            <summary><span class="step-index">A7</span><span class="step-title"><strong>逐票实施、体验验收与审查</strong><small>/implement → 建议 QA 门禁 → /code-review</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>按 frontier 逐票实施。<code>/implement</code> 在预先约定的 seam 上使用 TDD，持续执行类型检查与单测，最后跑完整测试。UI 工作还必须在真实浏览器中验证，不能用绿测试代替视觉验收。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">实施证据</div><ul><li>代码、测试、类型检查和 commit</li><li>设计系统引用与页面覆盖</li><li>真实浏览器截图、控制台和无障碍检查</li></ul></div><div class="io"><div class="io-label">审查输出</div><ul><li>Standards 轴报告</li><li>Spec 轴报告</li><li>交互 QA 形成的缺陷 Issue</li><li>最终人工验收结论</li></ul></div></div>
+              <div class="callout gate"><strong>当前官方顺序的已知断点</strong><code>implement</code> 原文要求“先 code-review、再 commit”，但 <code>code-review</code> 只审固定点到 <code>HEAD</code> 的已提交 diff，可能看不到工作树变化。更稳妥的质量做法是：形成可审实现 commit → 新会话指定基准 fixed point 做独立 review → 修复并复审。真实项目中的 commit 仍须遵守项目授权规则。</div>
+              <div class="exit"><strong>G5–G7：</strong>机械检查、真实运行、人工视觉接受和双轴审查全部独立通过，才算交付。</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="route-grill" class="route-panel" data-panel="grill" hidden>
+        <div class="section-head">
+          <div class="section-no">03B</div>
+          <div>
+            <h2>路线 B：一次会话收敛再构建</h2>
+            <p class="lede"><code>/grill-with-docs</code> 是同一个 <code>grilling</code> 访谈引擎，加上 <code>domain-modeling</code> 的仓库持久化纪律。它不是完整工作流，只是主链入口。</p>
+          </div>
+        </div>
+
+        <div class="workflow-rail">
+          <details class="step grill" open>
+            <summary><span class="step-index">B1</span><span class="step-title"><strong>/grill-with-docs</strong><small>设计树、frontier 分轮追问、领域语言即时落盘</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p><code>grilling</code> 将方案视为决策树，每一轮只询问前置决策已经解决的 frontier；每题给出推荐答案。环境事实由 Agent 查询，真正的取舍由用户决定。<code>domain-modeling</code> 同时检查术语、边界和代码矛盾。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">核心输入</div><ul><li>一个仓库内的想法、变更或设计</li><li>现有 CONTEXT、ADR 与代码事实</li><li>用户的范围与产品取舍</li></ul></div><div class="io"><div class="io-label">核心输出</div><ul><li>对话中的共同理解</li><li>确认术语写入 <code>CONTEXT.md</code></li><li>极少数关键决定写入 <code>docs/adr/</code></li><li>明确 Out of scope</li></ul></div></div>
+              <div class="callout grill"><strong>不要误判输出</strong><code>CONTEXT.md</code> 只是词汇表，不是 Spec；普通决定仍只在当前会话中。frontier 为空后，还必须由用户确认“共同理解已经形成”，不得自动开始实施。</div>
+              <div class="exit"><strong>G1 通过条件：</strong>没有沉默假设；术语与代码事实不冲突；用户明确确认理解一致。</div>
+            </div>
+          </details>
+
+          <details class="step">
+            <summary><span class="step-index">B2</span><span class="step-title"><strong>按需插入 Research / Prototype</strong><small>谈话不能替代事实与可运行答案</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>外部资料不清楚时，让 <code>/research</code> 读取一手来源；UI 手感、状态模型或交互行为无法靠文字决定时，用 <code>/prototype</code> 制作一次性答案。获得事实或观察后回到原决策树，而不是把原型当成生产实现。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">研究输出</div><ul><li>带一手来源引用的 Markdown</li><li>回答事实，不替用户做决定</li></ul></div><div class="io"><div class="io-label">原型输出</div><ul><li>UI route 或逻辑单 HTML</li><li>throwaway branch 上的 primary source</li><li>问题、观察与结论指针</li></ul></div></div>
+              <div class="exit"><strong>回环条件：</strong>新证据必须回到 grilling 形成用户决策；不能把工具输出默认为批准。</div>
+            </div>
+          </details>
+
+          <details class="step design">
+            <summary><span class="step-index">B3</span><span class="step-title"><strong>设计系统规范节点</strong><small>ui-ux-pro-max：把已收敛的产品方向变成可执行视觉规则</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>从已确认的产品类型、用户情境、风格关键词和真实技术栈生成设计系统。先检查是否已有 MASTER；页面级差异写 overrides，不在组件中散落任意颜色和间距。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>grill 已确认的产品与交互决定</li><li>从仓库检测的 stack</li><li>品牌资产与已有视觉语言</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li><code>design-system/&lt;slug&gt;/MASTER.md</code></li><li><code>pages/&lt;page&gt;.md</code> 可选覆盖</li><li>tokens、layout、a11y、motion 约束</li></ul></div></div>
+              <div class="exit"><strong>G2 通过条件：</strong>设计系统由人确认，覆盖核心状态、响应式和无障碍，不与既有品牌语言冲突。</div>
+            </div>
+          </details>
+
+          <details class="step">
+            <summary><span class="step-index">B4</span><span class="step-title"><strong>/to-spec</strong><small>留在同一会话，综合既有共识而不是重新访谈</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>由于大多数普通决定没有写入 CONTEXT 或 ADR，最佳做法是在同一上下文中立即调用 <code>/to-spec</code>。若必须跨会话，使用 <code>/handoff</code> 引用已有产物，并明确下一会话目标。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>完整 grill 对话上下文</li><li>CONTEXT、ADR、代码库事实</li><li>设计系统 MASTER</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>Tracker 上的 Spec</li><li>广泛 User Stories</li><li>Implementation / Testing Decisions</li><li>已确认 testing seams</li></ul></div></div>
+              <div class="exit"><strong>G3 通过条件：</strong>规格没有重新发明决定；范围、验收、测试与 UI 规范均可追溯。</div>
+            </div>
+          </details>
+
+          <details class="step">
+            <summary><span class="step-index">B5</span><span class="step-title"><strong>/to-tickets</strong><small>将已理解的 Spec 拆成纵向可验证切片</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>先草拟 ticket 与阻塞关系，向用户确认粒度、依赖、合并和拆分，再发布。不要把 Wayfinder 的“决策票”和这里的“实现票”混为一谈。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">输入</div><ul><li>已批准 Spec</li><li>现有 seam 与 prefactor 机会</li></ul></div><div class="io"><div class="io-label">输出</div><ul><li>Issue Tracker tickets</li><li>本地模式：每票一个 Markdown</li><li>Acceptance criteria + Blocked by</li></ul></div></div>
+              <div class="exit"><strong>G4 通过条件：</strong>每票一个新上下文可完成、可单独演示；宽重构使用 expand–migrate–contract。</div>
+            </div>
+          </details>
+
+          <details class="step gate">
+            <summary><span class="step-index">B6</span><span class="step-title"><strong>实施、浏览器验收与双轴审查</strong><small>/implement → 建议 QA 门禁 → /code-review</small></span><span class="chevron" aria-hidden="true">+</span></summary>
+            <div class="step-body">
+              <p>逐票实施；UI 必须检查设计系统一致性、断点、键盘、对比度、reduced motion、控制台和真实交互。当前 Matt 官方 <code>main</code> 已没有 <code>/qa</code> 技能，因此这里的 QA 是本教程建议的运行时与人工验收门禁；发现的问题应按项目 Tracker 规则形成 durable Issue。</p>
+              <div class="io-grid"><div class="io"><div class="io-label">核心证据</div><ul><li>测试、类型检查、full suite</li><li>真实浏览器和人工视觉验收</li><li>QA 缺陷 Issue 及处理状态</li></ul></div><div class="io"><div class="io-label">最终输出</div><ul><li>代码与 commits</li><li>Standards / Spec 双轴报告</li><li>确认通过或明确剩余风险</li></ul></div></div>
+              <div class="callout gate"><strong>审查顺序建议</strong>官方 <code>implement</code> 与 <code>code-review</code> 的已提交 diff 前提存在衔接断点。建议形成可审 commit 后，在新上下文中明确 fixed point 独立审查；再处理发现并复审。</div>
+              <div class="exit"><strong>G5–G7：</strong>测试绿不等于体验通过；审查绿也不能覆盖用户拒绝的视觉结果。</div>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="design-system">
+        <div class="section-head">
+          <div class="section-no">04</div>
+          <div>
+            <h2>设计系统节点不是“美化”</h2>
+            <p class="lede">它把已经确认的产品方向压缩成后续规格、拆票、实施和审查共同遵守的视觉与体验契约。</p>
+          </div>
+        </div>
+
+        <article class="design-node">
+          <div class="eyebrow">ui-ux-pro-max · required for new UI</div>
+          <h3>先生成 MASTER，再允许页面覆盖</h3>
+          <p>推荐顺序：检测真实 stack → 读取已有 MASTER → 用多维关键词生成设计系统 → 持久化 → 按需增加页面 override → 进行 UX、stack 和交付检查。若查询返回 0 条结果，必须改用更宽关键词重试，不能虚构命中。</p>
+          <div class="token-row" aria-label="设计系统包含内容">
+            <span class="token">Product pattern</span><span class="token">Style</span><span class="token">Color tokens</span><span class="token">Typography</span><span class="token">Spacing</span><span class="token">Responsive</span><span class="token">Accessibility</span><span class="token">Motion</span><span class="token">Anti-patterns</span><span class="token">Stack rules</span>
+          </div>
+          <div class="io-grid">
+            <div class="io"><div class="io-label">必须先有</div><ul><li>产品类型与行业</li><li>目标用户与使用情境</li><li>已确认的视觉关键词</li><li>从项目检测的技术栈</li></ul></div>
+            <div class="io"><div class="io-label">持久化文件</div><ul><li><code>design-system/&lt;project-slug&gt;/MASTER.md</code></li><li><code>design-system/&lt;project-slug&gt;/pages/&lt;page&gt;.md</code></li><li>页面覆盖优先于 MASTER，其余继承 MASTER</li></ul></div>
+          </div>
+        </article>
+
+        <div class="callout gate">
+          <strong>建议插入位置</strong>
+          在 G1“决策收敛”之后、G3“正式规格”之前。原因是它需要稳定的产品输入，而 Spec 又应引用它作为 UI 约束。纯后端任务可显式标记 N/A；有 UI 的任务不应跳过。
+        </div>
+      </section>
+
+      <section id="artifacts">
+        <div class="section-head"><div class="section-no">05</div><div><h2>技能、输入与输出物总表</h2><p class="lede">区分“文件”“Issue”“对话共识”和“验证证据”，避免误以为每个技能都会生成文档。</p></div></div>
+        <div class="artifact-table-wrap">
+          <table>
+            <thead><tr><th>技能 / 节点</th><th>核心输入</th><th>核心输出</th><th>关键边界</th></tr></thead>
+            <tbody>
+              <tr><td>setup-matt-pocock-skills</td><td>仓库、remote、tracker 选择、上下文布局</td><td><code>docs/agents/*.md</code> 与 Agent skills 指针</td><td>每仓库一次；先展示草案再写</td></tr>
+              <tr><td>wayfinder</td><td>Destination、范围、仓库与 Tracker</td><td>Map Issue、decision tickets、blocking、resolutions</td><td>决策票，不是实现票；默认不实施</td></tr>
+              <tr><td>grill-with-docs</td><td>仓库内想法、现有代码/词汇/ADR</td><td>对话共识、<code>CONTEXT.md</code>、少数 ADR</td><td>一次会话；不是完整 Spec</td></tr>
+              <tr><td>research</td><td>一个需要一手资料回答的事实问题</td><td>带引用的单一 Markdown 研究文件</td><td>查事实，不替用户决定</td></tr>
+              <tr><td>prototype</td><td>一个无法靠谈话解决的行为或视觉问题</td><td>throwaway 原型、分支与上下文指针</td><td>保留答案，不把原型当生产代码</td></tr>
+              <tr><td>ui-ux-pro-max</td><td>产品、受众、风格、真实 stack</td><td>设计系统 MASTER 与页面 overrides</td><td>先读现有 MASTER；不得静默覆盖</td></tr>
+              <tr><td>to-spec</td><td>当前上下文/地图决策、代码、领域文档、设计系统</td><td>Tracker Spec；<code>ready-for-agent</code></td><td>综合，不重新访谈</td></tr>
+              <tr><td>to-tickets</td><td>已批准 Spec、代码 seam、依赖</td><td>每票一个 Issue/Markdown 与 blocking edges</td><td>用户批准拆分后发布</td></tr>
+              <tr><td>implement</td><td>Spec 或 frontier ticket、预定 testing seam</td><td>代码、测试、review 调用与 commit</td><td>持续单测/类型检查；官方 review-before-commit 存在 diff 断点</td></tr>
+              <tr><td>建议 QA 门禁</td><td>可运行产品、关键路径、设计系统和验收标准</td><td>浏览器/运行时证据、视觉接受、缺陷 Issue</td><td>非 Matt 当前官方技能；不能被 code-review 替代</td></tr>
+              <tr><td>code-review</td><td>固定点、三点 diff、Spec、仓库标准</td><td>Standards 与 Spec 两轴发现</td><td>两轴不互相掩盖；固定点必须有效</td></tr>
+              <tr><td>handoff</td><td>当前会话与下一会话目标</td><td>OS 临时目录中的上下文压缩 Markdown</td><td>引用已有产物，不复制；必须脱敏</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="gates">
+        <div class="section-head"><div class="section-no">06</div><div><h2>八个质量门禁</h2><p class="lede">门禁的意义不是增加仪式，而是防止一种证据替另一种证据背书。绿测试、代码审查和人工接受各自回答不同问题。</p></div></div>
+        <div class="gate-grid">
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G0</span><h3>仓库准备</h3></div><span class="owner">Agent + 人确认</span></div><ul class="checklist"><li>Tracker、领域文档和标签位置明确</li><li>现有 Agent instructions 未被重复或覆盖</li><li>技能已安装与仓库已配置分开检查</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G1</span><h3>决策收敛</h3></div><span class="owner">人负责</span></div><ul class="checklist"><li>Wayfinder：目的地前无阻塞性 fog/票</li><li>Grill：frontier 为空且用户明确确认</li><li>范围外内容与沉默假设已显式化</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G2</span><h3>设计系统</h3></div><span class="owner">设计 + 人确认</span></div><ul class="checklist"><li>MASTER 与页面覆盖层级清楚</li><li>颜色、排版、间距、状态和组件一致</li><li>响应式、键盘、对比度和 reduced motion 有规则</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G3</span><h3>规格完整</h3></div><span class="owner">Agent 起草 + 人批准</span></div><ul class="checklist"><li>Problem、Solution、User Stories 完整</li><li>Implementation / Testing Decisions 可执行</li><li>Out of Scope、seams 与设计系统引用明确</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G4</span><h3>实现就绪</h3></div><span class="owner">人批准拆票</span></div><ul class="checklist"><li>每票是纵向、可演示的 tracer bullet</li><li>一个新上下文可完成</li><li>Blocking edges 真实；宽重构使用 expand–contract</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G5</span><h3>机械验证</h3></div><span class="owner">Agent</span></div><ul class="checklist"><li>预定 seam 上的测试通过</li><li>类型检查、单测和 full suite 有新鲜证据</li><li>没有用“应该能运行”代替实际命令</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G6</span><h3>真实体验</h3></div><span class="owner">Agent + 人接受</span></div><ul class="checklist"><li>真实浏览器/应用生命周期验证</li><li>关键断点、控制台、键盘和无障碍检查</li><li>视觉结果由产品负责人明确接受</li></ul></article>
+          <article class="gate-card"><div class="gate-top"><div><span class="gate-id">G7</span><h3>最终审查</h3></div><span class="owner">双轴 Reviewer</span></div><ul class="checklist"><li>Standards 与 Spec 分开报告</li><li>无未解释 scope creep 或缺失需求</li><li>QA Issue 已关闭、接受或明确延期</li></ul></article>
+        </div>
+      </section>
+
+      <section id="skills">
+        <div class="section-head"><div class="section-no">07</div><div><h2>辅助技能按问题插入</h2><p class="lede">不要把所有技能排成一条僵硬流水线。辅助技能是针对特定阻塞类型的分支，并在取得答案后回到主链。</p></div></div>
+        <div class="skill-tools">
+          <label for="skillSearch" class="eyebrow" style="align-self:center">筛选技能</label>
+          <input class="search" id="skillSearch" type="search" placeholder="输入：研究、原型、交接、审查……" autocomplete="off">
+          <button class="icon-button" type="button" id="expandAll">展开全部步骤</button>
+          <button class="icon-button" type="button" id="collapseAll">收起全部步骤</button>
+        </div>
+        <div class="skill-grid" id="skillGrid">
+          <article class="skill-card" data-search="grilling 访谈 决策 frontier 推荐答案"><span class="skill-name">/grilling</span><p>所有 grill 入口的底层机制；事实由 Agent 找，决策由用户做。</p></article>
+          <article class="skill-card" data-search="domain modeling 领域 术语 glossary context adr"><span class="skill-name">/domain-modeling</span><p>校准领域语言，维护 CONTEXT.md，并克制地记录 ADR。</p></article>
+          <article class="skill-card" data-search="research 研究 一手来源 文档"><span class="skill-name">/research</span><p>外部知识阻塞决策时，由后台 Agent 读取权威来源并写研究文件。</p></article>
+          <article class="skill-card" data-search="prototype 原型 ui 状态 交互 行为"><span class="skill-name">/prototype</span><p>文字无法回答外观或行为时，用一次性可运行物提高讨论保真度。</p></article>
+          <article class="skill-card" data-search="handoff 交接 跨会话 上下文 临时"><span class="skill-name">/handoff</span><p>在必须换会话、换工具或换执行者时压缩上下文，只引用现有权威产物。</p></article>
+          <article class="skill-card" data-search="tdd 测试 red green refactor seam"><span class="skill-name">/tdd</span><p>实施阶段在预定 seam 上形成短反馈闭环，不拿内部实现细节当行为契约。</p></article>
+          <article class="skill-card" data-search="qa 验收 bug issue 缺陷 用户 浏览器 运行时"><span class="skill-name">建议 QA 门禁</span><p>当前 Matt main 没有 /qa；使用项目测试、浏览器工具和人工验收形成运行时证据与缺陷 Issue。</p></article>
+          <article class="skill-card" data-search="code review standards spec 审查 差异"><span class="skill-name">/code-review</span><p>从固定点审查三点 diff，分别检查仓库标准与规格一致性。</p></article>
+          <article class="skill-card" data-search="ui ux design system 设计系统 无障碍 响应式"><span class="skill-name">ui-ux-pro-max</span><p>在产品决策收敛后生成并持久化设计系统，成为规格与实施的 UI 权威。</p></article>
+        </div>
+      </section>
+
+      <section id="cases">
+        <div class="section-head"><div class="section-no">08</div><div><h2>三个典型场景</h2><p class="lede">同一个产品可能在不同尺度上选择不同入口。入口由当前决策范围决定，而不是由项目名决定。</p></div></div>
+        <div class="case-grid">
+          <article class="case"><div class="eyebrow">Case 01 · 增量功能</div><h3>桌面应用新增收藏视图</h3><p>仓库与产品边界明确，一个会话能谈清数据模型、入口和空状态。</p><div class="path">setup → grill-with-docs → design system/page override → to-spec → to-tickets → implement → browser acceptance → review</div></article>
+          <article class="case"><div class="eyebrow">Case 02 · 平台级产品</div><h3>从零建设数字人运营平台</h3><p>业务角色、内容生产、资产、权限和交付链相互依赖，无法一次谈清。</p><div class="path">setup → wayfinder map → research/prototype/grilling tickets → design system → to-spec → tickets → iterative delivery</div></article>
+          <article class="case"><div class="eyebrow">Case 03 · 复杂但清晰</div><h3>支付模块协议升级</h3><p>技术实施很难，但目标和边界可能清楚。实现难度高不自动等于需要 Wayfinder。</p><div class="path">grill-with-docs（如仍有取舍）→ to-spec → expand–migrate–contract tickets → implement → review</div></article>
+        </div>
+      </section>
+
+      <section>
+        <div class="summary-box">
+          <div class="eyebrow" style="color:#aaa">Final rule</div>
+          <h2>先收敛决定，再固化规范，然后才允许拆票和实现。</h2>
+          <p>Wayfinder 管“一个会话装不下的决策空间”；grill-with-docs 管“一个会话能谈清并需要留下仓库共识的变更”；ui-ux-pro-max 把已确认方向转成设计契约。三者都不能替用户承担最终产品决定。</p>
+          <div class="rule">迷雾未清，不写 Spec。设计未定，不拆 UI 票。证据未新鲜，不宣布完成。用户未接受，不以绿测试代替。</div>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="section-head"><div class="section-no">09</div><div><h2>来源、假设与适用边界</h2><p class="lede">本教程以 2026-08-17 核对的官方仓库当前结构与本机技能源码为基线。链接仅供追溯，不是页面运行依赖。</p></div></div>
+        <ul class="source-list">
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md">wayfinder / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md">grill-with-docs / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md">grilling / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md">domain-modeling / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/SKILL.md">setup-matt-pocock-skills / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-spec/SKILL.md">to-spec / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/to-tickets/SKILL.md">to-tickets / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/implement/SKILL.md">implement / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/code-review/SKILL.md">code-review / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/research/SKILL.md">research / SKILL.md</a></li>
+          <li><a href="https://github.com/mattpocock/skills/blob/main/skills/engineering/prototype/SKILL.md">prototype / SKILL.md</a></li>
+        </ul>
+        <div class="callout">
+          <strong>教程中的建议性扩展</strong>
+          <code>ui-ux-pro-max</code> 不是 Matt 官方工作流的一部分；本教程将其作为外部设计系统节点嵌入。当前 Matt <code>main</code> 也没有 <code>/qa</code> 技能，所以运行时与人工 QA 以建议门禁呈现。G0–G7 是基于各技能职责组合出的质量治理建议，并非 Matt 仓库中的单一原文流程。
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <span>Matt 双工作流完整教程 · 为长期离线保存而制作</span>
+    <span>HTML / CSS / JavaScript 全部内嵌 · 无网络运行依赖</span>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const routeButtons = [...document.querySelectorAll('[data-route]')];
+      const panels = [...document.querySelectorAll('[data-panel]')];
+
+      function setRoute(route) {
+        routeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.route === route)));
+        panels.forEach(panel => { panel.hidden = panel.dataset.panel !== route; });
+      }
+      routeButtons.forEach(button => button.addEventListener('click', () => {
+        setRoute(button.dataset.route);
+        const target = document.querySelector(`[data-panel="${button.dataset.route}"]`);
+        target?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      }));
+
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        document.getElementById('themeToggle').setAttribute('aria-label', next === 'dark' ? '切换到浅色主题' : '切换到深色主题');
+      });
+      document.getElementById('printButton').addEventListener('click', () => window.print());
+
+      const allSteps = [...document.querySelectorAll('details.step')];
+      document.getElementById('expandAll').addEventListener('click', () => allSteps.forEach(step => { step.open = true; }));
+      document.getElementById('collapseAll').addEventListener('click', () => allSteps.forEach(step => { step.open = false; }));
+
+      const search = document.getElementById('skillSearch');
+      const cards = [...document.querySelectorAll('.skill-card')];
+      search.addEventListener('input', () => {
+        const query = search.value.trim().toLocaleLowerCase('zh-CN');
+        cards.forEach(card => {
+          const haystack = `${card.dataset.search || ''} ${card.textContent}`.toLocaleLowerCase('zh-CN');
+          card.hidden = Boolean(query) && !haystack.includes(query);
+        });
+      });
+
+      window.addEventListener('beforeprint', () => allSteps.forEach(step => { step.dataset.wasOpen = String(step.open); step.open = true; }));
+      window.addEventListener('afterprint', () => allSteps.forEach(step => { step.open = step.dataset.wasOpen === 'true'; delete step.dataset.wasOpen; }));
+    })();
+  </script>
+</body>
+</html>
