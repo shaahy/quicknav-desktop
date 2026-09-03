@@ -14,7 +14,7 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **60 张卡片**、**9 个分类**；其中 **56 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **61 张卡片**、**9 个分类**；其中 **57 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
 ### AI开发教程（27）
 
@@ -95,7 +95,7 @@
 - [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
 - [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
 
-### 工作文档（11）
+### 工作文档（12）
 
 - [工作记录](<A 教程集合/工作记录.md>) · MD
 - [AGENTS-卡帕西-开发用](<A 教程集合/AGENTS-卡帕西版本-开发用.md>) · MD
@@ -108,6 +108,7 @@
 - [常用提示词](<A 教程集合/常用提示词.md>) · MD
 - [Codex规则](<A 教程集合/Codex规则.md>) · MD
 - [Codex 桌面应用｜全面进阶实战教程](<A 教程集合/Codex桌面端隐藏功能与进阶使用教程-重制版.html>) · HTML
+- [需求版本治理规则](<A 教程集合/版本化产品需求治理规则.md>) · MD
 
 ### 其它（7）
 
