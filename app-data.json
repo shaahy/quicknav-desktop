@@ -1114,6 +1114,96 @@
       "isFavorite": false,
       "createdAt": "2026-09-03T08:53:34.912Z",
       "updatedAt": "2026-09-03T08:53:34.912Z"
+    },
+    {
+      "id": "13099569-e106-4b0b-9976-182929017844",
+      "name": "超级智能体新版8个场景",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/超级智能体新版8个场景.md",
+        "fileName": "超级智能体新版8个场景",
+        "extension": "md",
+        "fileSize": 28348,
+        "mtimeMs": 1788333467275.3691
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-16T01:30:54.654Z",
+      "updatedAt": "2026-09-16T01:30:54.654Z"
+    },
+    {
+      "id": "1f2b8866-8efc-469c-96ef-e126bfe95e55",
+      "name": "超级智能体新版四阶段规划-8场景路演版",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/超级智能体新版四阶段规划-8场景路演版.pptx",
+        "fileName": "超级智能体新版四阶段规划-8场景路演版",
+        "extension": "pptx",
+        "fileSize": 11309594,
+        "mtimeMs": 1788333969950.2483
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-16T01:30:54.654Z",
+      "updatedAt": "2026-09-16T01:30:54.654Z"
+    },
+    {
+      "id": "9ee996e6-d4ac-484e-825e-615d9d58328f",
+      "name": "超级智能体新版四阶段规划",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/超级智能体新版四阶段规划.md",
+        "fileName": "超级智能体新版四阶段规划",
+        "extension": "md",
+        "fileSize": 22550,
+        "mtimeMs": 1788332994100.5635
+      },
+      "categoryIds": [
+        "572e876b-8996-46da-b618-8d5380a94045"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-16T01:30:54.654Z",
+      "updatedAt": "2026-09-16T01:30:54.654Z"
+    },
+    {
+      "id": "d6edcdc5-47a7-4fae-8062-7fb5bb0fa88a",
+      "name": "道德经 · 原文与注解",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/道德经·原文与悬停注解.html",
+        "fileName": "道德经·原文与悬停注解",
+        "extension": "html",
+        "fileSize": 362965,
+        "mtimeMs": 1789445331256.249
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-16T01:39:59.494Z",
+      "updatedAt": "2026-09-16T01:39:59.494Z"
+    },
+    {
+      "id": "07d0fa91-54ee-473c-9b9c-4f7fd3c18eba",
+      "name": "字里有生活 · 甲骨文随身读本",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/甲骨文100字-离线读本.html",
+        "fileName": "甲骨文100字-离线读本",
+        "extension": "html",
+        "fileSize": 969272,
+        "mtimeMs": 1789523648394.6384
+      },
+      "categoryIds": [
+        "6e6bad8d-0100-4f99-827c-06a47dc270d6"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-16T03:16:29.829Z",
+      "updatedAt": "2026-09-16T03:16:29.829Z"
     }
   ],
   "categories": [
@@ -1277,7 +1367,12 @@
         "eedd624c-413b-4523-a8d4-e9a8239fdfe3",
         "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
         "5cd2c2a3-804a-4367-8c8e-8929d022146a",
-        "bf9b0cb0-dfb6-4052-a747-bd1b4ba4b6ee"
+        "bf9b0cb0-dfb6-4052-a747-bd1b4ba4b6ee",
+        "13099569-e106-4b0b-9976-182929017844",
+        "1f2b8866-8efc-469c-96ef-e126bfe95e55",
+        "9ee996e6-d4ac-484e-825e-615d9d58328f",
+        "d6edcdc5-47a7-4fae-8062-7fb5bb0fa88a",
+        "07d0fa91-54ee-473c-9b9c-4f7fd3c18eba"
       ]
     },
     {
@@ -1298,7 +1393,10 @@
         "ce94ff41-1a17-4492-8629-71c130051b26",
         "9d223c7a-a76d-4c0b-ad63-6caaf0ad4f60",
         "eedd624c-413b-4523-a8d4-e9a8239fdfe3",
-        "bf9b0cb0-dfb6-4052-a747-bd1b4ba4b6ee"
+        "bf9b0cb0-dfb6-4052-a747-bd1b4ba4b6ee",
+        "13099569-e106-4b0b-9976-182929017844",
+        "1f2b8866-8efc-469c-96ef-e126bfe95e55",
+        "9ee996e6-d4ac-484e-825e-615d9d58328f"
       ]
     },
     {
@@ -1354,7 +1452,9 @@
         "068bd48b-0000-453c-ac9d-9d76c8e65c12",
         "16bea9bb-f9f2-47ed-99eb-b913d7ec7b7d",
         "c24eb491-fdaf-4a45-8eb6-8ab33771cbd7",
-        "5cd2c2a3-804a-4367-8c8e-8929d022146a"
+        "5cd2c2a3-804a-4367-8c8e-8929d022146a",
+        "d6edcdc5-47a7-4fae-8062-7fb5bb0fa88a",
+        "07d0fa91-54ee-473c-9b9c-4f7fd3c18eba"
       ]
     },
     {

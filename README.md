@@ -14,7 +14,7 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **61 张卡片**、**9 个分类**；其中 **57 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **66 张卡片**、**9 个分类**；其中 **62 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
 ### AI开发教程（27）
 
@@ -95,7 +95,7 @@
 - [dbskill内容与逐字稿](<A 教程集合/dbskill-Codex桌面端实战教程.html>) · HTML
 - [Humanizer-zh 去AI味](<A 教程集合/Humanizer-zh技能实战教程.html>) · HTML
 
-### 工作文档（12）
+### 工作文档（15）
 
 - [工作记录](<A 教程集合/工作记录.md>) · MD
 - [AGENTS-卡帕西-开发用](<A 教程集合/AGENTS-卡帕西版本-开发用.md>) · MD
@@ -109,8 +109,11 @@
 - [Codex规则](<A 教程集合/Codex规则.md>) · MD
 - [Codex 桌面应用｜全面进阶实战教程](<A 教程集合/Codex桌面端隐藏功能与进阶使用教程-重制版.html>) · HTML
 - [需求版本治理规则](<A 教程集合/版本化产品需求治理规则.md>) · MD
+- [超级智能体新版8个场景](<A 教程集合/超级智能体新版8个场景.md>) · MD
+- [超级智能体新版四阶段规划-8场景路演版](<A 教程集合/超级智能体新版四阶段规划-8场景路演版.pptx>) · PPTX
+- [超级智能体新版四阶段规划](<A 教程集合/超级智能体新版四阶段规划.md>) · MD
 
-### 其它（7）
+### 其它（9）
 
 - [Github开源项目榜](<A 教程集合/github-top-repos-100k-stars.html>) · HTML
 - [GitHub 项目管理实战教程](<A 教程集合/github-tutorial.html>) · HTML
@@ -119,6 +122,8 @@
 - [LangGraph 实战教程](<A 教程集合/LangGraph实战教程.html>) · HTML
 - [Monorepo 工作流实战教程](<A 教程集合/Monorepo工作流实战教程.html>) · HTML
 - [Codex 统一词汇与指令示例](<A 教程集合/Codex统一词汇与指令示例.html>) · HTML
+- [道德经 · 原文与注解](<A 教程集合/道德经·原文与悬停注解.html>) · HTML
+- [字里有生活 · 甲骨文随身读本](<A 教程集合/甲骨文100字-离线读本.html>) · HTML
 <!-- tutorial-catalog:end -->
 
 ## 运行环境
