@@ -14,9 +14,9 @@
 <!-- tutorial-catalog:start -->
 > 本节由 `app-data.json` 自动生成。请勿直接编辑标记之间的列表；更新卡片后运行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/update-readme-tutorial-catalog.ps1`。
 
-当前共 **66 张卡片**、**9 个分类**；其中 **62 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
+当前共 **69 张卡片**、**10 个分类**；其中 **65 项**随仓库同步，**4 项**属于本机或相邻工作区。一个卡片可以属于多个分类，因此会在不同分类中重复出现。
 
-### AI开发教程（27）
+### AI开发教程（28）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
@@ -45,6 +45,7 @@
 - [Hermes Agent 教程](<A 教程集合/Hermes Agent实战教程.html>) · HTML
 - [DeepSeek Harness 实战教程](<A 教程集合/DeepSeek Harness实战教程.html>) · HTML
 - [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
+- [基于AI的产研协作流程](<A 教程集合/基于AI的产研协作流程.html>) · HTML
 
 ### 技能速查（9）
 
@@ -58,7 +59,7 @@
 - [OpenMontage｜技能速查 + 工作流程图](<A 教程集合/openmontage-skill-quicklook.html>) · HTML
 - [Agent Skills 技能速查](<A 教程集合/Agent Skills技能速查/Agent Skills 技能速查.html>) · HTML
 
-### 新产品开发（6）
+### 新产品开发（7）
 
 - [完整产品开发流程教程](<A 教程集合/完整产品开发流程可视化教程/完整产品开发流程教程.html>) · HTML
 - [六套框架选型与实战SOP](<A 教程集合/AI工程化全流程框架调研/index.html>) · HTML
@@ -66,6 +67,7 @@
 - [两种 BMAD 产品设计交付](<A 教程集合/两种BMAD产品设计交付.html>) · HTML
 - [Matt+UX+SP完整开发流程](<A 教程集合/Matt-UIUX-Pro-Max-Superpowers工作流教程.html>) · HTML
 - [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
+- [基于AI的产研协作流程](<A 教程集合/基于AI的产研协作流程.html>) · HTML
 
 ### UX设计（4）
 
@@ -74,7 +76,7 @@
 - [UI UX Pro Max 教程](<A 教程集合/UI UX Pro Max 项目教程.html>) · HTML
 - [BMAD 新产品 0→1 完整教程](<A 教程集合/BMAD新产品0-1完整流程教程/index.html>) · HTML
 
-### 增量开发（7）
+### 增量开发（8）
 
 - [增量迭代：五种开发方式怎么选](<A 教程集合/MVP-V1.0增量迭代方式对比教程/index.html>) · HTML
 - [BMAD Quick Dev 增量开发教程](<A 教程集合/BMAD Quick Dev已有V1增量开发教程/index.html>) · HTML
@@ -83,6 +85,7 @@
 - [OpenSpec 增量开发实战](<A 教程集合/OpenSpec已上线MVP-V1增量开发实战教程/OpenSpec已上线MVP-V1增量开发实战教程.html>) · HTML
 - [Superpowers 增量开发实战](<A 教程集合/Superpowers上线MVP增量开发教程/superpowers-mvp-incremental-development.html>) · HTML
 - [Matt 双工作流完整教程｜从迷雾到交付](<A 教程集合/Matt双工作流完整教程.html>) · HTML
+- [基于AI的产研协作流程](<A 教程集合/基于AI的产研协作流程.html>) · HTML
 
 ### bug修复（2）
 
@@ -112,6 +115,11 @@
 - [超级智能体新版8个场景](<A 教程集合/超级智能体新版8个场景.md>) · MD
 - [超级智能体新版四阶段规划-8场景路演版](<A 教程集合/超级智能体新版四阶段规划-8场景路演版.pptx>) · PPTX
 - [超级智能体新版四阶段规划](<A 教程集合/超级智能体新版四阶段规划.md>) · MD
+
+### ESP32（2）
+
+- [EMO 机器人 · 引脚使用图](<A 教程集合/EMO机器人引脚使用图.html>) · HTML
+- [ESP32引脚说明](<A 教程集合/ESP32引脚说明.html>) · HTML
 
 ### 其它（9）
 

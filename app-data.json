@@ -1204,6 +1204,62 @@
       "isFavorite": false,
       "createdAt": "2026-09-16T03:16:29.829Z",
       "updatedAt": "2026-09-16T03:16:29.829Z"
+    },
+    {
+      "id": "8895586c-f535-4170-975b-41f283f25381",
+      "name": "基于AI的产研协作流程",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/基于AI的产研协作流程.html",
+        "fileName": "基于AI的产研协作流程",
+        "extension": "html",
+        "fileSize": 49877,
+        "mtimeMs": 1789970791967.3105
+      },
+      "categoryIds": [
+        "0e59029a-e4ec-41fa-981a-c2a69bb8485d",
+        "58b460dc-76e8-49ec-960e-e412a7528992",
+        "d02b4519-bd86-4c2e-87cf-a258ccbfa3a5"
+      ],
+      "isFavorite": true,
+      "createdAt": "2026-09-21T06:12:26.114Z",
+      "updatedAt": "2026-09-21T06:14:01.868Z"
+    },
+    {
+      "id": "76aa9fec-b402-4aa7-b14e-7e4f4e8d6822",
+      "name": "EMO 机器人 · 引脚使用图",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/EMO机器人引脚使用图.html",
+        "fileName": "EMO机器人引脚使用图",
+        "extension": "html",
+        "fileSize": 72212,
+        "mtimeMs": 1790160785761.173
+      },
+      "categoryIds": [
+        "67c8000b-0248-4b40-a0c0-4396381d825e"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-24T05:49:54.269Z",
+      "updatedAt": "2026-09-24T05:49:54.269Z"
+    },
+    {
+      "id": "9d2e29d9-adc9-43f8-82d8-5cb24c26e8ab",
+      "name": "ESP32引脚说明",
+      "note": null,
+      "fileReference": {
+        "relativePath": "A 教程集合/ESP32引脚说明.html",
+        "fileName": "ESP32引脚说明",
+        "extension": "html",
+        "fileSize": 975615,
+        "mtimeMs": 1790159680568.5803
+      },
+      "categoryIds": [
+        "67c8000b-0248-4b40-a0c0-4396381d825e"
+      ],
+      "isFavorite": false,
+      "createdAt": "2026-09-24T05:49:54.269Z",
+      "updatedAt": "2026-09-24T05:49:54.269Z"
     }
   ],
   "categories": [
@@ -1264,9 +1320,16 @@
       "createdAt": "2026-07-24T03:04:28.023Z"
     },
     {
+      "id": "67c8000b-0248-4b40-a0c0-4396381d825e",
+      "name": "ESP32",
+      "order": 8,
+      "type": "user",
+      "createdAt": "2026-09-24T05:49:10.848Z"
+    },
+    {
       "id": "6e6bad8d-0100-4f99-827c-06a47dc270d6",
       "name": "其它",
-      "order": 8,
+      "order": 9,
       "type": "user",
       "createdAt": "2026-08-03T02:29:24.578Z"
     }
@@ -1301,7 +1364,8 @@
         "b344a4c3-9a5c-477f-9889-abfcd95614f8",
         "e2bf9c78-24a1-4e9b-8530-b844cd0fe7e0",
         "07d93418-cd44-4b6c-8457-70cb2b964eb7",
-        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
+        "8895586c-f535-4170-975b-41f283f25381"
       ]
     },
     {
@@ -1372,7 +1436,10 @@
         "1f2b8866-8efc-469c-96ef-e126bfe95e55",
         "9ee996e6-d4ac-484e-825e-615d9d58328f",
         "d6edcdc5-47a7-4fae-8062-7fb5bb0fa88a",
-        "07d0fa91-54ee-473c-9b9c-4f7fd3c18eba"
+        "07d0fa91-54ee-473c-9b9c-4f7fd3c18eba",
+        "8895586c-f535-4170-975b-41f283f25381",
+        "76aa9fec-b402-4aa7-b14e-7e4f4e8d6822",
+        "9d2e29d9-adc9-43f8-82d8-5cb24c26e8ab"
       ]
     },
     {
@@ -1422,7 +1489,8 @@
         "0f07b97d-5716-4ce0-bd9c-c26aae3cdf3e",
         "7cbf7b54-f17d-46d8-9e04-bd16ade9dd8c",
         "9d4568e4-1fc7-4355-b65a-788b1ea4d9bd",
-        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
+        "8895586c-f535-4170-975b-41f283f25381"
       ]
     },
     {
@@ -1440,7 +1508,8 @@
         "cb2e1745-8a1a-4ff6-8f15-24c8b8e0afb0",
         "3d9b8764-178f-44ea-9ab0-7c7496d98d99",
         "b344a4c3-9a5c-477f-9889-abfcd95614f8",
-        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4"
+        "4fe7cac9-93ef-4886-9ae7-419ac0be37d4",
+        "8895586c-f535-4170-975b-41f283f25381"
       ]
     },
     {
@@ -1480,7 +1549,15 @@
         "238f1926-f7f5-4dd5-9fa0-196d4b570546",
         "31a20f30-15d2-4b46-90d2-3e25ce65db4f",
         "b59015ec-8dc5-432a-a3d5-61d88c7e2c35",
-        "b344a4c3-9a5c-477f-9889-abfcd95614f8"
+        "b344a4c3-9a5c-477f-9889-abfcd95614f8",
+        "8895586c-f535-4170-975b-41f283f25381"
+      ]
+    },
+    {
+      "viewType": "category:67c8000b-0248-4b40-a0c0-4396381d825e",
+      "cardIds": [
+        "76aa9fec-b402-4aa7-b14e-7e4f4e8d6822",
+        "9d2e29d9-adc9-43f8-82d8-5cb24c26e8ab"
       ]
     }
   ]
